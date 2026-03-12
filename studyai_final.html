@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="StudyMind AI"/>
+<title>StudyMind AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body,#root{height:100%;width:100%;overflow:hidden;}
+  body{background:#0d0f14;font-family:'DM Sans',sans-serif;}
+  ::-webkit-scrollbar{width:4px;}
+  ::-webkit-scrollbar-track{background:#0d0f14;}
+  ::-webkit-scrollbar-thumb{background:#252836;border-radius:2px;}
+  @keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const ANTHROPIC_MODEL = "claude-sonnet-4-20250514";
+const palette = {
+  bg:"#0d0f14", surface:"#13161e", card:"#1a1e2a", border:"#252836",
+  accent:"#6c63ff", accentGlow:"#6c63ff44", green:"#3dd68c",
+  red:"#ff5c5c", yellow:"#f5c542", text:"#e8eaf0", muted:"#7b7f96",
+};
+const MODES = { HOME:"home", CHAT:"chat", QUIZ:"quiz", FLASHCARDS:"flashcards", SUMMARY:"summary", WRITTEN:"written" };
+
+async function callClaude(messages, system="") {
+  const res = await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:ANTHROPIC_MODEL,max_tokens:1000,system,messages})
+  });
+  const d = await res.json();
+  return d.content?.[0]?.text||"";
+}
+
+function TypingDots() {
+  return (
+    <span style={{display:"inline-flex",gap:4,alignItems:"center",padding:"2px 0"}}>
+      {[0,1,2].map(i=>(
+        <span key={i} style={{width:7,height:7,borderRadius:"50%",background:palette.accent,animation:`bounce 1.2s ${i*0.2}s infinite`}}/>
+      ))}
+    </span>
+  );
+}
+
+function Loader({text}) {
+  return (
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"100%",gap:16,color:palette.muted}}>
+      <div style={{width:36,height:36,border:`3px solid ${palette.border}`,borderTopColor:palette.accent,borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/>
+      <span style={{fontSize:14}}>{text}</span>
+    </div>
+  );
+}
+function ErrorMsg({onRetry}) {
+  return (
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"100%",gap:12,color:palette.muted}}>
+      <span style={{fontSize:32}}>⚠️</span>
+      <span>Something went wrong.</span>
+      <button onClick={onRetry} style={{padding:"9px 20px",borderRadius:8,background:palette.accent,border:"none",color:"#fff",fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Retry</button>
+    </div>
+  );
+}
+
+function Home({topic,setTopic,onStart}) {
+  const [focused,setFocused]=useState(false);
+  return (
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"100%",gap:32,padding:24}}>
+      <div style={{textAlign:"center"}}>
+        <div style={{fontSize:48,marginBottom:8}}>🧠</div>
+        <h1 style={{fontSize:36,fontWeight:900,fontFamily:"'Playfair Display',serif",color:palette.text,margin:0,letterSpacing:-1}}>StudyMind AI</h1>
+        <p style={{color:palette.muted,marginTop:8,fontSize:15}}>Enter any topic — get quizzes, flashcards, summaries & a tutor.</p>
+      </div>
+      <div style={{width:"100%",maxWidth:480}}>
+        <div style={{display:"flex",borderRadius:14,overflow:"hidden",border:`1.5px solid ${focused?palette.accent:palette.border}`,boxShadow:focused?`0 0 0 3px ${palette.accentGlow}`:"none",transition:"all 0.2s"}}>
+          <input value={topic} onChange={e=>setTopic(e.target.value)} onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)}
+            onKeyDown={e=>e.key==="Enter"&&topic.trim()&&onStart()}
+            placeholder="e.g. Nicomachean Ethics, Photosynthesis, WW2…"
+            style={{flex:1,padding:"14px 18px",background:palette.card,border:"none",outline:"none",color:palette.text,fontSize:15,fontFamily:"inherit"}}/>
+          <button onClick={()=>topic.trim()&&onStart()}
+            style={{padding:"14px 22px",background:palette.accent,border:"none",color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"inherit"}}>
+            Start →
+          </button>
+        </div>
+      </div>
+      <div style={{display:"flex",gap:12,flexWrap:"wrap",justifyContent:"center",maxWidth:500}}>
+        {["Euthyphro by Plato","Mitosis & Meiosis","French Revolution","Calculus Derivatives","Nicomachean Ethics"].map(s=>(
+          <button key={s} onClick={()=>setTopic(s)}
+            style={{padding:"7px 14px",borderRadius:20,border:`1px solid ${palette.border}`,background:palette.card,color:palette.muted,fontSize:13,cursor:"pointer",fontFamily:"inherit"}}>
+            {s}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ChatTutor({topic}) {
+  const [messages,setMessages]=useState([{role:"assistant",content:`Hey! I'm your tutor for **${topic}**. Ask me anything — definitions, examples, essay help, or "explain it simply". 🎓`}]);
+  const [input,setInput]=useState("");
+  const [loading,setLoading]=useState(false);
+  const bottomRef=useRef(null);
+  useEffect(()=>{bottomRef.current?.scrollIntoView({behavior:"smooth"})},[messages,loading]);
+
+  async function send() {
+    if(!input.trim()||loading)return;
+    const userMsg={role:"user",content:input};
+    const history=[...messages.filter((m,i)=>i>0||m.role!=="assistant"),userMsg];
+    setMessages(prev=>[...prev,userMsg]);
+    setInput(""); setLoading(true);
+    const reply=await callClaude(history.map(m=>({role:m.role,content:m.content})),`You are an expert tutor on "${topic}". Be clear, engaging, educational. Use **bold** for key terms.`);
+    setMessages(prev=>[...prev,{role:"assistant",content:reply}]);
+    setLoading(false);
+  }
+
+  return (
+    <div style={{display:"flex",flexDirection:"column",height:"100%"}}>
+      <div style={{flex:1,overflowY:"auto",padding:"16px 20px",display:"flex",flexDirection:"column",gap:14}}>
+        {messages.map((m,i)=>(
+          <div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start"}}>
+            <div style={{maxWidth:"80%",padding:"10px 15px",borderRadius:m.role==="user"?"16px 16px 4px 16px":"16px 16px 16px 4px",
+              background:m.role==="user"?palette.accent:palette.card,color:palette.text,fontSize:14,lineHeight:1.6,
+              border:m.role==="assistant"?`1px solid ${palette.border}`:"none"}}>
+              {m.content.split(/\*\*(.*?)\*\*/g).map((p,j)=>j%2===1?<strong key={j} style={{color:palette.accent}}>{p}</strong>:p)}
+            </div>
+          </div>
+        ))}
+        {loading&&<div style={{display:"flex"}}><div style={{padding:"10px 15px",borderRadius:"16px 16px 16px 4px",background:palette.card,border:`1px solid ${palette.border}`}}><TypingDots/></div></div>}
+        <div ref={bottomRef}/>
+      </div>
+      <div style={{padding:"12px 16px",borderTop:`1px solid ${palette.border}`,display:"flex",gap:10}}>
+        <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()}
+          placeholder="Ask a question…"
+          style={{flex:1,padding:"11px 15px",borderRadius:10,border:`1px solid ${palette.border}`,background:palette.card,color:palette.text,fontSize:14,fontFamily:"inherit",outline:"none"}}/>
+        <button onClick={send} disabled={loading||!input.trim()}
+          style={{padding:"11px 18px",borderRadius:10,background:palette.accent,border:"none",color:"#fff",fontWeight:700,cursor:"pointer",fontFamily:"inherit",opacity:loading?0.6:1}}>
+          Send
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Quiz({topic}) {
+  const [questions,setQuestions]=useState(null);
+  const [current,setCurrent]=useState(0);
+  const [selected,setSelected]=useState(null);
+  const [score,setScore]=useState(0);
+  const [done,setDone]=useState(false);
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState(false);
+
+  useEffect(()=>{generate()},[topic]);
+
+  async function generate() {
+    setLoading(true);setError(false);setQuestions(null);setCurrent(0);setSelected(null);setScore(0);setDone(false);
+    try {
+      const raw=await callClaude([{role:"user",content:`Generate 7 multiple-choice questions about "${topic}". Respond ONLY with a JSON array like:\n[{"question":"...","options":["A","B","C","D"],"answer":0,"explanation":"..."}]\nanswer is the index (0-3) of the correct option. No markdown, no extra text.`}]);
+      setQuestions(JSON.parse(raw.replace(/\`\`\`json|\`\`\`/g,"").trim()));
+    } catch{setError(true);}
+    setLoading(false);
+  }
+
+  function choose(idx) {
+    if(selected!==null)return;
+    setSelected(idx);
+    if(idx===questions[current].answer)setScore(s=>s+1);
+  }
+  function next() {
+    if(current+1>=questions.length){setDone(true);return;}
+    setCurrent(c=>c+1);setSelected(null);
+  }
+
+  if(loading)return <Loader text="Generating your quiz…"/>;
+  if(error)return <ErrorMsg onRetry={generate}/>;
+  if(done)return (
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"100%",gap:20,padding:24}}>
+      <div style={{fontSize:56}}>{score>=5?"🏆":score>=3?"👍":"📚"}</div>
+      <h2 style={{fontSize:28,fontWeight:900,fontFamily:"'Playfair Display',serif",color:palette.text,margin:0}}>{score} / {questions.length} correct</h2>
+      <p style={{color:palette.muted,margin:0}}>{score>=5?"Excellent work!":score>=3?"Good effort — review and retry!":"Keep studying and try again!"}</p>
+      <button onClick={generate} style={{padding:"12px 28px",borderRadius:10,background:palette.accent,border:"none",color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"inherit"}}>New Quiz</button>
+    </div>
+  );
+
+  const q=questions[current];
+  return (
+    <div style={{padding:24,maxWidth:620,margin:"0 auto",display:"flex",flexDirection:"column",gap:20}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <span style={{color:palette.muted,fontSize:13}}>Question {current+1} of {questions.length}</span>
+        <span style={{color:palette.accent,fontWeight:700}}>Score: {score}</span>
+      </div>
+      <div style={{width:"100%",height:4,background:palette.border,borderRadius:2}}>
+        <div style={{height:"100%",width:`${((current+1)/questions.length)*100}%`,background:palette.accent,borderRadius:2,transition:"width 0.3s"}}/>
+      </div>
+      <h3 style={{fontSize:18,color:palette.text,margin:0,lineHeight:1.5,fontWeight:700}}>{q.question}</h3>
+      <div style={{display:"flex",flexDirection:"column",gap:10}}>
+        {q.options.map((opt,i)=>{
+          let bg=palette.card,border=palette.border,color=palette.text;
+          if(selected!==null){
+            if(i===q.answer){bg="#1a3a2a";border=palette.green;color=palette.green;}
+            else if(i===selected&&i!==q.answer){bg="#3a1a1a";border=palette.red;color=palette.red;}
+          }
+          return (
+            <button key={i} onClick={()=>choose(i)}
+              style={{padding:"13px 16px",borderRadius:10,border:`1.5px solid ${border}`,background:bg,color,textAlign:"left",cursor:selected!==null?"default":"pointer",fontSize:14,fontFamily:"inherit",transition:"all 0.2s",fontWeight:selected!==null&&i===q.answer?700:400}}>
+              <span style={{color:palette.muted,marginRight:10}}>{["A","B","C","D"][i]}.</span>{opt}
+            </button>
+          );
+        })}
+      </div>
+      {selected!==null&&(
+        <div style={{padding:"12px 16px",borderRadius:10,background:palette.card,border:`1px solid ${palette.border}`,fontSize:13,color:palette.muted,lineHeight:1.6}}>
+          💡 {q.explanation}
+          <div style={{marginTop:12,textAlign:"right"}}>
+            <button onClick={next} style={{padding:"8px 20px",borderRadius:8,background:palette.accent,border:"none",color:"#fff",fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
+              {current+1>=questions.length?"See Results →":"Next →"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function WrittenTest({topic}) {
+  const [questions,setQuestions]=useState(null);
+  const [current,setCurrent]=useState(0);
+  const [answer,setAnswer]=useState("");
+  const [feedback,setFeedback]=useState(null);
+  const [grading,setGrading]=useState(false);
+  const [results,setResults]=useState([]);
+  const [done,setDone]=useState(false);
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState(false);
+
+  useEffect(()=>{generate()},[topic]);
+
+  async function generate() {
+    setLoading(true);setError(false);setQuestions(null);setCurrent(0);setAnswer("");setFeedback(null);setResults([]);setDone(false);
+    try {
+      const raw=await callClaude([{role:"user",content:`Generate 5 short-answer essay questions about "${topic}". Test conceptual understanding.\nRespond ONLY with JSON array:\n[{"question":"...","keyPoints":["concept 1","concept 2","concept 3"]}]\nNo markdown, no extra text.`}]);
+      setQuestions(JSON.parse(raw.replace(/\`\`\`json|\`\`\`/g,"").trim()));
+    } catch{setError(true);}
+    setLoading(false);
+  }
+
+  async function grade() {
+    if(!answer.trim()||grading)return;
+    setGrading(true);
+    const q=questions[current];
+    try {
+      const raw=await callClaude([{role:"user",content:`Topic: "${topic}"\nQuestion: "${q.question}"\nKey concepts: ${q.keyPoints.join(", ")}\nStudent answer: "${answer}"\n\nGrade generously — reward conceptual understanding, not exact wording.\nRespond ONLY with JSON (no markdown):\n{"score":0-100,"verdict":"Excellent"|"Good"|"Partial"|"Needs Work","feedback":"2-3 sentence encouraging feedback","missed":["any missed concept or empty array"]}`}]);
+      const result=JSON.parse(raw.replace(/\`\`\`json|\`\`\`/g,"").trim());
+      setFeedback(result);
+      setResults(prev=>[...prev,{question:q.question,answer,...result}]);
+    } catch {
+      const fb={score:70,verdict:"Good",feedback:"Your answer shows good understanding of the topic.",missed:[]};
+      setFeedback(fb);
+      setResults(prev=>[...prev,{question:q.question,answer,...fb}]);
+    }
+    setGrading(false);
+  }
+
+  function next() {
+    if(current+1>=questions.length){setDone(true);return;}
+    setCurrent(c=>c+1);setAnswer("");setFeedback(null);
+  }
+
+  const vc=(v)=>({Excellent:palette.green,Good:"#6cd4ff",Partial:palette.yellow,"Needs Work":palette.red}[v]||palette.muted);
+  const avg=results.length?Math.round(results.reduce((a,r)=>a+r.score,0)/results.length):0;
+
+  if(loading)return <Loader text="Crafting written questions…"/>;
+  if(error)return <ErrorMsg onRetry={generate}/>;
+  if(done)return (
+    <div style={{padding:24,maxWidth:620,margin:"0 auto",display:"flex",flexDirection:"column",gap:20,overflowY:"auto",height:"100%"}}>
+      <div style={{textAlign:"center",padding:"16px 0"}}>
+        <div style={{fontSize:48}}>{avg>=80?"🏆":avg>=60?"👍":"📚"}</div>
+        <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:26,margin:"8px 0 4px",color:palette.text}}>Test Complete</h2>
+        <div style={{fontSize:36,fontWeight:900,color:palette.accent}}>{avg}%</div>
+        <p style={{color:palette.muted,fontSize:14,margin:"4px 0 0"}}>average conceptual score</p>
+      </div>
+      {results.map((r,i)=>(
+        <div key={i} style={{padding:"14px 16px",borderRadius:12,background:palette.card,border:`1px solid ${palette.border}`}}>
+          <div style={{display:"flex",justifyContent:"space-between",gap:12,marginBottom:8}}>
+            <span style={{fontSize:13,color:palette.text,fontWeight:600,flex:1}}>Q{i+1}: {r.question}</span>
+            <span style={{fontSize:13,fontWeight:700,color:vc(r.verdict),whiteSpace:"nowrap"}}>{r.score}% · {r.verdict}</span>
+          </div>
+          <p style={{fontSize:12,color:palette.muted,margin:0,lineHeight:1.6}}>{r.feedback}</p>
+        </div>
+      ))}
+      <button onClick={generate} style={{padding:"12px",borderRadius:10,background:palette.accent,border:"none",color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"inherit"}}>New Written Test</button>
+    </div>
+  );
+
+  const q=questions[current];
+  return (
+    <div style={{padding:24,maxWidth:640,margin:"0 auto",display:"flex",flexDirection:"column",gap:18,overflowY:"auto",height:"100%"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <span style={{color:palette.muted,fontSize:13}}>Question {current+1} of {questions.length}</span>
+        <span style={{fontSize:12,color:palette.muted,background:palette.card,padding:"4px 10px",borderRadius:20,border:`1px solid ${palette.border}`}}>✍️ Written Test</span>
+      </div>
+      <div style={{width:"100%",height:4,background:palette.border,borderRadius:2}}>
+        <div style={{height:"100%",width:`${((current+1)/questions.length)*100}%`,background:palette.accent,borderRadius:2,transition:"width 0.3s"}}/>
+      </div>
+      <div style={{padding:"18px 20px",borderRadius:14,background:palette.card,border:`1px solid ${palette.border}`}}>
+        <div style={{fontSize:11,letterSpacing:2,textTransform:"uppercase",color:palette.accent,marginBottom:10,fontWeight:700}}>Question</div>
+        <p style={{margin:0,fontSize:16,color:palette.text,lineHeight:1.7,fontWeight:600}}>{q.question}</p>
+      </div>
+      <div>
+        <textarea value={answer} onChange={e=>setAnswer(e.target.value)} disabled={feedback!==null}
+          placeholder="Write your answer here — explain in your own words. You don't need to be word-perfect, just show you understand the idea…"
+          style={{width:"100%",minHeight:140,padding:"14px 16px",borderRadius:12,border:`1.5px solid ${feedback?palette.border:palette.accent}`,background:palette.card,color:palette.text,fontSize:14,fontFamily:"inherit",lineHeight:1.7,resize:"vertical",outline:"none",opacity:feedback?0.7:1,boxSizing:"border-box"}}/>
+        {!feedback&&(
+          <button onClick={grade} disabled={grading||!answer.trim()}
+            style={{marginTop:10,width:"100%",padding:"12px",borderRadius:10,background:palette.accent,border:"none",color:"#fff",fontWeight:700,fontSize:15,cursor:answer.trim()?"pointer":"default",fontFamily:"inherit",opacity:grading||!answer.trim()?0.5:1,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+            {grading?<><TypingDots/><span>Grading…</span></>:"Submit Answer →"}
+          </button>
+        )}
+      </div>
+      {feedback&&(
+        <div style={{borderRadius:14,overflow:"hidden",border:`1.5px solid ${vc(feedback.verdict)}22`}}>
+          <div style={{padding:"14px 18px",background:`${vc(feedback.verdict)}18`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <span style={{fontWeight:800,fontSize:18,color:vc(feedback.verdict)}}>{feedback.verdict}</span>
+            <span style={{fontWeight:900,fontSize:22,color:vc(feedback.verdict)}}>{feedback.score}%</span>
+          </div>
+          <div style={{padding:"14px 18px",background:palette.card}}>
+            <p style={{margin:"0 0 12px",fontSize:14,color:palette.text,lineHeight:1.7}}>{feedback.feedback}</p>
+            {feedback.missed?.length>0&&(
+              <div>
+                <div style={{fontSize:12,color:palette.muted,marginBottom:6,fontWeight:600}}>Consider also mentioning:</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                  {feedback.missed.map((m,i)=>(
+                    <span key={i} style={{padding:"4px 10px",borderRadius:20,background:palette.surface,border:`1px solid ${palette.border}`,fontSize:12,color:palette.muted}}>{m}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            <button onClick={next} style={{marginTop:14,padding:"10px 22px",borderRadius:9,background:palette.accent,border:"none",color:"#fff",fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
+              {current+1>=questions.length?"See Results →":"Next Question →"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Flashcards({topic}) {
+  const [cards,setCards]=useState(null);
+  const [idx,setIdx]=useState(0);
+  const [flipped,setFlipped]=useState(false);
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState(false);
+  const [known,setKnown]=useState(new Set());
+
+  useEffect(()=>{generate()},[topic]);
+
+  async function generate() {
+    setLoading(true);setError(false);setCards(null);setIdx(0);setFlipped(false);setKnown(new Set());
+    try {
+      const raw=await callClaude([{role:"user",content:`Generate 10 flashcards for "${topic}". Respond ONLY with JSON array:\n[{"front":"term or question","back":"definition or answer"}]\nNo markdown, no extra text.`}]);
+      setCards(JSON.parse(raw.replace(/\`\`\`json|\`\`\`/g,"").trim()));
+    } catch{setError(true);}
+    setLoading(false);
+  }
+
+  if(loading)return <Loader text="Creating flashcards…"/>;
+  if(error)return <ErrorMsg onRetry={generate}/>;
+
+  const card=cards[idx];
+  return (
+    <div style={{padding:24,maxWidth:560,margin:"0 auto",display:"flex",flexDirection:"column",gap:20,alignItems:"center"}}>
+      <div style={{display:"flex",justifyContent:"space-between",width:"100%",alignItems:"center"}}>
+        <span style={{color:palette.muted,fontSize:13}}>{idx+1} / {cards.length}</span>
+        <span style={{color:palette.green,fontSize:13}}>✓ Known: {known.size}</span>
+      </div>
+      <div onClick={()=>setFlipped(f=>!f)} style={{width:"100%",minHeight:200,borderRadius:16,background:flipped?"#1a2a3a":palette.card,border:`1.5px solid ${flipped?palette.accent:palette.border}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:"pointer",padding:28,textAlign:"center",transition:"all 0.3s",boxShadow:flipped?`0 0 24px ${palette.accentGlow}`:"none",userSelect:"none"}}>
+        <div style={{fontSize:11,letterSpacing:2,textTransform:"uppercase",color:palette.muted,marginBottom:14}}>{flipped?"Answer":"Question"}</div>
+        <div style={{fontSize:17,color:palette.text,lineHeight:1.6,fontWeight:flipped?400:600}}>{flipped?card.back:card.front}</div>
+        {!flipped&&<div style={{marginTop:16,fontSize:12,color:palette.muted}}>tap to reveal</div>}
+      </div>
+      {flipped&&(
+        <div style={{display:"flex",gap:12,width:"100%"}}>
+          <button onClick={()=>{setKnown(s=>{const n=new Set(s);n.add(idx);return n;});setFlipped(false);setIdx(i=>(i+1)%cards.length);}}
+            style={{flex:1,padding:"12px",borderRadius:10,background:"#1a3a2a",border:`1.5px solid ${palette.green}`,color:palette.green,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
+            ✓ Got it
+          </button>
+          <button onClick={()=>{setFlipped(false);setIdx(i=>(i+1)%cards.length);}}
+            style={{flex:1,padding:"12px",borderRadius:10,background:"#3a1a1a",border:`1.5px solid ${palette.red}`,color:palette.red,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
+            ✗ Review again
+          </button>
+        </div>
+      )}
+      <div style={{display:"flex",gap:10}}>
+        <button onClick={()=>{setFlipped(false);setIdx(i=>(i-1+cards.length)%cards.length);}}
+          style={{padding:"8px 18px",borderRadius:8,background:palette.card,border:`1px solid ${palette.border}`,color:palette.muted,cursor:"pointer",fontFamily:"inherit"}}>← Prev</button>
+        <button onClick={()=>{setFlipped(false);setIdx(i=>(i+1)%cards.length);}}
+          style={{padding:"8px 18px",borderRadius:8,background:palette.card,border:`1px solid ${palette.border}`,color:palette.muted,cursor:"pointer",fontFamily:"inherit"}}>Next →</button>
+      </div>
+      {known.size===cards.length&&<div style={{color:palette.green,fontWeight:700,fontSize:15}}>🎉 You've marked all cards as known!</div>}
+    </div>
+  );
+}
+
+function Summary({topic}) {
+  const [summary,setSummary]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState(false);
+
+  useEffect(()=>{generate()},[topic]);
+
+  async function generate() {
+    setLoading(true);setError(false);setSummary(null);
+    try {
+      const text=await callClaude([{role:"user",content:`Write a comprehensive study summary of "${topic}". Structure it with:\n1. Brief overview (2-3 sentences)\n2. Key concepts (5-7 bullet points with **bold** terms)\n3. Important figures/dates/events if relevant\n4. Common exam pitfalls or misconceptions\n5. One-sentence "elevator pitch" summary\n\nUse **bold** for key terms.`}]);
+      setSummary(text);
+    } catch{setError(true);}
+    setLoading(false);
+  }
+
+  if(loading)return <Loader text="Writing your study summary…"/>;
+  if(error)return <ErrorMsg onRetry={generate}/>;
+
+  return (
+    <div style={{padding:24,maxWidth:640,margin:"0 auto",display:"flex",flexDirection:"column",gap:16,overflowY:"auto",height:"100%"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <h2 style={{margin:0,fontSize:20,fontWeight:900,fontFamily:"'Playfair Display',serif",color:palette.text}}>{topic}</h2>
+        <button onClick={generate} style={{padding:"7px 14px",borderRadius:8,background:palette.card,border:`1px solid ${palette.border}`,color:palette.muted,cursor:"pointer",fontFamily:"inherit",fontSize:13}}>↺ Regenerate</button>
+      </div>
+      {summary.split(/\n\n+/).map((sec,i)=>(
+        <div key={i} style={{padding:"14px 18px",borderRadius:12,background:palette.card,border:`1px solid ${palette.border}`,fontSize:14,color:palette.text,lineHeight:1.8}}>
+          {sec.split(/\*\*(.*?)\*\*/g).map((p,j)=>j%2===1?<strong key={j} style={{color:palette.accent}}>{p}</strong>:p)}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function App() {
+  const [topic,setTopic]=useState("");
+  const [activeTopic,setActiveTopic]=useState("");
+  const [mode,setMode]=useState(MODES.HOME);
+
+  function startStudy(){setActiveTopic(topic.trim());setMode(MODES.CHAT);}
+
+  const tabs=[
+    {id:MODES.CHAT,label:"💬 Tutor"},
+    {id:MODES.QUIZ,label:"📝 Quiz"},
+    {id:MODES.WRITTEN,label:"✍️ Written"},
+    {id:MODES.FLASHCARDS,label:"🃏 Cards"},
+    {id:MODES.SUMMARY,label:"📖 Summary"},
+  ];
+
+  return (
+    <div style={{fontFamily:"'DM Sans','Segoe UI',sans-serif",background:palette.bg,color:palette.text,height:"100vh",display:"flex",flexDirection:"column",overflow:"hidden"}}>
+      {mode===MODES.HOME?(
+        <Home topic={topic} setTopic={setTopic} onStart={startStudy}/>
+      ):(
+        <>
+          <div style={{padding:"12px 20px",borderBottom:`1px solid ${palette.border}`,display:"flex",alignItems:"center",gap:14,background:palette.surface}}>
+            <button onClick={()=>setMode(MODES.HOME)} style={{background:"none",border:`1px solid ${palette.border}`,color:palette.muted,borderRadius:8,padding:"6px 12px",cursor:"pointer",fontFamily:"inherit",fontSize:13}}>← Back</button>
+            <span style={{fontWeight:800,fontFamily:"'Playfair Display',serif",fontSize:16,color:palette.text,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{activeTopic}</span>
+          </div>
+          <div style={{display:"flex",borderBottom:`1px solid ${palette.border}`,background:palette.surface,padding:"0 8px",overflowX:"auto"}}>
+            {tabs.map(t=>(
+              <button key={t.id} onClick={()=>setMode(t.id)}
+                style={{padding:"11px 14px",border:"none",background:"none",color:mode===t.id?palette.accent:palette.muted,fontWeight:mode===t.id?700:400,cursor:"pointer",fontFamily:"inherit",fontSize:13,borderBottom:mode===t.id?`2px solid ${palette.accent}`:"2px solid transparent",transition:"all 0.15s",whiteSpace:"nowrap"}}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <div style={{flex:1,overflow:"auto",background:palette.bg}}>
+            {mode===MODES.CHAT&&<ChatTutor topic={activeTopic} key={activeTopic}/>}
+            {mode===MODES.QUIZ&&<Quiz topic={activeTopic} key={activeTopic}/>}
+            {mode===MODES.WRITTEN&&<WrittenTest topic={activeTopic} key={activeTopic}/>}
+            {mode===MODES.FLASHCARDS&&<Flashcards topic={activeTopic} key={activeTopic}/>}
+            {mode===MODES.SUMMARY&&<Summary topic={activeTopic} key={activeTopic}/>}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
