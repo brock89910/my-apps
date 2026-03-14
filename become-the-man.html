@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Become The Man">
+<title>Become The Man</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --gold: #d4a853;
+    --gold-dim: #a07830;
+    --gold-glow: rgba(212,168,83,0.15);
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --bg3: #1a1a1a;
+    --bg4: #222222;
+    --border: #2a2a2a;
+    --text: #e8e4dc;
+    --text-dim: #888;
+    --text-muted: #555;
+    --green: #4caf50;
+    --red: #e05252;
+    --blue: #5b9cf6;
+    --safe-top: env(safe-area-inset-top);
+    --safe-bottom: env(safe-area-inset-bottom);
+  }
+
+- { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘DM Sans’, sans-serif;
+min-height: 100dvh;
+overflow-x: hidden;
+}
+
+/* ── TOP HEADER ── */
+.top-header {
+position: fixed;
+top: 0; left: 0; right: 0;
+z-index: 100;
+padding: calc(var(–safe-top) + 12px) 20px 12px;
+background: linear-gradient(to bottom, rgba(10,10,10,0.98) 80%, transparent);
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 12px;
+}
+.app-title {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 22px;
+letter-spacing: 2px;
+color: var(–gold);
+white-space: nowrap;
+}
+.date-badge {
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+color: var(–text-dim);
+letter-spacing: 0.5px;
+}
+.streak-badge {
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+background: var(–gold-glow);
+border: 1px solid var(–gold-dim);
+color: var(–gold);
+padding: 3px 8px;
+border-radius: 20px;
+white-space: nowrap;
+}
+
+/* ── TAB BAR ── */
+.tab-bar {
+position: fixed;
+bottom: 0; left: 0; right: 0;
+z-index: 100;
+padding: 8px 0 calc(var(–safe-bottom) + 8px);
+background: rgba(10,10,10,0.97);
+border-top: 1px solid var(–border);
+display: flex;
+justify-content: space-around;
+}
+.tab-btn {
+background: none; border: none;
+display: flex; flex-direction: column;
+align-items: center; gap: 3px;
+cursor: pointer;
+padding: 4px 12px;
+border-radius: 10px;
+transition: all 0.2s;
+flex: 1;
+}
+.tab-btn .tab-icon { font-size: 20px; line-height: 1; }
+.tab-btn .tab-label {
+font-family: ‘DM Mono’, monospace;
+font-size: 9px;
+letter-spacing: 1px;
+text-transform: uppercase;
+color: var(–text-muted);
+transition: color 0.2s;
+}
+.tab-btn.active .tab-label { color: var(–gold); }
+.tab-btn.active .tab-icon { filter: drop-shadow(0 0 6px var(–gold)); }
+
+/* ── MAIN SCROLL AREA ── */
+.main-content {
+padding-top: calc(var(–safe-top) + 60px);
+padding-bottom: calc(var(–safe-bottom) + 75px);
+min-height: 100dvh;
+}
+
+/* ── PAGE VISIBILITY ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── SECTION LABEL ── */
+.section-label {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 13px;
+letter-spacing: 3px;
+color: var(–text-muted);
+padding: 20px 20px 8px;
+}
+
+/* ═══════════════════════════
+MANDALA PAGE
+═══════════════════════════ */
+.mandala-date-nav {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 8px 16px;
+background: var(–bg2);
+margin: 0 16px 8px;
+border-radius: 12px;
+border: 1px solid var(–border);
+}
+.mandala-date-nav button {
+background: none; border: none;
+color: var(–gold); font-size: 20px;
+cursor: pointer; padding: 4px 8px;
+border-radius: 8px;
+}
+.mandala-date-nav button:active { background: var(–gold-glow); }
+.mandala-date-label {
+font-family: ‘DM Mono’, monospace;
+font-size: 13px;
+color: var(–text);
+letter-spacing: 0.5px;
+}
+.mandala-today-btn {
+background: var(–gold-glow) !important;
+border: 1px solid var(–gold-dim) !important;
+color: var(–gold) !important;
+font-family: ‘DM Mono’, monospace !important;
+font-size: 11px !important;
+padding: 4px 10px !important;
+border-radius: 8px !important;
+cursor: pointer;
+}
+
+.category-card {
+margin: 0 16px 12px;
+background: var(–bg2);
+border: 1px solid var(–border);
+border-radius: 14px;
+overflow: hidden;
+transition: border-color 0.2s;
+}
+.category-card.all-done { border-color: var(–gold-dim); }
+
+.category-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 12px 16px;
+cursor: pointer;
+user-select: none;
+}
+.category-header:active { background: rgba(255,255,255,0.03); }
+
+.cat-left { display: flex; align-items: center; gap: 10px; }
+.cat-icon { font-size: 18px; }
+.cat-name {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 16px;
+letter-spacing: 1.5px;
+color: var(–text);
+}
+.cat-progress {
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+color: var(–text-dim);
+}
+.cat-chevron {
+color: var(–text-muted);
+font-size: 12px;
+transition: transform 0.2s;
+}
+.category-card.open .cat-chevron { transform: rotate(180deg); }
+
+.progress-bar-wrap {
+height: 2px;
+background: var(–border);
+margin: 0 16px 0;
+}
+.progress-bar-fill {
+height: 100%;
+background: var(–gold);
+border-radius: 2px;
+transition: width 0.3s ease;
+}
+
+.habit-list {
+display: none;
+padding: 6px 0 10px;
+border-top: 1px solid var(–border);
+margin-top: 8px;
+}
+.category-card.open .habit-list { display: block; }
+
+.habit-row {
+display: flex;
+align-items: center;
+gap: 12px;
+padding: 8px 16px;
+cursor: pointer;
+transition: background 0.15s;
+}
+.habit-row:active { background: rgba(255,255,255,0.03); }
+
+.habit-checkbox {
+width: 22px; height: 22px;
+border-radius: 6px;
+border: 2px solid var(–border);
+background: transparent;
+display: flex; align-items: center; justify-content: center;
+flex-shrink: 0;
+transition: all 0.15s;
+}
+.habit-checkbox.checked {
+background: var(–gold);
+border-color: var(–gold);
+}
+.habit-checkbox.checked::after {
+content: ‘✓’;
+color: #000;
+font-size: 13px;
+font-weight: 700;
+}
+.habit-text {
+font-size: 14px;
+color: var(–text);
+line-height: 1.4;
+flex: 1;
+}
+.habit-text.done {
+color: var(–text-muted);
+text-decoration: line-through;
+}
+
+/* Daily summary bar */
+.daily-summary {
+margin: 0 16px 12px;
+background: var(–bg2);
+border: 1px solid var(–border);
+border-radius: 14px;
+padding: 14px 16px;
+display: flex;
+align-items: center;
+gap: 14px;
+}
+.summary-ring {
+width: 52px; height: 52px;
+flex-shrink: 0;
+position: relative;
+}
+.summary-ring svg { transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: var(–border); stroke-width: 4; }
+.ring-fill { fill: none; stroke: var(–gold); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.4s ease; }
+.ring-text {
+position: absolute; inset: 0;
+display: flex; align-items: center; justify-content: center;
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+color: var(–gold);
+}
+.summary-info { flex: 1; }
+.summary-title {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 15px;
+letter-spacing: 1.5px;
+color: var(–text-dim);
+margin-bottom: 3px;
+}
+.summary-count {
+font-family: ‘DM Mono’, monospace;
+font-size: 13px;
+color: var(–text);
+}
+
+/* ═══════════════════════════
+JOURNAL PAGE
+═══════════════════════════ */
+.journal-date-nav {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 8px 16px;
+background: var(–bg2);
+margin: 0 16px 8px;
+border-radius: 12px;
+border: 1px solid var(–border);
+}
+.journal-date-nav button {
+background: none; border: none;
+color: var(–gold); font-size: 20px;
+cursor: pointer; padding: 4px 8px;
+border-radius: 8px;
+}
+.journal-date-label {
+font-family: ‘DM Mono’, monospace;
+font-size: 13px;
+color: var(–text);
+}
+
+.prompt-card {
+margin: 0 16px 10px;
+background: var(–bg2);
+border: 1px solid var(–border);
+border-radius: 14px;
+overflow: hidden;
+}
+.prompt-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 12px 16px 10px;
+cursor: pointer;
+}
+.prompt-label {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 14px;
+letter-spacing: 1.5px;
+color: var(–gold);
+}
+.prompt-chevron {
+color: var(–text-muted);
+font-size: 12px;
+transition: transform 0.2s;
+}
+.prompt-card.open .prompt-chevron { transform: rotate(180deg); }
+.prompt-body {
+display: none;
+padding: 0 16px 14px;
+border-top: 1px solid var(–border);
+padding-top: 12px;
+}
+.prompt-card.open .prompt-body { display: block; }
+.prompt-question {
+font-size: 13px;
+color: var(–text-dim);
+margin-bottom: 8px;
+line-height: 1.5;
+font-style: italic;
+}
+.journal-textarea {
+width: 100%;
+background: var(–bg3);
+border: 1px solid var(–border);
+border-radius: 10px;
+color: var(–text);
+font-family: ‘DM Sans’, sans-serif;
+font-size: 14px;
+line-height: 1.6;
+padding: 12px;
+resize: none;
+min-height: 100px;
+outline: none;
+transition: border-color 0.2s;
+}
+.journal-textarea:focus { border-color: var(–gold-dim); }
+.journal-textarea::placeholder { color: var(–text-muted); }
+.save-indicator {
+font-family: ‘DM Mono’, monospace;
+font-size: 10px;
+color: var(–text-muted);
+text-align: right;
+margin-top: 5px;
+height: 14px;
+transition: color 0.3s;
+}
+.save-indicator.saved { color: var(–green); }
+
+/* ═══════════════════════════
+TASKS PAGE
+═══════════════════════════ */
+.add-task-bar {
+margin: 0 16px 12px;
+display: flex;
+gap: 8px;
+}
+.add-task-input {
+flex: 1;
+background: var(–bg2);
+border: 1px solid var(–border);
+border-radius: 10px;
+color: var(–text);
+font-family: ‘DM Sans’, sans-serif;
+font-size: 14px;
+padding: 10px 14px;
+outline: none;
+transition: border-color 0.2s;
+}
+.add-task-input:focus { border-color: var(–gold-dim); }
+.add-task-input::placeholder { color: var(–text-muted); }
+.add-task-btn {
+background: var(–gold);
+border: none;
+border-radius: 10px;
+color: #000;
+font-weight: 700;
+font-size: 20px;
+width: 42px;
+cursor: pointer;
+transition: opacity 0.15s;
+}
+.add-task-btn:active { opacity: 0.7; }
+
+.task-filters {
+display: flex;
+gap: 8px;
+padding: 0 16px 10px;
+overflow-x: auto;
+scrollbar-width: none;
+}
+.task-filters::-webkit-scrollbar { display: none; }
+.filter-chip {
+background: var(–bg2);
+border: 1px solid var(–border);
+border-radius: 20px;
+color: var(–text-dim);
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+letter-spacing: 0.5px;
+padding: 5px 12px;
+cursor: pointer;
+white-space: nowrap;
+transition: all 0.15s;
+}
+.filter-chip.active {
+background: var(–gold-glow);
+border-color: var(–gold-dim);
+color: var(–gold);
+}
+
+.task-item {
+display: flex;
+align-items: flex-start;
+gap: 12px;
+padding: 12px 16px;
+margin: 0 16px 8px;
+background: var(–bg2);
+border: 1px solid var(–border);
+border-radius: 12px;
+transition: opacity 0.2s;
+}
+.task-item.done-task { opacity: 0.5; }
+.task-check {
+width: 22px; height: 22px;
+border-radius: 50%;
+border: 2px solid var(–border);
+background: transparent;
+display: flex; align-items: center; justify-content: center;
+flex-shrink: 0;
+cursor: pointer;
+margin-top: 1px;
+transition: all 0.15s;
+}
+.task-check.checked {
+background: var(–green);
+border-color: var(–green);
+}
+.task-check.checked::after { content: ‘✓’; color: #fff; font-size: 12px; font-weight: 700; }
+.task-body { flex: 1; }
+.task-text {
+font-size: 14px;
+color: var(–text);
+line-height: 1.4;
+}
+.task-text.done { text-decoration: line-through; color: var(–text-muted); }
+.task-meta {
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+color: var(–text-muted);
+margin-top: 3px;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+.priority-dot {
+width: 6px; height: 6px;
+border-radius: 50%;
+display: inline-block;
+}
+.priority-high { background: var(–red); }
+.priority-med { background: var(–gold); }
+.priority-low { background: var(–text-muted); }
+.task-delete {
+background: none; border: none;
+color: var(–text-muted);
+font-size: 16px;
+cursor: pointer;
+padding: 2px 4px;
+border-radius: 6px;
+transition: color 0.15s;
+line-height: 1;
+}
+.task-delete:active { color: var(–red); }
+
+.task-priority-select {
+background: var(–bg3);
+border: 1px solid var(–border);
+border-radius: 8px;
+color: var(–text-dim);
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+padding: 6px 10px;
+outline: none;
+margin: 0 16px 10px;
+width: calc(100% - 32px);
+}
+
+/* ═══════════════════════════
+FITNESS PAGE
+═══════════════════════════ */
+.weight-cards {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 10px;
+margin: 0 16px 12px;
+}
+.weight-card {
+background: var(–bg2);
+border: 1px solid var(–border);
+border-radius: 14px;
+padding: 14px;
+}
+.weight-card-label {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 12px;
+letter-spacing: 2px;
+color: var(–text-muted);
+margin-bottom: 6px;
+}
+.weight-input-row {
+display: flex;
+align-items: center;
+gap: 6px;
+}
+.weight-input {
+flex: 1;
+background: var(–bg3);
+border: 1px solid var(–border);
+border-radius: 8px;
+color: var(–text);
+font-family: ‘DM Mono’, monospace;
+font-size: 18px;
+padding: 8px;
+outline: none;
+width: 100%;
+transition: border-color 0.2s;
+}
+.weight-input:focus { border-color: var(–gold-dim); }
+.weight-unit {
+font-family: ‘DM Mono’, monospace;
+font-size: 12px;
+color: var(–text-muted);
+}
+.log-weight-btn {
+width: calc(100% - 32px);
+margin: 0 16px 14px;
+background: var(–gold);
+border: none;
+border-radius: 10px;
+color: #000;
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 16px;
+letter-spacing: 2px;
+padding: 12px;
+cursor: pointer;
+transition: opacity 0.15s;
+}
+.log-weight-btn:active { opacity: 0.7; }
+
+.chart-card {
+margin: 0 16px 12px;
+background: var(–bg2);
+border: 1px solid var(–border);
+border-radius: 14px;
+padding: 14px;
+}
+.chart-title {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 14px;
+letter-spacing: 2px;
+color: var(–text-dim);
+margin-bottom: 12px;
+}
+
+.fitness-log-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 8px 16px;
+border-bottom: 1px solid var(–border);
+font-family: ‘DM Mono’, monospace;
+font-size: 12px;
+color: var(–text-dim);
+}
+.fitness-log-row:last-child { border-bottom: none; }
+.fitness-log-date { color: var(–text-muted); }
+.fitness-log-values { display: flex; gap: 12px; }
+
+/* ═══════════════════════════
+READINGS PAGE
+═══════════════════════════ */
+.reading-card {
+margin: 0 16px 10px;
+background: var(–bg2);
+border: 1px solid var(–border);
+border-radius: 14px;
+overflow: hidden;
+}
+.reading-header {
+padding: 12px 16px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+cursor: pointer;
+}
+.reading-course {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 15px;
+letter-spacing: 1.5px;
+color: var(–text);
+}
+.reading-progress-badge {
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+background: var(–bg3);
+border: 1px solid var(–border);
+color: var(–text-dim);
+padding: 3px 8px;
+border-radius: 20px;
+}
+.reading-body {
+display: none;
+padding: 0 16px 14px;
+border-top: 1px solid var(–border);
+padding-top: 12px;
+}
+.reading-card.open .reading-body { display: block; }
+.reading-card.open .reading-progress-badge { border-color: var(–gold-dim); color: var(–gold); }
+.reading-row {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 7px 0;
+border-bottom: 1px solid rgba(255,255,255,0.05);
+cursor: pointer;
+}
+.reading-row:last-child { border-bottom: none; }
+.reading-check {
+width: 18px; height: 18px;
+border-radius: 4px;
+border: 2px solid var(–border);
+background: transparent;
+display: flex; align-items: center; justify-content: center;
+flex-shrink: 0;
+transition: all 0.15s;
+}
+.reading-check.checked {
+background: var(–blue);
+border-color: var(–blue);
+}
+.reading-check.checked::after { content: ‘✓’; color: #fff; font-size: 10px; font-weight: 700; }
+.reading-title {
+font-size: 13px;
+color: var(–text);
+line-height: 1.4;
+flex: 1;
+}
+.reading-title.done { color: var(–text-muted); text-decoration: line-through; }
+.reading-notes-input {
+width: 100%;
+background: var(–bg3);
+border: 1px solid var(–border);
+border-radius: 8px;
+color: var(–text);
+font-family: ‘DM Sans’, sans-serif;
+font-size: 13px;
+padding: 10px;
+resize: none;
+min-height: 70px;
+outline: none;
+margin-top: 10px;
+transition: border-color 0.2s;
+}
+.reading-notes-input:focus { border-color: var(–blue); }
+.reading-notes-input::placeholder { color: var(–text-muted); }
+
+/* ── TOAST ── */
+.toast {
+position: fixed;
+bottom: calc(var(–safe-bottom) + 85px);
+left: 50%; transform: translateX(-50%) translateY(20px);
+background: var(–bg3);
+border: 1px solid var(–border);
+border-radius: 20px;
+padding: 8px 18px;
+font-family: ‘DM Mono’, monospace;
+font-size: 12px;
+color: var(–text);
+opacity: 0;
+transition: all 0.25s;
+pointer-events: none;
+white-space: nowrap;
+z-index: 200;
+}
+.toast.show {
+opacity: 1;
+transform: translateX(-50%) translateY(0);
+}
+
+/* ── EMPTY STATE ── */
+.empty-state {
+text-align: center;
+padding: 40px 20px;
+color: var(–text-muted);
+font-size: 14px;
+}
+.empty-icon { font-size: 32px; margin-bottom: 10px; }
+</style>
+
+</head>
+<body>
+
+<!-- HEADER -->
+
+<div class="top-header">
+  <div class="app-title">Become The Man</div>
+  <div class="date-badge" id="headerDate"></div>
+  <div class="streak-badge" id="streakBadge">🔥 0</div>
+</div>
+
+<!-- MAIN -->
+
+<div class="main-content">
+
+  <!-- ── MANDALA PAGE ── -->
+
+  <div class="page active" id="page-mandala">
+    <div class="section-label">DAILY TRACKER</div>
+    <div class="mandala-date-nav">
+      <button onclick="changeMandalDate(-1)">‹</button>
+      <span class="mandala-date-label" id="mandalaDateLabel"></span>
+      <button class="mandala-today-btn" onclick="goMandalToday()">Today</button>
+      <button onclick="changeMandalDate(1)">›</button>
+    </div>
+    <div id="dailySummary" class="daily-summary">
+      <div class="summary-ring">
+        <svg width="52" height="52" viewBox="0 0 52 52">
+          <circle class="ring-bg" cx="26" cy="26" r="22"/>
+          <circle class="ring-fill" id="ringFill" cx="26" cy="26" r="22"
+            stroke-dasharray="138.2" stroke-dashoffset="138.2"/>
+        </svg>
+        <div class="ring-text" id="ringPct">0%</div>
+      </div>
+      <div class="summary-info">
+        <div class="summary-title">TODAY'S PROGRESS</div>
+        <div class="summary-count" id="summaryCount">0 / 0 habits done</div>
+      </div>
+    </div>
+    <div id="categoryCards"></div>
+  </div>
+
+  <!-- ── JOURNAL PAGE ── -->
+
+  <div class="page" id="page-journal">
+    <div class="section-label">DAILY JOURNAL</div>
+    <div class="journal-date-nav">
+      <button onclick="changeJournalDate(-1)">‹</button>
+      <span class="journal-date-label" id="journalDateLabel"></span>
+      <button class="mandala-today-btn" onclick="goJournalToday()">Today</button>
+      <button onclick="changeJournalDate(1)">›</button>
+    </div>
+    <div id="journalPrompts"></div>
+  </div>
+
+  <!-- ── TASKS PAGE ── -->
+
+  <div class="page" id="page-tasks">
+    <div class="section-label">TASKS</div>
+    <div class="add-task-bar">
+      <input class="add-task-input" id="taskInput" placeholder="Add a task…" onkeydown="if(event.key==='Enter') addTask()">
+      <button class="add-task-btn" onclick="addTask()">+</button>
+    </div>
+    <div style="padding: 0 16px 8px; display: flex; gap: 8px; align-items: center;">
+      <select class="task-priority-select" id="taskPriority" style="margin: 0; width: auto; flex:1;">
+        <option value="med">● Medium Priority</option>
+        <option value="high">● High Priority</option>
+        <option value="low">● Low Priority</option>
+      </select>
+    </div>
+    <div class="task-filters">
+      <div class="filter-chip active" onclick="setFilter('all',this)">All</div>
+      <div class="filter-chip" onclick="setFilter('active',this)">Active</div>
+      <div class="filter-chip" onclick="setFilter('done',this)">Done</div>
+      <div class="filter-chip" onclick="setFilter('high',this)">🔴 High</div>
+    </div>
+    <div id="taskList"></div>
+  </div>
+
+  <!-- ── FITNESS PAGE ── -->
+
+  <div class="page" id="page-fitness">
+    <div class="section-label">WEIGHT LOG</div>
+    <div class="weight-cards">
+      <div class="weight-card">
+        <div class="weight-card-label">MORNING</div>
+        <div class="weight-input-row">
+          <input type="number" step="0.1" class="weight-input" id="amWeight" placeholder="0.0">
+          <span class="weight-unit">lbs</span>
+        </div>
+      </div>
+      <div class="weight-card">
+        <div class="weight-card-label">EVENING</div>
+        <div class="weight-input-row">
+          <input type="number" step="0.1" class="weight-input" id="pmWeight" placeholder="0.0">
+          <span class="weight-unit">lbs</span>
+        </div>
+      </div>
+    </div>
+    <button class="log-weight-btn" onclick="logWeight()">LOG TODAY'S WEIGHT</button>
+    <div class="chart-card">
+      <div class="chart-title">WEIGHT TREND (14 DAYS)</div>
+      <canvas id="weightChart" height="160"></canvas>
+    </div>
+    <div class="section-label">HISTORY</div>
+    <div id="fitnessHistory"></div>
+  </div>
+
+  <!-- ── READINGS PAGE ── -->
+
+  <div class="page" id="page-readings">
+    <div class="section-label">PHILOSOPHY READINGS</div>
+    <div id="readingCards"></div>
+  </div>
+
+</div>
+
+<!-- TAB BAR -->
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('mandala',this)">
+    <span class="tab-icon">⬡</span>
+    <span class="tab-label">Mandala</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('journal',this)">
+    <span class="tab-icon">📓</span>
+    <span class="tab-label">Journal</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('tasks',this)">
+    <span class="tab-icon">✓</span>
+    <span class="tab-label">Tasks</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('fitness',this)">
+    <span class="tab-icon">⚖</span>
+    <span class="tab-label">Fitness</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('readings',this)">
+    <span class="tab-icon">📖</span>
+    <span class="tab-label">Readings</span>
+  </button>
+</div>
+
+<!-- TOAST -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+//  DATA DEFINITIONS
+// ═══════════════════════════════════════
+
+const CATEGORIES = [
+  { id: 'body', name: 'Body', icon: '💪', habits: [
+    'Morning workout / movement', '10k steps', 'Stretch or mobility work',
+    'No junk food', 'Sleep 7-8 hrs', 'Stay hydrated', 'Cold shower', 'Track weight'
+  ]},
+  { id: 'mental', name: 'Mental', icon: '🧠', habits: [
+    '10 min meditation / breathwork', 'Read 20 min', 'No doom scrolling',
+    'Journaling', 'Learning session', 'Positive self-talk', 'Focus block', 'Gratitude'
+  ]},
+  { id: 'character', name: 'Character', icon: '⚡', habits: [
+    'Do one hard thing', 'Help someone', 'No complaining',
+    'Be on time', 'Follow through on a promise', 'Own a mistake', 'Act with integrity', 'Show up fully'
+  ]},
+  { id: 'life', name: 'Life / Future', icon: '🌟', habits: [
+    'Work on a long-term goal', 'Review vision board / goals', 'Budget check-in',
+    'Save / invest', 'Plan tomorrow tonight', 'Research or skill-building', 'Declutter something', 'Connect with a mentor'
+  ]},
+  { id: 'education', name: 'Education', icon: '📚', habits: [
+    'Complete assigned readings', 'Review lecture notes', 'Do homework on time',
+    'Study for 1+ hr', 'Attend class fully present', 'Clarify something confusing', 'Write / draft', 'Review next week\'s workload'
+  ]},
+  { id: 'karma', name: 'Karma / Luck', icon: '🍀', habits: [
+    'Random act of kindness', 'Reach out to someone you care about', 'Volunteer or contribute',
+    'Say thank you genuinely', 'Forgive something small', 'Give without expectation', 'Leave things better than you found them', 'Pray or set intentions'
+  ]},
+  { id: 'work', name: 'Work', icon: '🏆', habits: [
+    'Hit daily work target', 'Tackle top priority first', 'No phone during work blocks',
+    'Log hours / tasks', 'Check in with team or manager', 'One above-and-beyond action', 'No procrastination on tough task', 'End day with clean desk / list'
+  ]},
+  { id: 'wellbeing', name: 'Wellbeing', icon: '☀️', habits: [
+    'Time outside', 'Social connection', 'Do something enjoyable',
+    'Limit alcohol', 'No screens 1hr before bed', 'Deep breathing / wind-down', 'Check in with emotions', 'Self-care ritual'
+  ]}
+];
+
+const JOURNAL_PROMPTS = [
+  { id: 'win', label: 'WIN OF THE DAY', q: 'What is one thing that went well today, no matter how small?' },
+  { id: 'lesson', label: 'LESSON LEARNED', q: 'What did you learn today — about yourself, others, or the world?' },
+  { id: 'grateful', label: 'GRATITUDE', q: 'List 3 things you are genuinely grateful for right now.' },
+  { id: 'tomorrow', label: 'TOMORROW\'S INTENTION', q: 'What is the ONE thing you must accomplish tomorrow to move forward?' },
+  { id: 'reflection', label: 'REFLECTION', q: 'How aligned were your actions today with the man you are becoming?' },
+  { id: 'growth', label: 'GROWTH EDGE', q: 'Where did you hold back today? What would the best version of you have done?' },
+];
+
+const READINGS = [
+  { id: 'phl113', course: 'PHL 113 — Ethics', items: [
+    'Introduction to Moral Philosophy', 'Plato – Euthyphro', 'Plato – Republic (excerpt)',
+    'Aristotle – Nicomachean Ethics Bk 1', 'Aristotle – Nicomachean Ethics Bk 2', 'Aristotle – Nicomachean Ethics Bk 10',
+    'Kant – Groundwork for the Metaphysics of Morals', 'Mill – Utilitarianism', 'Rawls – A Theory of Justice (excerpts)',
+  ]},
+  { id: 'phl105', course: 'PHL 105 — Critical Thinking', items: [
+    'Logic and Argument Structure', 'Deductive Reasoning', 'Inductive Reasoning',
+    'Fallacies Pt. 1', 'Fallacies Pt. 2', 'Scientific Method', 'Evaluating Sources',
+    'Constructing Arguments', 'Rhetoric vs. Logic',
+  ]},
+  { id: 'phl114', course: 'PHL 114 — Eastern Philosophy', items: [
+    'Introduction to Eastern Thought', 'Confucius – Analects', 'Taoism – Tao Te Ching Pt. 1',
+    'Taoism – Tao Te Ching Pt. 2', 'Buddhism – The Four Noble Truths', 'Buddhism – The Eightfold Path',
+    'Zen Philosophy', 'Stoicism meets East', 'Synthesis & Reflection',
+  ]},
+];
+
+// ═══════════════════════════════════════
+//  STATE & STORAGE
+// ═══════════════════════════════════════
+
+const LS = {
+  get: (k) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e) { return null; } },
+  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} },
+};
+
+// Each key pattern:
+// habits: 'habits_YYYY-MM-DD' → { catId_habitIdx: true/false }
+// journal: 'journal_YYYY-MM-DD' → { promptId: string }
+// tasks: 'tasks' → [{ id, text, done, priority, created }]
+// fitness: 'fitness' → [{ date, am, pm }]
+// readings: 'readings' → { courseId_itemIdx: true/false }
+// reading_notes: 'reading_notes' → { courseId: string }
+
+let mandalaDate = todayStr();
+let journalDate = todayStr();
+let taskFilter = 'all';
+let weightChart = null;
+
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function formatDateLabel(str) {
+  const d = new Date(str + 'T12:00:00');
+  const opts = { weekday: 'short', month: 'short', day: 'numeric' };
+  return d.toLocaleDateString('en-US', opts);
+}
+
+function adjustDate(str, delta) {
+  const d = new Date(str + 'T12:00:00');
+  d.setDate(d.getDate() + delta);
+  return d.toISOString().split('T')[0];
+}
+
+// ═══════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  btn.classList.add('active');
+
+  if (tab === 'fitness') renderFitnessChart();
+}
+
+// ═══════════════════════════════════════
+//  HEADER
+// ═══════════════════════════════════════
+
+function updateHeader() {
+  const today = todayStr();
+  const d = new Date(today + 'T12:00:00');
+  document.getElementById('headerDate').textContent =
+    d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+  // Streak = consecutive days with at least 1 habit done
+  let streak = 0;
+  let check = today;
+  for (let i = 0; i < 365; i++) {
+    const h = LS.get('habits_' + check) || {};
+    if (Object.values(h).some(v => v)) { streak++; check = adjustDate(check, -1); }
+    else break;
+  }
+  document.getElementById('streakBadge').textContent = '🔥 ' + streak;
+}
+
+// ═══════════════════════════════════════
+//  MANDALA
+// ═══════════════════════════════════════
+
+function changeMandalDate(d) { mandalaDate = adjustDate(mandalaDate, d); renderMandala(); }
+function goMandalToday() { mandalaDate = todayStr(); renderMandala(); }
+
+function getHabits(dateStr) {
+  return LS.get('habits_' + dateStr) || {};
+}
+
+function toggleHabit(catId, idx) {
+  const data = getHabits(mandalaDate);
+  const key = catId + '_' + idx;
+  data[key] = !data[key];
+  LS.set('habits_' + mandalaDate, data);
+  renderMandala();
+  updateHeader();
+}
+
+function renderMandala() {
+  document.getElementById('mandalaDateLabel').textContent = formatDateLabel(mandalaDate);
+  const data = getHabits(mandalaDate);
+
+  let totalDone = 0, totalHabits = 0;
+  CATEGORIES.forEach(cat => { cat.habits.forEach((_, i) => {
+    totalHabits++;
+    if (data[cat.id + '_' + i]) totalDone++;
+  }); });
+
+  // Ring
+  const pct = totalHabits ? Math.round(totalDone / totalHabits * 100) : 0;
+  const circ = 138.2;
+  document.getElementById('ringFill').style.strokeDashoffset = circ - (circ * pct / 100);
+  document.getElementById('ringPct').textContent = pct + '%';
+  document.getElementById('summaryCount').textContent = totalDone + ' / ' + totalHabits + ' habits done';
+
+  // Cards
+  const container = document.getElementById('categoryCards');
+  container.innerHTML = '';
+  CATEGORIES.forEach(cat => {
+    const done = cat.habits.filter((_, i) => data[cat.id + '_' + i]).length;
+    const total = cat.habits.length;
+    const allDone = done === total;
+    const pctCat = Math.round(done / total * 100);
+
+    const card = document.createElement('div');
+    card.className = 'category-card' + (allDone ? ' all-done' : '');
+    card.innerHTML = `
+      <div class="category-header" onclick="toggleCard(this)">
+        <div class="cat-left">
+          <span class="cat-icon">${cat.icon}</span>
+          <span class="cat-name">${cat.name}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="cat-progress">${done}/${total}</span>
+          <span class="cat-chevron">▼</span>
+        </div>
+      </div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pctCat}%"></div></div>
+      <div class="habit-list">
+        ${cat.habits.map((h, i) => {
+          const checked = !!data[cat.id + '_' + i];
+          return `<div class="habit-row" onclick="toggleHabit('${cat.id}',${i})">
+            <div class="habit-checkbox ${checked ? 'checked' : ''}"></div>
+            <span class="habit-text ${checked ? 'done' : ''}">${h}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function toggleCard(header) {
+  const card = header.closest('.category-card');
+  card.classList.toggle('open');
+}
+
+// ═══════════════════════════════════════
+//  JOURNAL
+// ═══════════════════════════════════════
+
+function changeJournalDate(d) { journalDate = adjustDate(journalDate, d); renderJournal(); }
+function goJournalToday() { journalDate = todayStr(); renderJournal(); }
+
+function getJournalData(dateStr) { return LS.get('journal_' + dateStr) || {}; }
+
+function saveJournalEntry(promptId, val) {
+  const data = getJournalData(journalDate);
+  data[promptId] = val;
+  LS.set('journal_' + journalDate, data);
+}
+
+function renderJournal() {
+  document.getElementById('journalDateLabel').textContent = formatDateLabel(journalDate);
+  const data = getJournalData(journalDate);
+  const container = document.getElementById('journalPrompts');
+  container.innerHTML = '';
+
+  JOURNAL_PROMPTS.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'prompt-card';
+    const saved = data[p.id] || '';
+    card.innerHTML = `
+      <div class="prompt-header" onclick="togglePromptCard(this)">
+        <span class="prompt-label">${p.label}</span>
+        <span class="prompt-chevron">▼</span>
+      </div>
+      <div class="prompt-body">
+        <div class="prompt-question">${p.q}</div>
+        <textarea class="journal-textarea" placeholder="Write here…" data-pid="${p.id}"
+          oninput="handleJournalInput(this)">${saved}</textarea>
+
+```
+    <div class="save-indicator" id="ji_${p.id}">${saved ? '● saved' : ''}</div>
+  </div>
+`;
+container.appendChild(card);
+```
+
+});
+}
+
+function togglePromptCard(header) {
+header.closest(’.prompt-card’).classList.toggle(‘open’);
+}
+
+let journalTimers = {};
+function handleJournalInput(ta) {
+const pid = ta.dataset.pid;
+const ind = document.getElementById(‘ji_’ + pid);
+ind.textContent = ‘saving…’;
+ind.classList.remove(‘saved’);
+clearTimeout(journalTimers[pid]);
+journalTimers[pid] = setTimeout(() => {
+saveJournalEntry(pid, ta.value);
+ind.textContent = ‘● saved’;
+ind.classList.add(‘saved’);
+}, 800);
+}
+
+// ═══════════════════════════════════════
+//  TASKS
+// ═══════════════════════════════════════
+
+function getTasks() { return LS.get(‘tasks’) || []; }
+function saveTasks(arr) { LS.set(‘tasks’, arr); }
+
+function addTask() {
+const inp = document.getElementById(‘taskInput’);
+const text = inp.value.trim();
+if (!text) return;
+const priority = document.getElementById(‘taskPriority’).value;
+const tasks = getTasks();
+tasks.unshift({ id: Date.now(), text, done: false, priority, created: todayStr() });
+saveTasks(tasks);
+inp.value = ‘’;
+renderTasks();
+showToast(‘Task added’);
+}
+
+function toggleTask(id) {
+const tasks = getTasks();
+const t = tasks.find(t => t.id == id);
+if (t) { t.done = !t.done; saveTasks(tasks); renderTasks(); }
+}
+
+function deleteTask(id) {
+const tasks = getTasks().filter(t => t.id != id);
+saveTasks(tasks);
+renderTasks();
+showToast(‘Task removed’);
+}
+
+function setFilter(f, el) {
+taskFilter = f;
+document.querySelectorAll(’.filter-chip’).forEach(c => c.classList.remove(‘active’));
+el.classList.add(‘active’);
+renderTasks();
+}
+
+function renderTasks() {
+let tasks = getTasks();
+if (taskFilter === ‘active’) tasks = tasks.filter(t => !t.done);
+else if (taskFilter === ‘done’) tasks = tasks.filter(t => t.done);
+else if (taskFilter === ‘high’) tasks = tasks.filter(t => t.priority === ‘high’);
+
+const container = document.getElementById(‘taskList’);
+if (!tasks.length) {
+container.innerHTML = `<div class="empty-state"><div class="empty-icon">✓</div>No tasks here</div>`;
+return;
+}
+container.innerHTML = tasks.map(t => `<div class="task-item ${t.done ? 'done-task' : ''}"> <div class="task-check ${t.done ? 'checked' : ''}" onclick="toggleTask(${t.id})"></div> <div class="task-body"> <div class="task-text ${t.done ? 'done' : ''}">${escHtml(t.text)}</div> <div class="task-meta"> <span class="priority-dot priority-${t.priority}"></span> ${t.priority} · ${t.created} </div> </div> <button class="task-delete" onclick="deleteTask(${t.id})">✕</button> </div>`).join(’’);
+}
+
+// ═══════════════════════════════════════
+//  FITNESS
+// ═══════════════════════════════════════
+
+function getFitnessLog() { return LS.get(‘fitness’) || []; }
+function saveFitnessLog(arr) { LS.set(‘fitness’, arr); }
+
+function logWeight() {
+const am = parseFloat(document.getElementById(‘amWeight’).value);
+const pm = parseFloat(document.getElementById(‘pmWeight’).value);
+if (!am && !pm) { showToast(‘Enter at least one weight’); return; }
+
+const log = getFitnessLog();
+const today = todayStr();
+const existing = log.findIndex(l => l.date === today);
+const entry = { date: today, am: am || null, pm: pm || null };
+if (existing >= 0) log[existing] = entry;
+else log.unshift(entry);
+saveFitnessLog(log);
+
+document.getElementById(‘amWeight’).value = ‘’;
+document.getElementById(‘pmWeight’).value = ‘’;
+renderFitnessHistory();
+renderFitnessChart();
+showToast(‘Weight logged ✓’);
+}
+
+function renderFitnessHistory() {
+const log = getFitnessLog().slice(0, 14);
+const container = document.getElementById(‘fitnessHistory’);
+if (!log.length) {
+container.innerHTML = `<div class="empty-state"><div class="empty-icon">⚖</div>No entries yet</div>`;
+return;
+}
+container.innerHTML = log.map(e => `<div class="fitness-log-row"> <span class="fitness-log-date">${formatDateLabel(e.date)}</span> <div class="fitness-log-values"> <span>AM: ${e.am ? e.am + ' lbs' : '—'}</span> <span>PM: ${e.pm ? e.pm + ' lbs' : '—'}</span> </div> </div>`).join(’’);
+}
+
+function renderFitnessChart() {
+const log = getFitnessLog().slice(0, 14).reverse();
+const labels = log.map(e => {
+const d = new Date(e.date + ‘T12:00:00’);
+return d.toLocaleDateString(‘en-US’, { month: ‘short’, day: ‘numeric’ });
+});
+const amData = log.map(e => e.am);
+const pmData = log.map(e => e.pm);
+
+const ctx = document.getElementById(‘weightChart’).getContext(‘2d’);
+if (weightChart) weightChart.destroy();
+weightChart = new Chart(ctx, {
+type: ‘line’,
+data: {
+labels,
+datasets: [
+{ label: ‘AM’, data: amData, borderColor: ‘#d4a853’, backgroundColor: ‘rgba(212,168,83,0.08)’,
+tension: 0.4, pointBackgroundColor: ‘#d4a853’, pointRadius: 4, spanGaps: true },
+{ label: ‘PM’, data: pmData, borderColor: ‘#5b9cf6’, backgroundColor: ‘rgba(91,156,246,0.06)’,
+tension: 0.4, pointBackgroundColor: ‘#5b9cf6’, pointRadius: 4, spanGaps: true }
+]
+},
+options: {
+responsive: true,
+plugins: { legend: { labels: { color: ‘#888’, font: { family: ‘DM Mono’, size: 11 } } } },
+scales: {
+x: { ticks: { color: ‘#555’, font: { family: ‘DM Mono’, size: 10 } }, grid: { color: ‘#1a1a1a’ } },
+y: { ticks: { color: ‘#555’, font: { family: ‘DM Mono’, size: 10 } }, grid: { color: ‘#1a1a1a’ } }
+}
+}
+});
+}
+
+// ═══════════════════════════════════════
+//  READINGS
+// ═══════════════════════════════════════
+
+function getReadings() { return LS.get(‘readings’) || {}; }
+function saveReadings(obj) { LS.set(‘readings’, obj); }
+function getReadingNotes() { return LS.get(‘reading_notes’) || {}; }
+function saveReadingNotes(obj) { LS.set(‘reading_notes’, obj); }
+
+function toggleReading(courseId, idx) {
+const data = getReadings();
+const key = courseId + ‘_’ + idx;
+data[key] = !data[key];
+saveReadings(data);
+renderReadings();
+}
+
+function renderReadings() {
+const data = getReadings();
+const notes = getReadingNotes();
+const container = document.getElementById(‘readingCards’);
+container.innerHTML = ‘’;
+
+READINGS.forEach(course => {
+const done = course.items.filter((*, i) => data[course.id + ’*’ + i]).length;
+const card = document.createElement(‘div’);
+card.className = ‘reading-card’;
+card.innerHTML = `<div class="reading-header" onclick="toggleReadingCard(this)"> <span class="reading-course">${course.course}</span> <span class="reading-progress-badge">${done}/${course.items.length}</span> </div> <div class="reading-body"> ${course.items.map((item, i) => { const checked = !!data[course.id + '_' + i]; return`<div class="reading-row" onclick="toggleReading('${course.id}',${i})">
+<div class="reading-check ${checked ? 'checked' : ''}"></div>
+<span class="reading-title ${checked ? 'done' : ''}">${item}</span>
+</div>`; }).join('')} <textarea class="reading-notes-input" placeholder="Course notes…" data-cid="${course.id}" oninput="saveReadingNote(this)">${notes[course.id] || ''}</textarea> </div> `;
+container.appendChild(card);
+});
+}
+
+function toggleReadingCard(header) {
+header.closest(’.reading-card’).classList.toggle(‘open’);
+}
+
+let readingNoteTimers = {};
+function saveReadingNote(ta) {
+const cid = ta.dataset.cid;
+clearTimeout(readingNoteTimers[cid]);
+readingNoteTimers[cid] = setTimeout(() => {
+const notes = getReadingNotes();
+notes[cid] = ta.value;
+saveReadingNotes(notes);
+}, 600);
+}
+
+// ═══════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════
+
+function escHtml(str) {
+return str.replace(/&/g,’&’).replace(/</g,’<’).replace(/>/g,’>’).replace(/”/g,’"’);
+}
+
+let toastTimer;
+function showToast(msg) {
+const t = document.getElementById(‘toast’);
+t.textContent = msg;
+t.classList.add(‘show’);
+clearTimeout(toastTimer);
+toastTimer = setTimeout(() => t.classList.remove(‘show’), 1800);
+}
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+
+function init() {
+updateHeader();
+renderMandala();
+renderJournal();
+renderTasks();
+renderFitnessHistory();
+renderReadings();
+}
+
+init();
+</script>
+
+</body>
+</html>
