@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Become The Man">
+<title>Become The Man</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --gold:#d4a853;--golddim:#a07830;--goldglow:rgba(212,168,83,0.15);
+  --bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;--border:#2a2a2a;
+  --text:#e8e4dc;--dim:#888;--muted:#555;
+  --green:#4caf50;--red:#e05252;--blue:#5b9cf6;
+  --st:env(safe-area-inset-top);--sb:env(safe-area-inset-bottom)
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100dvh;overflow-x:hidden}
+
+/* HEADER */
+#header{position:fixed;top:0;left:0;right:0;z-index:99;
+padding:calc(var(–st) + 10px) 16px 10px;
+background:rgba(10,10,10,0.97);border-bottom:1px solid var(–border);
+display:flex;align-items:center;justify-content:space-between}
+#header .title{font-family:‘Bebas Neue’,sans-serif;font-size:20px;letter-spacing:2px;color:var(–gold)}
+#header .streak{font-family:‘DM Mono’,monospace;font-size:11px;
+background:var(–goldglow);border:1px solid var(–golddim);color:var(–gold);
+padding:3px 9px;border-radius:20px}
+
+/* TABS */
+#tabs{position:fixed;bottom:0;left:0;right:0;z-index:99;
+padding:6px 0 calc(var(–sb) + 6px);
+background:rgba(10,10,10,0.97);border-top:1px solid var(–border);
+display:flex}
+.tab{flex:1;background:none;border:none;display:flex;flex-direction:column;
+align-items:center;gap:2px;cursor:pointer;padding:4px 0}
+.tab .ti{font-size:19px;line-height:1}
+.tab .tl{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:.8px;
+text-transform:uppercase;color:var(–muted);transition:color .2s}
+.tab.on .tl{color:var(–gold)}
+
+/* CONTENT */
+#content{padding-top:calc(var(–st) + 56px);padding-bottom:calc(var(–sb) + 68px)}
+.page{display:none}.page.on{display:block}
+.slabel{font-family:‘Bebas Neue’,sans-serif;font-size:12px;letter-spacing:3px;
+color:var(–muted);padding:16px 16px 8px}
+
+/* CARDS */
+.card{margin:0 16px 10px;background:var(–bg2);border:1px solid var(–border);border-radius:14px;overflow:hidden}
+.card.gold-border{border-color:var(–golddim)}
+
+/* DATE NAV */
+.dnav{display:flex;align-items:center;justify-content:space-between;
+margin:0 16px 10px;background:var(–bg2);border:1px solid var(–border);
+border-radius:12px;padding:6px 10px}
+.dnav button{background:none;border:none;color:var(–gold);font-size:22px;
+cursor:pointer;padding:2px 8px;border-radius:8px;line-height:1}
+.dnav .dlabel{font-family:‘DM Mono’,monospace;font-size:13px;color:var(–text)}
+.dnav .today-btn{background:var(–goldglow);border:1px solid var(–golddim);
+color:var(–gold);font-family:‘DM Mono’,monospace;font-size:11px;
+padding:4px 10px;border-radius:8px;cursor:pointer}
+
+/* PROGRESS RING */
+.ring-wrap{margin:0 16px 10px;background:var(–bg2);border:1px solid var(–border);
+border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px}
+.ring-svg{flex-shrink:0;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(–border);stroke-width:4}
+.ring-fg{fill:none;stroke:var(–gold);stroke-width:4;stroke-linecap:round;
+stroke-dasharray:138.2;stroke-dashoffset:138.2;transition:stroke-dashoffset .4s}
+.ring-label{position:relative}
+.ring-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+font-family:‘DM Mono’,monospace;font-size:11px;color:var(–gold)}
+.ring-info .rt{font-family:‘Bebas Neue’,sans-serif;font-size:14px;letter-spacing:1.5px;color:var(–dim)}
+.ring-info .rc{font-family:‘DM Mono’,monospace;font-size:13px;color:var(–text);margin-top:3px}
+
+/* CATEGORY CARDS */
+.cat-header{display:flex;align-items:center;justify-content:space-between;
+padding:12px 16px;cursor:pointer;user-select:none}
+.cat-left{display:flex;align-items:center;gap:9px}
+.cat-icon{font-size:17px}
+.cat-name{font-family:‘Bebas Neue’,sans-serif;font-size:16px;letter-spacing:1.5px}
+.cat-right{display:flex;align-items:center;gap:9px}
+.cat-prog{font-family:‘DM Mono’,monospace;font-size:11px;color:var(–dim)}
+.chevron{color:var(–muted);font-size:11px;transition:transform .2s;display:inline-block}
+.card.open .chevron{transform:rotate(180deg)}
+.pbar-wrap{height:2px;background:var(–border);margin:0 16px}
+.pbar-fill{height:100%;background:var(–gold);border-radius:2px;transition:width .3s}
+.habit-list{display:none;border-top:1px solid var(–border);margin-top:8px;padding:4px 0 8px}
+.card.open .habit-list{display:block}
+.habit-row{display:flex;align-items:center;gap:12px;padding:8px 16px;cursor:pointer}
+.hbox{width:22px;height:22px;border-radius:6px;border:2px solid var(–border);
+flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.hbox.on{background:var(–gold);border-color:var(–gold)}
+.hbox.on::after{content:‘✓’;color:#000;font-size:13px;font-weight:700}
+.htext{font-size:14px;color:var(–text);flex:1;line-height:1.4}
+.htext.done{color:var(–muted);text-decoration:line-through}
+
+/* JOURNAL */
+.prompt-header{display:flex;align-items:center;justify-content:space-between;
+padding:12px 16px;cursor:pointer;user-select:none}
+.plabel{font-family:‘Bebas Neue’,sans-serif;font-size:14px;letter-spacing:1.5px;color:var(–gold)}
+.prompt-body{display:none;padding:12px 16px 14px;border-top:1px solid var(–border)}
+.card.open .prompt-body{display:block}
+.pq{font-size:13px;color:var(–dim);font-style:italic;margin-bottom:8px;line-height:1.5}
+textarea{width:100%;background:var(–bg3);border:1px solid var(–border);border-radius:10px;
+color:var(–text);font-family:‘DM Sans’,sans-serif;font-size:14px;line-height:1.6;
+padding:11px;resize:none;min-height:90px;outline:none;transition:border-color .2s;
+-webkit-appearance:none}
+textarea:focus{border-color:var(–golddim)}
+textarea::placeholder{color:var(–muted)}
+.saved-ind{font-family:‘DM Mono’,monospace;font-size:10px;color:var(–muted);
+text-align:right;margin-top:4px;min-height:14px}
+.saved-ind.ok{color:var(–green)}
+
+/* TASKS */
+.task-add{display:flex;gap:8px;margin:0 16px 8px}
+.task-add input{flex:1;background:var(–bg2);border:1px solid var(–border);border-radius:10px;
+color:var(–text);font-family:‘DM Sans’,sans-serif;font-size:14px;padding:10px 13px;
+outline:none;transition:border-color .2s;-webkit-appearance:none}
+.task-add input:focus{border-color:var(–golddim)}
+.task-add input::placeholder{color:var(–muted)}
+.add-btn{background:var(–gold);border:none;border-radius:10px;color:#000;
+font-size:22px;width:44px;cursor:pointer;font-weight:700}
+.pri-sel{display:block;width:calc(100% - 32px);margin:0 16px 8px;
+background:var(–bg2);border:1px solid var(–border);border-radius:10px;
+color:var(–dim);font-family:‘DM Mono’,monospace;font-size:12px;
+padding:8px 12px;outline:none;-webkit-appearance:none;appearance:none}
+.filters{display:flex;gap:7px;padding:0 16px 10px;overflow-x:auto;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.chip{background:var(–bg2);border:1px solid var(–border);border-radius:20px;
+color:var(–dim);font-family:‘DM Mono’,monospace;font-size:11px;
+padding:5px 12px;cursor:pointer;white-space:nowrap;transition:all .15s}
+.chip.on{background:var(–goldglow);border-color:var(–golddim);color:var(–gold)}
+.task-item{display:flex;align-items:flex-start;gap:11px;padding:11px 14px;
+margin:0 16px 8px;background:var(–bg2);border:1px solid var(–border);border-radius:12px}
+.task-item.done{opacity:.45}
+.tcheck{width:22px;height:22px;border-radius:50%;border:2px solid var(–border);
+flex-shrink:0;display:flex;align-items:center;justify-content:center;
+cursor:pointer;margin-top:1px;transition:all .15s}
+.tcheck.on{background:var(–green);border-color:var(–green)}
+.tcheck.on::after{content:‘✓’;color:#fff;font-size:12px;font-weight:700}
+.tbody{flex:1}
+.ttext{font-size:14px;color:var(–text);line-height:1.4}
+.ttext.done{text-decoration:line-through;color:var(–muted)}
+.tmeta{font-family:‘DM Mono’,monospace;font-size:11px;color:var(–muted);
+margin-top:3px;display:flex;align-items:center;gap:7px}
+.pdot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.ph{background:var(–red)}.pm{background:var(–gold)}.pl{background:var(–muted)}
+.tdel{background:none;border:none;color:var(–muted);font-size:15px;
+cursor:pointer;padding:2px 5px;border-radius:6px;line-height:1}
+
+/* FITNESS */
+.wgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 16px 10px}
+.wcard{background:var(–bg2);border:1px solid var(–border);border-radius:14px;padding:13px}
+.wlabel{font-family:‘Bebas Neue’,sans-serif;font-size:12px;letter-spacing:2px;
+color:var(–muted);margin-bottom:6px}
+.wrow{display:flex;align-items:center;gap:6px}
+.winput{flex:1;background:var(–bg3);border:1px solid var(–border);border-radius:8px;
+color:var(–text);font-family:‘DM Mono’,monospace;font-size:18px;padding:7px 8px;
+outline:none;width:100%;transition:border-color .2s;-webkit-appearance:none}
+.winput:focus{border-color:var(–golddim)}
+.wunit{font-family:‘DM Mono’,monospace;font-size:12px;color:var(–muted)}
+.log-btn{display:block;width:calc(100% - 32px);margin:0 16px 12px;
+background:var(–gold);border:none;border-radius:10px;color:#000;
+font-family:‘Bebas Neue’,sans-serif;font-size:16px;letter-spacing:2px;
+padding:12px;cursor:pointer}
+.chart-card{margin:0 16px 12px;background:var(–bg2);border:1px solid var(–border);border-radius:14px;padding:14px}
+.chart-title{font-family:‘Bebas Neue’,sans-serif;font-size:13px;letter-spacing:2px;color:var(–dim);margin-bottom:10px}
+.flog-row{display:flex;justify-content:space-between;align-items:center;
+padding:8px 16px;border-bottom:1px solid var(–border);
+font-family:‘DM Mono’,monospace;font-size:12px;color:var(–dim)}
+.flog-row:last-child{border-bottom:none}
+
+/* READINGS */
+.read-header{display:flex;align-items:center;justify-content:space-between;
+padding:12px 16px;cursor:pointer;user-select:none}
+.rcourse{font-family:‘Bebas Neue’,sans-serif;font-size:15px;letter-spacing:1.5px}
+.rbadge{font-family:‘DM Mono’,monospace;font-size:11px;
+background:var(–bg3);border:1px solid var(–border);
+color:var(–dim);padding:3px 8px;border-radius:20px}
+.card.open .rbadge{border-color:var(–golddim);color:var(–gold)}
+.read-body{display:none;padding:10px 16px 14px;border-top:1px solid var(–border)}
+.card.open .read-body{display:block}
+.rrow{display:flex;align-items:center;gap:10px;padding:7px 0;
+border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer}
+.rrow:last-of-type{border-bottom:none}
+.rbox{width:18px;height:18px;border-radius:4px;border:2px solid var(–border);
+flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.rbox.on{background:var(–blue);border-color:var(–blue)}
+.rbox.on::after{content:‘✓’;color:#fff;font-size:10px;font-weight:700}
+.rtitle{font-size:13px;color:var(–text);flex:1;line-height:1.4}
+.rtitle.done{color:var(–muted);text-decoration:line-through}
+.rnotes{margin-top:10px}
+
+/* TOAST */
+#toast{position:fixed;bottom:calc(var(–sb) + 78px);left:50%;
+transform:translateX(-50%) translateY(16px);
+background:var(–bg3);border:1px solid var(–border);border-radius:20px;
+padding:7px 16px;font-family:‘DM Mono’,monospace;font-size:12px;color:var(–text);
+opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;z-index:200}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(–muted);font-size:14px}
+.empty-icon{font-size:30px;margin-bottom:8px}
+</style>
+
+</head>
+<body>
+
+<div id="header">
+  <span class="title">Become The Man</span>
+  <span class="streak" id="streak">🔥 0</span>
+</div>
+
+<div id="content">
+  <div class="page on" id="p-mandala"></div>
+  <div class="page" id="p-journal"></div>
+  <div class="page" id="p-tasks"></div>
+  <div class="page" id="p-fitness"></div>
+  <div class="page" id="p-readings"></div>
+</div>
+
+<div id="tabs">
+  <button class="tab on" data-tab="mandala"><span class="ti">⬡</span><span class="tl">Mandala</span></button>
+  <button class="tab" data-tab="journal"><span class="ti">📓</span><span class="tl">Journal</span></button>
+  <button class="tab" data-tab="tasks"><span class="ti">✓</span><span class="tl">Tasks</span></button>
+  <button class="tab" data-tab="fitness"><span class="ti">⚖</span><span class="tl">Fitness</span></button>
+  <button class="tab" data-tab="readings"><span class="ti">📖</span><span class="tl">Readings</span></button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────
+var CATS = [
+  {id:'body',name:'Body',icon:'💪',habits:['Morning workout / movement','10k steps','Stretch or mobility work','No junk food','Sleep 7-8 hrs','Stay hydrated','Cold shower','Track weight']},
+  {id:'mental',name:'Mental',icon:'🧠',habits:['10 min meditation / breathwork','Read 20 min','No doom scrolling','Journaling','Learning session','Positive self-talk','Focus block','Gratitude']},
+  {id:'character',name:'Character',icon:'⚡',habits:['Do one hard thing','Help someone','No complaining','Be on time','Follow through on a promise','Own a mistake','Act with integrity','Show up fully']},
+  {id:'life',name:'Life / Future',icon:'🌟',habits:['Work on a long-term goal','Review vision / goals','Budget check-in','Save / invest','Plan tomorrow tonight','Research or skill-building','Declutter something','Connect with a mentor']},
+  {id:'education',name:'Education',icon:'📚',habits:['Complete assigned readings','Review lecture notes','Do homework on time','Study for 1+ hr','Attend class fully present','Clarify something confusing','Write / draft','Review next week\'s workload']},
+  {id:'karma',name:'Karma / Luck',icon:'🍀',habits:['Random act of kindness','Reach out to someone you care about','Volunteer or contribute','Say thank you genuinely','Forgive something small','Give without expectation','Leave things better than you found them','Pray or set intentions']},
+  {id:'work',name:'Work',icon:'🏆',habits:['Hit daily work target','Tackle top priority first','No phone during work blocks','Log hours / tasks','Check in with team or manager','One above-and-beyond action','No procrastination on tough task','End day with clean desk / list']},
+  {id:'wellbeing',name:'Wellbeing',icon:'☀️',habits:['Time outside','Social connection','Do something enjoyable','Limit alcohol','No screens 1hr before bed','Deep breathing / wind-down','Check in with emotions','Self-care ritual']}
+];
+
+var PROMPTS = [
+  {id:'win',label:'WIN OF THE DAY',q:'What is one thing that went well today, no matter how small?'},
+  {id:'lesson',label:'LESSON LEARNED',q:'What did you learn today — about yourself, others, or the world?'},
+  {id:'grateful',label:'GRATITUDE',q:'List 3 things you are genuinely grateful for right now.'},
+  {id:'tomorrow',label:"TOMORROW'S INTENTION",q:'What is the ONE thing you must accomplish tomorrow to move forward?'},
+  {id:'reflect',label:'REFLECTION',q:'How aligned were your actions today with the man you are becoming?'},
+  {id:'growth',label:'GROWTH EDGE',q:'Where did you hold back today? What would the best version of you have done?'}
+];
+
+var READINGS = [
+  {id:'phl113',course:'PHL 113 — Ethics',items:['Introduction to Moral Philosophy','Plato – Euthyphro','Plato – Republic (excerpt)','Aristotle – Nicomachean Ethics Bk 1','Aristotle – Nicomachean Ethics Bk 2','Aristotle – Nicomachean Ethics Bk 10','Kant – Groundwork for the Metaphysics of Morals','Mill – Utilitarianism','Rawls – A Theory of Justice (excerpts)']},
+  {id:'phl105',course:'PHL 105 — Critical Thinking',items:['Logic and Argument Structure','Deductive Reasoning','Inductive Reasoning','Fallacies Pt. 1','Fallacies Pt. 2','Scientific Method','Evaluating Sources','Constructing Arguments','Rhetoric vs. Logic']},
+  {id:'phl114',course:'PHL 114 — Eastern Philosophy',items:['Introduction to Eastern Thought','Confucius – Analects','Taoism – Tao Te Ching Pt. 1','Taoism – Tao Te Ching Pt. 2','Buddhism – The Four Noble Truths','Buddhism – The Eightfold Path','Zen Philosophy','Stoicism meets East','Synthesis & Reflection']}
+];
+
+// ── STORAGE ───────────────────────────────────────────────
+function lsGet(k) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+
+// ── DATE HELPERS ──────────────────────────────────────────
+function today() { return new Date().toISOString().split('T')[0]; }
+function fmtDate(s) {
+  var d = new Date(s + 'T12:00:00');
+  return d.toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'});
+}
+function shiftDate(s, n) {
+  var d = new Date(s + 'T12:00:00');
+  d.setDate(d.getDate() + n);
+  return d.toISOString().split('T')[0];
+}
+
+// ── STATE ─────────────────────────────────────────────────
+var mDate = today();
+var jDate = today();
+var tFilter = 'all';
+var jTimers = {};
+var rTimers = {};
+var toastTimer;
+
+// ── UTILS ─────────────────────────────────────────────────
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function toast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { el.classList.remove('show'); }, 1800);
+}
+
+// ── TABS ──────────────────────────────────────────────────
+document.getElementById('tabs').addEventListener('click', function(e) {
+  var btn = e.target.closest('.tab');
+  if (!btn) return;
+  var tab = btn.dataset.tab;
+  document.querySelectorAll('.tab').forEach(function(b) { b.classList.remove('on'); });
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('on'); });
+  btn.classList.add('on');
+  document.getElementById('p-' + tab).classList.add('on');
+  if (tab === 'fitness') drawChart();
+});
+
+// ── STREAK & HEADER ───────────────────────────────────────
+function updateStreak() {
+  var streak = 0;
+  var d = today();
+  for (var i = 0; i < 365; i++) {
+    var h = lsGet('h_' + d) || {};
+    var hasAny = false;
+    for (var k in h) { if (h[k]) { hasAny = true; break; } }
+    if (hasAny) { streak++; d = shiftDate(d, -1); } else break;
+  }
+  document.getElementById('streak').textContent = '🔥 ' + streak;
+}
+
+// ── MANDALA ───────────────────────────────────────────────
+function renderMandala() {
+  var pg = document.getElementById('p-mandala');
+  var habits = lsGet('h_' + mDate) || {};
+
+  var totalDone = 0, totalAll = 0;
+  CATS.forEach(function(cat) {
+    cat.habits.forEach(function(h, i) {
+      totalAll++;
+      if (habits[cat.id + '_' + i]) totalDone++;
+    });
+  });
+
+  var pct = totalAll ? Math.round(totalDone / totalAll * 100) : 0;
+  var circ = 138.2;
+  var offset = circ - (circ * pct / 100);
+
+  var html = '<div class="slabel">DAILY TRACKER</div>';
+
+  // date nav
+  html += '<div class="dnav">'
+    + '<button id="m-prev">‹</button>'
+    + '<span class="dlabel">' + fmtDate(mDate) + '</span>'
+    + '<button class="today-btn" id="m-today">Today</button>'
+    + '<button id="m-next">›</button>'
+    + '</div>';
+
+  // ring
+  html += '<div class="ring-wrap">'
+    + '<div class="ring-label" style="position:relative;width:52px;height:52px;flex-shrink:0">'
+    + '<svg width="52" height="52" viewBox="0 0 52 52" style="transform:rotate(-90deg)">'
+    + '<circle class="ring-bg" cx="26" cy="26" r="22"/>'
+    + '<circle class="ring-fg" cx="26" cy="26" r="22" style="stroke-dashoffset:' + offset + '"/>'
+    + '</svg>'
+    + '<div class="ring-pct">' + pct + '%</div>'
+    + '</div>'
+    + '<div class="ring-info"><div class="rt">TODAY\'S PROGRESS</div><div class="rc">' + totalDone + ' / ' + totalAll + ' habits done</div></div>'
+    + '</div>';
+
+  // category cards
+  CATS.forEach(function(cat) {
+    var done = 0;
+    cat.habits.forEach(function(h, i) { if (habits[cat.id + '_' + i]) done++; });
+    var catPct = Math.round(done / cat.habits.length * 100);
+
+    html += '<div class="card" data-catid="' + cat.id + '">'
+      + '<div class="cat-header">'
+      + '<div class="cat-left"><span class="cat-icon">' + cat.icon + '</span><span class="cat-name">' + cat.name + '</span></div>'
+      + '<div class="cat-right"><span class="cat-prog">' + done + '/' + cat.habits.length + '</span><span class="chevron">▼</span></div>'
+      + '</div>'
+      + '<div class="pbar-wrap"><div class="pbar-fill" style="width:' + catPct + '%"></div></div>'
+      + '<div class="habit-list">';
+
+    cat.habits.forEach(function(h, i) {
+      var checked = !!habits[cat.id + '_' + i];
+      html += '<div class="habit-row" data-cat="' + cat.id + '" data-idx="' + i + '">'
+        + '<div class="hbox' + (checked ? ' on' : '') + '"></div>'
+        + '<span class="htext' + (checked ? ' done' : '') + '">' + esc(h) + '</span>'
+        + '</div>';
+    });
+
+    html += '</div></div>';
+  });
+
+  pg.innerHTML = html;
+
+  // bind date nav
+  document.getElementById('m-prev').addEventListener('click', function() { mDate = shiftDate(mDate, -1); renderMandala(); });
+  document.getElementById('m-next').addEventListener('click', function() { mDate = shiftDate(mDate, 1); renderMandala(); });
+  document.getElementById('m-today').addEventListener('click', function() { mDate = today(); renderMandala(); });
+
+  // bind cat headers (toggle open)
+  pg.querySelectorAll('.cat-header').forEach(function(hdr) {
+    hdr.addEventListener('click', function() {
+      hdr.closest('.card').classList.toggle('open');
+    });
+  });
+
+  // bind habit rows
+  pg.querySelectorAll('.habit-row').forEach(function(row) {
+    row.addEventListener('click', function() {
+      var catId = row.dataset.cat;
+      var idx = parseInt(row.dataset.idx);
+      var h = lsGet('h_' + mDate) || {};
+      var key = catId + '_' + idx;
+      h[key] = !h[key];
+      lsSet('h_' + mDate, h);
+      renderMandala();
+      updateStreak();
+    });
+  });
+}
+
+// ── JOURNAL ───────────────────────────────────────────────
+function renderJournal() {
+  var pg = document.getElementById('p-journal');
+  var data = lsGet('j_' + jDate) || {};
+
+  var html = '<div class="slabel">DAILY JOURNAL</div>';
+  html += '<div class="dnav">'
+    + '<button id="j-prev">‹</button>'
+    + '<span class="dlabel">' + fmtDate(jDate) + '</span>'
+    + '<button class="today-btn" id="j-today">Today</button>'
+    + '<button id="j-next">›</button>'
+    + '</div>';
+
+  PROMPTS.forEach(function(p) {
+    var saved = data[p.id] || '';
+    html += '<div class="card" data-pid="' + p.id + '">'
+      + '<div class="prompt-header">'
+      + '<span class="plabel">' + p.label + '</span>'
+      + '<span class="chevron">▼</span>'
+      + '</div>'
+      + '<div class="prompt-body">'
+      + '<div class="pq">' + p.q + '</div>'
+      + '<textarea placeholder="Write here…" data-pid="' + p.id + '">' + esc(saved) + '</textarea>'
+
+```
+  + '<div class="saved-ind" id="si_' + p.id + '">' + (saved ? '● saved' : '') + '</div>'
+  + '</div></div>';
+```
+
+});
+
+pg.innerHTML = html;
+
+document.getElementById(‘j-prev’).addEventListener(‘click’, function() { jDate = shiftDate(jDate, -1); renderJournal(); });
+document.getElementById(‘j-next’).addEventListener(‘click’, function() { jDate = shiftDate(jDate, 1); renderJournal(); });
+document.getElementById(‘j-today’).addEventListener(‘click’, function() { jDate = today(); renderJournal(); });
+
+pg.querySelectorAll(’.prompt-header’).forEach(function(hdr) {
+hdr.addEventListener(‘click’, function() { hdr.closest(’.card’).classList.toggle(‘open’); });
+});
+
+pg.querySelectorAll(‘textarea’).forEach(function(ta) {
+ta.addEventListener(‘input’, function() {
+var pid = ta.dataset.pid;
+var ind = document.getElementById(‘si_’ + pid);
+ind.textContent = ‘saving…’; ind.classList.remove(‘ok’);
+clearTimeout(jTimers[pid]);
+jTimers[pid] = setTimeout(function() {
+var d = lsGet(‘j_’ + jDate) || {};
+d[pid] = ta.value;
+lsSet(‘j_’ + jDate, d);
+ind.textContent = ‘● saved’; ind.classList.add(‘ok’);
+}, 700);
+});
+});
+}
+
+// ── TASKS ─────────────────────────────────────────────────
+function getTasks() { return lsGet(‘tasks’) || []; }
+function saveTasks(arr) { lsSet(‘tasks’, arr); }
+
+function renderTasks() {
+var pg = document.getElementById(‘p-tasks’);
+var tasks = getTasks();
+var filtered = tasks.filter(function(t) {
+if (tFilter === ‘active’) return !t.done;
+if (tFilter === ‘done’) return t.done;
+if (tFilter === ‘high’) return t.priority === ‘high’;
+return true;
+});
+
+var html = ‘<div class="slabel">TASKS</div>’
++ ‘<div class="task-add">’
++ ‘<input type="text" id="task-input" placeholder="Add a task…">’
++ ‘<button class="add-btn" id="task-add-btn">+</button>’
++ ‘</div>’
++ ‘<select class="pri-sel" id="task-pri">’
++ ‘<option value="med">● Medium priority</option>’
++ ‘<option value="high">● High priority</option>’
++ ‘<option value="low">● Low priority</option>’
++ ‘</select>’
++ ‘<div class="filters">’
++ [‘all’,‘active’,‘done’,‘high’].map(function(f) {
+var labels = {all:‘All’,active:‘Active’,done:‘Done’,high:‘🔴 High’};
+return ‘<div class="chip' + (tFilter===f?' on':'') + '" data-filter="' + f + '">’ + labels[f] + ‘</div>’;
+}).join(’’)
++ ‘</div>’;
+
+if (!filtered.length) {
+html += ‘<div class="empty"><div class="empty-icon">✓</div>Nothing here</div>’;
+} else {
+filtered.forEach(function(t) {
+html += ‘<div class="task-item' + (t.done?' done':'') + '">’
++ ‘<div class="tcheck' + (t.done?' on':'') + '" data-tid="' + t.id + '"></div>’
++ ‘<div class="tbody">’
++ ‘<div class="ttext' + (t.done?' done':'') + '">’ + esc(t.text) + ‘</div>’
++ ‘<div class="tmeta"><span class="pdot p' + t.priority[0] + '"></span>’ + t.priority + ’ · ’ + t.created + ‘</div>’
++ ‘</div>’
++ ‘<button class="tdel" data-tid="' + t.id + '">✕</button>’
++ ‘</div>’;
+});
+}
+
+pg.innerHTML = html;
+
+document.getElementById(‘task-add-btn’).addEventListener(‘click’, addTask);
+document.getElementById(‘task-input’).addEventListener(‘keydown’, function(e) {
+if (e.key === ‘Enter’) addTask();
+});
+
+pg.querySelectorAll(’.chip’).forEach(function(chip) {
+chip.addEventListener(‘click’, function() {
+tFilter = chip.dataset.filter;
+renderTasks();
+});
+});
+
+pg.querySelectorAll(’.tcheck’).forEach(function(el) {
+el.addEventListener(‘click’, function() {
+var id = parseInt(el.dataset.tid);
+var arr = getTasks();
+arr.forEach(function(t) { if (t.id === id) t.done = !t.done; });
+saveTasks(arr); renderTasks();
+});
+});
+
+pg.querySelectorAll(’.tdel’).forEach(function(btn) {
+btn.addEventListener(‘click’, function() {
+var id = parseInt(btn.dataset.tid);
+saveTasks(getTasks().filter(function(t) { return t.id !== id; }));
+renderTasks(); toast(‘Removed’);
+});
+});
+}
+
+function addTask() {
+var inp = document.getElementById(‘task-input’);
+var pri = document.getElementById(‘task-pri’);
+var text = inp ? inp.value.trim() : ‘’;
+if (!text) return;
+var arr = getTasks();
+arr.unshift({id: Date.now(), text: text, done: false, priority: pri ? pri.value : ‘med’, created: today()});
+saveTasks(arr);
+inp.value = ‘’;
+renderTasks();
+toast(‘Task added’);
+}
+
+// ── FITNESS ───────────────────────────────────────────────
+function getFitness() { return lsGet(‘fitness’) || []; }
+function saveFitness(arr) { lsSet(‘fitness’, arr); }
+
+function renderFitness() {
+var pg = document.getElementById(‘p-fitness’);
+var log = getFitness();
+
+var html = ‘<div class="slabel">WEIGHT LOG</div>’
++ ‘<div class="wgrid">’
++ ‘<div class="wcard"><div class="wlabel">MORNING</div><div class="wrow"><input type="number" step="0.1" class="winput" id="wam" placeholder="0.0"><span class="wunit">lbs</span></div></div>’
++ ‘<div class="wcard"><div class="wlabel">EVENING</div><div class="wrow"><input type="number" step="0.1" class="winput" id="wpm" placeholder="0.0"><span class="wunit">lbs</span></div></div>’
++ ‘</div>’
++ ‘<button class="log-btn" id="log-btn">LOG TODAY'S WEIGHT</button>’
++ ‘<div class="chart-card"><div class="chart-title">WEIGHT TREND — 14 DAYS</div><canvas id="wchart" height="150"></canvas></div>’
++ ‘<div class="slabel">HISTORY</div>’;
+
+var recent = log.slice(0, 20);
+if (!recent.length) {
+html += ‘<div class="empty"><div class="empty-icon">⚖</div>No entries yet</div>’;
+} else {
+recent.forEach(function(e) {
+html += ‘<div class="flog-row"><span>’ + fmtDate(e.date) + ‘</span>’
++ ’<span>AM: ’ + (e.am || ‘—’) + ’ · PM: ’ + (e.pm || ‘—’) + ‘</span></div>’;
+});
+}
+
+pg.innerHTML = html;
+
+document.getElementById(‘log-btn’).addEventListener(‘click’, function() {
+var am = parseFloat(document.getElementById(‘wam’).value) || null;
+var pm = parseFloat(document.getElementById(‘wpm’).value) || null;
+if (!am && !pm) { toast(‘Enter a weight first’); return; }
+var log2 = getFitness();
+var t = today();
+var idx = -1;
+log2.forEach(function(e, i) { if (e.date === t) idx = i; });
+var entry = {date: t, am: am, pm: pm};
+if (idx >= 0) log2[idx] = entry; else log2.unshift(entry);
+saveFitness(log2);
+renderFitness();
+drawChart();
+toast(‘Logged ✓’);
+});
+
+drawChart();
+}
+
+function drawChart() {
+var canvas = document.getElementById(‘wchart’);
+if (!canvas) return;
+var log = getFitness().slice(0, 14).reverse();
+var ctx = canvas.getContext(‘2d’);
+var dpr = window.devicePixelRatio || 1;
+var W = canvas.parentElement.clientWidth - 28;
+var H = 150;
+canvas.width = W * dpr; canvas.height = H * dpr;
+canvas.style.width = W + ‘px’; canvas.style.height = H + ‘px’;
+ctx.scale(dpr, dpr);
+ctx.clearRect(0, 0, W, H);
+
+if (!log.length) {
+ctx.fillStyle = ‘#555’; ctx.font = ‘12px monospace’;
+ctx.textAlign = ‘center’; ctx.fillText(‘No data yet’, W/2, H/2); return;
+}
+
+var PAD = {t:10, r:16, b:36, l:46};
+var gW = W - PAD.l - PAD.r, gH = H - PAD.t - PAD.b;
+var vals = [];
+log.forEach(function(e) { if (e.am) vals.push(e.am); if (e.pm) vals.push(e.pm); });
+if (!vals.length) return;
+var minV = Math.floor(Math.min.apply(null,vals) - 1);
+var maxV = Math.ceil(Math.max.apply(null,vals) + 1);
+var range = maxV - minV || 1;
+
+function xOf(i) { return PAD.l + (i / (log.length - 1 || 1)) * gW; }
+function yOf(v) { return PAD.t + gH - ((v - minV) / range) * gH; }
+
+// grid
+ctx.strokeStyle = ‘#1a1a1a’; ctx.lineWidth = 1;
+for (var t = 0; t <= 4; t++) {
+var y = PAD.t + (t/4) * gH;
+ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l + gW, y); ctx.stroke();
+ctx.fillStyle = ‘#555’; ctx.font = ‘9px monospace’; ctx.textAlign = ‘right’;
+ctx.fillText((maxV - range*t/4).toFixed(1), PAD.l - 4, y + 3);
+}
+
+// x labels
+var step = Math.max(1, Math.ceil(log.length / 5));
+log.forEach(function(e, i) {
+if (i % step !== 0 && i !== log.length-1) return;
+var d2 = new Date(e.date + ‘T12:00:00’);
+var lbl = d2.toLocaleDateString(‘en-US’,{month:‘short’,day:‘numeric’});
+ctx.fillStyle = ‘#555’; ctx.font = ‘9px monospace’; ctx.textAlign = ‘center’;
+ctx.fillText(lbl, xOf(i), H - 6);
+});
+
+// lines
+function line(getter, color) {
+ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.lineJoin = ‘round’;
+ctx.beginPath(); var started = false;
+log.forEach(function(e, i) {
+var v = getter(e); if (!v) { started = false; return; }
+if (!started) { ctx.moveTo(xOf(i), yOf(v)); started = true; }
+else ctx.lineTo(xOf(i), yOf(v));
+});
+ctx.stroke();
+log.forEach(function(e, i) {
+var v = getter(e); if (!v) return;
+ctx.beginPath(); ctx.arc(xOf(i), yOf(v), 3, 0, Math.PI*2);
+ctx.fillStyle = color; ctx.fill();
+});
+}
+
+line(function(e){return e.am;}, ‘#d4a853’);
+line(function(e){return e.pm;}, ‘#5b9cf6’);
+
+// legend
+ctx.fillStyle = ‘#d4a853’; ctx.fillRect(PAD.l, H - PAD.b + 14, 10, 2);
+ctx.fillStyle = ‘#888’; ctx.font = ‘9px monospace’; ctx.textAlign = ‘left’;
+ctx.fillText(‘AM’, PAD.l + 13, H - PAD.b + 17);
+ctx.fillStyle = ‘#5b9cf6’; ctx.fillRect(PAD.l + 36, H - PAD.b + 14, 10, 2);
+ctx.fillStyle = ‘#888’; ctx.fillText(‘PM’, PAD.l + 49, H - PAD.b + 17);
+}
+
+// ── READINGS ──────────────────────────────────────────────
+function getReadings() { return lsGet(‘readings’) || {}; }
+function getRNotes() { return lsGet(‘rnotes’) || {}; }
+
+function renderReadings() {
+var pg = document.getElementById(‘p-readings’);
+var data = getReadings();
+var notes = getRNotes();
+
+var html = ‘<div class="slabel">PHILOSOPHY READINGS</div>’;
+
+READINGS.forEach(function(course) {
+var done = 0;
+course.items.forEach(function(item, i) { if (data[course.id + ‘_’ + i]) done++; });
+
+```
+html += '<div class="card" data-cid="' + course.id + '">'
+  + '<div class="read-header">'
+  + '<span class="rcourse">' + course.course + '</span>'
+  + '<span class="rbadge">' + done + '/' + course.items.length + '</span>'
+  + '</div>'
+  + '<div class="read-body">';
+
+course.items.forEach(function(item, i) {
+  var checked = !!data[course.id + '_' + i];
+  html += '<div class="rrow" data-cid="' + course.id + '" data-idx="' + i + '">'
+    + '<div class="rbox' + (checked?' on':'') + '"></div>'
+    + '<span class="rtitle' + (checked?' done':'') + '">' + esc(item) + '</span>'
+    + '</div>';
+});
+
+var savedNote = notes[course.id] || '';
+html += '<textarea class="rnotes" placeholder="Course notes…" data-cid="' + course.id + '">' + esc(savedNote) + '</textarea>'
+  + '</div></div>';
+```
+
+});
+
+pg.innerHTML = html;
+
+pg.querySelectorAll(’.read-header’).forEach(function(hdr) {
+hdr.addEventListener(‘click’, function() { hdr.closest(’.card’).classList.toggle(‘open’); });
+});
+
+pg.querySelectorAll(’.rrow’).forEach(function(row) {
+row.addEventListener(‘click’, function() {
+var cid = row.dataset.cid;
+var idx = parseInt(row.dataset.idx);
+var d = getReadings();
+d[cid + ‘*’ + idx] = !d[cid + ’*’ + idx];
+lsSet(‘readings’, d);
+renderReadings();
+});
+});
+
+pg.querySelectorAll(‘textarea.rnotes’).forEach(function(ta) {
+ta.addEventListener(‘input’, function() {
+var cid = ta.dataset.cid;
+clearTimeout(rTimers[cid]);
+rTimers[cid] = setTimeout(function() {
+var n = getRNotes();
+n[cid] = ta.value;
+lsSet(‘rnotes’, n);
+}, 600);
+});
+});
+}
+
+// ── INIT ──────────────────────────────────────────────────
+updateStreak();
+renderMandala();
+renderJournal();
+renderTasks();
+renderFitness();
+renderReadings();
+</script>
+
+</body>
+</html>
