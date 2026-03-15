@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Hibachi Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- ════════════════════════════════════════════════════════════
+     FIREBASE CONFIG — PASTE YOUR CONFIG OBJECT HERE
+     Replace everything inside the firebaseConfig object below
+     ════════════════════════════════════════════════════════════ -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, set, onValue, remove, push, get }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  /* ▼▼▼ PASTE YOUR FIREBASE CONFIG HERE ▼▼▼ */
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCMXA2a4RUUNuzmTz1QxdJbIciICojLjA8",
+    authDomain:        "restaurant599-b5595.firebaseapp.com",
+    databaseURL:       "https://restaurant599-b5595-default-rtdb.firebaseio.com",
+    projectId:         "restaurant599-b5595",
+    storageBucket:     "restaurant599-b5595.firebasestorage.app",
+    messagingSenderId: "141750935511",
+    appId:             "1:141750935511:web:8ad37806a7d9a70a8e7592",
+    measurementId:     "G-MVT5RGJBLL"
+  };
+  /* ▲▲▲ END OF CONFIG ▲▲▲ */
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+  window._db  = db;
+  window._ref = ref;
+  window._set = set;
+  window._onValue = onValue;
+  window._remove  = remove;
+  window._push    = push;
+  window._get     = get;
+  window._fbReady = true;
+  document.dispatchEvent(new Event('fbReady'));
+</script>
+
+<style>
+/* ── TOKENS ── */
+:root {
+  --bg:      #fdf8f0;
+  --bg2:     #ffffff;
+  --bg3:     #f5efe3;
+  --panel:   #ffffff;
+  --lift:    #fef9f2;
+  --border:  rgba(180,140,60,0.18);
+  --border2: rgba(180,140,60,0.10);
+  --gold:    #9a6e18;
+  --gold2:   #b8892a;
+  --gold3:   rgba(154,110,24,0.12);
+  --text:    #1a1208;
+  --text2:   #4a3818;
+  --text3:   #6a5530;
+  --green:   #1a5e30;
+  --red:     #8a1818;
+  --amber:   #6a4008;
+  --blue:    #1a4070;
+  --r:       8px;
+  --mono:    'IBM Plex Mono', monospace;
+  --sans:    'IBM Plex Sans', sans-serif;
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html { height:100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  height: 100%;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+.app-header {
+  position: sticky; top:0; z-index:100;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+.header-top {
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.app-title {
+  font-family: var(--mono); font-size: 0.85rem; font-weight: 700;
+  color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+.live-dot {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 0.65rem;
+  color: var(--text3); letter-spacing: 0.05em;
+}
+
+.live-dot::before {
+  content:''; width:6px; height:6px; border-radius:50%;
+  background: var(--green);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+/* ── DATE NAV ── */
+.date-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg3); border-radius: var(--r);
+  border: 1px solid var(--border);
+  padding: 0 4px;
+}
+
+.date-nav-btn {
+  width: 38px; height: 38px;
+  background: none; border: none; color: var(--text2);
+  font-size: 1rem; cursor: pointer; border-radius: 6px;
+  display: flex; align-items:center; justify-content:center;
+  transition: all 0.15s;
+}
+
+.date-nav-btn:active { background: var(--lift); }
+
+.date-center {
+  text-align: center; flex:1;
+}
+
+.date-label {
+  font-family: var(--mono); font-weight: 700; font-size: 0.88rem;
+  color: var(--text); letter-spacing: 0.04em;
+}
+
+.date-sub {
+  font-family: var(--mono); font-size: 0.62rem;
+  color: var(--text3); letter-spacing: 0.06em; text-transform:uppercase;
+}
+
+/* ── TABS ── */
+.tab-bar {
+  display: flex; gap: 4px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  padding: 6px 16px 0;
+}
+
+.tab-btn {
+  padding: 9px 18px 8px;
+  font-family: var(--mono); font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.04em;
+  border: none; background: transparent;
+  color: var(--text2); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+
+.tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* ── GRILL CHIPS ── */
+.grill-chips {
+  display: flex; gap: 6px; padding: 10px 16px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  border-bottom: 1px solid var(--border2);
+}
+
+.grill-chip {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 20px;
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 600;
+  border: 1px solid; cursor: default;
+  letter-spacing: 0.03em;
+  transition: all 0.2s;
+}
+
+.grill-chip.open   { color: #1a5e30; border-color: rgba(26,94,48,0.4);    background: rgba(26,94,48,0.08); }
+.grill-chip.nearly { color: #6a4008; border-color: rgba(106,64,8,0.45);   background: rgba(106,64,8,0.08); }
+.grill-chip.full   { color: #8a1818; border-color: rgba(138,24,24,0.4);   background: rgba(138,24,24,0.07); }
+.grill-chip.locked { color: var(--text3); border-color: var(--border);    background: var(--bg3); }
+
+/* ── SCROLL AREA ── */
+.scroll-area {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+}
+
+/* ── TIME SLOT ── */
+.time-block {
+  border-bottom: 1px solid var(--border2);
+}
+
+.time-header {
+  display: flex; align-items: center;
+  padding: 8px 16px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border2);
+  position: sticky; top: 0; z-index: 5;
+}
+
+.time-label {
+  font-family: var(--mono); font-size: 0.8rem; font-weight: 700;
+  color: var(--gold); letter-spacing: 0.05em; min-width: 50px;
+}
+
+.time-chef-info {
+  font-family: var(--mono); font-size: 0.62rem;
+  color: var(--text3); margin-left: 10px; letter-spacing: 0.03em;
+}
+
+.time-add-btn {
+  margin-left: auto;
+  width: 30px; height: 30px;
+  background: var(--gold3); border: 1px solid rgba(212,168,83,0.3);
+  border-radius: 6px; color: var(--gold);
+  font-size: 1.1rem; cursor: pointer;
+  display: flex; align-items:center; justify-content:center;
+  transition: all 0.15s;
+}
+
+.time-add-btn:active { background: rgba(212,168,83,0.22); }
+
+/* grills-row and grill-cell removed — layout now uses slot-res-list */
+
+/* ── RESERVATION LIST (replaces grill-column grid) ── */
+.slot-res-list {
+  padding: 4px 12px 8px;
+  display: flex; flex-direction: column; gap: 5px;
+}
+
+.res-row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 9px 13px;
+  cursor: pointer; transition: all 0.15s;
+  border-left: 3px solid var(--gold2);
+}
+
+.res-row:active { opacity: 0.8; }
+
+.res-row-name {
+  font-family: var(--mono); font-size: 0.8rem; font-weight: 700;
+  color: var(--text); flex: 1; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.res-row-meta {
+  font-family: var(--mono); font-size: 0.65rem;
+  color: var(--text2); display: flex; gap: 8px; align-items: center; flex-shrink: 0;
+}
+
+.res-row-badge {
+  font-family: var(--mono); font-size: 0.6rem; font-weight: 700;
+  padding: 2px 7px; border-radius: 10px;
+  background: rgba(154,110,24,0.1); color: var(--gold);
+  border: 1px solid rgba(154,110,24,0.2);
+}
+
+.slot-empty {
+  padding: 6px 12px 10px;
+  font-family: var(--mono); font-size: 0.65rem;
+  color: var(--text3); font-style: italic;
+}
+
+/* ── HISTORY TAB ── */
+.history-list { padding: 10px 16px; display: flex; flex-direction: column; gap: 6px; }
+
+.history-month-label {
+  font-family: var(--mono); font-size: 0.65rem; font-weight: 700;
+  color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 10px 0 4px; border-bottom: 1px solid var(--border2); margin-bottom: 4px;
+}
+
+.history-entry {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 10px 13px;
+  font-family: var(--mono); font-size: 0.72rem; line-height: 1.6;
+}
+
+.history-entry .h-action {
+  font-weight: 700; font-size: 0.7rem; letter-spacing: 0.04em;
+  text-transform: uppercase; padding: 1px 7px; border-radius: 4px;
+  margin-right: 6px; display: inline-block;
+}
+
+.h-action.create { background: rgba(26,94,48,0.12);  color: #1a5e30; }
+.h-action.edit   { background: rgba(154,110,24,0.12); color: #7a5010; }
+.h-action.delete { background: rgba(138,24,24,0.1);   color: #8a1818; }
+
+.history-entry .h-who {
+  color: var(--gold2); font-weight: 600;
+}
+
+.history-entry .h-detail { color: var(--text2); }
+.history-entry .h-time   { color: var(--text3); font-size: 0.62rem; float: right; }
+
+/* ── RESERVATION CARD ── */
+.res-card {
+  border-radius: 5px; padding: 5px 7px;
+  border-left: 3px solid;
+  margin-bottom: 3px; cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.res-card:active { opacity: 0.8; }
+
+.res-card.grill-1 { background: rgba(42,122,70,0.08);  border-color: #3a9e60; }
+.res-card.grill-2 { background: rgba(42,80,158,0.08);  border-color: #3a60b8; }
+.res-card.grill-3 { background: rgba(158,110,30,0.08); border-color: #b8882a; }
+.res-card.grill-4 { background: rgba(120,42,158,0.08); border-color: #9a4ab8; }
+.res-card.dining  { background: rgba(212,168,83,0.10); border-color: var(--gold2); }
+
+.res-name {
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 700;
+  color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.res-detail {
+  font-family: var(--mono); font-size: 0.62rem;
+  color: var(--text2); display: flex; gap: 6px; flex-wrap: wrap;
+}
+
+.res-badge {
+  font-family: var(--mono); font-size: 0.58rem; font-weight: 600;
+  padding: 1px 5px; border-radius: 3px;
+  background: rgba(255,255,255,0.06); color: var(--text2);
+}
+
+.blocked-cell {
+  background: repeating-linear-gradient(
+    45deg,
+    transparent, transparent 4px,
+    rgba(180,140,60,0.06) 4px, rgba(180,140,60,0.06) 8px
+  );
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 6px;
+  font-family: var(--mono); font-size: 0.58rem;
+  color: var(--text3); text-align: center;
+  min-height: 32px;
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(40,20,0,0.45);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: flex-end;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.modal-sheet {
+  width: 100%; background: var(--bg2);
+  border-radius: 18px 18px 0 0;
+  border-top: 1px solid var(--border);
+  max-height: 92vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+.modal-handle {
+  width: 36px; height: 4px; border-radius: 2px;
+  background: var(--border); margin: 12px auto 0;
+}
+
+.modal-head {
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.modal-title {
+  font-family: var(--mono); font-size: 0.82rem; font-weight: 700;
+  color: var(--gold); letter-spacing: 0.05em; text-transform: uppercase;
+}
+
+.modal-close {
+  width: 32px; height: 32px; border-radius: 6px;
+  background: var(--lift); border: 1px solid var(--border);
+  color: var(--text2); font-size: 1rem; cursor: pointer;
+  display: flex; align-items:center; justify-content:center;
+}
+
+.modal-body { padding: 16px 20px 24px; }
+
+/* ── FORM ── */
+.form-row { margin-bottom: 14px; }
+
+.form-label {
+  font-family: var(--mono); font-size: 0.65rem; font-weight: 600;
+  color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 5px; display: block;
+}
+
+.form-input, .form-select, .form-textarea {
+  width: 100%; background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r); padding: 11px 13px;
+  color: var(--text); font-family: var(--mono); font-size: 0.85rem;
+  outline: none; transition: border-color 0.15s;
+  -webkit-appearance: none; appearance: none;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: rgba(212,168,83,0.5);
+}
+
+.form-input::placeholder { color: var(--text3); }
+.form-textarea { resize: none; min-height: 80px; }
+.form-select option { background: var(--bg2); }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.card-row { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; }
+
+/* ── BUTTONS ── */
+.btn-gold {
+  width: 100%; padding: 13px;
+  background: var(--gold); color: #fff;
+  font-family: var(--mono); font-size: 0.82rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  border: none; border-radius: var(--r); cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-gold:active { background: var(--gold2); }
+.btn-gold:disabled { background: var(--text3); color: var(--bg3); cursor: not-allowed; }
+
+.btn-danger {
+  width: 100%; padding: 11px;
+  background: rgba(138,24,24,0.07); color: #7a1010;
+  font-family: var(--mono); font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  border: 1px solid rgba(184,48,48,0.25); border-radius: var(--r);
+  cursor: pointer; margin-top: 8px; transition: all 0.15s;
+}
+
+.btn-danger:active { background: rgba(184,48,48,0.14); }
+
+.btn-outline {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 10px 22px; border-radius: var(--r);
+  background: transparent; color: var(--text2);
+  font-family: var(--mono); font-size: 0.78rem; font-weight: 600;
+  border: 1px solid var(--border); cursor: pointer;
+  transition: all 0.2s; letter-spacing: 0.03em;
+}
+.btn-outline:hover { border-color: var(--gold2); color: var(--gold); }
+
+/* ── GRILL ASSIGN DISPLAY ── */
+.grill-assign-info {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 14px;
+  font-family: var(--mono); font-size: 0.78rem;
+  color: var(--text2);
+  display: flex; align-items: center; gap: 8px;
+}
+
+.grill-assign-badge {
+  font-weight: 700; font-size: 0.82rem;
+  padding: 3px 10px; border-radius: 4px;
+}
+
+.grill-assign-badge.g1 { background: rgba(26,112,64,0.12);  color: #0e4020; border: 1px solid rgba(26,112,64,0.3); }
+.grill-assign-badge.g2 { background: rgba(26,64,160,0.12);  color: #0e2860; border: 1px solid rgba(26,64,160,0.3); }
+.grill-assign-badge.g3 { background: rgba(154,96,16,0.12);  color: #5a3808; border: 1px solid rgba(154,96,16,0.3); }
+.grill-assign-badge.g4 { background: rgba(122,26,154,0.12); color: #4a0e60; border: 1px solid rgba(122,26,154,0.3); }
+.grill-assign-badge.double { background: rgba(154,110,24,0.12); color: #5a3808; border: 1px solid rgba(154,110,24,0.3); }
+
+.grill-label-row {
+  display: flex; align-items: center; gap: 8px; margin-top: 6px;
+}
+
+.grill-label-row label {
+  font-family: var(--mono); font-size: 0.6rem; color: var(--text3);
+  letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+}
+
+/* ── DOUBLE GRILL CARD ── */
+.res-card.double-grill {
+  background: rgba(154,110,24,0.09);
+  border-left: 3px solid var(--gold2);
+  border-top: 1px dashed rgba(154,110,24,0.25);
+}
+
+/* ── WARNING BANNER ── */
+.warn-banner {
+  background: rgba(106,64,8,0.08);
+  border: 1px solid rgba(106,64,8,0.28);
+  border-radius: 6px; padding: 8px 12px; margin-bottom: 12px;
+  font-family: var(--mono); font-size: 0.7rem;
+  color: #5a3808; letter-spacing: 0.03em;
+  display: flex; gap: 8px; align-items: flex-start;
+}
+
+.err-banner {
+  background: rgba(138,24,24,0.07);
+  border: 1px solid rgba(138,24,24,0.28);
+  border-radius: 6px; padding: 8px 12px; margin-bottom: 12px;
+  font-family: var(--mono); font-size: 0.7rem;
+  color: #7a1010; letter-spacing: 0.03em;
+}
+
+/* ── EMPTY STATE ── */
+.empty-slot {
+  padding: 10px 16px;
+  font-family: var(--mono); font-size: 0.65rem;
+  color: var(--text3); font-style: italic;
+}
+
+/* ── DINING ROOM ── */
+.dining-list { padding: 10px 16px; display: flex; flex-direction: column; gap: 8px; }
+
+.dining-card {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 13px 15px;
+  border-left: 3px solid var(--gold); cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.dining-card:active { border-color: rgba(212,168,83,0.8); }
+
+.dining-name {
+  font-family: var(--mono); font-size: 0.82rem; font-weight: 700; color: var(--text);
+}
+
+.dining-detail {
+  font-family: var(--mono); font-size: 0.65rem; color: var(--text2);
+  margin-top: 3px; display: flex; gap: 10px;
+}
+
+.dining-note {
+  font-size: 0.68rem; color: var(--text3); margin-top: 5px;
+  font-style: italic; line-height: 1.4;
+}
+
+.fab {
+  position: fixed; bottom: 24px; right: 20px; z-index: 200;
+  width: 54px; height: 54px; border-radius: 50%;
+  background: var(--gold); color: #fff;
+  font-size: 1.5rem; font-weight: 600;
+  border: none; cursor: pointer; box-shadow: 0 4px 20px rgba(184,137,42,0.35);
+  display: flex; align-items:center; justify-content:center;
+  transition: all 0.15s;
+}
+
+.fab:active { transform: scale(0.94); }
+
+.section-divider {
+  font-family: var(--mono); font-size: 0.62rem; font-weight: 700;
+  color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 10px 16px 4px;
+  border-top: 1px solid var(--border2);
+}
+
+/* ── CAPACITY BAR ── */
+.cap-bar-wrap {
+  height: 3px; background: var(--bg); border-radius: 2px; margin-top: 3px;
+}
+.cap-bar {
+  height: 100%; border-radius: 2px; transition: width 0.3s;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ════ APP ════════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="app-header">
+    <div class="header-top">
+      <div class="app-title">🔥 Hibachi Tracker</div>
+      <div class="live-dot" id="liveStatus">LIVE</div>
+    </div>
+    <div class="date-nav">
+      <button class="date-nav-btn" onclick="changeDay(-1)">‹</button>
+      <div class="date-center" onclick="toggleCalendar()" style="cursor:pointer">
+        <div class="date-label" id="dateLabel">—</div>
+        <div class="date-sub" id="dateSub">— <span style="font-size:0.55rem;opacity:0.6">📅</span></div>
+      </div>
+      <button class="date-nav-btn" onclick="changeDay(1)">›</button>
+    </div>
+  </div>
+
+  <!-- INLINE CALENDAR DROPDOWN -->
+  <div id="calDropdown" style="display:none;position:sticky;top:62px;z-index:99;background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <button onclick="calShiftMonth(-1)" style="background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text2);padding:4px 10px">‹</button>
+      <span id="calMonthLabel" style="font-family:var(--mono);font-size:0.82rem;font-weight:700;color:var(--text)"></span>
+      <button onclick="calShiftMonth(1)"  style="background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text2);padding:4px 10px">›</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;margin-bottom:6px">
+      <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);padding:2px 0">Su</div>
+      <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);padding:2px 0">Mo</div>
+      <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);padding:2px 0">Tu</div>
+      <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);padding:2px 0">We</div>
+      <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);padding:2px 0">Th</div>
+      <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);padding:2px 0">Fr</div>
+      <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);padding:2px 0">Sa</div>
+    </div>
+    <div id="calGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center"></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-hibachi" onclick="switchTab('hibachi')">🔥 Hibachi</button>
+    <button class="tab-btn"        id="tab-dining"  onclick="switchTab('dining')">🍽 Dining</button>
+    <button class="tab-btn"        id="tab-history" onclick="switchTab('history')">📋 History</button>
+    <button class="tab-btn"        id="tab-export"  onclick="switchTab('export')">📤 Export</button>
+  </div>
+
+  <!-- ═══ HIBACHI TAB ═══ -->
+  <div id="view-hibachi">
+    <div class="grill-chips" id="grillChips"></div>
+    <div class="scroll-area" id="hibachiScroll" style="height:calc(100vh - 210px)">
+      <div id="timeSlots"></div>
+    </div>
+  </div>
+
+  <!-- ═══ DINING TAB ═══ -->
+  <div id="view-dining" style="display:none">
+    <div class="scroll-area" style="height:calc(100vh - 160px)">
+      <div class="dining-list" id="diningList"></div>
+    </div>
+    <button class="fab" onclick="openDiningModal(null)">＋</button>
+  </div>
+
+  <!-- ═══ HISTORY TAB ═══ -->
+  <div id="view-history" style="display:none">
+    <div class="scroll-area" style="height:calc(100vh - 160px)">
+      <div class="history-list" id="historyList">
+        <div class="empty-slot">Loading history…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ EXPORT TAB ═══ -->
+  <div id="view-export" style="display:none">
+    <div class="scroll-area" style="height:calc(100vh - 160px)">
+      <div style="padding:20px 16px">
+
+        <!-- Controls -->
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:16px">
+          <div style="font-family:var(--mono);font-size:0.7rem;font-weight:700;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px">Export Range</div>
+          <div class="form-grid" style="margin-bottom:12px">
+            <div>
+              <label class="form-label">From</label>
+              <input class="form-input" type="date" id="exportFrom">
+            </div>
+            <div>
+              <label class="form-label">To</label>
+              <input class="form-input" type="date" id="exportTo">
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-outline" style="font-size:0.72rem;padding:7px 14px" onclick="setExportRange('month')">This Month</button>
+            <button class="btn-outline" style="font-size:0.72rem;padding:7px 14px" onclick="setExportRange('year')">This Year</button>
+            <button class="btn-outline" style="font-size:0.72rem;padding:7px 14px" onclick="setExportRange('all')">All Time</button>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <button class="btn-gold" style="flex:1;min-width:140px" onclick="runExport()">⟳ Load Data</button>
+          <button class="btn-outline" style="flex:1;min-width:140px" id="copyBtn" onclick="copyTsv()" disabled>⎘ Copy for Spreadsheet</button>
+          <button class="btn-outline" style="flex:1;min-width:140px" id="emailBtn" onclick="emailExport()" disabled>✉ Email Report</button>
+        </div>
+
+        <!-- Status -->
+        <div id="exportStatus" style="font-family:var(--mono);font-size:0.7rem;color:var(--text3);margin-bottom:12px;min-height:18px"></div>
+
+        <!-- Table -->
+        <div id="exportTableWrap" style="display:none">
+          <div style="font-family:var(--mono);font-size:0.65rem;color:var(--text3);margin-bottom:6px;letter-spacing:0.04em">
+            TAB-SEPARATED — paste directly into Google Sheets or Excel
+          </div>
+          <!-- Copyable TSV textarea -->
+          <textarea id="exportTsv" readonly
+            style="width:100%;height:120px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);
+                   padding:10px;font-family:var(--mono);font-size:0.7rem;color:var(--text2);
+                   resize:vertical;outline:none;margin-bottom:14px;line-height:1.5"
+            placeholder="Data will appear here after loading…"></textarea>
+
+          <!-- Visual table -->
+          <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+            <table id="exportTable" style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:0.72rem">
+              <thead>
+                <tr style="background:var(--bg3);border-bottom:2px solid var(--border)">
+                  <th style="padding:8px 10px;text-align:left;color:var(--gold);font-weight:700;letter-spacing:0.05em;white-space:nowrap">DATE</th>
+                  <th style="padding:8px 10px;text-align:left;color:var(--gold);font-weight:700;letter-spacing:0.05em;white-space:nowrap">TIME</th>
+                  <th style="padding:8px 10px;text-align:left;color:var(--gold);font-weight:700;letter-spacing:0.05em;white-space:nowrap">#</th>
+                  <th style="padding:8px 10px;text-align:left;color:var(--gold);font-weight:700;letter-spacing:0.05em;white-space:nowrap">NAME</th>
+                  <th style="padding:8px 10px;text-align:left;color:var(--gold);font-weight:700;letter-spacing:0.05em;white-space:nowrap">PHONE</th>
+                  <th style="padding:8px 10px;text-align:left;color:var(--gold);font-weight:700;letter-spacing:0.05em;white-space:nowrap">INIT</th>
+                  <th style="padding:8px 10px;text-align:left;color:var(--gold);font-weight:700;letter-spacing:0.05em;white-space:nowrap">TYPE</th>
+                  <th style="padding:8px 10px;text-align:left;color:var(--gold);font-weight:700;letter-spacing:0.05em;white-space:nowrap">NOTES</th>
+                </tr>
+              </thead>
+              <tbody id="exportTbody"></tbody>
+            </table>
+          </div>
+          <div id="exportSummary" style="margin-top:14px;padding:12px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border);font-family:var(--mono);font-size:0.72rem;color:var(--text2)"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════ MODAL ════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="closeModalIfOutside(event)">
+  <div class="modal-sheet" id="modalSheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title" id="modalTitle">New Reservation</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ════ SCRIPT ════════════════════════════════════════════════ -->
+<script>
+/* ── CHEF SCHEDULE ── */
+// chefs = how many chef/grill stations are active in that window
+// All 4 grills are always physically available; chef count limits simultaneous active grills
+const CHEF_SCHEDULE = {
+  0: [ // Sunday
+    { start:'12:00', end:'20:00', chefs:2 }
+  ],
+  1: [ // Monday
+    { start:'12:00', end:'16:00', chefs:1 },
+    { start:'16:00', end:'20:00', chefs:2 }
+  ],
+  2: [ // Tuesday
+    { start:'12:00', end:'17:00', chefs:1 },
+    { start:'17:00', end:'20:00', chefs:2 }
+  ],
+  3: [ // Wednesday
+    { start:'12:00', end:'17:00', chefs:1 },
+    { start:'17:00', end:'20:00', chefs:2 }
+  ],
+  4: [ // Thursday
+    { start:'12:00', end:'20:00', chefs:2 }
+  ],
+  5: [ // Friday
+    { start:'12:00', end:'16:00', chefs:2 },
+    { start:'16:00', end:'21:00', chefs:3 }
+  ],
+  6: [ // Saturday
+    { start:'12:00', end:'16:00', chefs:2 },
+    { start:'16:00', end:'21:00', chefs:3 }
+  ]
+};
+
+// Last bookable slot: Fri/Sat = 9 PM, all other days = 8 PM
+// The slot AT closing time is the last valid booking (chef cooks for 1hr after)
+function getLastBookableMinutes(dow) {
+  return (dow === 5 || dow === 6) ? 21*60 : 20*60;
+}
+
+// Slot increment: Mon–Thu use 60-min slots, Fri/Sat/Sun use 30-min slots
+function getSlotIncrement(dow) {
+  return (dow >= 1 && dow <= 4) ? 60 : 30;
+}
+
+const GRILL_COLORS = ['grill-1','grill-2','grill-3','grill-4'];
+const GRILL_COLORS_HEX = ['#1a7040','#1a40a0','#9a6010','#7a1a9a'];
+// Capacity rules by number of groups sharing a grill:
+// 1 group alone  → 14 max
+// 2 groups combined → 13 max total
+// 3+ groups combined → 12 max total
+const CAP_BY_GROUPS = { 1: 14, 2: 13, default: 12 };
+const WARN_GUESTS = 10;
+const COOK_BLOCK_MINUTES = 60;
+const SEAT_BLOCK_MINUTES = 90;
+// Card required: groups of 4+ always, EXCEPT on the day itself groups of 1-5 don't need it
+const CARD_REQUIRED_MIN = 4;        // advance bookings: 4+ need card
+const CARD_SAMEDAY_MAX_NO_CARD = 5; // same-day: ≤5 guests never need card
+
+function cardRequired(guests, bookingDateKey) {
+  const isToday = bookingDateKey === dateKey(new Date());
+  if (isToday && guests <= CARD_SAMEDAY_MAX_NO_CARD) return false;
+  return guests >= CARD_REQUIRED_MIN;
+}
+
+// Per-day grill labels stored in memory (not Firebase — just UI labeling)
+let grillLabels = { G1:'Grill 1', G2:'Grill 2', G3:'Grill 3', G4:'Grill 4' };
+function grillLabel(g) { return grillLabels[`G${g}`] || `Grill ${g}`; }
+
+// Helper: get capacity limit for a grill given how many groups are already there
+function getGrillCap(existingGroupCount) {
+  if (existingGroupCount === 0) return CAP_BY_GROUPS[1];
+  if (existingGroupCount === 1) return CAP_BY_GROUPS[2];
+  return CAP_BY_GROUPS.default;
+}
+
+/* ── STATE ── */
+let currentDate = new Date();
+currentDate.setHours(0,0,0,0);
+let activeTab = 'hibachi';
+let reservations = {}; // keyed by date string
+let diningReservations = {};
+let fbListener = null;
+let fbDiningListener = null;
+
+/* ── DATE UTILS ── */
+function dateKey(d) {
+  return d.toISOString().slice(0,10);
+}
+
+function formatDateLabel(d) {
+  return d.toLocaleDateString('en-CA', { month:'short', day:'numeric', year:'numeric' });
+}
+
+function formatDateSub(d) {
+  return d.toLocaleDateString('en-CA', { weekday:'long' }).toUpperCase();
+}
+
+function timeToMinutes(t) {
+  const [h,m] = t.split(':').map(Number);
+  return h*60+m;
+}
+
+function minutesToTime(m) {
+  const h = Math.floor(m/60); const mn = m%60;
+  return `${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}`;
+}
+
+function displayTime(t) {
+  const [h,m] = t.split(':').map(Number);
+  const suffix = h>=12 ? 'PM':'AM';
+  const dh = h>12 ? h-12 : h===0 ? 12 : h;
+  return `${dh}:${String(m).padStart(2,'0')} ${suffix}`;
+}
+
+/* ── DAY SERVICE WINDOW ── */
+function getServiceWindow(dow) {
+  const sched = CHEF_SCHEDULE[dow];
+  if (!sched || !sched.length) return null;
+  const starts = sched.map(s=>timeToMinutes(s.start));
+  const ends   = sched.map(s=>timeToMinutes(s.end));
+  return { start: Math.min(...starts), end: Math.max(...ends) };
+}
+
+function getChefsAtTime(dow, timeMins) {
+  const sched = CHEF_SCHEDULE[dow];
+  if (!sched) return 0;
+  for (const seg of [...sched].reverse()) {
+    if (timeMins >= timeToMinutes(seg.start) && timeMins < timeToMinutes(seg.end)) {
+      return seg.chefs;
+    }
+  }
+  return 0;
+}
+
+function generateTimeSlots(dow) {
+  const win = getServiceWindow(dow);
+  if (!win) return [];
+  const lastBook = getLastBookableMinutes(dow); // inclusive — 8pm or 9pm IS a valid last slot
+  const inc = getSlotIncrement(dow);
+  const slots = [];
+  for (let m = win.start; m <= lastBook; m += inc) {
+    slots.push(minutesToTime(m));
+  }
+  return slots;
+}
+
+/* ── NAV ── */
+function changeDay(dir) {
+  currentDate = new Date(currentDate.getTime() + dir*86400000);
+  renderDateHeader();
+  subscribeToDate();
+}
+
+function openCalendar() {}  // unused, kept for safety
+
+function toggleCalendar() {
+  const drop = document.getElementById('calDropdown');
+  if (drop.style.display === 'none') {
+    calViewYear  = currentDate.getFullYear();
+    calViewMonth = currentDate.getMonth();
+    renderCalGrid();
+    drop.style.display = 'block';
+  } else {
+    drop.style.display = 'none';
+  }
+}
+
+let calViewYear  = new Date().getFullYear();
+let calViewMonth = new Date().getMonth();
+
+function calShiftMonth(dir) {
+  calViewMonth += dir;
+  if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+  if (calViewMonth < 0)  { calViewMonth = 11; calViewYear--; }
+  renderCalGrid();
+}
+
+function renderCalGrid() {
+  const monthNames = ['January','February','March','April','May','June',
+    'July','August','September','October','November','December'];
+  document.getElementById('calMonthLabel').textContent =
+    `${monthNames[calViewMonth]} ${calViewYear}`;
+
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  const first = new Date(calViewYear, calViewMonth, 1).getDay();
+  const days  = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+  const todayKey = dateKey(new Date());
+  const selKey   = dateKey(currentDate);
+
+  // Empty cells before first day
+  for (let i = 0; i < first; i++) {
+    grid.appendChild(Object.assign(document.createElement('div'), {}));
+  }
+
+  for (let d = 1; d <= days; d++) {
+    const btn = document.createElement('button');
+    const thisKey = `${calViewYear}-${String(calViewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = thisKey === todayKey;
+    const isSel   = thisKey === selKey;
+    btn.textContent = d;
+    btn.style.cssText = `
+      width:100%; padding:6px 2px; border-radius:6px; border:none; cursor:pointer;
+      font-family:var(--mono); font-size:0.75rem; font-weight:${isSel?'700':'400'};
+      background:${isSel ? 'var(--gold)' : isToday ? 'rgba(154,110,24,0.15)' : 'transparent'};
+      color:${isSel ? '#fff' : isToday ? 'var(--gold)' : 'var(--text)'};
+      border:1px solid ${isSel ? 'var(--gold)' : isToday ? 'rgba(154,110,24,0.3)' : 'transparent'};
+    `;
+    btn.onclick = () => pickDate(thisKey);
+    grid.appendChild(btn);
+  }
+}
+
+function pickDate(val) {
+  if (!val) return;
+  const [y,m,d] = val.split('-').map(Number);
+  currentDate = new Date(y, m-1, d);
+  currentDate.setHours(0,0,0,0);
+  renderDateHeader();
+  subscribeToDate();
+  document.getElementById('calDropdown').style.display = 'none';
+}
+
+function renderDateHeader() {
+  document.getElementById('dateLabel').textContent = formatDateLabel(currentDate);
+  document.getElementById('dateSub').textContent   = formatDateSub(currentDate);
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.getElementById('view-hibachi').style.display = tab==='hibachi' ? '' : 'none';
+  document.getElementById('view-dining').style.display  = tab==='dining'  ? '' : 'none';
+  document.getElementById('view-history').style.display = tab==='history' ? '' : 'none';
+  document.getElementById('view-export').style.display  = tab==='export'  ? '' : 'none';
+  document.getElementById('tab-hibachi').classList.toggle('active', tab==='hibachi');
+  document.getElementById('tab-dining').classList.toggle('active',  tab==='dining');
+  document.getElementById('tab-history').classList.toggle('active', tab==='history');
+  document.getElementById('tab-export').classList.toggle('active',  tab==='export');
+  if (tab === 'history') renderHistory();
+  if (tab === 'export')  initExportTab();
+}
+
+/* ── FIREBASE SUBSCRIPTION ── */
+let fbHistoryListener = null;
+let auditLog = {}; // keyed by month "YYYY-MM"
+
+function subscribeToDate() {
+  if (!window._db) return;
+  const key = dateKey(currentDate);
+
+  // Hibachi
+  if (fbListener) fbListener();
+  const rRef = window._ref(window._db, `reservations/${key}`);
+  fbListener = window._onValue(rRef, snap => {
+    reservations[key] = snap.val() || {};
+    renderHibachi();
+  });
+
+  // Dining
+  if (fbDiningListener) fbDiningListener();
+  const dRef = window._ref(window._db, `dining/${key}`);
+  fbDiningListener = window._onValue(dRef, snap => {
+    diningReservations[key] = snap.val() || {};
+    renderDining();
+  });
+
+  // History — subscribe to current month
+  const monthKey = key.slice(0,7); // "YYYY-MM"
+  if (fbHistoryListener) fbHistoryListener();
+  const hRef = window._ref(window._db, `auditlog/${monthKey}`);
+  fbHistoryListener = window._onValue(hRef, snap => {
+    auditLog[monthKey] = snap.val() || {};
+    if (activeTab === 'history') renderHistory();
+  });
+}
+
+async function logAudit(action, details, staffInitials) {
+  if (!window._db) return;
+  const monthKey = dateKey(currentDate).slice(0,7);
+  const entry = {
+    action, // 'create' | 'edit' | 'delete'
+    details,
+    staff: staffInitials || '??',
+    date: dateKey(currentDate),
+    ts: Date.now()
+  };
+  try {
+    await window._push(window._ref(window._db, `auditlog/${monthKey}`), entry);
+  } catch(e) { console.warn('Audit log failed:', e); }
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  list.innerHTML = '';
+
+  // Collect all months from auditLog
+  const months = Object.keys(auditLog).sort().reverse();
+
+  // Also try to load previous months if not already loaded
+  if (!months.length) {
+    list.innerHTML = '<div class="empty-slot">No history recorded yet.</div>';
+    return;
+  }
+
+  months.forEach(month => {
+    const entries = Object.entries(auditLog[month] || {})
+      .map(([id, e]) => ({id, ...e}))
+      .sort((a,b) => b.ts - a.ts);
+
+    if (!entries.length) return;
+
+    const monthLabel = document.createElement('div');
+    monthLabel.className = 'history-month-label';
+    const [y, m] = month.split('-');
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    monthLabel.textContent = `${monthNames[parseInt(m)-1]} ${y}`;
+    list.appendChild(monthLabel);
+
+    entries.forEach(e => {
+      const div = document.createElement('div');
+      div.className = 'history-entry';
+      const t = new Date(e.ts);
+      const timeStr = t.toLocaleDateString('en-CA',{month:'short',day:'numeric'}) + ' ' +
+        t.toLocaleTimeString('en-CA',{hour:'numeric',minute:'2-digit'});
+      div.innerHTML = `
+        <span class="h-time">${timeStr}</span>
+        <span class="h-action ${e.action}">${e.action}</span>
+        <span class="h-who">${escHtml(e.staff)}</span>
+        <span class="h-detail"> — ${escHtml(e.details)}</span>`;
+      list.appendChild(div);
+    });
+  });
+
+  // Button to load more months
+  const loadBtn = document.createElement('button');
+  loadBtn.className = 'btn-outline';
+  loadBtn.style.cssText = 'margin:12px auto;display:block;padding:8px 20px;font-size:0.75rem';
+  loadBtn.textContent = 'Load previous months';
+  loadBtn.onclick = loadMoreHistory;
+  list.appendChild(loadBtn);
+}
+
+async function loadMoreHistory() {
+  if (!window._db) return;
+  // Load last 6 months
+  const now = new Date();
+  for (let i = 1; i <= 6; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const mk = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    if (auditLog[mk] !== undefined) continue;
+    try {
+      const snap = await window._get(window._ref(window._db, `auditlog/${mk}`));
+      auditLog[mk] = snap.val() || {};
+    } catch(e) { auditLog[mk] = {}; }
+  }
+  renderHistory();
+}
+
+/* ── BOOKING HELPERS ── */
+function getResForDateSlotGrill(dateStr, slot, grill) {
+  const all = reservations[dateStr] || {};
+  return Object.entries(all).filter(([id,r]) => {
+    if (r.slot !== slot) return false;
+    if (r.grill === grill) return true;
+    return false;
+  }).map(([id,r])=>({id,...r}));
+}
+
+function getAllResForDate(dateStr) {
+  return Object.entries(reservations[dateStr]||{}).map(([id,r])=>({id,...r}));
+}
+
+// Returns groups currently seated/active at this grill during the seating window
+function getGroupsAtGrillAtSlot(dateStr, grill, slotMins, excludeId) {
+  const all = getAllResForDate(dateStr);
+  return all.filter(r => {
+    if (excludeId && r.id === excludeId) return false;
+    if (r.grill !== grill) return false;
+    const rMins = timeToMinutes(r.slot);
+    // Active during seating window: booked within 90 min before slotMins
+    return rMins <= slotMins && slotMins < rMins + SEAT_BLOCK_MINUTES;
+  });
+}
+
+// Total guests at grill during the seating window
+function getGrillGuestsAtSlot(dateStr, grill, slotMins, excludeId) {
+  return getGroupsAtGrillAtSlot(dateStr, grill, slotMins, excludeId)
+    .reduce((s,r) => s + (r.guests||0), 0);
+}
+
+function isGrillBlocked(dateStr, grill, slotMins) {
+  const all = getAllResForDate(dateStr);
+  for (const r of all) {
+    if (r.grill !== grill) continue;
+    const rMins = timeToMinutes(r.slot);
+    if (slotMins > rMins && slotMins < rMins + COOK_BLOCK_MINUTES) {
+      return { reason:'cook', bookedAt: r.slot };
+    }
+  }
+  return null;
+}
+
+function isGrillBlockedExcluding(dateStr, grill, slotMins, excludeId) {
+  const all = getAllResForDate(dateStr).filter(r => r.id !== excludeId);
+  for (const r of all) {
+    if (r.grill !== grill) continue;
+    const rMins = timeToMinutes(r.slot);
+    if (slotMins > rMins && slotMins < rMins + COOK_BLOCK_MINUTES) return { reason:'cook', bookedAt: r.slot };
+  }
+  return null;
+}
+
+function grillStatus(dateStr, grill) {
+  // Use current time for today, start of day for other days
+  const dow = currentDate.getDay();
+  const win = getServiceWindow(dow);
+  const now = new Date();
+  let checkMins;
+  if (dateKey(currentDate) === dateKey(new Date())) {
+    checkMins = now.getHours()*60 + now.getMinutes();
+  } else {
+    checkMins = win ? win.start : 0;
+  }
+  const groups = getGroupsAtGrillAtSlot(dateStr, grill, checkMins, null);
+  const totalGuests = groups.reduce((s,r) => s+(r.guests||0), 0);
+  const cap = getGrillCap(groups.length);
+  if (!groups.length) return 'open';
+  if (totalGuests >= cap) return 'full';
+  if (totalGuests >= WARN_GUESTS) return 'nearly';
+  return 'open';
+}
+
+/**
+ * AUTO-ASSIGN: finds best available grill for new group.
+ * Priority: grill with existing group(s) that still has room (combine groups),
+ * then empty grill. All 4 grills available; chef count = max simultaneous active grills.
+ */
+function autoAssignGrill(dateStr, slot, guests, chefs, excludeId) {
+  const slotMins = timeToMinutes(slot);
+
+  // Build state for each grill
+  const grillState = [];
+  for (let g = 1; g <= 4; g++) {
+    const blocked = isGrillBlockedExcluding(dateStr, g, slotMins, excludeId);
+    const groups = getGroupsAtGrillAtSlot(dateStr, g, slotMins, excludeId);
+    const totalGuests = groups.reduce((s,r) => s+(r.guests||0), 0);
+    const cap = getGrillCap(groups.length); // cap for adding ONE MORE group
+    const room = cap - totalGuests;
+    grillState.push({ g, blocked, groups, totalGuests, cap, room });
+  }
+
+  // Count how many grills are currently active (have groups seated now)
+  const activeGrills = grillState.filter(s => s.groups.length > 0).map(s => s.g);
+
+  // First pass: try to COMBINE into an existing grill that has room
+  for (const state of grillState) {
+    if (state.blocked) continue;
+    if (state.groups.length === 0) continue; // skip empty for now
+    if (state.room >= guests) {
+      return { grill: state.g, isDouble: false };
+    }
+  }
+
+  // Second pass: assign to a fresh empty grill (must respect chef count)
+  for (const state of grillState) {
+    if (state.blocked) continue;
+    if (state.groups.length > 0) continue; // already tried these
+    // Check chef availability: activeGrills + this new one must not exceed chefs
+    // (A grill with existing groups already counted in activeGrills)
+    const wouldBeActive = activeGrills.length + 1;
+    if (wouldBeActive > chefs) continue;
+    const cap = getGrillCap(0); // 1 group alone
+    if (cap >= guests) {
+      return { grill: state.g, isDouble: false };
+    }
+  }
+
+  return null; // no availability
+}
+
+/* ── RENDER HIBACHI ── */
+function renderHibachi() {
+  renderGrillChips();
+  renderTimeSlots();
+}
+
+function renderGrillChips() {
+  const key = dateKey(currentDate);
+  const dow = currentDate.getDay();
+  const win = getServiceWindow(dow);
+  const container = document.getElementById('grillChips');
+  container.innerHTML = '';
+  if (!win) {
+    container.innerHTML = '<div style="font-family:var(--mono);font-size:0.68rem;color:var(--text3);padding:8px">Closed today</div>';
+    return;
+  }
+  const now = new Date(); let curMins;
+  if (dateKey(currentDate) === dateKey(new Date())) {
+    curMins = now.getHours()*60 + now.getMinutes();
+  } else {
+    curMins = win.start;
+  }
+  const chefs = getChefsAtTime(dow, curMins);
+
+  // Total guests currently seated across all grills
+  const allToday = getAllResForDate(key);
+  let totalNow = 0, totalGroups = 0;
+  for (let g=1; g<=4; g++) {
+    const groups = getGroupsAtGrillAtSlot(key, g, curMins, null);
+    totalNow += groups.reduce((s,r)=>s+(r.guests||0),0);
+    totalGroups += groups.length;
+  }
+
+  // Guests booked today total
+  const totalBooked = allToday.reduce((s,r)=>s+(r.guests||0),0);
+  const totalBookings = allToday.length;
+
+  const items = [
+    { label: `${chefs} CHEF${chefs!==1?'S':''}`, cls: 'open', style: 'color:#7a5010;border-color:rgba(154,110,24,0.35);background:rgba(154,110,24,0.09)' },
+    { label: `${totalGroups} SEATED NOW`, cls: totalGroups ? 'nearly' : 'open' },
+    { label: `${totalNow} GUESTS NOW`, cls: totalNow >= 40 ? 'full' : totalNow >= 24 ? 'nearly' : 'open' },
+    { label: `${totalBookings} BOOKED TODAY`, cls: 'open' },
+  ];
+
+  items.forEach(item => {
+    const chip = document.createElement('div');
+    chip.className = `grill-chip ${item.cls}`;
+    if (item.style) chip.style.cssText = item.style;
+    chip.textContent = item.label;
+    container.appendChild(chip);
+  });
+}
+
+function renderTimeSlots() {
+  const container = document.getElementById('timeSlots');
+  container.innerHTML = '';
+  const dow = currentDate.getDay();
+  const slots = generateTimeSlots(dow);
+  const key = dateKey(currentDate);
+
+  if (!slots.length) {
+    container.innerHTML = '<div class="empty-slot">No service scheduled for this day.</div>';
+    return;
+  }
+
+  slots.forEach(slot => {
+    const slotMins = timeToMinutes(slot);
+    const chefs = getChefsAtTime(dow, slotMins);
+    if (chefs === 0) return;
+
+    // All reservations at this exact slot
+    const allRecs = getAllResForDate(key).filter(r => r.slot === slot);
+
+    const block = document.createElement('div');
+    block.className = 'time-block';
+
+    const head = document.createElement('div');
+    head.className = 'time-header';
+    const totalAtSlot = allRecs.reduce((s,r)=>s+(r.guests||0),0);
+    head.innerHTML = `
+      <div class="time-label">${displayTime(slot)}</div>
+      <div class="time-chef-info">${chefs} chef${chefs!==1?'s':''} · ${allRecs.length} group${allRecs.length!==1?'s':''} · ${totalAtSlot} guests</div>
+      <button class="time-add-btn" onclick="openHibachiModal('${slot}',null)" aria-label="Add reservation">+</button>`;
+    block.appendChild(head);
+
+    const listDiv = document.createElement('div');
+    listDiv.className = 'slot-res-list';
+
+    if (!allRecs.length) {
+      const em = document.createElement('div');
+      em.className = 'slot-empty';
+      em.textContent = 'No bookings yet — tap + to add';
+      listDiv.appendChild(em);
+    } else {
+      allRecs.sort((a,b)=>(a.name||'').localeCompare(b.name||'')).forEach(r => {
+        const row = document.createElement('div');
+        row.className = 'res-row';
+
+        // Check if this grill is blocked for future guests (cook block)
+        const blockInfo = isGrillBlocked(key, r.grill, slotMins);
+
+        row.innerHTML = `
+          <div class="res-row-meta" style="flex-shrink:0">
+            <span style="font-weight:700;color:var(--text);font-size:0.82rem">👥 ${r.guests}</span>
+          </div>
+          <div class="res-row-name">${escHtml(r.name||'Guest')}</div>
+          <div class="res-row-meta">
+            ${r.phone ? `<span>${escHtml(r.phone)}</span>` : ''}
+            ${r.initials ? `<span class="res-row-badge">${escHtml(r.initials)}</span>` : ''}
+          </div>`;
+        row.onclick = () => openHibachiModal(slot, r.id);
+        listDiv.appendChild(row);
+      });
+    }
+
+    block.appendChild(listDiv);
+    container.appendChild(block);
+  });
+}
+
+/* ── RENDER DINING ── */
+function renderDining() {
+  const key = dateKey(currentDate);
+  const list = document.getElementById('diningList');
+  list.innerHTML = '';
+  const all = Object.entries(diningReservations[key]||{});
+
+  if (!all.length) {
+    list.innerHTML = '<div class="empty-slot">No dining room reservations for this day.</div>';
+    return;
+  }
+
+  all.sort(([,a],[,b]) => (a.name||'').localeCompare(b.name||''));
+  all.forEach(([id,r]) => {
+    const card = document.createElement('div');
+    card.className = 'dining-card';
+    card.innerHTML = `
+      <div class="dining-name">${escHtml(r.name||'Guest')}</div>
+      <div class="dining-detail">
+        <span>👥 ${r.guests} guests</span>
+        ${r.phone ? `<span>📞 ${escHtml(r.phone)}</span>` : ''}
+      </div>
+      ${r.notes ? `<div class="dining-note">${escHtml(r.notes)}</div>` : ''}`;
+    card.onclick = () => openDiningModal({id,...r});
+    list.appendChild(card);
+  });
+}
+
+/* ── HIBACHI MODAL ── */
+function openHibachiModal(slot, editId) {
+  const key = dateKey(currentDate);
+  const dow = currentDate.getDay();
+  const slotMins = slot ? timeToMinutes(slot) : 0;
+  const chefs = getChefsAtTime(dow, slotMins);
+  const existing = editId ? (reservations[key]||{})[editId] : null;
+
+  document.getElementById('modalTitle').textContent = editId ? 'Edit Reservation' : 'New Hibachi Reservation';
+
+  const needCard = cardRequired(existing?.guests||0, dateKey(currentDate));
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row">
+      <label class="form-label">Time Slot</label>
+      <select class="form-select" id="fSlot" onchange="previewGrillAssign()">
+        ${generateTimeSlots(dow).filter(s => getChefsAtTime(dow, timeToMinutes(s))>0).map(s =>
+          `<option value="${s}" ${s===slot?'selected':''}>${displayTime(s)}</option>`
+        ).join('')}
+      </select>
+    </div>
+    <div class="form-grid">
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Party Size *</label>
+        <input class="form-input" id="fGuests" type="number" min="1" max="14"
+          placeholder="e.g. 4" value="${existing?.guests||''}"
+          oninput="previewGrillAssign();toggleCardFields()">
+      </div>
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Phone *</label>
+        <input class="form-input" id="fPhone" type="tel" placeholder="(506) 555-0100"
+          value="${escHtml(existing?.phone||'')}" oninput="fmtPhone(this)" maxlength="14">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Guest Name *</label>
+      <input class="form-input" id="fName" type="text" placeholder="Last name or full name" value="${escHtml(existing?.name||'')}">
+    </div>
+    <div class="form-row" id="grillPreviewRow">
+      <label class="form-label">Seating Assignment</label>
+      <div id="grillPreview" class="grill-assign-info">
+        <span style="color:var(--text3);font-style:italic">Enter party size to see assignment</span>
+      </div>
+    </div>
+    <div id="cardSection" style="${needCard || !editId ? '' : 'display:none'}">
+      <div class="card-row" style="margin:0 0 14px">
+        <div class="form-row" style="margin:0">
+          <label class="form-label">Card Number <span style="color:var(--red)" id="cardStar">*</span></label>
+          <input class="form-input" id="fCard" type="text" maxlength="19"
+            placeholder="•••• •••• •••• ••••" value="${escHtml(existing?.card||'')}" oninput="fmtCard(this)">
+        </div>
+        <div class="form-row" style="margin:0">
+          <label class="form-label">Expiry <span style="color:var(--red)">*</span></label>
+          <input class="form-input" id="fExpiry" type="text" maxlength="5"
+            placeholder="MM/YY" value="${escHtml(existing?.expiry||'')}" oninput="fmtExpiry(this)">
+        </div>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Staff Initials *</label>
+        <input class="form-input" id="fInitials" type="text" maxlength="4"
+          placeholder="JS" value="${escHtml(existing?.initials||'')}">
+      </div>
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Booked On</label>
+        <input class="form-input" id="fBookedOn" type="date"
+          value="${existing?.bookedOn||new Date().toISOString().slice(0,10)}">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="fNotes"
+        placeholder="Allergies, special requests, birthday…">${escHtml(existing?.notes||'')}</textarea>
+    </div>
+    <div id="formErr"></div>
+    <button class="btn-gold" onclick="saveHibachi('${key}','${editId||''}')">
+      ${editId ? '✓ Update Reservation' : '✓ Confirm Reservation'}
+    </button>
+    ${editId ? `<button class="btn-danger" onclick="confirmDelete('${key}','${editId}')">✕ Delete Reservation</button>` : ''}
+  `;
+
+  if (existing) {
+    const slotM = timeToMinutes(existing.slot);
+    const exGroups = getGroupsAtGrillAtSlot(key, existing.grill, slotM, editId);
+    showGrillAssignPreview(existing.grill, existing.guests, exGroups);
+    toggleCardFields();
+  }
+
+  showModal();
+}
+
+function confirmDelete(dk, id) {
+  // Inject inline delete confirmation with initials requirement
+  const err = document.getElementById('formErr');
+  err.innerHTML = `
+    <div class="warn-banner" style="flex-direction:column;gap:8px">
+      <div>⚠ Confirm deletion — enter your initials to proceed:</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input class="form-input" id="delInitials" type="text" maxlength="4"
+          placeholder="Your initials" style="flex:1;padding:8px 10px">
+        <button onclick="deleteRes('${dk}','${id}')"
+          style="padding:8px 16px;background:var(--red);color:#fff;border:none;border-radius:var(--r);font-family:var(--mono);font-size:0.75rem;font-weight:700;cursor:pointer">
+          DELETE
+        </button>
+      </div>
+    </div>`;
+}
+
+function toggleCardFields() {
+  const guests = parseInt(document.getElementById('fGuests')?.value)||0;
+  const section = document.getElementById('cardSection');
+  if (!section) return;
+  const needed = cardRequired(guests, dateKey(currentDate));
+  section.style.display = needed ? '' : 'none';
+}
+
+function previewGrillAssign() {
+  const key = dateKey(currentDate);
+  const dow = currentDate.getDay();
+  const slot = document.getElementById('fSlot')?.value;
+  const guests = parseInt(document.getElementById('fGuests')?.value) || 0;
+  if (!slot || !guests) return;
+  const slotMins = timeToMinutes(slot);
+  const chefs = getChefsAtTime(dow, slotMins);
+  const editIdMatch = document.querySelector('.btn-gold')?.getAttribute('onclick')?.match(/'([^']*)',\s*'([^']*)'\)/);
+  const editId = editIdMatch?.[2] || null;
+  const assign = autoAssignGrill(key, slot, guests, chefs, editId || undefined);
+  if (!assign) {
+    document.getElementById('grillPreview').innerHTML =
+      `<span style="color:#8a1818">⚠ No availability for ${guests} guests at this time</span>`;
+    return;
+  }
+  // Show combining info
+  const existingGroups = getGroupsAtGrillAtSlot(key, assign.grill, slotMins, editId || undefined);
+  showGrillAssignPreview(assign.grill, guests, existingGroups);
+}
+
+function showGrillAssignPreview(g, guests, existingGroups) {
+  const el = document.getElementById('grillPreview');
+  if (!el) return;
+  const existingGuests = existingGroups.reduce((s,r)=>s+(r.guests||0),0);
+  const cap = getGrillCap(existingGroups.length);
+  const names = existingGroups.map(r=>r.name).filter(Boolean);
+  const combineNote = names.length
+    ? `<span style="color:var(--amber);font-size:0.72rem">Joining: ${names.join(', ')} · ${existingGuests}+${guests}=${existingGuests+guests}/${cap}</span>`
+    : `<span style="color:var(--text2)">Solo group · max ${cap} guests</span>`;
+  el.innerHTML = `
+    <span class="grill-assign-badge g${g}">${grillLabel(g)}</span>
+    ${combineNote}`;
+}
+
+async function saveHibachi(dk, editId) {
+  const name     = document.getElementById('fName').value.trim();
+  const guests   = parseInt(document.getElementById('fGuests').value)||0;
+  const card     = document.getElementById('fCard')?.value.trim() || '';
+  const expiry   = document.getElementById('fExpiry')?.value.trim() || '';
+  const phone    = document.getElementById('fPhone').value.replace(/\D/g,'');
+  const initials = document.getElementById('fInitials').value.trim().toUpperCase();
+  const bookedOn = document.getElementById('fBookedOn').value;
+  const notes    = document.getElementById('fNotes').value.trim();
+  const slot     = document.getElementById('fSlot').value;
+  const err      = document.getElementById('formErr');
+  err.innerHTML  = '';
+
+  if (!name)                return showErr('Guest name is required.');
+  if (!guests || guests<1)  return showErr('Party size must be at least 1.');
+  if (guests > 14)          return showErr('Maximum party size is 14.');
+  if (!initials)            return showErr('Staff initials are required.');
+  if (!phone || (phone.length !== 7 && phone.length !== 10))
+    return showErr('Phone must be exactly 7 digits (local) or 10 digits (with area code).');
+
+  if (cardRequired(guests, dk)) {
+    if (!card || card.replace(/\s/g,'').length < 12) return showErr('Card number required for this booking (min 12 digits).');
+    if (!expiry || expiry.length < 5) return showErr('Card expiry required (MM/YY).');
+  }
+
+  const slotMins = timeToMinutes(slot);
+  const dow = currentDate.getDay();
+  const chefs = getChefsAtTime(dow, slotMins);
+
+  const assign = autoAssignGrill(dk, slot, guests, chefs, editId || undefined);
+  if (!assign) return showErr(`No availability at ${displayTime(slot)} for ${guests} guests. All stations are full or at chef capacity.`);
+
+  const existingGroups = getGroupsAtGrillAtSlot(dk, assign.grill, slotMins, editId || undefined);
+  const existingGuests = existingGroups.reduce((s,r)=>s+(r.guests||0),0);
+  const cap = getGrillCap(existingGroups.length);
+  if (existingGuests + guests > cap) {
+    return showErr(`Station full: ${existingGuests}+${guests}=${existingGuests+guests} exceeds max ${cap} for ${existingGroups.length+1} groups.`);
+  }
+
+  // Format phone for storage as (XXX) XXX-XXXX or XXX-XXXX
+  const fmtPhoneVal = phone.length === 10
+    ? `(${phone.slice(0,3)}) ${phone.slice(3,6)}-${phone.slice(6)}`
+    : phone.length === 7
+    ? `${phone.slice(0,3)}-${phone.slice(3)}`
+    : phone;
+
+  const data = { name, guests, phone: fmtPhoneVal, initials, bookedOn, notes, slot, grill: assign.grill, updatedAt: Date.now() };
+  if (card) { data.card = card; data.expiry = expiry; }
+
+  const isNew = !editId;
+  const oldData = editId ? (reservations[dk]||{})[editId] : null;
+
+  try {
+    if (editId) {
+      await window._set(window._ref(window._db, `reservations/${dk}/${editId}`), data);
+      await logAudit('edit', `${name} · ${guests}p · ${displayTime(slot)}${oldData ? ` (was: ${oldData.name}, ${oldData.guests}p)` : ''}`, initials);
+    } else {
+      await window._push(window._ref(window._db, `reservations/${dk}`), data);
+      await logAudit('create', `${name} · ${guests}p · ${displayTime(slot)}`, initials);
+    }
+    closeModal();
+  } catch(e) { showErr('Firebase error: ' + e.message); }
+}
+
+async function deleteRes(dk, id) {
+  const initials = document.getElementById('delInitials')?.value.trim().toUpperCase();
+  if (!initials) {
+    document.getElementById('delInitials')?.focus();
+    return;
+  }
+  const r = (reservations[dk]||{})[id];
+  try {
+    await logAudit('delete', `${r?.name||'?'} · ${r?.guests||'?'}p · ${displayTime(r?.slot||'00:00')}`, initials);
+    await window._remove(window._ref(window._db, `reservations/${dk}/${id}`));
+    closeModal();
+  } catch(e) { showErr('Firebase error: ' + e.message); }
+}
+
+/* ── DINING MODAL ── */
+function openDiningModal(existing) {
+  document.getElementById('modalTitle').textContent = existing ? 'Edit Dining Reservation' : 'Dining Room';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row">
+      <label class="form-label">Guest Name *</label>
+      <input class="form-input" id="dName" type="text" placeholder="Last name or full name" value="${escHtml(existing?.name||'')}">
+    </div>
+    <div class="form-grid">
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Party Size *</label>
+        <input class="form-input" id="dGuests" type="number" min="1" placeholder="e.g. 3" value="${existing?.guests||''}">
+      </div>
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Phone</label>
+        <input class="form-input" id="dPhone" type="tel" placeholder="506-555-0100" value="${escHtml(existing?.phone||'')}">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="dNotes" placeholder="Allergies, preferences, time preference…">${escHtml(existing?.notes||'')}</textarea>
+    </div>
+    <div id="formErr"></div>
+    <button class="btn-gold" onclick="saveDining('${dateKey(currentDate)}','${existing?.id||''}')">
+      ${existing ? '✓ Update' : '✓ Add to Dining'}
+    </button>
+    ${existing ? `<button class="btn-danger" onclick="deleteDining('${dateKey(currentDate)}','${existing.id}')">✕ Remove</button>` : ''}
+  `;
+  showModal();
+}
+
+async function saveDining(dk, editId) {
+  const name   = document.getElementById('dName').value.trim();
+  const guests = parseInt(document.getElementById('dGuests').value)||0;
+  const phone  = document.getElementById('dPhone').value.trim();
+  const notes  = document.getElementById('dNotes').value.trim();
+
+  if (!name)   return showErr('Guest name is required.');
+  if (!guests) return showErr('Party size required.');
+
+  const data = { name, guests, phone, notes, updatedAt: Date.now() };
+  try {
+    if (editId) {
+      await window._set(window._ref(window._db, `dining/${dk}/${editId}`), data);
+    } else {
+      await window._push(window._ref(window._db, `dining/${dk}`), data);
+    }
+    closeModal();
+  } catch(e) { showErr('Firebase error: '+e.message); }
+}
+
+async function deleteDining(dk, id) {
+  if (!confirm('Remove this reservation?')) return;
+  await window._remove(window._ref(window._db, `dining/${dk}/${id}`));
+  closeModal();
+}
+
+/* ── MODAL UTILS ── */
+function showModal() {
+  document.getElementById('modalOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function closeModalIfOutside(e) {
+  if (e.target.id === 'modalOverlay') closeModal();
+}
+
+function showErr(msg) {
+  const el = document.getElementById('formErr');
+  if (el) el.innerHTML = `<div class="err-banner">${escHtml(msg)}</div>`;
+}
+
+/* ── INPUT FORMATTERS ── */
+function fmtCard(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,16);
+  el.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+
+function fmtExpiry(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,4);
+  if (v.length>=3) v = v.slice(0,2)+'/'+v.slice(2);
+  el.value = v;
+}
+
+function fmtPhone(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,10);
+  if (v.length > 6) {
+    el.value = `(${v.slice(0,3)}) ${v.slice(3,6)}-${v.slice(6)}`;
+  } else if (v.length > 3) {
+    el.value = `(${v.slice(0,3)}) ${v.slice(3)}`;
+  } else if (v.length > 0) {
+    el.value = `(${v}`;
+  }
+}
+
+/* ── EXPORT ─────────────────────────────────────────────────── */
+let exportRows = []; // holds the built dataset
+
+function initExportTab() {
+  // Default range: current year
+  const now = new Date();
+  const y = now.getFullYear();
+  document.getElementById('exportFrom').value = `${y}-01-01`;
+  document.getElementById('exportTo').value   = `${y}-12-31`;
+}
+
+function setExportRange(mode) {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth()+1).padStart(2,'0');
+  const lastDay = new Date(y, now.getMonth()+1, 0).getDate();
+  if (mode === 'month') {
+    document.getElementById('exportFrom').value = `${y}-${m}-01`;
+    document.getElementById('exportTo').value   = `${y}-${m}-${lastDay}`;
+  } else if (mode === 'year') {
+    document.getElementById('exportFrom').value = `${y}-01-01`;
+    document.getElementById('exportTo').value   = `${y}-12-31`;
+  } else { // all time — 5 years back to 1 year forward
+    document.getElementById('exportFrom').value = `${y-5}-01-01`;
+    document.getElementById('exportTo').value   = `${y+1}-12-31`;
+  }
+}
+
+async function runExport() {
+  if (!window._db) {
+    document.getElementById('exportStatus').textContent = '⚠ Firebase not connected.';
+    return;
+  }
+  const fromVal = document.getElementById('exportFrom').value;
+  const toVal   = document.getElementById('exportTo').value;
+  if (!fromVal || !toVal) {
+    document.getElementById('exportStatus').textContent = '⚠ Set a date range first.';
+    return;
+  }
+
+  const status = document.getElementById('exportStatus');
+  status.textContent = '⟳ Loading all reservations…';
+  document.getElementById('copyBtn').disabled = true;
+  document.getElementById('emailBtn').disabled = true;
+
+  // Build list of all dates in range
+  const from = new Date(fromVal); from.setHours(0,0,0,0);
+  const to   = new Date(toVal);   to.setHours(0,0,0,0);
+
+  exportRows = [];
+
+  // Fetch all hibachi reservations — Firebase query by date keys
+  // We read each date individually (Firebase RTDB has no range query on keys without indexes)
+  // For a year that's up to 366 reads but they're tiny and batched
+  let d = new Date(from);
+  let fetched = 0;
+  const promises = [];
+
+  while (d <= to) {
+    const dk = dateKey(d);
+    promises.push(
+      window._get(window._ref(window._db, `reservations/${dk}`))
+        .then(snap => {
+          const data = snap.val();
+          if (data) {
+            Object.values(data).forEach(r => {
+              exportRows.push({
+                date: dk,
+                time: r.slot ? displayTime(r.slot) : '—',
+                guests: r.guests || '',
+                name: r.name || '',
+                phone: r.phone || '',
+                initials: r.initials || '',
+                type: 'Hibachi',
+                notes: (r.notes || '').replace(/\n/g,' '),
+                _sortKey: dk + (r.slot||'00:00')
+              });
+            });
+          }
+        }).catch(()=>{}),
+      window._get(window._ref(window._db, `dining/${dk}`))
+        .then(snap => {
+          const data = snap.val();
+          if (data) {
+            Object.values(data).forEach(r => {
+              exportRows.push({
+                date: dk,
+                time: '—',
+                guests: r.guests || '',
+                name: r.name || '',
+                phone: r.phone || '',
+                initials: r.initials || '',
+                type: 'Dining',
+                notes: (r.notes || '').replace(/\n/g,' '),
+                _sortKey: dk + '99:99'
+              });
+            });
+          }
+        }).catch(()=>{})
+    );
+    d = new Date(d.getTime() + 86400000);
+    fetched++;
+  }
+
+  await Promise.all(promises);
+
+  // Sort by date + time
+  exportRows.sort((a,b) => a._sortKey.localeCompare(b._sortKey));
+
+  status.textContent = `✓ Loaded ${exportRows.length} reservation${exportRows.length!==1?'s':''} across ${fetched} days`;
+
+  renderExportTable();
+  buildTsv();
+
+  document.getElementById('copyBtn').disabled = exportRows.length === 0;
+  document.getElementById('emailBtn').disabled = exportRows.length === 0;
+  document.getElementById('exportTableWrap').style.display = exportRows.length ? 'block' : 'none';
+}
+
+function renderExportTable() {
+  const tbody = document.getElementById('exportTbody');
+  tbody.innerHTML = '';
+
+  let totalGuests = 0;
+  let hibachiCount = 0;
+  let diningCount = 0;
+
+  exportRows.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    tr.style.cssText = `border-bottom:1px solid var(--border2);background:${i%2===0?'var(--bg2)':'var(--bg3)'}`;
+    const cells = [
+      fmtDateDisplay(r.date),
+      r.time,
+      r.guests,
+      r.name,
+      r.phone,
+      r.initials,
+      r.type,
+      r.notes || '—'
+    ];
+    cells.forEach((val, ci) => {
+      const td = document.createElement('td');
+      td.style.cssText = `padding:7px 10px;color:${ci===2?'var(--text)':ci===3?'var(--text)':'var(--text2)'};white-space:${ci===7?'normal':'nowrap'};font-weight:${ci===2||ci===3?'600':'400'}`;
+      td.textContent = val;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+
+    totalGuests += parseInt(r.guests)||0;
+    if (r.type==='Hibachi') hibachiCount++;
+    else diningCount++;
+  });
+
+  document.getElementById('exportSummary').innerHTML =
+    `<strong style="color:var(--text)">${exportRows.length}</strong> total reservations &nbsp;·&nbsp; ` +
+    `<strong style="color:var(--text)">${totalGuests}</strong> total guests &nbsp;·&nbsp; ` +
+    `<strong style="color:var(--text)">${hibachiCount}</strong> hibachi &nbsp;·&nbsp; ` +
+    `<strong style="color:var(--text)">${diningCount}</strong> dining room`;
+}
+
+function fmtDateDisplay(dk) {
+  const [y,m,d] = dk.split('-').map(Number);
+  const date = new Date(y, m-1, d);
+  return date.toLocaleDateString('en-CA', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+}
+
+function buildTsv() {
+  const headers = ['DATE','TIME','GUESTS','NAME','PHONE','INITIALS','TYPE','NOTES'];
+  const lines = [headers.join('\t')];
+  exportRows.forEach(r => {
+    lines.push([
+      fmtDateDisplay(r.date),
+      r.time,
+      r.guests,
+      r.name,
+      r.phone,
+      r.initials,
+      r.type,
+      r.notes || ''
+    ].join('\t'));
+  });
+  document.getElementById('exportTsv').value = lines.join('\n');
+}
+
+function copyTsv() {
+  const ta = document.getElementById('exportTsv');
+  ta.select();
+  ta.setSelectionRange(0, 999999);
+  try {
+    document.execCommand('copy');
+    const btn = document.getElementById('copyBtn');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 2000);
+  } catch(e) {
+    // fallback: navigator clipboard
+    navigator.clipboard?.writeText(ta.value).then(() => {
+      document.getElementById('copyBtn').textContent = '✓ Copied!';
+    });
+  }
+}
+
+function emailExport() {
+  if (!exportRows.length) return;
+  const from = document.getElementById('exportFrom').value;
+  const to   = document.getElementById('exportTo').value;
+
+  const subject = `Hibachi Reservations Export — ${from} to ${to}`;
+
+  // Plain text table for email body
+  const col = (s, w) => String(s||'').padEnd(w).slice(0,w);
+  const divider = '─'.repeat(90);
+
+  let body = `HIBACHI RESERVATION EXPORT\n`;
+  body += `Range: ${from} → ${to}\n`;
+  body += `Generated: ${new Date().toLocaleString('en-CA')}\n`;
+  body += `Total: ${exportRows.length} reservations\n\n`;
+  body += divider + '\n';
+  body += col('DATE',22) + col('TIME',10) + col('#',4) + col('NAME',18) + col('PHONE',15) + col('INIT',6) + col('TYPE',8) + 'NOTES\n';
+  body += divider + '\n';
+
+  exportRows.forEach(r => {
+    body += col(fmtDateDisplay(r.date),22) +
+            col(r.time,10) +
+            col(r.guests,4) +
+            col(r.name,18) +
+            col(r.phone,15) +
+            col(r.initials,6) +
+            col(r.type,8) +
+            (r.notes||'') + '\n';
+  });
+
+  body += divider + '\n';
+  const totalGuests = exportRows.reduce((s,r)=>s+(parseInt(r.guests)||0),0);
+  body += `TOTAL GUESTS: ${totalGuests}\n`;
+
+  // mailto: limit is ~2000 chars for body on mobile — we chunk if needed
+  const encodedBody = encodeURIComponent(body);
+  const encodedSubject = encodeURIComponent(subject);
+
+  // Check length — if too long, warn and just open with summary
+  if (encodedBody.length > 8000) {
+    // Too long for mailto on most mobile clients — copy instead and tell user
+    navigator.clipboard?.writeText(body).then(() => {
+      alert(`The export is too large for a single email (${exportRows.length} rows).\n\nThe full report has been COPIED TO YOUR CLIPBOARD.\n\nOpen your email app, compose a new email, and paste it in.`);
+    }).catch(() => {
+      document.getElementById('exportTsv').value = body;
+      alert('Export copied to the text box above — select all and copy, then paste into an email.');
+    });
+    return;
+  }
+
+  window.location.href = `mailto:?subject=${encodedSubject}&body=${encodedBody}`;
+}
+
+/* ── MISC ── */
+function escHtml(str) {
+  return String(str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ── INIT ── */
+function init() {
+  renderDateHeader();
+  document.getElementById('liveStatus').style.display = window._fbReady ? 'flex' : 'none';
+  subscribeToDate();
+}
+
+if (window._fbReady) {
+  init();
+} else {
+  document.addEventListener('fbReady', init);
+  // Offline fallback: render with empty data
+  setTimeout(() => {
+    if (!window._fbReady) {
+      reservations = {}; diningReservations = {};
+      renderDateHeader();
+      renderHibachi();
+    }
+  }, 2000);
+}
+</script>
+</body>
+</html>
