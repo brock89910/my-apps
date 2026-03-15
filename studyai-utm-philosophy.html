@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyAI — UTM Philosophy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400;1,600&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ─────────────────────────────────── */
+:root {
+  --ink:      #0d0c0a;
+  --paper:    #111009;
+  --surface:  #181610;
+  --raised:   #1e1b12;
+  --lift:     #252118;
+  --edge:     rgba(210,185,120,0.12);
+  --edge2:    rgba(210,185,120,0.06);
+  --gold:     #c9a84c;
+  --gold2:    #e2c97e;
+  --gold3:    #f5e9c0;
+  --ash:      #7a7060;
+  --fog:      #4a4438;
+  --text:     #e8dfc8;
+  --text2:    #9e9278;
+  --text3:    #5a5040;
+  --red:      #c0614a;
+  --green:    #5a9e70;
+  --blue:     #5a7a9e;
+  --r: 14px;
+  --glow: 0 0 40px rgba(201,168,76,0.12);
+  --shadow: 0 4px 32px rgba(0,0,0,0.6);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--text);
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 17px;
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Subtle paper texture overlay */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(201,168,76,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(201,168,76,0.03) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  background-size: 100% 100%, 100% 100%, 300px 300px;
+  mix-blend-mode: screen;
+}
+
+/* ─── NAV ─────────────────────────────────────── */
+nav {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(13,12,10,0.92);
+  backdrop-filter: blur(20px) saturate(1.4);
+  border-bottom: 1px solid var(--edge);
+  display: flex; align-items: center;
+  padding: 0 40px; height: 62px;
+  gap: 32px;
+}
+
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem; font-weight: 800;
+  color: var(--gold2);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-shadow: 0 0 20px rgba(201,168,76,0.3);
+  margin-right: 8px;
+}
+
+.nav-logo em {
+  font-style: italic; color: var(--gold);
+  font-weight: 400;
+}
+
+.nav-sep { width: 1px; height: 24px; background: var(--edge); }
+
+.nav-tabs {
+  display: flex; gap: 2px; flex: 1;
+}
+
+.nav-tab {
+  padding: 7px 16px; border-radius: 8px;
+  font-family: 'Crimson Pro', serif; font-size: 0.95rem;
+  color: var(--text2); border: none; background: transparent;
+  cursor: pointer; transition: all 0.2s; letter-spacing: 0.02em;
+}
+
+.nav-tab:hover { color: var(--text); background: var(--raised); }
+
+.nav-tab.active {
+  color: var(--gold2);
+  background: rgba(201,168,76,0.1);
+  border: 1px solid rgba(201,168,76,0.2);
+}
+
+.nav-course {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem; color: var(--text2);
+  background: var(--raised); border: 1px solid var(--edge);
+  border-radius: 6px; padding: 4px 10px;
+  white-space: nowrap;
+}
+
+/* ─── LAYOUT ──────────────────────────────────── */
+main {
+  position: relative; z-index: 1;
+  max-width: 1080px; margin: 0 auto;
+  padding: 48px 32px 100px;
+}
+
+.page { display: none; animation: pageIn 0.35s ease; }
+.page.active { display: block; }
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── HOMEPAGE ────────────────────────────────── */
+.hero {
+  text-align: center;
+  padding: 56px 0 48px;
+}
+
+.hero-rule {
+  display: flex; align-items: center; gap: 16px;
+  justify-content: center; margin-bottom: 28px;
+}
+
+.hero-rule-line {
+  width: 60px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold));
+}
+
+.hero-rule-line.r { background: linear-gradient(90deg, var(--gold), transparent); }
+
+.hero-rule-sym {
+  font-family: 'Playfair Display', serif;
+  color: var(--gold); font-size: 1.1rem; opacity: 0.7;
+}
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3rem, 7vw, 5.2rem);
+  font-weight: 800; line-height: 1.0; letter-spacing: -0.02em;
+  color: var(--text); margin-bottom: 6px;
+}
+
+.hero h1 em {
+  font-style: italic; color: var(--gold2);
+  text-shadow: 0 0 30px rgba(201,168,76,0.2);
+}
+
+.hero-sub {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic; font-size: 1.15rem;
+  color: var(--text2); margin-bottom: 40px;
+  letter-spacing: 0.03em;
+}
+
+.quick-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 16px; margin-top: 8px;
+}
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--r);
+  padding: 28px 22px;
+  cursor: pointer; text-align: left;
+  transition: all 0.25s;
+  position: relative; overflow: hidden;
+}
+
+.q-card::after {
+  content: ''; position: absolute;
+  bottom: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.q-card:hover {
+  border-color: rgba(201,168,76,0.35);
+  background: var(--raised);
+  transform: translateY(-3px);
+  box-shadow: var(--glow);
+}
+
+.q-card:hover::after { transform: scaleX(1); }
+
+.q-icon { font-size: 1.8rem; margin-bottom: 14px; }
+
+.q-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem; font-weight: 600;
+  color: var(--text); margin-bottom: 6px;
+}
+
+.q-desc { font-size: 0.85rem; color: var(--text2); line-height: 1.5; }
+
+/* ─── SHARED CARD ─────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--r);
+}
+
+.section-header { margin-bottom: 28px; }
+
+.section-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--gold);
+  opacity: 0.7; margin-bottom: 6px;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem; font-weight: 800;
+  letter-spacing: -0.02em; color: var(--text);
+  margin-bottom: 4px;
+}
+
+.section-sub { color: var(--text2); font-size: 0.93rem; font-style: italic; }
+
+/* ─── CHATBOT ─────────────────────────────────── */
+.chat-wrap {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 18px;
+  height: calc(100vh - 220px);
+  min-height: 520px;
+}
+
+.chat-sidebar {
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--r);
+  padding: 14px 10px;
+  overflow-y: auto; display: flex; flex-direction: column; gap: 2px;
+}
+
+.sidebar-section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--text3); padding: 8px 8px 4px;
+}
+
+.sb-btn {
+  width: 100%; text-align: left; border: none;
+  background: transparent; color: var(--text2);
+  padding: 9px 10px; border-radius: 8px;
+  font-family: 'Crimson Pro', serif; font-size: 0.9rem;
+  cursor: pointer; transition: all 0.15s; line-height: 1.3;
+}
+
+.sb-btn:hover { background: var(--raised); color: var(--text); }
+.sb-btn.active { background: rgba(201,168,76,0.1); color: var(--gold2); }
+
+.chat-panel {
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--r);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-topbar {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--edge2);
+  display: flex; align-items: center; gap: 12px;
+  background: var(--raised);
+}
+
+.tutor-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(135deg, #2a200a, #3d2e0e);
+  border: 1px solid rgba(201,168,76,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 0 16px rgba(201,168,76,0.2);
+  flex-shrink: 0;
+}
+
+.tutor-name {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600; font-size: 1rem; color: var(--text);
+}
+
+.tutor-status {
+  font-size: 0.75rem; color: var(--green);
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'Crimson Pro', serif; font-style: italic;
+}
+
+.tutor-status::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); animation: breathe 2.5s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,100% { opacity: 1; box-shadow: 0 0 4px var(--green); }
+  50%      { opacity: 0.4; box-shadow: none; }
+}
+
+.chat-messages {
+  flex: 1; overflow-y: auto;
+  padding: 24px 20px; display: flex;
+  flex-direction: column; gap: 18px;
+  scroll-behavior: smooth;
+}
+
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-thumb { background: var(--edge); border-radius: 4px; }
+
+.msg { display: flex; gap: 10px; max-width: 88%; animation: msgIn 0.3s ease; }
+.msg.user { align-self: flex-end; flex-direction: row-reverse; }
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.msg-av {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; flex-shrink: 0;
+  background: var(--raised); border: 1px solid var(--edge);
+}
+
+.msg.ai .msg-av {
+  background: linear-gradient(135deg, #2a200a, #3d2e0e);
+  border-color: rgba(201,168,76,0.25);
+}
+
+.bubble {
+  padding: 13px 17px; border-radius: 12px;
+  font-size: 0.95rem; line-height: 1.7;
+}
+
+.msg.ai .bubble {
+  background: var(--raised);
+  border: 1px solid var(--edge2);
+  border-top-left-radius: 3px;
+  color: var(--text);
+}
+
+.msg.user .bubble {
+  background: linear-gradient(135deg, #2a1e06, #3d2c09);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-top-right-radius: 3px;
+  color: var(--gold3);
+}
+
+.bubble code {
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(0,0,0,0.4); padding: 1px 6px;
+  border-radius: 4px; font-size: 0.82em;
+  color: var(--gold2);
+}
+
+.bubble blockquote {
+  border-left: 2px solid var(--gold);
+  padding-left: 12px; margin: 8px 0;
+  color: var(--text2); font-style: italic;
+}
+
+.typing { display: flex; gap: 5px; align-items: center; padding: 4px 0; }
+.t-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--gold); opacity: 0.6;
+  animation: tdot 1.3s infinite;
+}
+.t-dot:nth-child(2) { animation-delay: 0.2s; }
+.t-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes tdot {
+  0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+  30%          { transform: translateY(-6px); opacity: 1; }
+}
+
+.chat-input-row {
+  padding: 14px 18px;
+  border-top: 1px solid var(--edge2);
+  display: flex; gap: 10px; align-items: flex-end;
+}
+
+.chat-ta {
+  flex: 1; background: var(--paper);
+  border: 1px solid var(--edge);
+  border-radius: 10px; padding: 11px 15px;
+  color: var(--text); font-family: 'Crimson Pro', serif;
+  font-size: 1rem; resize: none; max-height: 110px;
+  outline: none; line-height: 1.5;
+  transition: border-color 0.2s;
+}
+
+.chat-ta::placeholder { color: var(--text3); font-style: italic; }
+.chat-ta:focus { border-color: rgba(201,168,76,0.4); }
+
+.send-btn {
+  width: 42px; height: 42px; border-radius: 10px;
+  background: rgba(201,168,76,0.15);
+  border: 1px solid rgba(201,168,76,0.3);
+  color: var(--gold2); cursor: pointer; font-size: 1rem;
+  transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.send-btn:hover { background: rgba(201,168,76,0.25); box-shadow: 0 0 16px rgba(201,168,76,0.2); }
+.send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ─── TEST GENERATOR ──────────────────────────── */
+.test-config-card {
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--r);
+  padding: 28px; margin-bottom: 22px;
+}
+
+.config-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px; margin-bottom: 22px;
+}
+
+.f-group label {
+  display: block; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text2); margin-bottom: 7px;
+}
+
+.f-group select,
+.f-group input[type="number"] {
+  width: 100%; padding: 10px 14px;
+  background: var(--paper); border: 1px solid var(--edge);
+  border-radius: 9px; color: var(--text);
+  font-family: 'Crimson Pro', serif; font-size: 0.95rem;
+  outline: none; -webkit-appearance: none;
+  transition: border-color 0.2s;
+}
+
+.f-group select:focus,
+.f-group input:focus { border-color: rgba(201,168,76,0.4); }
+.f-group select option { background: var(--paper); }
+
+.btn-gen {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 30px; border-radius: 50px;
+  background: rgba(201,168,76,0.12);
+  border: 1px solid rgba(201,168,76,0.35);
+  color: var(--gold2);
+  font-family: 'Playfair Display', serif;
+  font-weight: 600; font-size: 1rem;
+  cursor: pointer; transition: all 0.2s;
+  letter-spacing: 0.02em;
+}
+
+.btn-gen:hover {
+  background: rgba(201,168,76,0.2);
+  box-shadow: 0 0 24px rgba(201,168,76,0.2);
+  transform: translateY(-1px);
+}
+
+.btn-gen:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.btn-outline {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 22px; border-radius: 50px;
+  background: transparent;
+  border: 1px solid var(--edge);
+  color: var(--text2);
+  font-family: 'Crimson Pro', serif; font-size: 0.95rem;
+  cursor: pointer; transition: all 0.2s;
+}
+
+.btn-outline:hover { border-color: rgba(201,168,76,0.3); color: var(--text); }
+
+/* Test paper */
+.test-paper {
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+
+.paper-head {
+  background: var(--raised);
+  border-bottom: 1px solid var(--edge);
+  padding: 22px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.paper-head-left h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem; font-weight: 800; margin-bottom: 4px;
+}
+
+.paper-meta { display: flex; gap: 10px; margin-top: 6px; }
+
+.paper-tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+  padding: 3px 10px; border-radius: 50px;
+  background: var(--paper); border: 1px solid var(--edge);
+  color: var(--text2);
+}
+
+.paper-body { padding: 28px; }
+
+.q-block {
+  margin-bottom: 30px; padding-bottom: 30px;
+  border-bottom: 1px solid var(--edge2);
+  animation: pageIn 0.4s ease;
+}
+
+.q-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.q-num {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+  color: var(--gold); margin-bottom: 8px; letter-spacing: 1px;
+}
+
+.q-text {
+  font-size: 1rem; line-height: 1.65; margin-bottom: 14px;
+  color: var(--text);
+}
+
+.q-text em { font-style: italic; color: var(--text2); }
+
+.opts { display: flex; flex-direction: column; gap: 8px; }
+
+.opt {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 14px; border-radius: 9px;
+  border: 1px solid var(--edge2); background: var(--paper);
+  cursor: pointer; transition: all 0.15s; font-size: 0.93rem;
+  line-height: 1.4;
+}
+
+.opt:hover { border-color: rgba(201,168,76,0.3); background: var(--raised); }
+.opt.selected { border-color: rgba(201,168,76,0.5); background: rgba(201,168,76,0.07); color: var(--gold3); }
+.opt.correct  { border-color: var(--green); background: rgba(90,158,112,0.08); color: #7dcc9a; }
+.opt.wrong    { border-color: var(--red);   background: rgba(192,97,74,0.08);  color: #e08070; }
+
+.opt-lbl {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  width: 22px; height: 22px; flex-shrink: 0;
+  border-radius: 4px; border: 1px solid var(--edge);
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface); margin-top: 1px;
+}
+
+.sa-input {
+  width: 100%; padding: 11px 14px;
+  background: var(--paper); border: 1px solid var(--edge);
+  border-radius: 9px; color: var(--text);
+  font-family: 'Crimson Pro', serif; font-size: 0.95rem;
+  outline: none; resize: vertical; min-height: 90px;
+  transition: border-color 0.2s;
+}
+
+.sa-input:focus { border-color: rgba(201,168,76,0.4); }
+
+.expl {
+  margin-top: 12px; padding: 13px 16px;
+  background: rgba(90,122,158,0.07);
+  border: 1px solid rgba(90,122,158,0.25);
+  border-radius: 9px; font-size: 0.88rem;
+  color: var(--text2); line-height: 1.65;
+  font-style: italic; display: none;
+}
+
+.expl.show { display: block; animation: pageIn 0.3s ease; }
+.expl strong { color: #8aaeca; font-style: normal; }
+
+.paper-foot {
+  padding: 18px 28px; border-top: 1px solid var(--edge);
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.score-display {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem; font-weight: 800; display: none;
+}
+
+.score-display.show { display: block; animation: pageIn 0.4s ease; }
+
+/* ─── FLASHCARDS ──────────────────────────────── */
+.fc-header {
+  display: flex; gap: 12px; align-items: center;
+  margin-bottom: 24px; flex-wrap: wrap;
+}
+
+.fc-stage { perspective: 1400px; max-width: 700px; margin: 0 auto 22px; }
+
+.fc-card {
+  width: 100%; height: 330px;
+  position: relative; cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.23, 1, 0.32, 1);
+  user-select: none;
+}
+
+.fc-card.flipped { transform: rotateY(180deg); }
+
+.fc-face {
+  position: absolute; inset: 0; border-radius: var(--r);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 44px 48px; text-align: center;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+}
+
+.fc-front {
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  box-shadow: var(--shadow);
+}
+
+.fc-back {
+  background: var(--raised);
+  border: 1px solid rgba(201,168,76,0.25);
+  transform: rotateY(180deg);
+  box-shadow: var(--shadow);
+}
+
+.fc-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--text3);
+  margin-bottom: 20px;
+}
+
+.fc-q {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem; font-weight: 600;
+  line-height: 1.4; color: var(--text);
+}
+
+.fc-a {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1rem; color: var(--text2);
+  line-height: 1.65;
+}
+
+.fc-hint { font-size: 0.78rem; color: var(--text3); margin-top: 22px; font-style: italic; }
+
+.fc-nav {
+  display: flex; align-items: center; justify-content: center;
+  gap: 14px; margin-bottom: 18px;
+}
+
+.fc-nav-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--edge);
+  color: var(--text2); cursor: pointer; font-size: 0.9rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+
+.fc-nav-btn:hover { border-color: rgba(201,168,76,0.3); color: var(--gold2); }
+.fc-nav-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+
+.fc-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem; color: var(--text2);
+  min-width: 55px; text-align: center;
+}
+
+.fc-result-btns {
+  display: flex; gap: 10px; justify-content: center; margin-top: 10px;
+}
+
+.btn-know {
+  padding: 9px 24px; border-radius: 50px;
+  background: rgba(90,158,112,0.1); border: 1px solid var(--green);
+  color: #7dcc9a; cursor: pointer; font-family: 'Crimson Pro', serif;
+  font-size: 0.95rem; transition: all 0.2s;
+}
+
+.btn-know:hover { background: rgba(90,158,112,0.18); }
+
+.btn-review {
+  padding: 9px 24px; border-radius: 50px;
+  background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.3);
+  color: var(--gold); cursor: pointer; font-family: 'Crimson Pro', serif;
+  font-size: 0.95rem; transition: all 0.2s;
+}
+
+.btn-review:hover { background: rgba(201,168,76,0.15); }
+
+.prog-wrap {
+  background: var(--paper); border-radius: 50px; height: 5px; margin-bottom: 6px;
+}
+
+.prog-fill {
+  height: 100%; border-radius: 50px;
+  background: linear-gradient(90deg, var(--gold), var(--gold2));
+  transition: width 0.4s ease;
+}
+
+/* ─── NOTES / SUMMARIZER ──────────────────────── */
+.sum-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+}
+
+.sum-panel {
+  background: var(--surface);
+  border: 1px solid var(--edge);
+  border-radius: var(--r);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+
+.sum-panel-head {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--edge2);
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem; font-weight: 600; color: var(--text2);
+  background: var(--raised);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.sum-panel-head span { font-size: 0.8rem; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+
+.notes-ta {
+  flex: 1; width: 100%; min-height: 360px;
+  background: transparent; border: none;
+  padding: 18px 20px; color: var(--text);
+  font-family: 'Crimson Pro', serif; font-size: 1rem;
+  outline: none; resize: none; line-height: 1.75;
+}
+
+.notes-ta::placeholder { color: var(--text3); font-style: italic; }
+
+.sum-output {
+  flex: 1; padding: 18px 20px;
+  color: var(--text2); font-family: 'Crimson Pro', serif;
+  font-size: 0.97rem; line-height: 1.75;
+  min-height: 360px; overflow-y: auto;
+}
+
+.sum-output p { margin-bottom: 14px; }
+.sum-output h4 {
+  font-family: 'Playfair Display', serif; font-size: 1rem;
+  color: var(--text); margin: 18px 0 6px;
+}
+
+.sum-output .bullet { margin-left: 16px; margin-bottom: 6px; }
+.sum-output .bullet::before { content: '— '; color: var(--gold); }
+
+.sum-footer {
+  padding: 14px 18px; border-top: 1px solid var(--edge2);
+  display: flex; gap: 10px; align-items: center;
+}
+
+/* ─── TIMELINE / STUDY PLAN ───────────────────── */
+.timeline-wrap {
+  position: relative; padding-left: 40px;
+}
+
+.timeline-wrap::before {
+  content: ''; position: absolute;
+  left: 15px; top: 0; bottom: 0; width: 1px;
+  background: linear-gradient(180deg, var(--gold), transparent);
+  opacity: 0.4;
+}
+
+.tl-item {
+  position: relative; margin-bottom: 24px;
+  background: var(--surface); border: 1px solid var(--edge);
+  border-radius: var(--r); padding: 20px 22px;
+  transition: border-color 0.2s;
+}
+
+.tl-item:hover { border-color: rgba(201,168,76,0.3); }
+
+.tl-dot {
+  position: absolute; left: -32px; top: 22px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--gold); opacity: 0.7;
+  box-shadow: 0 0 8px rgba(201,168,76,0.5);
+}
+
+.tl-week {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 2px;
+  color: var(--gold); text-transform: uppercase; margin-bottom: 6px;
+}
+
+.tl-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem; font-weight: 600; margin-bottom: 6px;
+}
+
+.tl-desc { font-size: 0.88rem; color: var(--text2); line-height: 1.5; }
+
+.tl-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+
+.tl-tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+  padding: 3px 9px; border-radius: 4px;
+  background: var(--raised); border: 1px solid var(--edge);
+  color: var(--text3);
+}
+
+/* ─── UTILITIES ───────────────────────────────── */
+.divider {
+  border: none; border-top: 1px solid var(--edge);
+  margin: 20px 0;
+}
+
+.loading-shimmer {
+  background: linear-gradient(90deg, var(--raised) 25%, var(--lift) 50%, var(--raised) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px; color: transparent;
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: var(--text3);
+}
+
+.empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 14px; opacity: 0.5; }
+
+.empty-state p {
+  font-family: 'Crimson Pro', serif; font-style: italic;
+  font-size: 1rem; color: var(--text3);
+}
+
+/* Score colours */
+.score-great { color: #7dcc9a; }
+.score-ok    { color: var(--gold2); }
+.score-low   { color: #e08070; }
+
+/* responsive */
+@media (max-width: 820px) {
+  nav { padding: 0 18px; gap: 12px; }
+  .nav-course { display: none; }
+  main { padding: 32px 18px 80px; }
+  .chat-wrap { grid-template-columns: 1fr; }
+  .chat-sidebar { display: none; }
+  .sum-grid { grid-template-columns: 1fr; }
+  .config-row { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 500px) {
+  .nav-tabs .nav-tab { padding: 6px 10px; font-size: 0.82rem; }
+  .hero h1 { font-size: 2.5rem; }
+  .config-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══════════════════════════════════════════════════ -->
+<nav>
+  <div class="nav-logo">Study<em>AI</em></div>
+  <div class="nav-sep"></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('home')">Home</button>
+    <button class="nav-tab" onclick="showPage('chat')">Tutor Chat</button>
+    <button class="nav-tab" onclick="showPage('test')">Test Generator</button>
+    <button class="nav-tab" onclick="showPage('flash')">Flashcards</button>
+    <button class="nav-tab" onclick="showPage('notes')">Summarizer</button>
+    <button class="nav-tab" onclick="showPage('plan')">Study Plan</button>
+  </div>
+  <div class="nav-course">UTM · PHI · First Year</div>
+</nav>
+
+<!-- ═══ MAIN ══════════════════════════════════════════════════ -->
+<main>
+
+<!-- ─── HOME ──────────────────────────────────── -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-rule">
+      <div class="hero-rule-line"></div>
+      <div class="hero-rule-sym">❧</div>
+      <div class="hero-rule-line r"></div>
+    </div>
+    <h1>Your <em>Philosophy</em><br>Study Companion</h1>
+    <p class="hero-sub">Socratic tutor · practice tests · flashcards · note summaries<br>Tailored for UTM First Year Philosophy</p>
+  </div>
+
+  <div class="quick-grid">
+    <div class="q-card" onclick="showPage('chat')">
+      <div class="q-icon">🏛️</div>
+      <div class="q-title">Ask the Tutor</div>
+      <div class="q-desc">Chat with a Socratic AI tutor trained on PHI100, PHI160, PHI240 and more. Ask anything.</div>
+    </div>
+    <div class="q-card" onclick="showPage('test')">
+      <div class="q-icon">📜</div>
+      <div class="q-title">Generate a Test</div>
+      <div class="q-desc">Create MCQ or short-answer exams on any philosophy topic. Graded instantly.</div>
+    </div>
+    <div class="q-card" onclick="showPage('flash')">
+      <div class="q-icon">🃏</div>
+      <div class="q-title">Flashcards</div>
+      <div class="q-desc">Study key terms, arguments, and thinkers with spaced-repetition cards.</div>
+    </div>
+    <div class="q-card" onclick="showPage('notes')">
+      <div class="q-icon">📖</div>
+      <div class="q-title">Note Summarizer</div>
+      <div class="q-desc">Paste your lecture notes and get a clean, structured summary in seconds.</div>
+    </div>
+    <div class="q-card" onclick="showPage('plan')">
+      <div class="q-icon">🗓️</div>
+      <div class="q-title">Study Plan</div>
+      <div class="q-desc">A week-by-week plan for UTM first-year philosophy covering all core topics.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CHAT ───────────────────────────────────── -->
+<div id="page-chat" class="page">
+  <div class="section-header">
+    <div class="section-eyebrow">Tutor Chat</div>
+    <div class="section-title">Socratic Dialogue</div>
+    <div class="section-sub">Your AI professor of Philosophy — ask anything about arguments, texts, or concepts</div>
+  </div>
+
+  <div class="chat-wrap">
+    <div class="chat-sidebar">
+      <div class="sidebar-section-label">Quick Prompts</div>
+
+      <button class="sb-btn" onclick="insertPrompt('Explain Plato\'s Theory of Forms in simple terms')">Plato's Forms</button>
+      <button class="sb-btn" onclick="insertPrompt('What is Descartes\' Cogito argument and why does it matter?')">Cogito Argument</button>
+      <button class="sb-btn" onclick="insertPrompt('Explain the difference between deontology and consequentialism with examples')">Ethics Overview</button>
+      <button class="sb-btn" onclick="insertPrompt('What is the problem of free will vs determinism?')">Free Will</button>
+      <button class="sb-btn" onclick="insertPrompt('How does Kant\'s categorical imperative work?')">Kant's C.I.</button>
+      <button class="sb-btn" onclick="insertPrompt('Explain Hume\'s problem of induction')">Hume's Induction</button>
+      <button class="sb-btn" onclick="insertPrompt('What is the mind-body problem in philosophy of mind?')">Mind-Body Problem</button>
+      <button class="sb-btn" onclick="insertPrompt('Give me the key arguments in Plato\'s Republic')">Plato's Republic</button>
+      <button class="sb-btn" onclick="insertPrompt('What are the main branches of philosophy and what does each study?')">Branches of Phil.</button>
+      <button class="sb-btn" onclick="insertPrompt('Explain Aristotle\'s Nicomachean Ethics and eudaimonia')">Aristotle & Ethics</button>
+      <button class="sb-btn" onclick="insertPrompt('What is the trolley problem and what does it show about ethics?')">Trolley Problem</button>
+      <button class="sb-btn" onclick="insertPrompt('Can you quiz me on the pre-Socratic philosophers?')">Pre-Socratics Quiz</button>
+
+      <div class="sidebar-section-label" style="margin-top:8px">Courses</div>
+      <button class="sb-btn active">PHI100 – Knowledge & Reality</button>
+      <button class="sb-btn">PHI160 – Ethics</button>
+      <button class="sb-btn">PHI240 – Modern Philosophy</button>
+    </div>
+
+    <div class="chat-panel">
+      <div class="chat-topbar">
+        <div class="tutor-avatar">🦉</div>
+        <div>
+          <div class="tutor-name">Prof. Athena</div>
+          <div class="tutor-status">online · ready to philosophise</div>
+        </div>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="msg ai">
+          <div class="msg-av">🦉</div>
+          <div class="bubble">
+            Welcome, student. I am your philosophy tutor, here to guide you through the great questions of existence, knowledge, and ethics.<br><br>
+            Ask me anything — whether you're wrestling with Descartes' demon, confused by Kant, or preparing for your PHI100 midterm. I'll help you understand, not just memorise.<br><br>
+            <blockquote>"The unexamined life is not worth living." — Socrates</blockquote>
+            Where shall we begin?
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input-row">
+        <textarea class="chat-ta" id="chatInput" placeholder="Ask about Plato, Kant, free will, ethics…" rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"
+          oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendChat()">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TEST ───────────────────────────────────── -->
+<div id="page-test" class="page">
+  <div class="section-header">
+    <div class="section-eyebrow">Test Generator</div>
+    <div class="section-title">Practice Examination</div>
+    <div class="section-sub">Generate a custom philosophy test and receive instant feedback</div>
+  </div>
+
+  <div class="test-config-card">
+    <div class="config-row">
+      <div class="f-group">
+        <label>Topic / Unit</label>
+        <select id="testTopic">
+          <option value="epistemology">Epistemology (Knowledge)</option>
+          <option value="metaphysics">Metaphysics (Reality & Existence)</option>
+          <option value="ethics">Ethics & Moral Philosophy</option>
+          <option value="political_phil">Political Philosophy</option>
+          <option value="phil_mind">Philosophy of Mind</option>
+          <option value="logic">Logic & Critical Thinking</option>
+          <option value="ancient">Ancient Philosophy (Plato / Aristotle)</option>
+          <option value="modern">Modern Philosophy (Descartes–Kant)</option>
+          <option value="existentialism">Existentialism</option>
+          <option value="free_will">Free Will & Determinism</option>
+        </select>
+      </div>
+      <div class="f-group">
+        <label>Question Type</label>
+        <select id="testType">
+          <option value="mcq">Multiple Choice</option>
+          <option value="short">Short Answer</option>
+          <option value="mixed">Mixed</option>
+        </select>
+      </div>
+      <div class="f-group">
+        <label>Difficulty</label>
+        <select id="testDiff">
+          <option value="introductory">Introductory</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="advanced">Advanced (Upper Year)</option>
+        </select>
+      </div>
+      <div class="f-group">
+        <label>No. of Questions</label>
+        <input type="number" id="testCount" value="5" min="3" max="10">
+      </div>
+    </div>
+    <button class="btn-gen" id="genBtn" onclick="generateTest()">✦ Generate Test</button>
+  </div>
+
+  <div id="testPaper" style="display:none">
+    <div class="test-paper">
+      <div class="paper-head">
+        <div class="paper-head-left">
+          <h3 id="testPaperTitle">Philosophy Practice Test</h3>
+          <div class="paper-meta">
+            <span class="paper-tag" id="testPaperTopic">—</span>
+            <span class="paper-tag" id="testPaperDiff">—</span>
+            <span class="paper-tag" id="testPaperCount">—</span>
+          </div>
+        </div>
+        <button class="btn-outline" onclick="resetTest()">↺ New Test</button>
+      </div>
+      <div class="paper-body" id="testPaperBody"></div>
+      <div class="paper-foot">
+        <div class="score-display" id="scoreDisplay"></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-outline" id="checkBtn" onclick="checkAnswers()">Check Answers</button>
+          <button class="btn-gen" id="explainBtn" onclick="revealExplanations()" style="display:none">Show Explanations</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FLASHCARDS ─────────────────────────────── -->
+<div id="page-flash" class="page">
+  <div class="section-header">
+    <div class="section-eyebrow">Flashcards</div>
+    <div class="section-title">Key Terms & Thinkers</div>
+    <div class="section-sub">Tap a card to reveal the answer · mark your confidence</div>
+  </div>
+
+  <div class="fc-header">
+    <select id="deckSelect" onchange="loadDeck()" style="padding:9px 14px;background:var(--surface);border:1px solid var(--edge);border-radius:9px;color:var(--text);font-family:'Crimson Pro',serif;font-size:0.95rem;outline:none;">
+      <option value="core">Core Concepts</option>
+      <option value="thinkers">Major Thinkers</option>
+      <option value="ethics">Ethical Theories</option>
+      <option value="epistemology">Epistemology</option>
+      <option value="logic">Logic & Arguments</option>
+    </select>
+    <button class="btn-outline" onclick="shuffleDeck()">⇄ Shuffle</button>
+    <button class="btn-gen" onclick="generateAICards()">✦ AI Generate Deck</button>
+    <span style="color:var(--text3);font-size:0.85rem;font-style:italic;margin-left:auto" id="fcStats"></span>
+  </div>
+
+  <div class="prog-wrap"><div class="prog-fill" id="fcProg" style="width:0%"></div></div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--text3);margin-bottom:14px" id="fcProgLabel">0 / 0</div>
+
+  <div class="fc-stage">
+    <div class="fc-card" id="fcCard" onclick="flipCard()">
+      <div class="fc-face fc-front">
+        <div class="fc-chip">Question — tap to flip</div>
+        <div class="fc-q" id="fcQ">Loading…</div>
+        <div class="fc-hint" id="fcHint"></div>
+      </div>
+      <div class="fc-face fc-back">
+        <div class="fc-chip">Answer</div>
+        <div class="fc-a" id="fcA"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fc-nav">
+    <button class="fc-nav-btn" id="fcPrev" onclick="fcNavigate(-1)">←</button>
+    <span class="fc-count" id="fcCount">1 / 1</span>
+    <button class="fc-nav-btn" id="fcNext" onclick="fcNavigate(1)">→</button>
+  </div>
+
+  <div class="fc-result-btns" id="fcResultBtns" style="display:none">
+    <button class="btn-know" onclick="markCard('know')">✓ I know this</button>
+    <button class="btn-review" onclick="markCard('review')">⟳ Review again</button>
+  </div>
+</div>
+
+<!-- ─── NOTES SUMMARIZER ───────────────────────── -->
+<div id="page-notes" class="page">
+  <div class="section-header">
+    <div class="section-eyebrow">Note Summarizer</div>
+    <div class="section-title">Lecture Distillery</div>
+    <div class="section-sub">Paste raw lecture notes · receive a structured philosophical summary</div>
+  </div>
+
+  <div class="sum-grid">
+    <div class="sum-panel">
+      <div class="sum-panel-head">
+        Your Notes
+        <span id="noteWordCount">0 words</span>
+      </div>
+      <textarea class="notes-ta" id="notesInput"
+        placeholder="Paste your lecture notes here…&#10;&#10;e.g. Today we discussed Descartes' Meditations. He starts by doubting everything he can…"
+        oninput="updateWordCount()"></textarea>
+      <div class="sum-footer">
+        <button class="btn-gen" onclick="summarizeNotes()">✦ Summarize</button>
+        <button class="btn-outline" onclick="clearNotes()">Clear</button>
+        <select id="sumMode" style="padding:8px 12px;background:var(--paper);border:1px solid var(--edge);border-radius:8px;color:var(--text2);font-family:'Crimson Pro',serif;font-size:0.9rem;outline:none;margin-left:auto">
+          <option value="summary">Summary</option>
+          <option value="outline">Outline</option>
+          <option value="keyterms">Key Terms</option>
+          <option value="questions">Study Questions</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sum-panel">
+      <div class="sum-panel-head">Summary <span id="sumStatus">—</span></div>
+      <div class="sum-output" id="sumOutput">
+        <div class="empty-state">
+          <div class="empty-icon">📜</div>
+          <p>Your summary will appear here.<br>Paste notes and click Summarize.</p>
+        </div>
+      </div>
+      <div class="sum-footer">
+        <button class="btn-outline" onclick="copySummary()">⎘ Copy</button>
+        <button class="btn-outline" onclick="chatFromSummary()">💬 Discuss with Tutor</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── STUDY PLAN ─────────────────────────────── -->
+<div id="page-plan" class="page">
+  <div class="section-header">
+    <div class="section-eyebrow">Study Plan</div>
+    <div class="section-title">UTM First Year · Philosophy</div>
+    <div class="section-sub">A structured week-by-week guide through the core curriculum</div>
+  </div>
+
+  <div class="timeline-wrap" id="studyPlan"></div>
+</div>
+
+</main>
+
+<!-- ═══ SCRIPT ════════════════════════════════════════════════ -->
+<script>
+/* ── NAV ────────────────────────────────────────── */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  const tabs = ['home','chat','test','flash','notes','plan'];
+  const idx = tabs.indexOf(id);
+  document.querySelectorAll('.nav-tab')[idx]?.classList.add('active');
+  if (id === 'flash' && flashDecks[currentDeck]) renderFC();
+  if (id === 'plan') renderPlan();
+}
+
+/* ── CHAT ───────────────────────────────────────── */
+const chatHistory = [
+  { role: 'user', content: `You are Prof. Athena, a sharp, warm, Socratic philosophy tutor at the University of Toronto Mississauga (UTM). You are helping a first-year philosophy student. Your style is scholarly yet accessible — you use clear examples, Socratic questioning, and occasionally quote primary texts. You specialise in: PHI100 (Knowledge & Reality), PHI160 (Ethics), PHI240 (Modern Philosophy). Always encourage critical thinking. Format answers clearly — use paragraph breaks, occasionally use blockquotes for quotes, bold key terms. Keep answers thorough but not overwhelming for a first-year.` },
+];
+
+function insertPrompt(text) {
+  document.getElementById('chatInput').value = text;
+  document.getElementById('chatInput').focus();
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  input.value = ''; input.style.height = 'auto';
+  appendMsg('user', msg);
+  chatHistory.push({ role: 'user', content: msg });
+
+  const typingEl = appendTyping();
+  document.getElementById('sendBtn').disabled = true;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: `You are Prof. Athena, a Socratic philosophy tutor at UTM. Help a first-year student. Be scholarly yet accessible. Use bold for key terms. Use blockquotes for famous quotes. Keep answers clear and well-structured for a first year. Focus on PHI100, PHI160, PHI240.`,
+        messages: chatHistory.slice(1).filter(m => m.role !== 'system')
+      })
+    });
+    const data = await res.json();
+    typingEl.remove();
+    const reply = data.content?.[0]?.text || 'I seem to have lost my train of thought. Please try again.';
+    chatHistory.push({ role: 'assistant', content: reply });
+    appendMsg('ai', formatBubble(reply));
+  } catch (e) {
+    typingEl.remove();
+    appendMsg('ai', '⚠️ Could not connect to the tutor. Check your connection and try again.');
+  }
+  document.getElementById('sendBtn').disabled = false;
+}
+
+function formatBubble(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/> (.+)/g, '<blockquote>$1</blockquote>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
+
+function appendMsg(role, html) {
+  const box = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.innerHTML = `
+    <div class="msg-av">${role === 'ai' ? '🦉' : '👤'}</div>
+    <div class="bubble">${html}</div>`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function appendTyping() {
+  const box = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.innerHTML = `<div class="msg-av">🦉</div>
+    <div class="bubble"><div class="typing"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div></div>`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+
+/* ── TEST GENERATOR ─────────────────────────────── */
+let testQuestions = [];
+let testAnswered = false;
+
+const topicLabels = {
+  epistemology: 'Epistemology', metaphysics: 'Metaphysics', ethics: 'Ethics',
+  political_phil: 'Political Philosophy', phil_mind: 'Philosophy of Mind',
+  logic: 'Logic', ancient: 'Ancient Philosophy', modern: 'Modern Philosophy',
+  existentialism: 'Existentialism', free_will: 'Free Will & Determinism'
+};
+
+async function generateTest() {
+  const topic    = document.getElementById('testTopic').value;
+  const type     = document.getElementById('testType').value;
+  const diff     = document.getElementById('testDiff').value;
+  const count    = parseInt(document.getElementById('testCount').value) || 5;
+  const btn      = document.getElementById('genBtn');
+
+  btn.disabled = true; btn.textContent = '✦ Generating…';
+  testAnswered = false;
+  document.getElementById('testPaper').style.display = 'none';
+
+  const prompt = `You are a UTM philosophy professor creating a practice test. 
+Topic: ${topicLabels[topic]}
+Type: ${type === 'mcq' ? 'All Multiple Choice (A/B/C/D)' : type === 'short' ? 'All Short Answer' : 'Mix of MCQ and Short Answer'}
+Difficulty: ${diff}
+Number of questions: ${count}
+
+Return ONLY a valid JSON array. No markdown fences, no preamble. Each element:
+For MCQ: {"type":"mcq","question":"...","options":["A. ...","B. ...","C. ...","D. ..."],"answer":"A","explanation":"..."}
+For short: {"type":"short","question":"...","answer":"Model answer in 2-3 sentences","explanation":"..."}
+
+Make questions genuinely philosophical and thought-provoking. For MCQ ensure only one correct answer. Explanation should be 1-2 sentences explaining the correct answer.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    let raw = data.content?.[0]?.text || '[]';
+    raw = raw.replace(/```json|```/g, '').trim();
+    testQuestions = JSON.parse(raw);
+    renderTestPaper(topic, diff, count);
+  } catch (e) {
+    alert('Could not generate test. Please try again.');
+  }
+  btn.disabled = false; btn.textContent = '✦ Generate Test';
+}
+
+function renderTestPaper(topic, diff, count) {
+  document.getElementById('testPaperTitle').textContent = topicLabels[topic] + ' · Practice Test';
+  document.getElementById('testPaperTopic').textContent = topicLabels[topic];
+  document.getElementById('testPaperDiff').textContent = diff.charAt(0).toUpperCase() + diff.slice(1);
+  document.getElementById('testPaperCount').textContent = testQuestions.length + ' Questions';
+
+  const body = document.getElementById('testPaperBody');
+  body.innerHTML = '';
+
+  testQuestions.forEach((q, i) => {
+    const block = document.createElement('div');
+    block.className = 'q-block';
+    block.id = 'q' + i;
+
+    if (q.type === 'mcq') {
+      block.innerHTML = `
+        <div class="q-num">Question ${i+1} — Multiple Choice</div>
+        <div class="q-text">${q.question}</div>
+        <div class="opts" id="opts${i}">
+          ${q.options.map((o, j) => `
+            <div class="opt" id="opt${i}_${j}" onclick="selectOpt(${i},${j})">
+              <div class="opt-lbl">${String.fromCharCode(65+j)}</div>
+              <span>${o.replace(/^[A-D]\.\s*/,'')}</span>
+            </div>`).join('')}
+        </div>
+        <div class="expl" id="expl${i}"><strong>Explanation:</strong> ${q.explanation}</div>`;
+    } else {
+      block.innerHTML = `
+        <div class="q-num">Question ${i+1} — Short Answer</div>
+        <div class="q-text">${q.question}</div>
+        <textarea class="sa-input" id="sa${i}" placeholder="Write your answer here…"></textarea>
+        <div class="expl" id="expl${i}"><strong>Model Answer:</strong> ${q.answer}<br><br><strong>Explanation:</strong> ${q.explanation}</div>`;
+    }
+    body.appendChild(block);
+  });
+
+  document.getElementById('scoreDisplay').classList.remove('show');
+  document.getElementById('checkBtn').style.display = '';
+  document.getElementById('explainBtn').style.display = 'none';
+  document.getElementById('testPaper').style.display = 'block';
+  testAnswered = false;
+}
+
+function selectOpt(qi, oi) {
+  if (testAnswered) return;
+  document.querySelectorAll(`#opts${qi} .opt`).forEach(o => o.classList.remove('selected'));
+  document.getElementById(`opt${qi}_${oi}`).classList.add('selected');
+}
+
+function checkAnswers() {
+  let correct = 0; let mcqTotal = 0;
+  testQuestions.forEach((q, i) => {
+    if (q.type === 'mcq') {
+      mcqTotal++;
+      const opts = document.querySelectorAll(`#opts${i} .opt`);
+      const sel = [...opts].findIndex(o => o.classList.contains('selected'));
+      const correctIdx = q.answer.charCodeAt(0) - 65;
+      opts.forEach((o, j) => {
+        if (j === correctIdx) o.classList.add('correct');
+        else if (j === sel && sel !== correctIdx) o.classList.add('wrong');
+      });
+      if (sel === correctIdx) correct++;
+    }
+  });
+
+  testAnswered = true;
+  const score = document.getElementById('scoreDisplay');
+  if (mcqTotal > 0) {
+    const pct = Math.round((correct / mcqTotal) * 100);
+    const cls = pct >= 70 ? 'score-great' : pct >= 50 ? 'score-ok' : 'score-low';
+    score.innerHTML = `<span class="${cls}">${correct}/${mcqTotal} correct (${pct}%)</span>`;
+    score.classList.add('show');
+  }
+  document.getElementById('checkBtn').style.display = 'none';
+  document.getElementById('explainBtn').style.display = '';
+}
+
+function revealExplanations() {
+  testQuestions.forEach((_, i) => document.getElementById(`expl${i}`)?.classList.add('show'));
+  document.getElementById('explainBtn').style.display = 'none';
+}
+
+function resetTest() {
+  document.getElementById('testPaper').style.display = 'none';
+  testQuestions = []; testAnswered = false;
+}
+
+/* ── FLASHCARDS ─────────────────────────────────── */
+const flashDecks = {
+  core: [
+    { q: 'What is epistemology?', a: 'The branch of philosophy concerned with the nature, sources, and limits of knowledge. Key questions: What is knowledge? How do we know what we know?', hint: 'Think: what does it mean to KNOW something?' },
+    { q: 'Define "a priori" knowledge', a: 'Knowledge that is independent of experience — knowable through reason alone. Example: mathematical truths like "2+2=4" are true regardless of observation.', hint: 'Before experience' },
+    { q: 'Define "a posteriori" knowledge', a: 'Knowledge that depends on sensory experience or empirical evidence. Example: "The sky is blue" requires you to observe the sky.', hint: 'After/through experience' },
+    { q: 'What is the classic definition of knowledge (JTB)?', a: 'Justified True Belief (Plato\'s Theaetetus): Knowledge = a belief that is (1) true, (2) believed, and (3) justified. Edmund Gettier famously challenged this in 1963.', hint: 'Three conditions...' },
+    { q: 'What is ontology?', a: 'A branch of metaphysics studying the fundamental nature of being and existence. It asks: What exists? What categories of things are there?', hint: 'The study of being itself' },
+    { q: 'What is the analytic/synthetic distinction (Kant)?', a: 'Analytic statements are true by definition ("All bachelors are unmarried"). Synthetic statements add new information ("It is raining outside") — their truth depends on the world.', hint: 'Does the predicate "analyse" the subject?' },
+    { q: 'What is moral relativism?', a: 'The view that moral judgments are not universally true — they are relative to cultural, social, or individual standards. Contrast with moral universalism.', hint: 'Morality varies by...' },
+    { q: 'What is the is-ought problem (Hume)?', a: 'Hume\'s observation that descriptive claims ("is") cannot logically entail prescriptive claims ("ought"). You cannot derive moral conclusions purely from factual premises.', hint: 'The gap between facts and values' },
+  ],
+  thinkers: [
+    { q: 'Socrates (470–399 BCE)', a: 'Founder of Western philosophy. Known for the Socratic method (elenchus) — questioning assumptions to expose ignorance. Famously said: "I know that I know nothing."', hint: 'Hemlock, dialectic, "Know thyself"' },
+    { q: 'Plato (428–348 BCE)', a: 'Student of Socrates. Developed the Theory of Forms (ideal abstract realities). Wrote The Republic (justice/ideal state) and the Allegory of the Cave.', hint: 'Forms, the Cave, philosopher-kings' },
+    { q: 'Aristotle (384–322 BCE)', a: 'Student of Plato. Founded logic (syllogisms), virtue ethics (eudaimonia/flourishing), and empiricism. Rejected Platonic Forms — reality is in particular things.', hint: 'Eudaimonia, virtue, the golden mean' },
+    { q: 'René Descartes (1596–1650)', a: 'Father of modern philosophy. Used radical doubt to find certainty: "Cogito ergo sum" (I think, therefore I am). Mind-body dualism: mind and body are distinct substances.', hint: 'Cogito, evil demon, dualism' },
+    { q: 'David Hume (1711–1776)', a: 'Scottish empiricist and sceptic. Challenged causation (we see correlation, not necessity), problem of induction, and the is-ought gap. Also: the bundle theory of self.', hint: 'Impressions, induction, causation' },
+    { q: 'Immanuel Kant (1724–1804)', a: 'Reconciled empiricism and rationalism. The Categorical Imperative: act only on maxims you could universalise. Distinguished phenomena (how things appear) from noumena (things in themselves).', hint: 'Categorical imperative, duty, phenomena' },
+    { q: 'John Stuart Mill (1806–1873)', a: 'Utilitarian philosopher. "The greatest happiness for the greatest number." Distinguished higher pleasures (intellectual) from lower pleasures (bodily). Also a major liberal political philosopher.', hint: 'Utilitarianism, happiness, liberty' },
+    { q: 'Friedrich Nietzsche (1844–1900)', a: 'Critiqued traditional morality as "slave morality." Declared "God is dead" — we must create our own values. Introduced the Übermensch and the Will to Power.', hint: 'God is dead, Übermensch, nihilism' },
+  ],
+  ethics: [
+    { q: 'Consequentialism', a: 'The right action is determined by its outcomes. The most famous version is Utilitarianism (Bentham, Mill): maximise overall happiness/welfare.', hint: 'Ends justify the means' },
+    { q: 'Deontology (Kantian)', a: 'Morality is about following duties and rules regardless of consequences. Kant\'s Categorical Imperative: "Act only according to a maxim you could will to be a universal law."', hint: 'Duty, rules, universalisability' },
+    { q: 'Virtue Ethics (Aristotle)', a: 'Focuses on the character of the moral agent rather than rules or outcomes. We should cultivate virtues (courage, honesty, justice) to achieve eudaimonia (flourishing).', hint: 'Character, virtues, eudaimonia' },
+    { q: 'The Trolley Problem', a: 'A thought experiment by Philippa Foot / Judith Thomson: Is it permissible to divert a trolley to kill 1 person instead of 5? Tests deontology vs consequentialism.', hint: 'Trolley, 5 vs 1, doctrine of double effect' },
+    { q: 'The Veil of Ignorance (Rawls)', a: 'John Rawls\' device: imagine choosing societal rules without knowing your place in society. Leads to the Difference Principle: inequalities are only just if they benefit the least advantaged.', hint: 'Original position, justice, fairness' },
+    { q: 'Moral Universalism', a: 'Some moral truths hold for all people in all cultures regardless of belief. Contrasts with relativism. Kant and many natural law theorists hold this view.', hint: 'Morality applies to everyone' },
+  ],
+  epistemology: [
+    { q: 'Descartes\' Method of Doubt', a: 'To find certain knowledge, Descartes doubted everything that could possibly be doubted (senses, dreams, evil demon). Only the Cogito ("I think, therefore I am") survived.', hint: 'Systematic doubt to find certainty' },
+    { q: 'The Gettier Problem', a: 'Edmund Gettier (1963) showed that Justified True Belief is not sufficient for knowledge — you can have a JTB that is true by luck. E.g., a stopped clock that shows the correct time.', hint: 'True + justified + believed ≠ knowledge?' },
+    { q: 'Empiricism', a: 'The view that all knowledge ultimately derives from sensory experience. Key figures: Locke, Berkeley, Hume. The mind begins as a "blank slate" (tabula rasa) — Locke.', hint: 'Experience is the source of knowledge' },
+    { q: 'Rationalism', a: 'The view that reason alone can give us substantive knowledge about the world, independent of experience. Key figures: Descartes, Leibniz, Spinoza.', hint: 'Reason is the source of knowledge' },
+    { q: 'Scepticism', a: 'The philosophical position that knowledge (or justified belief) in some domain is impossible or very difficult. Pyrrhonian sceptics suspended all judgment; Hume practised mitigated scepticism.', hint: 'Can we really KNOW anything?' },
+  ],
+  logic: [
+    { q: 'What is a valid argument?', a: 'An argument is valid if it is impossible for the premises to be true and the conclusion false — the conclusion follows necessarily from the premises. Validity is about form, not truth.', hint: 'Form matters, not content' },
+    { q: 'What is a sound argument?', a: 'A sound argument is both (1) valid AND (2) has all true premises. A sound argument guarantees a true conclusion.', hint: 'Valid + true premises' },
+    { q: 'Modus Ponens', a: 'The basic valid argument form: (1) If P then Q. (2) P. Therefore (3) Q. Example: If it rains, I get wet. It rains. Therefore I get wet.', hint: 'Affirming the antecedent' },
+    { q: 'Ad Hominem Fallacy', a: 'Attacking the person making an argument rather than the argument itself. "You shouldn\'t trust her view on climate — she\'s not a scientist." This is fallacious if the argument stands on its own merits.', hint: 'Attacking the arguer, not the argument' },
+    { q: 'Strawman Fallacy', a: 'Misrepresenting someone\'s argument to make it easier to attack. You attack a distorted version rather than the actual claim.', hint: 'Defeating a fake version of the argument' },
+    { q: 'Begging the Question (Petitio Principii)', a: 'An argument that assumes its conclusion in its premises. Circular reasoning. E.g., "The Bible is true because it says so in the Bible."', hint: 'The conclusion is already in the premises' },
+  ]
+};
+
+let currentDeck = 'core';
+let currentCards = [];
+let fcIndex = 0;
+let fcKnown = new Set();
+let fcReview = new Set();
+
+function loadDeck() {
+  currentDeck = document.getElementById('deckSelect').value;
+  currentCards = [...flashDecks[currentDeck]];
+  fcIndex = 0; fcKnown.clear(); fcReview.clear();
+  document.getElementById('fcCard').classList.remove('flipped');
+  renderFC();
+}
+
+function renderFC() {
+  if (!currentCards.length) return;
+  const card = currentCards[fcIndex];
+  document.getElementById('fcQ').textContent = card.q;
+  document.getElementById('fcA').textContent = card.a;
+  document.getElementById('fcHint').textContent = card.hint ? `Hint: ${card.hint}` : '';
+  document.getElementById('fcCount').textContent = `${fcIndex+1} / ${currentCards.length}`;
+  document.getElementById('fcPrev').disabled = fcIndex === 0;
+  document.getElementById('fcNext').disabled = fcIndex === currentCards.length - 1;
+  document.getElementById('fcCard').classList.remove('flipped');
+  document.getElementById('fcResultBtns').style.display = 'none';
+  updateFCProgress();
+}
+
+function flipCard() {
+  document.getElementById('fcCard').classList.toggle('flipped');
+  const flipped = document.getElementById('fcCard').classList.contains('flipped');
+  document.getElementById('fcResultBtns').style.display = flipped ? 'flex' : 'none';
+}
+
+function fcNavigate(dir) {
+  const newIdx = fcIndex + dir;
+  if (newIdx < 0 || newIdx >= currentCards.length) return;
+  fcIndex = newIdx;
+  renderFC();
+}
+
+function markCard(type) {
+  if (type === 'know') fcKnown.add(fcIndex);
+  else fcReview.add(fcIndex);
+  if (fcIndex < currentCards.length - 1) {
+    fcIndex++;
+    renderFC();
+  } else {
+    updateFCProgress();
+    document.getElementById('fcStats').textContent =
+      `✓ ${fcKnown.size} known · ⟳ ${fcReview.size} to review`;
+  }
+}
+
+function updateFCProgress() {
+  const pct = currentCards.length ? ((fcKnown.size / currentCards.length) * 100) : 0;
+  document.getElementById('fcProg').style.width = pct + '%';
+  document.getElementById('fcProgLabel').textContent =
+    `${fcKnown.size} / ${currentCards.length} mastered`;
+}
+
+function shuffleDeck() {
+  currentCards = [...currentCards].sort(() => Math.random() - 0.5);
+  fcIndex = 0; fcKnown.clear(); fcReview.clear();
+  document.getElementById('fcCard').classList.remove('flipped');
+  renderFC();
+}
+
+async function generateAICards() {
+  const topic = prompt('Enter a philosophy topic for AI-generated flashcards:\n(e.g. "Existentialism", "Plato\'s Republic", "Free Will")');
+  if (!topic) return;
+
+  document.getElementById('fcQ').textContent = 'Generating cards…';
+  document.getElementById('fcA').textContent = '';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `Create 8 philosophy flashcards on the topic: "${topic}" for a UTM first-year student.
+Return ONLY a valid JSON array, no markdown. Each item: {"q":"question","a":"answer in 1-3 sentences","hint":"short hint phrase"}`
+        }]
+      })
+    });
+    const data = await res.json();
+    let raw = (data.content?.[0]?.text || '[]').replace(/```json|```/g, '').trim();
+    const cards = JSON.parse(raw);
+    flashDecks['ai_' + topic] = cards;
+    currentDeck = 'ai_' + topic;
+    currentCards = [...cards];
+    fcIndex = 0; fcKnown.clear(); fcReview.clear();
+    // Add to select
+    const sel = document.getElementById('deckSelect');
+    const opt = document.createElement('option');
+    opt.value = currentDeck; opt.textContent = '✦ ' + topic;
+    sel.appendChild(opt); sel.value = currentDeck;
+    renderFC();
+  } catch (e) {
+    document.getElementById('fcQ').textContent = 'Generation failed. Try again.';
+  }
+}
+
+/* ── NOTES SUMMARIZER ──────────────────────────── */
+let lastSummary = '';
+
+function updateWordCount() {
+  const words = document.getElementById('notesInput').value.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('noteWordCount').textContent = words + ' words';
+}
+
+async function summarizeNotes() {
+  const notes = document.getElementById('notesInput').value.trim();
+  if (!notes) return alert('Please paste your lecture notes first.');
+
+  const mode = document.getElementById('sumMode').value;
+  const out = document.getElementById('sumOutput');
+  const status = document.getElementById('sumStatus');
+
+  status.textContent = 'generating…';
+  out.innerHTML = '<div style="color:var(--text3);font-style:italic;padding:20px">Distilling your notes…</div>';
+
+  const modePrompts = {
+    summary: 'Write a clear, structured summary with headings and paragraph explanations of the key philosophical ideas.',
+    outline: 'Create a detailed hierarchical outline of the main arguments, concepts, and examples.',
+    keyterms: 'Extract and define all key philosophical terms and concepts, formatted as a glossary.',
+    questions: 'Generate 8 thoughtful study questions based on these notes, ranging from recall to critical analysis.'
+  };
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: 'You are a philosophy professor summarising student lecture notes. Be clear, rigorous, and helpful. Use bold for key terms. Format with headings where appropriate. Target a first-year university student.',
+        messages: [{ role: 'user', content: `Lecture notes:\n\n${notes}\n\nTask: ${modePrompts[mode]}` }]
+      })
+    });
+    const data = await res.json();
+    lastSummary = data.content?.[0]?.text || 'Could not generate summary.';
+    status.textContent = 'ready';
+    out.innerHTML = formatSummaryHTML(lastSummary);
+  } catch (e) {
+    status.textContent = 'error';
+    out.innerHTML = '<div style="color:var(--red);padding:20px">Connection failed. Try again.</div>';
+  }
+}
+
+function formatSummaryHTML(text) {
+  return text
+    .replace(/^#{1,3} (.+)$/gm, '<h4>$1</h4>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^[-•] (.+)$/gm, '<div class="bullet">$1</div>')
+    .replace(/\n\n+/g, '</p><p>')
+    .replace(/^/, '<p>').replace(/$/, '</p>');
+}
+
+function clearNotes() {
+  document.getElementById('notesInput').value = '';
+  document.getElementById('sumOutput').innerHTML = '<div class="empty-state"><div class="empty-icon">📜</div><p>Your summary will appear here.<br>Paste notes and click Summarize.</p></div>';
+  document.getElementById('noteWordCount').textContent = '0 words';
+  document.getElementById('sumStatus').textContent = '—';
+  lastSummary = '';
+}
+
+function copySummary() {
+  if (!lastSummary) return;
+  navigator.clipboard.writeText(lastSummary).then(() => alert('Copied to clipboard!'));
+}
+
+function chatFromSummary() {
+  if (!lastSummary) return;
+  showPage('chat');
+  document.getElementById('chatInput').value = 'I have some philosophy notes. Can you help me understand them better?\n\n' + lastSummary.slice(0, 300) + '…';
+}
+
+/* ── STUDY PLAN ─────────────────────────────────── */
+const plan = [
+  { week: 'Week 1–2', title: 'Introduction to Philosophy & Logic', desc: 'What is philosophy? Overview of major branches. Basic logic: validity, soundness, argument forms. Modus ponens/tollens. Common fallacies.', tags: ['PHI100', 'Logic', 'Critical Thinking'] },
+  { week: 'Week 3–4', title: 'Ancient Philosophy: Socrates & Plato', desc: 'The Socratic method. Plato\'s Theory of Forms. The Allegory of the Cave. The Divided Line. Epistemology in Meno and Theaetetus (JTB theory of knowledge).', tags: ['PHI100', 'Ancient', 'Epistemology'] },
+  { week: 'Week 5–6', title: 'Aristotle: Logic, Ethics & Reality', desc: 'Aristotle\'s rejection of Forms. Syllogistic logic. Nicomachean Ethics: eudaimonia, virtue, the golden mean. Aristotle\'s metaphysics: substance, form, matter.', tags: ['PHI100', 'Ancient', 'Ethics', 'Logic'] },
+  { week: 'Week 7–8', title: 'Descartes & the Rise of Modern Philosophy', desc: 'Method of doubt. The Cogito. Substance dualism. The problem of the external world. Meditations on First Philosophy. Rationalism vs Empiricism debate begins.', tags: ['PHI240', 'Modern', 'Epistemology', 'Metaphysics'] },
+  { week: 'Week 9–10', title: 'Hume & Empiricism', desc: 'Impressions and ideas. The problem of induction. Causation as habit. The bundle theory of personal identity. The is-ought gap. Hume\'s scepticism.', tags: ['PHI240', 'Empiricism', 'Epistemology'] },
+  { week: 'Week 11–12', title: 'Kant: Bridging Rationalism & Empiricism', desc: 'The Copernican revolution in philosophy. Synthetic a priori. Space and time as forms of intuition. The Categorical Imperative. Duty-based ethics. Phenomena vs noumena.', tags: ['PHI240', 'Kant', 'Ethics', 'Epistemology'] },
+  { week: 'Week 13–14', title: 'Ethics: Consequentialism & Deontology', desc: 'Bentham\'s and Mill\'s Utilitarianism. Pleasure calculus. Higher vs lower pleasures. Kantian deontology. The trolley problem. Comparing ethical frameworks.', tags: ['PHI160', 'Ethics', 'Utilitarianism', 'Kant'] },
+  { week: 'Week 15–16', title: 'Virtue Ethics & Political Philosophy', desc: 'Aristotle\'s virtue ethics revisited. Modern virtue ethics (MacIntyre). Rawls\' Theory of Justice. Veil of Ignorance. Difference Principle. Social contract theories.', tags: ['PHI160', 'Ethics', 'Political', 'Rawls'] },
+  { week: 'Week 17–18', title: 'Philosophy of Mind & Free Will', desc: 'The mind-body problem. Substance dualism, physicalism, functionalism. Qualia and the hard problem of consciousness. Free will vs determinism. Compatibilism.', tags: ['PHI100', 'Mind', 'Free Will', 'Metaphysics'] },
+  { week: 'Week 19–20', title: 'Existentialism & Review', desc: 'Kierkegaard\'s leap of faith. Nietzsche: God is dead, Übermensch, nihilism. Sartre: existence precedes essence, bad faith. Camus and absurdism. Final exam preparation.', tags: ['Existentialism', 'Nietzsche', 'Sartre', 'Review'] },
+];
+
+function renderPlan() {
+  const wrap = document.getElementById('studyPlan');
+  if (wrap.children.length > 0) return;
+  plan.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'tl-item';
+    div.innerHTML = `
+      <div class="tl-dot"></div>
+      <div class="tl-week">${item.week}</div>
+      <div class="tl-title">${item.title}</div>
+      <div class="tl-desc">${item.desc}</div>
+      <div class="tl-tags">${item.tags.map(t => `<span class="tl-tag">${t}</span>`).join('')}</div>`;
+    wrap.appendChild(div);
+  });
+}
+
+/* ── INIT ────────────────────────────────────────── */
+loadDeck();
+</script>
+</body>
+</html>
