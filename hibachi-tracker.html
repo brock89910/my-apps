@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Hibachi Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- ════════════════════════════════════════════════════════════
+     FIREBASE CONFIG — PASTE YOUR CONFIG OBJECT HERE
+     Replace everything inside the firebaseConfig object below
+     ════════════════════════════════════════════════════════════ -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, set, onValue, remove, push, get }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  /* ▼▼▼ PASTE YOUR FIREBASE CONFIG HERE ▼▼▼ */
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCMXA2a4RUUNuzmTz1QxdJbIciICojLjA8",
+    authDomain:        "restaurant599-b5595.firebaseapp.com",
+    databaseURL:       "https://restaurant599-b5595-default-rtdb.firebaseio.com",
+    projectId:         "restaurant599-b5595",
+    storageBucket:     "restaurant599-b5595.firebasestorage.app",
+    messagingSenderId: "141750935511",
+    appId:             "1:141750935511:web:8ad37806a7d9a70a8e7592",
+    measurementId:     "G-MVT5RGJBLL"
+  };
+  /* ▲▲▲ END OF CONFIG ▲▲▲ */
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+  window._db  = db;
+  window._ref = ref;
+  window._set = set;
+  window._onValue = onValue;
+  window._remove  = remove;
+  window._push    = push;
+  window._get     = get;
+  window._fbReady = true;
+  document.dispatchEvent(new Event('fbReady'));
+</script>
+
+<style>
+/* ── TOKENS ── */
+:root {
+  --bg:      #fdf8f0;
+  --bg2:     #ffffff;
+  --bg3:     #f5efe3;
+  --panel:   #ffffff;
+  --lift:    #fef9f2;
+  --border:  rgba(180,140,60,0.18);
+  --border2: rgba(180,140,60,0.10);
+  --gold:    #9a6e18;
+  --gold2:   #b8892a;
+  --gold3:   rgba(154,110,24,0.12);
+  --text:    #1a1208;
+  --text2:   #4a3818;
+  --text3:   #6a5530;
+  --green:   #1a5e30;
+  --red:     #8a1818;
+  --amber:   #6a4008;
+  --blue:    #1a4070;
+  --r:       8px;
+  --mono:    'IBM Plex Mono', monospace;
+  --sans:    'IBM Plex Sans', sans-serif;
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html { height:100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  height: 100%;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+.app-header {
+  position: sticky; top:0; z-index:100;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+.header-top {
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.app-title {
+  font-family: var(--mono); font-size: 0.85rem; font-weight: 700;
+  color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+.live-dot {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 0.65rem;
+  color: var(--text3); letter-spacing: 0.05em;
+}
+
+.live-dot::before {
+  content:''; width:6px; height:6px; border-radius:50%;
+  background: var(--green);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+/* ── DATE NAV ── */
+.date-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg3); border-radius: var(--r);
+  border: 1px solid var(--border);
+  padding: 0 4px;
+}
+
+.date-nav-btn {
+  width: 38px; height: 38px;
+  background: none; border: none; color: var(--text2);
+  font-size: 1rem; cursor: pointer; border-radius: 6px;
+  display: flex; align-items:center; justify-content:center;
+  transition: all 0.15s;
+}
+
+.date-nav-btn:active { background: var(--lift); }
+
+.date-center {
+  text-align: center; flex:1;
+}
+
+.date-label {
+  font-family: var(--mono); font-weight: 700; font-size: 0.88rem;
+  color: var(--text); letter-spacing: 0.04em;
+}
+
+.date-sub {
+  font-family: var(--mono); font-size: 0.62rem;
+  color: var(--text3); letter-spacing: 0.06em; text-transform:uppercase;
+}
+
+/* ── TABS ── */
+.tab-bar {
+  display: flex; gap: 4px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  padding: 6px 16px 0;
+}
+
+.tab-btn {
+  padding: 9px 18px 8px;
+  font-family: var(--mono); font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.04em;
+  border: none; background: transparent;
+  color: var(--text2); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+
+.tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* ── GRILL CHIPS ── */
+.grill-chips {
+  display: flex; gap: 6px; padding: 10px 16px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  border-bottom: 1px solid var(--border2);
+}
+
+.grill-chip {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 20px;
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 600;
+  border: 1px solid; cursor: default;
+  letter-spacing: 0.03em;
+  transition: all 0.2s;
+}
+
+.grill-chip.open   { color: #1a5e30; border-color: rgba(26,94,48,0.4);    background: rgba(26,94,48,0.08); }
+.grill-chip.nearly { color: #6a4008; border-color: rgba(106,64,8,0.45);   background: rgba(106,64,8,0.08); }
+.grill-chip.full   { color: #8a1818; border-color: rgba(138,24,24,0.4);   background: rgba(138,24,24,0.07); }
+.grill-chip.locked { color: var(--text3); border-color: var(--border);    background: var(--bg3); }
+
+/* ── SCROLL AREA ── */
+.scroll-area {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+}
+
+/* ── TIME SLOT ── */
+.time-block {
+  border-bottom: 1px solid var(--border2);
+}
+
+.time-header {
+  display: flex; align-items: center;
+  padding: 8px 16px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border2);
+  position: sticky; top: 0; z-index: 5;
+}
+
+.time-label {
+  font-family: var(--mono); font-size: 0.8rem; font-weight: 700;
+  color: var(--gold); letter-spacing: 0.05em; min-width: 50px;
+}
+
+.time-chef-info {
+  font-family: var(--mono); font-size: 0.62rem;
+  color: var(--text3); margin-left: 10px; letter-spacing: 0.03em;
+}
+
+.time-add-btn {
+  margin-left: auto;
+  width: 30px; height: 30px;
+  background: var(--gold3); border: 1px solid rgba(212,168,83,0.3);
+  border-radius: 6px; color: var(--gold);
+  font-size: 1.1rem; cursor: pointer;
+  display: flex; align-items:center; justify-content:center;
+  transition: all 0.15s;
+}
+
+.time-add-btn:active { background: rgba(212,168,83,0.22); }
+
+.grills-row {
+  display: flex; gap: 0;
+  min-height: 42px;
+}
+
+.grill-cell {
+  flex: 1; min-width: 0;
+  border-right: 1px solid var(--border2);
+  padding: 4px;
+  position: relative;
+}
+
+.grill-cell:last-child { border-right: none; }
+
+.grill-cell-header {
+  font-family: var(--mono); font-size: 0.58rem;
+  color: var(--text3); padding: 0 2px 3px;
+  letter-spacing: 0.04em;
+}
+
+/* ── RESERVATION CARD ── */
+.res-card {
+  border-radius: 5px; padding: 5px 7px;
+  border-left: 3px solid;
+  margin-bottom: 3px; cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.res-card:active { opacity: 0.8; }
+
+.res-card.grill-1 { background: rgba(42,122,70,0.08);  border-color: #3a9e60; }
+.res-card.grill-2 { background: rgba(42,80,158,0.08);  border-color: #3a60b8; }
+.res-card.grill-3 { background: rgba(158,110,30,0.08); border-color: #b8882a; }
+.res-card.grill-4 { background: rgba(120,42,158,0.08); border-color: #9a4ab8; }
+.res-card.dining  { background: rgba(212,168,83,0.10); border-color: var(--gold2); }
+
+.res-name {
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 700;
+  color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.res-detail {
+  font-family: var(--mono); font-size: 0.62rem;
+  color: var(--text2); display: flex; gap: 6px; flex-wrap: wrap;
+}
+
+.res-badge {
+  font-family: var(--mono); font-size: 0.58rem; font-weight: 600;
+  padding: 1px 5px; border-radius: 3px;
+  background: rgba(255,255,255,0.06); color: var(--text2);
+}
+
+.blocked-cell {
+  background: repeating-linear-gradient(
+    45deg,
+    transparent, transparent 4px,
+    rgba(180,140,60,0.06) 4px, rgba(180,140,60,0.06) 8px
+  );
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 6px;
+  font-family: var(--mono); font-size: 0.58rem;
+  color: var(--text3); text-align: center;
+  min-height: 32px;
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(40,20,0,0.45);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: flex-end;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.modal-sheet {
+  width: 100%; background: var(--bg2);
+  border-radius: 18px 18px 0 0;
+  border-top: 1px solid var(--border);
+  max-height: 92vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+.modal-handle {
+  width: 36px; height: 4px; border-radius: 2px;
+  background: var(--border); margin: 12px auto 0;
+}
+
+.modal-head {
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.modal-title {
+  font-family: var(--mono); font-size: 0.82rem; font-weight: 700;
+  color: var(--gold); letter-spacing: 0.05em; text-transform: uppercase;
+}
+
+.modal-close {
+  width: 32px; height: 32px; border-radius: 6px;
+  background: var(--lift); border: 1px solid var(--border);
+  color: var(--text2); font-size: 1rem; cursor: pointer;
+  display: flex; align-items:center; justify-content:center;
+}
+
+.modal-body { padding: 16px 20px 24px; }
+
+/* ── FORM ── */
+.form-row { margin-bottom: 14px; }
+
+.form-label {
+  font-family: var(--mono); font-size: 0.65rem; font-weight: 600;
+  color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 5px; display: block;
+}
+
+.form-input, .form-select, .form-textarea {
+  width: 100%; background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r); padding: 11px 13px;
+  color: var(--text); font-family: var(--mono); font-size: 0.85rem;
+  outline: none; transition: border-color 0.15s;
+  -webkit-appearance: none; appearance: none;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: rgba(212,168,83,0.5);
+}
+
+.form-input::placeholder { color: var(--text3); }
+.form-textarea { resize: none; min-height: 80px; }
+.form-select option { background: var(--bg2); }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.card-row { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; }
+
+/* ── BUTTONS ── */
+.btn-gold {
+  width: 100%; padding: 13px;
+  background: var(--gold); color: #fff;
+  font-family: var(--mono); font-size: 0.82rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  border: none; border-radius: var(--r); cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-gold:active { background: var(--gold2); }
+.btn-gold:disabled { background: var(--text3); color: var(--bg3); cursor: not-allowed; }
+
+.btn-danger {
+  width: 100%; padding: 11px;
+  background: rgba(138,24,24,0.07); color: #7a1010;
+  font-family: var(--mono); font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  border: 1px solid rgba(184,48,48,0.25); border-radius: var(--r);
+  cursor: pointer; margin-top: 8px; transition: all 0.15s;
+}
+
+.btn-danger:active { background: rgba(184,48,48,0.14); }
+
+/* ── GRILL ASSIGN DISPLAY ── */
+.grill-assign-info {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 14px;
+  font-family: var(--mono); font-size: 0.78rem;
+  color: var(--text2);
+  display: flex; align-items: center; gap: 8px;
+}
+
+.grill-assign-badge {
+  font-weight: 700; font-size: 0.82rem;
+  padding: 3px 10px; border-radius: 4px;
+}
+
+.grill-assign-badge.g1 { background: rgba(26,112,64,0.12);  color: #0e4020; border: 1px solid rgba(26,112,64,0.3); }
+.grill-assign-badge.g2 { background: rgba(26,64,160,0.12);  color: #0e2860; border: 1px solid rgba(26,64,160,0.3); }
+.grill-assign-badge.g3 { background: rgba(154,96,16,0.12);  color: #5a3808; border: 1px solid rgba(154,96,16,0.3); }
+.grill-assign-badge.g4 { background: rgba(122,26,154,0.12); color: #4a0e60; border: 1px solid rgba(122,26,154,0.3); }
+.grill-assign-badge.double { background: rgba(154,110,24,0.12); color: #5a3808; border: 1px solid rgba(154,110,24,0.3); }
+
+.grill-label-row {
+  display: flex; align-items: center; gap: 8px; margin-top: 6px;
+}
+
+.grill-label-row label {
+  font-family: var(--mono); font-size: 0.6rem; color: var(--text3);
+  letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+}
+
+/* ── DOUBLE GRILL CARD ── */
+.res-card.double-grill {
+  background: rgba(154,110,24,0.09);
+  border-left: 3px solid var(--gold2);
+  border-top: 1px dashed rgba(154,110,24,0.25);
+}
+
+/* ── WARNING BANNER ── */
+.warn-banner {
+  background: rgba(106,64,8,0.08);
+  border: 1px solid rgba(106,64,8,0.28);
+  border-radius: 6px; padding: 8px 12px; margin-bottom: 12px;
+  font-family: var(--mono); font-size: 0.7rem;
+  color: #5a3808; letter-spacing: 0.03em;
+  display: flex; gap: 8px; align-items: flex-start;
+}
+
+.err-banner {
+  background: rgba(138,24,24,0.07);
+  border: 1px solid rgba(138,24,24,0.28);
+  border-radius: 6px; padding: 8px 12px; margin-bottom: 12px;
+  font-family: var(--mono); font-size: 0.7rem;
+  color: #7a1010; letter-spacing: 0.03em;
+}
+
+/* ── EMPTY STATE ── */
+.empty-slot {
+  padding: 10px 16px;
+  font-family: var(--mono); font-size: 0.65rem;
+  color: var(--text3); font-style: italic;
+}
+
+/* ── DINING ROOM ── */
+.dining-list { padding: 10px 16px; display: flex; flex-direction: column; gap: 8px; }
+
+.dining-card {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 13px 15px;
+  border-left: 3px solid var(--gold); cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.dining-card:active { border-color: rgba(212,168,83,0.8); }
+
+.dining-name {
+  font-family: var(--mono); font-size: 0.82rem; font-weight: 700; color: var(--text);
+}
+
+.dining-detail {
+  font-family: var(--mono); font-size: 0.65rem; color: var(--text2);
+  margin-top: 3px; display: flex; gap: 10px;
+}
+
+.dining-note {
+  font-size: 0.68rem; color: var(--text3); margin-top: 5px;
+  font-style: italic; line-height: 1.4;
+}
+
+.fab {
+  position: fixed; bottom: 24px; right: 20px; z-index: 200;
+  width: 54px; height: 54px; border-radius: 50%;
+  background: var(--gold); color: #fff;
+  font-size: 1.5rem; font-weight: 600;
+  border: none; cursor: pointer; box-shadow: 0 4px 20px rgba(184,137,42,0.35);
+  display: flex; align-items:center; justify-content:center;
+  transition: all 0.15s;
+}
+
+.fab:active { transform: scale(0.94); }
+
+.section-divider {
+  font-family: var(--mono); font-size: 0.62rem; font-weight: 700;
+  color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 10px 16px 4px;
+  border-top: 1px solid var(--border2);
+}
+
+/* ── CAPACITY BAR ── */
+.cap-bar-wrap {
+  height: 3px; background: var(--bg); border-radius: 2px; margin-top: 3px;
+}
+.cap-bar {
+  height: 100%; border-radius: 2px; transition: width 0.3s;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ════ APP ════════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="app-header">
+    <div class="header-top">
+      <div class="app-title">🔥 Hibachi Tracker</div>
+      <div class="live-dot" id="liveStatus">LIVE</div>
+    </div>
+    <div class="date-nav">
+      <button class="date-nav-btn" onclick="changeDay(-1)">‹</button>
+      <div class="date-center" onclick="openCalendar()" style="cursor:pointer">
+        <div class="date-label" id="dateLabel">—</div>
+        <div class="date-sub" id="dateSub">— <span style="font-size:0.55rem;opacity:0.6">📅 tap to pick</span></div>
+      </div>
+      <button class="date-nav-btn" onclick="changeDay(1)">›</button>
+    </div>
+    <!-- Hidden native date picker -->
+    <input type="date" id="calPicker" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px"
+      onchange="pickDate(this.value)">`
+  </div>
+
+  <!-- TABS -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-hibachi" onclick="switchTab('hibachi')">🔥 Hibachi</button>
+    <button class="tab-btn"        id="tab-dining"  onclick="switchTab('dining')">🍽 Dining</button>
+  </div>
+
+  <!-- ═══ HIBACHI TAB ═══ -->
+  <div id="view-hibachi">
+    <div class="grill-chips" id="grillChips"></div>
+    <div class="scroll-area" id="hibachiScroll" style="height:calc(100vh - 210px)">
+      <div id="timeSlots"></div>
+    </div>
+  </div>
+
+  <!-- ═══ DINING TAB ═══ -->
+  <div id="view-dining" style="display:none">
+    <div class="scroll-area" style="height:calc(100vh - 160px)">
+      <div class="dining-list" id="diningList"></div>
+    </div>
+    <button class="fab" onclick="openDiningModal(null)">＋</button>
+  </div>
+
+</div>
+
+<!-- ════ MODAL ════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="closeModalIfOutside(event)">
+  <div class="modal-sheet" id="modalSheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <div class="modal-title" id="modalTitle">New Reservation</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ════ SCRIPT ════════════════════════════════════════════════ -->
+<script>
+/* ── CHEF SCHEDULE ── */
+// chefs = how many chef/grill stations are active in that window
+// All 4 grills are always physically available; chef count limits simultaneous active grills
+const CHEF_SCHEDULE = {
+  0: [ // Sunday
+    { start:'12:00', end:'20:00', chefs:2 }
+  ],
+  1: [ // Monday
+    { start:'12:00', end:'16:00', chefs:1 },
+    { start:'16:00', end:'20:00', chefs:2 }
+  ],
+  2: [ // Tuesday
+    { start:'12:00', end:'17:00', chefs:1 },
+    { start:'17:00', end:'20:00', chefs:2 }
+  ],
+  3: [ // Wednesday
+    { start:'12:00', end:'17:00', chefs:1 },
+    { start:'17:00', end:'20:00', chefs:2 }
+  ],
+  4: [ // Thursday
+    { start:'12:00', end:'20:00', chefs:2 }
+  ],
+  5: [ // Friday
+    { start:'12:00', end:'16:00', chefs:2 },
+    { start:'16:00', end:'21:00', chefs:3 }
+  ],
+  6: [ // Saturday
+    { start:'12:00', end:'16:00', chefs:2 },
+    { start:'16:00', end:'21:00', chefs:3 }
+  ]
+};
+
+// Last bookable slot: Fri/Sat = 9 PM (21:00), all other days = 8 PM (20:00)
+// The service window end is already correct above. We just need to exclude the
+// final slot if it equals the closing time (no booking AT closing time).
+function getLastBookableMinutes(dow) {
+  return (dow === 5 || dow === 6) ? 21*60 : 20*60;
+}
+
+const GRILL_COLORS = ['grill-1','grill-2','grill-3','grill-4'];
+const GRILL_COLORS_HEX = ['#1a7040','#1a40a0','#9a6010','#7a1a9a'];
+// Capacity rules by number of groups sharing a grill:
+// 1 group alone  → 14 max
+// 2 groups combined → 13 max total
+// 3+ groups combined → 12 max total
+const CAP_BY_GROUPS = { 1: 14, 2: 13, default: 12 };
+const WARN_GUESTS = 10;
+const COOK_BLOCK_MINUTES = 60;
+const SEAT_BLOCK_MINUTES = 90;
+// Card required only for groups of 4 or more
+const CARD_REQUIRED_MIN = 4;
+
+// Per-day grill labels stored in memory (not Firebase — just UI labeling)
+let grillLabels = { G1:'Grill 1', G2:'Grill 2', G3:'Grill 3', G4:'Grill 4' };
+function grillLabel(g) { return grillLabels[`G${g}`] || `Grill ${g}`; }
+
+// Helper: get capacity limit for a grill given how many groups are already there
+function getGrillCap(existingGroupCount) {
+  if (existingGroupCount === 0) return CAP_BY_GROUPS[1];
+  if (existingGroupCount === 1) return CAP_BY_GROUPS[2];
+  return CAP_BY_GROUPS.default;
+}
+
+/* ── STATE ── */
+let currentDate = new Date();
+currentDate.setHours(0,0,0,0);
+let activeTab = 'hibachi';
+let reservations = {}; // keyed by date string
+let diningReservations = {};
+let fbListener = null;
+let fbDiningListener = null;
+
+/* ── DATE UTILS ── */
+function dateKey(d) {
+  return d.toISOString().slice(0,10);
+}
+
+function formatDateLabel(d) {
+  return d.toLocaleDateString('en-CA', { month:'short', day:'numeric', year:'numeric' });
+}
+
+function formatDateSub(d) {
+  return d.toLocaleDateString('en-CA', { weekday:'long' }).toUpperCase();
+}
+
+function timeToMinutes(t) {
+  const [h,m] = t.split(':').map(Number);
+  return h*60+m;
+}
+
+function minutesToTime(m) {
+  const h = Math.floor(m/60); const mn = m%60;
+  return `${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}`;
+}
+
+function displayTime(t) {
+  const [h,m] = t.split(':').map(Number);
+  const suffix = h>=12 ? 'PM':'AM';
+  const dh = h>12 ? h-12 : h===0 ? 12 : h;
+  return `${dh}:${String(m).padStart(2,'0')} ${suffix}`;
+}
+
+/* ── DAY SERVICE WINDOW ── */
+function getServiceWindow(dow) {
+  const sched = CHEF_SCHEDULE[dow];
+  if (!sched || !sched.length) return null;
+  const starts = sched.map(s=>timeToMinutes(s.start));
+  const ends   = sched.map(s=>timeToMinutes(s.end));
+  return { start: Math.min(...starts), end: Math.max(...ends) };
+}
+
+function getChefsAtTime(dow, timeMins) {
+  const sched = CHEF_SCHEDULE[dow];
+  if (!sched) return 0;
+  for (const seg of [...sched].reverse()) {
+    if (timeMins >= timeToMinutes(seg.start) && timeMins < timeToMinutes(seg.end)) {
+      return seg.chefs;
+    }
+  }
+  return 0;
+}
+
+function generateTimeSlots(dow) {
+  const win = getServiceWindow(dow);
+  if (!win) return [];
+  const lastBook = getLastBookableMinutes(dow);
+  const slots = [];
+  for (let m = win.start; m < lastBook; m += 30) {
+    slots.push(minutesToTime(m));
+  }
+  return slots;
+}
+
+/* ── NAV ── */
+function changeDay(dir) {
+  currentDate = new Date(currentDate.getTime() + dir*86400000);
+  renderDateHeader();
+  subscribeToDate();
+}
+
+function openCalendar() {
+  const picker = document.getElementById('calPicker');
+  picker.value = dateKey(currentDate);
+  picker.showPicker ? picker.showPicker() : picker.click();
+}
+
+function pickDate(val) {
+  if (!val) return;
+  // Parse as local date to avoid timezone shifting
+  const [y,m,d] = val.split('-').map(Number);
+  currentDate = new Date(y, m-1, d);
+  currentDate.setHours(0,0,0,0);
+  renderDateHeader();
+  subscribeToDate();
+}
+
+function renderDateHeader() {
+  document.getElementById('dateLabel').textContent = formatDateLabel(currentDate);
+  document.getElementById('dateSub').textContent   = formatDateSub(currentDate);
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.getElementById('view-hibachi').style.display = tab==='hibachi' ? '' : 'none';
+  document.getElementById('view-dining').style.display  = tab==='dining'  ? '' : 'none';
+  document.getElementById('tab-hibachi').classList.toggle('active', tab==='hibachi');
+  document.getElementById('tab-dining').classList.toggle('active',  tab==='dining');
+}
+
+/* ── FIREBASE SUBSCRIPTION ── */
+function subscribeToDate() {
+  if (!window._db) return;
+  const key = dateKey(currentDate);
+
+  // Hibachi
+  if (fbListener) { /* onValue returns unsubscribe fn */ fbListener(); }
+  const rRef = window._ref(window._db, `reservations/${key}`);
+  fbListener = window._onValue(rRef, snap => {
+    reservations[key] = snap.val() || {};
+    renderHibachi();
+  });
+
+  // Dining
+  if (fbDiningListener) fbDiningListener();
+  const dRef = window._ref(window._db, `dining/${key}`);
+  fbDiningListener = window._onValue(dRef, snap => {
+    diningReservations[key] = snap.val() || {};
+    renderDining();
+  });
+}
+
+/* ── BOOKING HELPERS ── */
+function getResForDateSlotGrill(dateStr, slot, grill) {
+  const all = reservations[dateStr] || {};
+  return Object.entries(all).filter(([id,r]) => {
+    if (r.slot !== slot) return false;
+    if (r.grill === grill) return true;
+    return false;
+  }).map(([id,r])=>({id,...r}));
+}
+
+function getAllResForDate(dateStr) {
+  return Object.entries(reservations[dateStr]||{}).map(([id,r])=>({id,...r}));
+}
+
+// Returns groups currently seated/active at this grill during the seating window
+function getGroupsAtGrillAtSlot(dateStr, grill, slotMins, excludeId) {
+  const all = getAllResForDate(dateStr);
+  return all.filter(r => {
+    if (excludeId && r.id === excludeId) return false;
+    if (r.grill !== grill) return false;
+    const rMins = timeToMinutes(r.slot);
+    // Active during seating window: booked within 90 min before slotMins
+    return rMins <= slotMins && slotMins < rMins + SEAT_BLOCK_MINUTES;
+  });
+}
+
+// Total guests at grill during the seating window
+function getGrillGuestsAtSlot(dateStr, grill, slotMins, excludeId) {
+  return getGroupsAtGrillAtSlot(dateStr, grill, slotMins, excludeId)
+    .reduce((s,r) => s + (r.guests||0), 0);
+}
+
+function isGrillBlocked(dateStr, grill, slotMins) {
+  const all = getAllResForDate(dateStr);
+  for (const r of all) {
+    if (r.grill !== grill) continue;
+    const rMins = timeToMinutes(r.slot);
+    if (slotMins > rMins && slotMins < rMins + COOK_BLOCK_MINUTES) {
+      return { reason:'cook', bookedAt: r.slot };
+    }
+  }
+  return null;
+}
+
+function isGrillBlockedExcluding(dateStr, grill, slotMins, excludeId) {
+  const all = getAllResForDate(dateStr).filter(r => r.id !== excludeId);
+  for (const r of all) {
+    if (r.grill !== grill) continue;
+    const rMins = timeToMinutes(r.slot);
+    if (slotMins > rMins && slotMins < rMins + COOK_BLOCK_MINUTES) return { reason:'cook', bookedAt: r.slot };
+  }
+  return null;
+}
+
+function grillStatus(dateStr, grill) {
+  // Use current time for today, start of day for other days
+  const dow = currentDate.getDay();
+  const win = getServiceWindow(dow);
+  const now = new Date();
+  let checkMins;
+  if (dateKey(currentDate) === dateKey(new Date())) {
+    checkMins = now.getHours()*60 + now.getMinutes();
+  } else {
+    checkMins = win ? win.start : 0;
+  }
+  const groups = getGroupsAtGrillAtSlot(dateStr, grill, checkMins, null);
+  const totalGuests = groups.reduce((s,r) => s+(r.guests||0), 0);
+  const cap = getGrillCap(groups.length);
+  if (!groups.length) return 'open';
+  if (totalGuests >= cap) return 'full';
+  if (totalGuests >= WARN_GUESTS) return 'nearly';
+  return 'open';
+}
+
+/**
+ * AUTO-ASSIGN: finds best available grill for new group.
+ * Priority: grill with existing group(s) that still has room (combine groups),
+ * then empty grill. All 4 grills available; chef count = max simultaneous active grills.
+ */
+function autoAssignGrill(dateStr, slot, guests, chefs, excludeId) {
+  const slotMins = timeToMinutes(slot);
+
+  // Build state for each grill
+  const grillState = [];
+  for (let g = 1; g <= 4; g++) {
+    const blocked = isGrillBlockedExcluding(dateStr, g, slotMins, excludeId);
+    const groups = getGroupsAtGrillAtSlot(dateStr, g, slotMins, excludeId);
+    const totalGuests = groups.reduce((s,r) => s+(r.guests||0), 0);
+    const cap = getGrillCap(groups.length); // cap for adding ONE MORE group
+    const room = cap - totalGuests;
+    grillState.push({ g, blocked, groups, totalGuests, cap, room });
+  }
+
+  // Count how many grills are currently active (have groups seated now)
+  const activeGrills = grillState.filter(s => s.groups.length > 0).map(s => s.g);
+
+  // First pass: try to COMBINE into an existing grill that has room
+  for (const state of grillState) {
+    if (state.blocked) continue;
+    if (state.groups.length === 0) continue; // skip empty for now
+    if (state.room >= guests) {
+      return { grill: state.g, isDouble: false };
+    }
+  }
+
+  // Second pass: assign to a fresh empty grill (must respect chef count)
+  for (const state of grillState) {
+    if (state.blocked) continue;
+    if (state.groups.length > 0) continue; // already tried these
+    // Check chef availability: activeGrills + this new one must not exceed chefs
+    // (A grill with existing groups already counted in activeGrills)
+    const wouldBeActive = activeGrills.length + 1;
+    if (wouldBeActive > chefs) continue;
+    const cap = getGrillCap(0); // 1 group alone
+    if (cap >= guests) {
+      return { grill: state.g, isDouble: false };
+    }
+  }
+
+  return null; // no availability
+}
+
+/* ── RENDER HIBACHI ── */
+function renderHibachi() {
+  renderGrillChips();
+  renderTimeSlots();
+}
+
+function renderGrillChips() {
+  const key = dateKey(currentDate);
+  const dow = currentDate.getDay();
+  const win = getServiceWindow(dow);
+  const container = document.getElementById('grillChips');
+  container.innerHTML = '';
+  if (!win) {
+    container.innerHTML = '<div style="font-family:var(--mono);font-size:0.68rem;color:var(--text3);padding:8px">Closed today</div>';
+    return;
+  }
+  const now = new Date(); let curMins;
+  if (dateKey(currentDate) === dateKey(new Date())) {
+    curMins = now.getHours()*60+now.getMinutes();
+  } else {
+    curMins = win.start;
+  }
+  const chefs = getChefsAtTime(dow, curMins);
+
+  for (let g=1; g<=4; g++) {
+    const st = grillStatus(key, g);
+    const groups = getGroupsAtGrillAtSlot(key, g, curMins, null);
+    const guests = groups.reduce((s,r)=>s+(r.guests||0),0);
+    const cap = getGrillCap(groups.length > 0 ? groups.length - 1 : 0);
+    const chip = document.createElement('div');
+    chip.className = `grill-chip ${st}`;
+    chip.innerHTML = `${grillLabel(g)} · ${guests}/${cap}`;
+    container.appendChild(chip);
+  }
+  // Chef info chip
+  const chip2 = document.createElement('div');
+  chip2.className = 'grill-chip open';
+  chip2.style.cssText = 'color:#7a5010;border-color:rgba(154,110,24,0.35);background:rgba(154,110,24,0.09)';
+  chip2.textContent = `${chefs} CHEF${chefs!==1?'S':''}`;
+  container.appendChild(chip2);
+}
+
+function renderTimeSlots() {
+  const container = document.getElementById('timeSlots');
+  container.innerHTML = '';
+  const dow = currentDate.getDay();
+  const slots = generateTimeSlots(dow);
+  const key = dateKey(currentDate);
+
+  if (!slots.length) {
+    container.innerHTML = '<div class="empty-slot">No service scheduled for this day.</div>';
+    return;
+  }
+
+  slots.forEach(slot => {
+    const slotMins = timeToMinutes(slot);
+    const chefs = getChefsAtTime(dow, slotMins);
+    if (chefs === 0) return;
+
+    const block = document.createElement('div');
+    block.className = 'time-block';
+
+    const head = document.createElement('div');
+    head.className = 'time-header';
+    head.innerHTML = `
+      <div class="time-label">${displayTime(slot)}</div>
+      <div class="time-chef-info">${chefs} chef${chefs!==1?'s':''} active</div>
+      <button class="time-add-btn" onclick="openHibachiModal('${slot}',null)" aria-label="Add reservation">+</button>`;
+    block.appendChild(head);
+
+    const row = document.createElement('div');
+    row.className = 'grills-row';
+
+    for (let g=1; g<=4; g++) {
+      const cell = document.createElement('div');
+      cell.className = 'grill-cell';
+      cell.innerHTML = `<div class="grill-cell-header">${grillLabel(g)}</div>`;
+
+      const blockInfo = isGrillBlocked(key, g, slotMins);
+      const recs = getResForDateSlotGrill(key, slot, g);
+      const groups = getGroupsAtGrillAtSlot(key, g, slotMins, null);
+      const totalGuests = groups.reduce((s,r)=>s+(r.guests||0),0);
+      const cap = getGrillCap(Math.max(0, groups.length - 1));
+
+      if (blockInfo && !recs.length) {
+        const bk = document.createElement('div');
+        bk.className = 'blocked-cell';
+        bk.textContent = `🔒 cooking\nsince ${displayTime(blockInfo.bookedAt)}`;
+        bk.style.whiteSpace = 'pre-line';
+        cell.appendChild(bk);
+      } else {
+        recs.forEach(r => {
+          const card = document.createElement('div');
+          card.className = `res-card grill-${g}`;
+          const capColor = totalGuests >= cap ? '#8a1818' : totalGuests >= WARN_GUESTS ? '#6a4008' : GRILL_COLORS_HEX[g-1];
+          card.innerHTML = `
+            <div class="res-name">${escHtml(r.name||'Guest')}</div>
+            <div class="res-detail">
+              <span>👥 ${r.guests}</span>
+              ${r.phone ? `<span>📞 ${escHtml(r.phone)}</span>` : ''}
+            </div>
+            <div class="cap-bar-wrap"><div class="cap-bar" style="width:${Math.min((totalGuests/cap)*100,100)}%;background:${capColor}"></div></div>`;
+          card.onclick = () => openHibachiModal(slot, r.id);
+          cell.appendChild(card);
+        });
+        if (!recs.length) {
+          cell.style.cursor = 'pointer';
+          cell.onclick = () => openHibachiModal(slot, null);
+        }
+      }
+      row.appendChild(cell);
+    }
+
+    block.appendChild(row);
+    container.appendChild(block);
+  });
+}
+
+/* ── RENDER DINING ── */
+function renderDining() {
+  const key = dateKey(currentDate);
+  const list = document.getElementById('diningList');
+  list.innerHTML = '';
+  const all = Object.entries(diningReservations[key]||{});
+
+  if (!all.length) {
+    list.innerHTML = '<div class="empty-slot">No dining room reservations for this day.</div>';
+    return;
+  }
+
+  all.sort(([,a],[,b]) => (a.name||'').localeCompare(b.name||''));
+  all.forEach(([id,r]) => {
+    const card = document.createElement('div');
+    card.className = 'dining-card';
+    card.innerHTML = `
+      <div class="dining-name">${escHtml(r.name||'Guest')}</div>
+      <div class="dining-detail">
+        <span>👥 ${r.guests} guests</span>
+        ${r.phone ? `<span>📞 ${escHtml(r.phone)}</span>` : ''}
+      </div>
+      ${r.notes ? `<div class="dining-note">${escHtml(r.notes)}</div>` : ''}`;
+    card.onclick = () => openDiningModal({id,...r});
+    list.appendChild(card);
+  });
+}
+
+/* ── HIBACHI MODAL ── */
+function openHibachiModal(slot, editId) {
+  const key = dateKey(currentDate);
+  const dow = currentDate.getDay();
+  const slotMins = slot ? timeToMinutes(slot) : 0;
+  const chefs = getChefsAtTime(dow, slotMins);
+  const existing = editId ? (reservations[key]||{})[editId] : null;
+
+  document.getElementById('modalTitle').textContent = editId ? 'Edit Reservation' : 'New Hibachi Reservation';
+
+  // Build grill label editor section
+  const labelEditorHTML = `
+    <div class="form-row" style="margin-bottom:10px">
+      <label class="form-label">Grill Labels <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional — rename grills for today)</span></label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        ${[1,2,3,4].map(g => `
+          <div style="display:flex;align-items:center;gap:5px">
+            <span style="font-family:var(--mono);font-size:0.65rem;color:var(--text3);min-width:18px">G${g}</span>
+            <input class="form-input" style="padding:7px 10px;font-size:0.78rem"
+              id="lbl${g}" value="${escHtml(grillLabels['G'+g])}"
+              onchange="grillLabels['G${g}']=this.value;renderHibachi()"
+              placeholder="Grill ${g}">
+          </div>`).join('')}
+      </div>
+    </div>`;
+
+  // Auto-detect large party note
+  const existingGuests = existing?.guests || 0;
+  const isEdit = !!editId;
+
+  document.getElementById('modalBody').innerHTML = `
+    ${labelEditorHTML}
+    <hr style="border:none;border-top:1px solid var(--border);margin:4px 0 14px">
+    <div class="form-row">
+      <label class="form-label">Time Slot</label>
+      <select class="form-select" id="fSlot" onchange="previewGrillAssign()">
+        ${generateTimeSlots(dow).filter(s => getChefsAtTime(dow, timeToMinutes(s))>0).map(s =>
+          `<option value="${s}" ${s===slot?'selected':''}>${displayTime(s)}</option>`
+        ).join('')}
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Guest Name *</label>
+      <input class="form-input" id="fName" type="text" placeholder="Last name or full name" value="${escHtml(existing?.name||'')}">
+    </div>
+    <div class="form-grid">
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Party Size *</label>
+        <input class="form-input" id="fGuests" type="number" min="1" max="14"
+          placeholder="e.g. 4" value="${existing?.guests||''}"
+          oninput="previewGrillAssign();toggleCardFields()">
+      </div>
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Phone</label>
+        <input class="form-input" id="fPhone" type="tel" placeholder="506-555-0100" value="${escHtml(existing?.phone||'')}">
+      </div>
+    </div>
+    <div class="form-row" id="grillPreviewRow">
+      <label class="form-label">Grill Assignment</label>
+      <div id="grillPreview" class="grill-assign-info">
+        <span style="color:var(--text3);font-style:italic">Enter party size to see assignment</span>
+      </div>
+    </div>
+    <div id="cardSection" style="${(existing?.guests||0) >= CARD_REQUIRED_MIN || !existing ? '' : 'display:none'}">
+      <div class="card-row" style="margin:0 0 14px">
+        <div class="form-row" style="margin:0">
+          <label class="form-label">Card Number <span id="cardRequired" style="color:var(--red)">*</span></label>
+          <input class="form-input" id="fCard" type="text" maxlength="19" placeholder="•••• •••• •••• ••••" value="${escHtml(existing?.card||'')}" oninput="fmtCard(this)">
+        </div>
+        <div class="form-row" style="margin:0">
+          <label class="form-label">Expiry <span style="color:var(--red)">*</span></label>
+          <input class="form-input" id="fExpiry" type="text" maxlength="5" placeholder="MM/YY" value="${escHtml(existing?.expiry||'')}" oninput="fmtExpiry(this)">
+        </div>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Staff Initials</label>
+        <input class="form-input" id="fInitials" type="text" maxlength="4" placeholder="JS" value="${escHtml(existing?.initials||'')}">
+      </div>
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Booked On</label>
+        <input class="form-input" id="fBookedOn" type="date" value="${existing?.bookedOn||new Date().toISOString().slice(0,10)}">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="fNotes" placeholder="Allergies, special requests, birthday…">${escHtml(existing?.notes||'')}</textarea>
+    </div>
+    <div id="formErr"></div>
+    <button class="btn-gold" onclick="saveHibachi('${key}','${editId||''}')">
+      ${editId ? '✓ Update Reservation' : '✓ Confirm Reservation'}
+    </button>
+    ${editId ? `<button class="btn-danger" onclick="deleteRes('${key}','${editId}')">✕ Delete Reservation</button>` : ''}
+  `;
+
+  // If editing, show current assignment
+  if (existing) {
+    const slotM = timeToMinutes(existing.slot);
+    const exGroups = getGroupsAtGrillAtSlot(key, existing.grill, slotM, editId);
+    showGrillAssignPreview(existing.grill, existing.guests, exGroups);
+  }
+
+  showModal();
+}
+
+function toggleCardFields() {
+  const guests = parseInt(document.getElementById('fGuests')?.value)||0;
+  const section = document.getElementById('cardSection');
+  if (!section) return;
+  section.style.display = guests >= CARD_REQUIRED_MIN ? '' : 'none';
+}
+
+function previewGrillAssign() {
+  const key = dateKey(currentDate);
+  const dow = currentDate.getDay();
+  const slot = document.getElementById('fSlot')?.value;
+  const guests = parseInt(document.getElementById('fGuests')?.value) || 0;
+  if (!slot || !guests) return;
+  const slotMins = timeToMinutes(slot);
+  const chefs = getChefsAtTime(dow, slotMins);
+  const editIdMatch = document.querySelector('.btn-gold')?.getAttribute('onclick')?.match(/'([^']*)',\s*'([^']*)'\)/);
+  const editId = editIdMatch?.[2] || null;
+  const assign = autoAssignGrill(key, slot, guests, chefs, editId || undefined);
+  if (!assign) {
+    document.getElementById('grillPreview').innerHTML =
+      `<span style="color:#8a1818">⚠ No availability for ${guests} guests at this time</span>`;
+    return;
+  }
+  // Show combining info
+  const existingGroups = getGroupsAtGrillAtSlot(key, assign.grill, slotMins, editId || undefined);
+  showGrillAssignPreview(assign.grill, guests, existingGroups);
+}
+
+function showGrillAssignPreview(g, guests, existingGroups) {
+  const el = document.getElementById('grillPreview');
+  if (!el) return;
+  const existingGuests = existingGroups.reduce((s,r)=>s+(r.guests||0),0);
+  const cap = getGrillCap(existingGroups.length);
+  const names = existingGroups.map(r=>r.name).filter(Boolean);
+  const combineNote = names.length
+    ? `<span style="color:var(--amber);font-size:0.72rem">Joining: ${names.join(', ')} · ${existingGuests}+${guests}=${existingGuests+guests}/${cap}</span>`
+    : `<span style="color:var(--text2)">Solo group · max ${cap} guests</span>`;
+  el.innerHTML = `
+    <span class="grill-assign-badge g${g}">${grillLabel(g)}</span>
+    ${combineNote}`;
+}
+
+async function saveHibachi(dateKey, editId) {
+  const name     = document.getElementById('fName').value.trim();
+  const guests   = parseInt(document.getElementById('fGuests').value)||0;
+  const card     = document.getElementById('fCard')?.value.trim() || '';
+  const expiry   = document.getElementById('fExpiry')?.value.trim() || '';
+  const phone    = document.getElementById('fPhone').value.trim();
+  const initials = document.getElementById('fInitials').value.trim();
+  const bookedOn = document.getElementById('fBookedOn').value;
+  const notes    = document.getElementById('fNotes').value.trim();
+  const slot     = document.getElementById('fSlot').value;
+  const err      = document.getElementById('formErr');
+
+  err.innerHTML = '';
+
+  if (!name)               return showErr('Guest name is required.');
+  if (!guests || guests<1) return showErr('Party size must be at least 1.');
+  if (guests > 14)         return showErr('Maximum party size is 14 (use 2 grills for larger groups).');
+
+  // Card required only for groups of 4+
+  if (guests >= CARD_REQUIRED_MIN) {
+    if (!card || card.replace(/\s/g,'').length < 12) return showErr('Card number required for groups of 4 or more (min 12 digits).');
+    if (!expiry || expiry.length < 5) return showErr('Card expiry required (MM/YY).');
+  }
+
+  const slotMins = timeToMinutes(slot);
+  const dow = currentDate.getDay();
+  const chefs = getChefsAtTime(dow, slotMins);
+
+  const assign = autoAssignGrill(dateKey, slot, guests, chefs, editId || undefined);
+  if (!assign) {
+    return showErr(`No grill available at ${displayTime(slot)} for ${guests} guests. All grills are full or at chef capacity.`);
+  }
+
+  // Final capacity check
+  const existingGroups = getGroupsAtGrillAtSlot(dateKey, assign.grill, slotMins, editId || undefined);
+  const existingGuests = existingGroups.reduce((s,r)=>s+(r.guests||0),0);
+  const cap = getGrillCap(existingGroups.length); // cap for this group being added
+  if (existingGuests + guests > cap) {
+    return showErr(`Grill would exceed capacity: ${existingGuests} + ${guests} = ${existingGuests+guests} (max ${cap} for ${existingGroups.length+1} groups). Try another time.`);
+  }
+
+  const data = {
+    name, guests, phone, initials, bookedOn, notes, slot,
+    grill: assign.grill,
+    updatedAt: Date.now()
+  };
+
+  // Only store card info if provided
+  if (card) { data.card = card; data.expiry = expiry; }
+
+  try {
+    if (editId) {
+      await window._set(window._ref(window._db, `reservations/${dateKey}/${editId}`), data);
+    } else {
+      await window._push(window._ref(window._db, `reservations/${dateKey}`), data);
+    }
+    closeModal();
+  } catch(e) {
+    showErr('Firebase error: ' + e.message);
+  }
+}
+
+async function deleteRes(dateKey, id) {
+  if (!confirm('Delete this reservation?')) return;
+  await window._remove(window._ref(window._db, `reservations/${dateKey}/${id}`));
+  closeModal();
+}
+
+/* ── DINING MODAL ── */
+function openDiningModal(existing) {
+  document.getElementById('modalTitle').textContent = existing ? 'Edit Dining Reservation' : 'Dining Room';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row">
+      <label class="form-label">Guest Name *</label>
+      <input class="form-input" id="dName" type="text" placeholder="Last name or full name" value="${escHtml(existing?.name||'')}">
+    </div>
+    <div class="form-grid">
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Party Size *</label>
+        <input class="form-input" id="dGuests" type="number" min="1" placeholder="e.g. 3" value="${existing?.guests||''}">
+      </div>
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Phone</label>
+        <input class="form-input" id="dPhone" type="tel" placeholder="506-555-0100" value="${escHtml(existing?.phone||'')}">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="dNotes" placeholder="Allergies, preferences, time preference…">${escHtml(existing?.notes||'')}</textarea>
+    </div>
+    <div id="formErr"></div>
+    <button class="btn-gold" onclick="saveDining('${dateKey(currentDate)}','${existing?.id||''}')">
+      ${existing ? '✓ Update' : '✓ Add to Dining'}
+    </button>
+    ${existing ? `<button class="btn-danger" onclick="deleteDining('${dateKey(currentDate)}','${existing.id}')">✕ Remove</button>` : ''}
+  `;
+  showModal();
+}
+
+async function saveDining(dk, editId) {
+  const name   = document.getElementById('dName').value.trim();
+  const guests = parseInt(document.getElementById('dGuests').value)||0;
+  const phone  = document.getElementById('dPhone').value.trim();
+  const notes  = document.getElementById('dNotes').value.trim();
+
+  if (!name)   return showErr('Guest name is required.');
+  if (!guests) return showErr('Party size required.');
+
+  const data = { name, guests, phone, notes, updatedAt: Date.now() };
+  try {
+    if (editId) {
+      await window._set(window._ref(window._db, `dining/${dk}/${editId}`), data);
+    } else {
+      await window._push(window._ref(window._db, `dining/${dk}`), data);
+    }
+    closeModal();
+  } catch(e) { showErr('Firebase error: '+e.message); }
+}
+
+async function deleteDining(dk, id) {
+  if (!confirm('Remove this reservation?')) return;
+  await window._remove(window._ref(window._db, `dining/${dk}/${id}`));
+  closeModal();
+}
+
+/* ── MODAL UTILS ── */
+function showModal() {
+  document.getElementById('modalOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function closeModalIfOutside(e) {
+  if (e.target.id === 'modalOverlay') closeModal();
+}
+
+function showErr(msg) {
+  const el = document.getElementById('formErr');
+  if (el) el.innerHTML = `<div class="err-banner">${escHtml(msg)}</div>`;
+}
+
+/* ── INPUT FORMATTERS ── */
+function fmtCard(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,16);
+  el.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+
+function fmtExpiry(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,4);
+  if (v.length>=3) v = v.slice(0,2)+'/'+v.slice(2);
+  el.value = v;
+}
+
+/* ── MISC ── */
+function escHtml(str) {
+  return String(str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ── INIT ── */
+function init() {
+  renderDateHeader();
+  document.getElementById('liveStatus').style.display = window._fbReady ? 'flex' : 'none';
+  subscribeToDate();
+}
+
+if (window._fbReady) {
+  init();
+} else {
+  document.addEventListener('fbReady', init);
+  // Offline fallback: render with empty data
+  setTimeout(() => {
+    if (!window._fbReady) {
+      reservations = {}; diningReservations = {};
+      renderDateHeader();
+      renderHibachi();
+    }
+  }, 2000);
+}
+</script>
+</body>
+</html>
