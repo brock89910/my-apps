@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Become The Man</title>
 <style>
@@ -158,289 +157,305 @@ var COURSES=[
 
 function G(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch(e){return null;}}
 function S(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-function today(){return new Date().toISOString().split(“T”)[0];}
-function fmt(s){return new Date(s+“T12:00:00”).toLocaleDateString(“en-US”,{weekday:“short”,month:“short”,day:“numeric”});}
-function shift(s,n){var d=new Date(s+“T12:00:00”);d.setDate(d.getDate()+n);return d.toISOString().split(“T”)[0];}
-function esc(s){return String(s).replace(/&/g,”&”).replace(/</g,”<”).replace(/>/g,”>”);}
+function today(){return new Date().toISOString().split("T")[0];}
+function fmt(s){return new Date(s+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});}
+function shift(s,n){var d=new Date(s+"T12:00:00");d.setDate(d.getDate()+n);return d.toISOString().split("T")[0];}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 
-var mD=today(), jD=today(), filt=“all”, jT={}, rT={}, tT=null;
+var mD=today(), jD=today(), filt="all", jT={}, rT={}, tT=null;
 
-function toast(m){var e=document.getElementById(“toast”);e.textContent=m;e.classList.add(“on”);clearTimeout(tT);tT=setTimeout(function(){e.classList.remove(“on”);},1800);}
+function toast(m){var e=document.getElementById("toast");e.textContent=m;e.classList.add("on");clearTimeout(tT);tT=setTimeout(function(){e.classList.remove("on");},1800);}
 
 // TABS
-document.getElementById(“tabs”).addEventListener(“click”,function(e){
-var b=e.target.closest(”.tab”);
-if(!b)return;
-var t=b.dataset.t;
-document.querySelectorAll(”.tab”).forEach(function(x){x.classList.remove(“on”);});
-document.querySelectorAll(”.pg”).forEach(function(x){x.classList.remove(“on”);});
-b.classList.add(“on”);
-document.getElementById(“pg-”+t).classList.add(“on”);
-if(t===“fitness”)drawChart();
+document.getElementById("tabs").addEventListener("click",function(e){
+  var b=e.target.closest(".tab");
+  if(!b)return;
+  var t=b.dataset.t;
+  document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("on");});
+  document.querySelectorAll(".pg").forEach(function(x){x.classList.remove("on");});
+  b.classList.add("on");
+  document.getElementById("pg-"+t).classList.add("on");
+  if(t==="fitness")drawChart();
 });
 
 function streak(){
-var n=0,d=today();
-for(var i=0;i<365;i++){
-var h=G(“h_”+d)||{},a=false;
-for(var k in h){if(h[k]){a=true;break;}}
-if(a){n++;d=shift(d,-1);}else break;
-}
-document.getElementById(“streak”).textContent=“🔥 “+n;
+  var n=0,d=today();
+  for(var i=0;i<365;i++){
+    var h=G("h_"+d)||{},a=false;
+    for(var k in h){if(h[k]){a=true;break;}}
+    if(a){n++;d=shift(d,-1);}else break;
+  }
+  document.getElementById("streak").textContent="🔥 "+n;
 }
 
 // MANDALA
 function mandala(){
-var pg=document.getElementById(“pg-mandala”);
-var H=G(“h_”+mD)||{};
-var done=0,tot=0;
-for(var i=0;i<CATS.length;i++)for(var j=0;j<CATS[i].h.length;j++){tot++;if(H[CATS[i].id+”_”+j])done++;}
-var pct=tot?Math.round(done/tot*100):0;
-var C=144.5,off=C-(C*pct/100);
+  var pg=document.getElementById("pg-mandala");
+  var H=G("h_"+mD)||{};
+  var done=0,tot=0;
+  // FIX: use consistent "_" separator throughout
+  for(var i=0;i<CATS.length;i++)for(var j=0;j<CATS[i].h.length;j++){tot++;if(H[CATS[i].id+"_"+j])done++;}
+  var pct=tot?Math.round(done/tot*100):0;
+  var C=144.5,off=C-(C*pct/100);
 
-var html=’<div class="sec">Daily Tracker</div>’
-+’<div class="dnav">’
-+’<button class="darr" id="mp">‹</button>’
-+’<span class="dlbl">’+fmt(mD)+’</span>’
-+’<button class="dtbtn" id="mt">Today</button>’
-+’<button class="darr" id="mn">›</button>’
-+’</div>’
-+’<div class="ring-row">’
-+’<div class="rw"><svg width="54" height="54" viewBox="0 0 54 54">’
-+’<circle cx="27" cy="27" r="23" fill="none" stroke="#2a2a2a" stroke-width="4"/>’
-+’<circle cx="27" cy="27" r="23" fill="none" stroke="#d4a853" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+off+'"/>’
-+’</svg><div class="rpct">’+pct+’%</div></div>’
-+’<div class="rinfo"><div class="rt">Progress</div><div class="rc">’+done+’ / ‘+tot+’ habits</div></div>’
-+’</div>’;
+  var html='<div class="sec">Daily Tracker</div>'
+    +'<div class="dnav">'
+    +'<button class="darr" id="mp">‹</button>'
+    +'<span class="dlbl">'+fmt(mD)+'</span>'
+    +'<button class="dtbtn" id="mt">Today</button>'
+    +'<button class="darr" id="mn">›</button>'
+    +'</div>'
+    +'<div class="ring-row">'
+    +'<div class="rw"><svg width="54" height="54" viewBox="0 0 54 54">'
+    +'<circle cx="27" cy="27" r="23" fill="none" stroke="#2a2a2a" stroke-width="4"/>'
+    +'<circle cx="27" cy="27" r="23" fill="none" stroke="#d4a853" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+off+'"/>'
+    +'</svg><div class="rpct">'+pct+'%</div></div>'
+    +'<div class="rinfo"><div class="rt">Progress</div><div class="rc">'+done+' / '+tot+' habits</div></div>'
+    +'</div>';
 
-for(var ci=0;ci<CATS.length;ci++){
-var cat=CATS[ci],cd=0;
-for(var hi=0;hi<cat.h.length;hi++)if(H[cat.id+”*”+hi])cd++;
-var cp=Math.round(cd/cat.h.length*100);
-html+=’<div class=“cc’+(cd===cat.h.length?” gold”:””)+’” id=“cc*’+cat.id+’”>’
-+’<button class="chdr" data-cid="'+cat.id+'">’
-+’<div class="cleft"><span class="ci">’+cat.icon+’</span><span class="cn">’+cat.name+’</span></div>’
-+’<div class="cright"><span class="cpg">’+cd+’/’+cat.h.length+’</span><span class="chv">▼</span></div>’
-+’</button>’
-+’<div class="pb"><div class="pf" style="width:'+cp+'%"></div></div>’
-+’<div class="hl">’;
-for(var hi2=0;hi2<cat.h.length;hi2++){
-var ck=!!H[cat.id+”_”+hi2];
-html+=’<div class="hr" data-cid="'+cat.id+'" data-i="'+hi2+'">’
-+’<div class=“hb’+(ck?” on”:””)+’”></div>’
-+’<span class=“ht’+(ck?” done”:””)+’”>’+esc(cat.h[hi2])+’</span>’
-+’</div>’;
-}
-html+=’</div></div>’;
-}
-pg.innerHTML=html;
+  for(var ci=0;ci<CATS.length;ci++){
+    var cat=CATS[ci],cd=0;
+    // FIX: use "_" separator (was "*")
+    for(var hi=0;hi<cat.h.length;hi++)if(H[cat.id+"_"+hi])cd++;
+    var cp=Math.round(cd/cat.h.length*100);
+    // FIX: use "cc_" prefix for ID (was "cc*")
+    html+='<div class="cc'+(cd===cat.h.length?" gold":"")+'" id="cc_'+cat.id+'">'
+      +'<button class="chdr" data-cid="'+cat.id+'">'
+      +'<div class="cleft"><span class="ci">'+cat.icon+'</span><span class="cn">'+cat.name+'</span></div>'
+      +'<div class="cright"><span class="cpg">'+cd+'/'+cat.h.length+'</span><span class="chv">▼</span></div>'
+      +'</button>'
+      +'<div class="pb"><div class="pf" style="width:'+cp+'%"></div></div>'
+      +'<div class="hl">';
+    for(var hi2=0;hi2<cat.h.length;hi2++){
+      // FIX: use "_" separator (was "*")
+      var ck=!!H[cat.id+"_"+hi2];
+      html+='<div class="hr" data-cid="'+cat.id+'" data-i="'+hi2+'">'
+        +'<div class="hb'+(ck?" on":"")+'"></div>'
+        +'<span class="ht'+(ck?" done":"")+'">'+esc(cat.h[hi2])+'</span>'
+        +'</div>';
+    }
+    html+='</div></div>';
+  }
+  pg.innerHTML=html;
 
-document.getElementById(“mp”).addEventListener(“click”,function(){mD=shift(mD,-1);mandala();});
-document.getElementById(“mn”).addEventListener(“click”,function(){mD=shift(mD,1);mandala();});
-document.getElementById(“mt”).addEventListener(“click”,function(){mD=today();mandala();});
+  document.getElementById("mp").addEventListener("click",function(){mD=shift(mD,-1);mandala();});
+  document.getElementById("mn").addEventListener("click",function(){mD=shift(mD,1);mandala();});
+  document.getElementById("mt").addEventListener("click",function(){mD=today();mandala();});
 
-pg.querySelectorAll(”.chdr”).forEach(function(b){
-b.addEventListener(“click”,function(){document.getElementById(“cc_”+b.dataset.cid).classList.toggle(“open”);});
-});
-pg.querySelectorAll(”.hr”).forEach(function(r){
-r.addEventListener(“click”,function(){
-var h=G(“h_”+mD)||{},k=r.dataset.cid+”*”+r.dataset.i;
-h[k]=!h[k];S(“h*”+mD,h);mandala();streak();
-});
-});
+  pg.querySelectorAll(".chdr").forEach(function(b){
+    b.addEventListener("click",function(){
+      // FIX: use "cc_" prefix (was "cc_" — this was correct but the ID generation above was wrong)
+      document.getElementById("cc_"+b.dataset.cid).classList.toggle("open");
+    });
+  });
+  pg.querySelectorAll(".hr").forEach(function(r){
+    r.addEventListener("click",function(){
+      var h=G("h_"+mD)||{};
+      // FIX: use "_" separator consistently (was "*")
+      var k=r.dataset.cid+"_"+r.dataset.i;
+      h[k]=!h[k];
+      // FIX: storage key uses "h_" prefix (was "h*")
+      S("h_"+mD,h);
+      mandala();streak();
+    });
+  });
 }
 
 // JOURNAL
 function journal(){
-var pg=document.getElementById(“pg-journal”);
-var D=G(“j_”+jD)||{};
-var html=’<div class="sec">Daily Journal</div>’
-+’<div class="dnav">’
-+’<button class="darr" id="jp">‹</button>’
-+’<span class="dlbl">’+fmt(jD)+’</span>’
-+’<button class="dtbtn" id="jt">Today</button>’
-+’<button class="darr" id="jn">›</button>’
-+’</div>’;
-for(var i=0;i<PROMPTS.length;i++){
-var p=PROMPTS[i],v=D[p.id]||””;
-html+=’<div class="pc" id="pc_'+p.id+'">’
-+’<button class="phdr" data-pid="'+p.id+'">’
-+’<span class="plbl">’+p.lbl+’</span><span class="chv">▼</span>’
-+’</button>’
-+’<div class="pbdy"><div class="pq">’+p.q+’</div>’
-+’<textarea data-pid="'+p.id+'" placeholder="Write here...">’+esc(v)+’</textarea>’
-+’<div class="sind" id="si_'+p.id+'">’+(v?“saved”:””)+’</div>’
-+’</div></div>’;
-}
-pg.innerHTML=html;
-document.getElementById(“jp”).addEventListener(“click”,function(){jD=shift(jD,-1);journal();});
-document.getElementById(“jn”).addEventListener(“click”,function(){jD=shift(jD,1);journal();});
-document.getElementById(“jt”).addEventListener(“click”,function(){jD=today();journal();});
-pg.querySelectorAll(”.phdr”).forEach(function(b){
-b.addEventListener(“click”,function(){document.getElementById(“pc_”+b.dataset.pid).classList.toggle(“open”);});
-});
-pg.querySelectorAll(“textarea”).forEach(function(ta){
-ta.addEventListener(“input”,function(){
-var pid=ta.dataset.pid,si=document.getElementById(“si_”+pid);
-si.textContent=“saving…”;si.classList.remove(“ok”);
-clearTimeout(jT[pid]);
-jT[pid]=setTimeout(function(){
-var d=G(“j_”+jD)||{};d[pid]=ta.value;S(“j_”+jD,d);
-si.textContent=“saved”;si.classList.add(“ok”);
-},700);
-});
-});
+  var pg=document.getElementById("pg-journal");
+  var D=G("j_"+jD)||{};
+  var html='<div class="sec">Daily Journal</div>'
+    +'<div class="dnav">'
+    +'<button class="darr" id="jp">‹</button>'
+    +'<span class="dlbl">'+fmt(jD)+'</span>'
+    +'<button class="dtbtn" id="jt">Today</button>'
+    +'<button class="darr" id="jn">›</button>'
+    +'</div>';
+  for(var i=0;i<PROMPTS.length;i++){
+    var p=PROMPTS[i],v=D[p.id]||"";
+    html+='<div class="pc" id="pc_'+p.id+'">'
+      +'<button class="phdr" data-pid="'+p.id+'">'
+      +'<span class="plbl">'+p.lbl+'</span><span class="chv">▼</span>'
+      +'</button>'
+      +'<div class="pbdy"><div class="pq">'+p.q+'</div>'
+      +'<textarea data-pid="'+p.id+'" placeholder="Write here...">'+esc(v)+'</textarea>'
+      +'<div class="sind" id="si_'+p.id+'">'+(v?"saved":"")+'</div>'
+      +'</div></div>';
+  }
+  pg.innerHTML=html;
+  document.getElementById("jp").addEventListener("click",function(){jD=shift(jD,-1);journal();});
+  document.getElementById("jn").addEventListener("click",function(){jD=shift(jD,1);journal();});
+  document.getElementById("jt").addEventListener("click",function(){jD=today();journal();});
+  pg.querySelectorAll(".phdr").forEach(function(b){
+    b.addEventListener("click",function(){document.getElementById("pc_"+b.dataset.pid).classList.toggle("open");});
+  });
+  pg.querySelectorAll("textarea").forEach(function(ta){
+    ta.addEventListener("input",function(){
+      var pid=ta.dataset.pid,si=document.getElementById("si_"+pid);
+      si.textContent="saving…";si.classList.remove("ok");
+      clearTimeout(jT[pid]);
+      jT[pid]=setTimeout(function(){
+        var d=G("j_"+jD)||{};d[pid]=ta.value;S("j_"+jD,d);
+        si.textContent="saved";si.classList.add("ok");
+      },700);
+    });
+  });
 }
 
 // TASKS
 function tasks(){
-var pg=document.getElementById(“pg-tasks”);
-var all=G(“tasks”)||[],list=[];
-for(var i=0;i<all.length;i++){
-if(filt===“active”&&all[i].done)continue;
-if(filt===“done”&&!all[i].done)continue;
-if(filt===“high”&&all[i].pri!==“high”)continue;
-list.push(all[i]);
-}
-var html=’<div class="sec">Tasks</div>’
-+’<div class="tadd"><input type="text" id="ti" placeholder="Add a task..."><button class="abtn" id="ta">+</button></div>’
-+’<select class="psel" id="tpr"><option value="med">Medium priority</option><option value="high">High priority</option><option value="low">Low priority</option></select>’
-+’<div class="frow">’;
-[“all”,“active”,“done”,“high”].forEach(function(f){
-html+=’<div class=“chip’+(filt===f?” on”:””)+’” data-f=”’+f+’”>{’+{all:“All”,active:“Active”,done:“Done”,high:“High”}[f]+’}</div>’;
-});
-html=html.replace(/{/g,””).replace(/}/g,””)+”</div>”;
-if(!list.length){html+=’<div class="empty">No tasks here</div>’;}
-else list.forEach(function(t){
-html+=’<div class=“ti2’+(t.done?” done”:””)+’”>’
-+’<div class=“tck’+(t.done?” on”:””)+’” data-id=”’+t.id+’”></div>’
-+’<div class="tb2"><div class=“tt’+(t.done?” done”:””)+’”>’+esc(t.txt)+’</div>’
-+’<div class="tm">’+t.pri+” · “+t.dt+’</div></div>’
-+’<button class="tdel" data-id="'+t.id+'">×</button>’
-+’</div>’;
-});
-pg.innerHTML=html;
-document.getElementById(“ta”).addEventListener(“click”,addTask);
-document.getElementById(“ti”).addEventListener(“keydown”,function(e){if(e.key===“Enter”)addTask();});
-pg.querySelectorAll(”.chip”).forEach(function(c){
-c.addEventListener(“click”,function(){filt=c.dataset.f;tasks();});
-});
-pg.querySelectorAll(”.tck”).forEach(function(el){
-el.addEventListener(“click”,function(){
-var id=Number(el.dataset.id),a=G(“tasks”)||[];
-for(var i=0;i<a.length;i++)if(a[i].id===id){a[i].done=!a[i].done;break;}
-S(“tasks”,a);tasks();
-});
-});
-pg.querySelectorAll(”.tdel”).forEach(function(el){
-el.addEventListener(“click”,function(){
-var id=Number(el.dataset.id),a=G(“tasks”)||[];
-S(“tasks”,a.filter(function(t){return t.id!==id;}));
-tasks();toast(“Removed”);
-});
-});
+  var pg=document.getElementById("pg-tasks");
+  var all=G("tasks")||[],list=[];
+  for(var i=0;i<all.length;i++){
+    if(filt==="active"&&all[i].done)continue;
+    if(filt==="done"&&!all[i].done)continue;
+    if(filt==="high"&&all[i].pri!=="high")continue;
+    list.push(all[i]);
+  }
+  var html='<div class="sec">Tasks</div>'
+    +'<div class="tadd"><input type="text" id="ti" placeholder="Add a task..."><button class="abtn" id="ta">+</button></div>'
+    +'<select class="psel" id="tpr"><option value="med">Medium priority</option><option value="high">High priority</option><option value="low">Low priority</option></select>'
+    +'<div class="frow">';
+  var labels={all:"All",active:"Active",done:"Done",high:"High"};
+  ["all","active","done","high"].forEach(function(f){
+    html+='<div class="chip'+(filt===f?" on":"")+'" data-f="'+f+'">'+labels[f]+'</div>';
+  });
+  html+="</div>";
+  if(!list.length){html+='<div class="empty">No tasks here</div>';}
+  else list.forEach(function(t){
+    html+='<div class="ti2'+(t.done?" done":"")+'">'
+      +'<div class="tck'+(t.done?" on":"")+'" data-id="'+t.id+'"></div>'
+      +'<div class="tb2"><div class="tt'+(t.done?" done":"")+'">'+esc(t.txt)+'</div>'
+      +'<div class="tm">'+t.pri+" · "+t.dt+'</div></div>'
+      +'<button class="tdel" data-id="'+t.id+'">×</button>'
+      +'</div>';
+  });
+  pg.innerHTML=html;
+  document.getElementById("ta").addEventListener("click",addTask);
+  document.getElementById("ti").addEventListener("keydown",function(e){if(e.key==="Enter")addTask();});
+  pg.querySelectorAll(".chip").forEach(function(c){
+    c.addEventListener("click",function(){filt=c.dataset.f;tasks();});
+  });
+  pg.querySelectorAll(".tck").forEach(function(el){
+    el.addEventListener("click",function(){
+      var id=Number(el.dataset.id),a=G("tasks")||[];
+      for(var i=0;i<a.length;i++)if(a[i].id===id){a[i].done=!a[i].done;break;}
+      S("tasks",a);tasks();
+    });
+  });
+  pg.querySelectorAll(".tdel").forEach(function(el){
+    el.addEventListener("click",function(){
+      var id=Number(el.dataset.id),a=G("tasks")||[];
+      S("tasks",a.filter(function(t){return t.id!==id;}));
+      tasks();toast("Removed");
+    });
+  });
 }
 function addTask(){
-var inp=document.getElementById(“ti”),pri=document.getElementById(“tpr”);
-if(!inp||!inp.value.trim())return;
-var a=G(“tasks”)||[];
-a.unshift({id:Date.now(),txt:inp.value.trim(),done:false,pri:pri?pri.value:“med”,dt:today()});
-S(“tasks”,a);inp.value=””;tasks();toast(“Added”);
+  var inp=document.getElementById("ti"),pri=document.getElementById("tpr");
+  if(!inp||!inp.value.trim())return;
+  var a=G("tasks")||[];
+  a.unshift({id:Date.now(),txt:inp.value.trim(),done:false,pri:pri?pri.value:"med",dt:today()});
+  S("tasks",a);inp.value="";tasks();toast("Added");
 }
 
 // FITNESS
 function fitness(){
-var pg=document.getElementById(“pg-fitness”);
-var log=G(“fitness”)||[];
-var html=’<div class="sec">Weight Log</div>’
-+’<div class="wgrid">’
-+’<div class="wcard"><div class="wlbl">Morning</div><div class="wrow2"><input type="number" step="0.1" class="win" id="wam" placeholder="0.0"><span class="wunit">lbs</span></div></div>’
-+’<div class="wcard"><div class="wlbl">Evening</div><div class="wrow2"><input type="number" step="0.1" class="win" id="wpm" placeholder="0.0"><span class="wunit">lbs</span></div></div>’
-+’</div>’
-+’<button class="lbtn" id="wl">Log Weight</button>’
-+’<div class="cwrap"><div class="cttl">14-Day Trend</div><canvas id="wc" height="140"></canvas></div>’
-+’<div class="sec">History</div>’;
-if(!log.length)html+=’<div class="empty">No entries yet</div>’;
-else log.slice(0,20).forEach(function(e){
-html+=’<div class="fhr"><span>’+fmt(e.dt)+’</span><span>AM:’+(e.am||”—”)+’ PM:’+(e.pm||”—”)+’</span></div>’;
-});
-pg.innerHTML=html;
-document.getElementById(“wl”).addEventListener(“click”,function(){
-var am=parseFloat(document.getElementById(“wam”).value)||null;
-var pm=parseFloat(document.getElementById(“wpm”).value)||null;
-if(!am&&!pm){toast(“Enter a weight”);return;}
-var l=G(“fitness”)||[],t=today(),found=false;
-for(var i=0;i<l.length;i++)if(l[i].dt===t){l[i]={dt:t,am:am,pm:pm};found=true;break;}
-if(!found)l.unshift({dt:t,am:am,pm:pm});
-S(“fitness”,l);fitness();toast(“Logged”);
-});
-drawChart();
+  var pg=document.getElementById("pg-fitness");
+  var log=G("fitness")||[];
+  var html='<div class="sec">Weight Log</div>'
+    +'<div class="wgrid">'
+    +'<div class="wcard"><div class="wlbl">Morning</div><div class="wrow2"><input type="number" step="0.1" class="win" id="wam" placeholder="0.0"><span class="wunit">lbs</span></div></div>'
+    +'<div class="wcard"><div class="wlbl">Evening</div><div class="wrow2"><input type="number" step="0.1" class="win" id="wpm" placeholder="0.0"><span class="wunit">lbs</span></div></div>'
+    +'</div>'
+    +'<button class="lbtn" id="wl">Log Weight</button>'
+    +'<div class="cwrap"><div class="cttl">14-Day Trend</div><canvas id="wc" height="140"></canvas></div>'
+    +'<div class="sec">History</div>';
+  if(!log.length)html+='<div class="empty">No entries yet</div>';
+  else log.slice(0,20).forEach(function(e){
+    html+='<div class="fhr"><span>'+fmt(e.dt)+'</span><span>AM:'+(e.am||"—")+' PM:'+(e.pm||"—")+'</span></div>';
+  });
+  pg.innerHTML=html;
+  document.getElementById("wl").addEventListener("click",function(){
+    var am=parseFloat(document.getElementById("wam").value)||null;
+    var pm=parseFloat(document.getElementById("wpm").value)||null;
+    if(!am&&!pm){toast("Enter a weight");return;}
+    var l=G("fitness")||[],t=today(),found=false;
+    for(var i=0;i<l.length;i++)if(l[i].dt===t){l[i]={dt:t,am:am,pm:pm};found=true;break;}
+    if(!found)l.unshift({dt:t,am:am,pm:pm});
+    S("fitness",l);fitness();toast("Logged");
+  });
+  drawChart();
 }
 function drawChart(){
-var cv=document.getElementById(“wc”);if(!cv)return;
-var log=(G(“fitness”)||[]).slice(0,14).reverse();
-var ctx=cv.getContext(“2d”),dpr=window.devicePixelRatio||1;
-var W=Math.max(cv.parentElement.clientWidth-28,100),H=140;
-cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+“px”;cv.style.height=H+“px”;
-ctx.scale(dpr,dpr);ctx.clearRect(0,0,W,H);
-if(!log.length){ctx.fillStyle=”#555”;ctx.font=“12px sans-serif”;ctx.textAlign=“center”;ctx.fillText(“No data yet”,W/2,H/2);return;}
-var P={t:8,r:14,b:32,l:42},gW=W-P.l-P.r,gH=H-P.t-P.b,vs=[];
-log.forEach(function(e){if(e.am)vs.push(e.am);if(e.pm)vs.push(e.pm);});
-if(!vs.length)return;
-var mn=Math.floor(Math.min.apply(null,vs)-1),mx=Math.ceil(Math.max.apply(null,vs)+1),rng=mx-mn||1;
-function xf(i){return P.l+(i/(log.length-1||1))*gW;}
-function yf(v){return P.t+gH-((v-mn)/rng)*gH;}
-ctx.strokeStyle=”#1a1a1a”;ctx.lineWidth=1;
-for(var t=0;t<=4;t++){var y=P.t+(t/4)*gH;ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(P.l+gW,y);ctx.stroke();ctx.fillStyle=”#555”;ctx.font=“9px sans-serif”;ctx.textAlign=“right”;ctx.fillText((mx-rng*t/4).toFixed(1),P.l-3,y+3);}
-var st=Math.max(1,Math.ceil(log.length/5));
-log.forEach(function(e,i){if(i%st!==0&&i!==log.length-1)return;ctx.fillStyle=”#555”;ctx.font=“9px sans-serif”;ctx.textAlign=“center”;ctx.fillText(new Date(e.dt+“T12:00:00”).toLocaleDateString(“en-US”,{month:“short”,day:“numeric”}),xf(i),H-4);});
-function ln(g,c){ctx.strokeStyle=c;ctx.lineWidth=2;ctx.lineJoin=“round”;ctx.beginPath();var s=false;log.forEach(function(e,i){var v=g(e);if(!v){s=false;return;}if(!s){ctx.moveTo(xf(i),yf(v));s=true;}else ctx.lineTo(xf(i),yf(v));});ctx.stroke();log.forEach(function(e,i){var v=g(e);if(!v)return;ctx.beginPath();ctx.arc(xf(i),yf(v),3,0,Math.PI*2);ctx.fillStyle=c;ctx.fill();});}
-ln(function(e){return e.am;},”#d4a853”);
-ln(function(e){return e.pm;},”#5b9cf6”);
+  var cv=document.getElementById("wc");if(!cv)return;
+  var log=(G("fitness")||[]).slice(0,14).reverse();
+  var ctx=cv.getContext("2d"),dpr=window.devicePixelRatio||1;
+  var W=Math.max(cv.parentElement.clientWidth-28,100),H=140;
+  cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+"px";cv.style.height=H+"px";
+  ctx.scale(dpr,dpr);ctx.clearRect(0,0,W,H);
+  if(!log.length){ctx.fillStyle="#555";ctx.font="12px sans-serif";ctx.textAlign="center";ctx.fillText("No data yet",W/2,H/2);return;}
+  var P={t:8,r:14,b:32,l:42},gW=W-P.l-P.r,gH=H-P.t-P.b,vs=[];
+  log.forEach(function(e){if(e.am)vs.push(e.am);if(e.pm)vs.push(e.pm);});
+  if(!vs.length)return;
+  var mn=Math.floor(Math.min.apply(null,vs)-1),mx=Math.ceil(Math.max.apply(null,vs)+1),rng=mx-mn||1;
+  function xf(i){return P.l+(i/(log.length-1||1))*gW;}
+  function yf(v){return P.t+gH-((v-mn)/rng)*gH;}
+  ctx.strokeStyle="#1a1a1a";ctx.lineWidth=1;
+  for(var t=0;t<=4;t++){var y=P.t+(t/4)*gH;ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(P.l+gW,y);ctx.stroke();ctx.fillStyle="#555";ctx.font="9px sans-serif";ctx.textAlign="right";ctx.fillText((mx-rng*t/4).toFixed(1),P.l-3,y+3);}
+  var st=Math.max(1,Math.ceil(log.length/5));
+  log.forEach(function(e,i){if(i%st!==0&&i!==log.length-1)return;ctx.fillStyle="#555";ctx.font="9px sans-serif";ctx.textAlign="center";ctx.fillText(new Date(e.dt+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"}),xf(i),H-4);});
+  function ln(g,c){ctx.strokeStyle=c;ctx.lineWidth=2;ctx.lineJoin="round";ctx.beginPath();var s=false;log.forEach(function(e,i){var v=g(e);if(!v){s=false;return;}if(!s){ctx.moveTo(xf(i),yf(v));s=true;}else ctx.lineTo(xf(i),yf(v));});ctx.stroke();log.forEach(function(e,i){var v=g(e);if(!v)return;ctx.beginPath();ctx.arc(xf(i),yf(v),3,0,Math.PI*2);ctx.fillStyle=c;ctx.fill();});}
+  ln(function(e){return e.am;},"#d4a853");
+  ln(function(e){return e.pm;},"#5b9cf6");
 }
 
 // READINGS
 function readings(){
-var pg=document.getElementById(“pg-readings”);
-var D=G(“readings”)||{},N=G(“rnotes”)||{};
-var html=’<div class="sec">Philosophy Readings</div>’;
-COURSES.forEach(function(c){
-var d=0;
-c.items.forEach(function(it,i){if(D[c.id+”*”+i])d++;});
-html+=’<div class="rc2" id="rc_'+c.id+'">’
-+’<button class="rhdr" data-cid="'+c.id+'">’
-+’<span class="rcs">’+c.name+’</span><span class="rbdg">’+d+’/’+c.items.length+’</span>’
-+’</button>’
-+’<div class="rbdy">’;
-c.items.forEach(function(it,i){
-var ck=!!D[c.id+”*”+i];
-html+=’<div class="rrow" data-cid="'+c.id+'" data-i="'+i+'">’
-+’<div class=“rbox’+(ck?” on”:””)+’”></div>’
-+’<span class=“rtxt’+(ck?” done”:””)+’”>’+esc(it)+’</span>’
-+’</div>’;
-});
-html+=’<textarea data-cid="'+c.id+'" placeholder="Course notes...">’+esc(N[c.id]||””)+’</textarea></div></div>’;
-});
-pg.innerHTML=html;
-pg.querySelectorAll(”.rhdr”).forEach(function(b){
-b.addEventListener(“click”,function(){document.getElementById(“rc_”+b.dataset.cid).classList.toggle(“open”);});
-});
-pg.querySelectorAll(”.rrow”).forEach(function(r){
-r.addEventListener(“click”,function(){
-var d=G(“readings”)||{},k=r.dataset.cid+”_”+r.dataset.i;
-d[k]=!d[k];S(“readings”,d);readings();
-});
-});
-pg.querySelectorAll(“textarea”).forEach(function(ta){
-ta.addEventListener(“input”,function(){
-var cid=ta.dataset.cid;clearTimeout(rT[cid]);
-rT[cid]=setTimeout(function(){var n=G(“rnotes”)||{};n[cid]=ta.value;S(“rnotes”,n);},600);
-});
-});
+  var pg=document.getElementById("pg-readings");
+  var D=G("readings")||{},N=G("rnotes")||{};
+  var html='<div class="sec">Philosophy Readings</div>';
+  COURSES.forEach(function(c){
+    var d=0;
+    // FIX: use "_" separator (was "*")
+    c.items.forEach(function(it,i){if(D[c.id+"_"+i])d++;});
+    html+='<div class="rc2" id="rc_'+c.id+'">'
+      +'<button class="rhdr" data-cid="'+c.id+'">'
+      +'<span class="rcs">'+c.name+'</span><span class="rbdg">'+d+'/'+c.items.length+'</span>'
+      +'</button>'
+      +'<div class="rbdy">';
+    c.items.forEach(function(it,i){
+      // FIX: use "_" separator (was "*")
+      var ck=!!D[c.id+"_"+i];
+      html+='<div class="rrow" data-cid="'+c.id+'" data-i="'+i+'">'
+        +'<div class="rbox'+(ck?" on":"")+'"></div>'
+        +'<span class="rtxt'+(ck?" done":"")+'">'+esc(it)+'</span>'
+        +'</div>';
+    });
+    html+='<textarea data-cid="'+c.id+'" placeholder="Course notes...">'+esc(N[c.id]||"")+'</textarea></div></div>';
+  });
+  pg.innerHTML=html;
+  pg.querySelectorAll(".rhdr").forEach(function(b){
+    b.addEventListener("click",function(){document.getElementById("rc_"+b.dataset.cid).classList.toggle("open");});
+  });
+  pg.querySelectorAll(".rrow").forEach(function(r){
+    r.addEventListener("click",function(){
+      var d=G("readings")||{};
+      // FIX: use "_" separator (was "_" in original but HTML rendered "*")
+      var k=r.dataset.cid+"_"+r.dataset.i;
+      d[k]=!d[k];S("readings",d);readings();
+    });
+  });
+  pg.querySelectorAll("textarea").forEach(function(ta){
+    ta.addEventListener("input",function(){
+      var cid=ta.dataset.cid;clearTimeout(rT[cid]);
+      rT[cid]=setTimeout(function(){var n=G("rnotes")||{};n[cid]=ta.value;S("rnotes",n);},600);
+    });
+  });
 }
 
 streak();mandala();journal();tasks();fitness();readings();
 </script>
-
 </body>
 </html>
