@@ -73,32 +73,28 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
 
-/* SECTION HEADERS — softer, easier on the eyes */
-.s-title{color:#fff;padding:8px 14px;font-size:14px;font-weight:700;border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:space-between;}
-.s-costco{background:#b5313a;}.s-ws{background:#3d6b9e;}.s-chinese{background:#c05a2a;}
-.s-sobeys{background:#2e7d5e;}.s-korea{background:#3a6fa8;}.s-bulk{background:#5c5c6e;}
-.s-liquor{background:#6b4f8e;}.s-sauce{background:#3a7a52;}.s-mcs{background:#7a5230;}
-.s-extras{background:#5c7a8e;}.s-sysco{background:#b04040;}.s-toronto{background:#8a3a6a;}
-.s-fish{background:#2a7aaa;}
+/* SECTION HEADERS — soft, muted, easy on eyes, no red */
+.s-title{color:#fff;padding:9px 14px;font-size:15px;font-weight:700;border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:space-between;}
+.s-costco{background:#4a7fa5;}.s-ws{background:#5a7ea0;}.s-chinese{background:#7a6fa0;}
+.s-sobeys{background:#4a8a6a;}.s-korea{background:#5578a0;}.s-bulk{background:#6a6a7e;}
+.s-liquor{background:#7a5f9e;}.s-sauce{background:#4a8070;}.s-mcs{background:#7a6a4a;}
+.s-extras{background:#5a7a8e;}.s-sysco{background:#6a7aaa;}.s-toronto{background:#7a5a7a;}
+.s-fish{background:#3a7a9e;}
 .store-block{margin-bottom:14px;border-radius:6px;overflow:hidden;border:1px solid var(--border);}
 
-/* TABLE — bigger, easier to read */
-.tbl{width:100%;border-collapse:collapse;background:var(--surface);font-size:14px;}
-.tbl th{background:#4a6fa8;color:#fff;padding:8px 10px;font-weight:700;text-align:center;border:1px solid #3a5a90;font-size:13px;}
+/* TABLE — bigger and easier to read */
+.tbl{width:100%;border-collapse:collapse;background:var(--surface);font-size:15px;}
+.tbl th{background:#5578a0;color:#fff;padding:9px 10px;font-weight:700;text-align:center;border:1px solid #3d608a;font-size:13px;}
 .tbl th.lft{text-align:left;}
-.tbl td{padding:7px 10px;border:1px solid var(--bl);vertical-align:middle;}
+.tbl td{padding:8px 10px;border:1px solid var(--bl);vertical-align:middle;}
 .tbl td.num{text-align:center;font-family:'IBM Plex Mono',monospace;}
 .tbl td.cc{text-align:center;}
-.rY{background:var(--yellow)!important;}
-.rB{background:var(--blue)!important;}
-.rG{background:var(--green)!important;}
-.rO{background:var(--orange)!important;}
-.rCat{background:#f0ede6!important;font-weight:700;}
-.cRed{background:#e05555!important;color:#fff!important;font-weight:700;}
-.cBlue{background:#3a6fa8!important;color:#fff!important;}
-.cGreen{background:#3a9a3a!important;color:#fff!important;}
+/* row color classes removed — all non-key rows are white */
+.cRed{background:#c06060!important;color:#fff!important;font-weight:700;}
+.cBlue{background:#4a7aaa!important;color:#fff!important;}
+.cGreen{background:#4a9a4a!important;color:#fff!important;}
 
-/* HILITE ROW — #FFEF99 soft yellow highlight */
+/* HILITE ROW — soft warm yellow */
 .hilite-row td{background:#FFEF99!important;}
 .hilite-row td.iname{font-weight:700;}
 
@@ -296,24 +292,24 @@ tr.tbl-drag-over{outline:2px solid #f59e0b;}
         <tbody id="tb-beer"></tbody></table>
         <button class="add-btn-row" onclick="openAdd('beer','Liquor')">+ Add item</button>
       </div>
-      <div class="store-block"><div class="s-title s-liquor" style="background:#7a5a9e">🍾 Bar 용소모품</div>
+      <div class="store-block"><div class="s-title s-liquor" style="background:#7a5f9e">🍾 Bar 용소모품</div>
         <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
         <tbody id="tb-bargoods"></tbody></table>
         <button class="add-btn-row" onclick="openAdd('bargoods','Liquor')">+ Add item</button>
       </div>
     </div>
     <div>
-      <div class="store-block"><div class="s-title s-liquor" style="background:#a84040">🍷 Wine 4B</div>
+      <div class="store-block"><div class="s-title s-liquor" style="background:#7a5f9e">🍷 Wine 4B</div>
         <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
         <tbody id="tb-wine"></tbody></table>
         <button class="add-btn-row" onclick="openAdd('wine','Liquor')">+ Add item</button>
       </div>
-      <div class="store-block"><div class="s-title s-liquor" style="background:#a84040">🥂 White Wine</div>
+      <div class="store-block"><div class="s-title s-liquor" style="background:#7a5f9e">🥂 White Wine</div>
         <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
         <tbody id="tb-whitewine"></tbody></table>
         <button class="add-btn-row" onclick="openAdd('whitewine','Liquor')">+ Add item</button>
       </div>
-      <div class="store-block"><div class="s-title s-liquor" style="background:#2a7aaa">🍶 피 맥</div>
+      <div class="store-block"><div class="s-title s-liquor" style="background:#3a7a9e">🍶 피 맥</div>
         <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
         <tbody id="tb-draft"></tbody></table>
         <button class="add-btn-row" onclick="openAdd('draft','Liquor')">+ Add item</button>
@@ -921,10 +917,10 @@ const D={
 
 // Store → solid bg color for key items
 const STORE_BG={
-  costco:'#b5313a',ws:'#3d6b9e',sobeys:'#2e7d5e',sysco:'#b04040',
-  chinese:'#c05a2a',korea:'#3a6fa8',toronto:'#8a3a6a',fish:'#2a7aaa',
-  bulk:'#5c5c6e',beer:'#6b4f8e',wine:'#b04040',whitewine:'#b04040',
-  draft:'#2a7aaa',bargoods:'#6b4f8e',mcs:'#7a5230',sauce:'#3a7a52',extras:'#5c7a8e'
+  costco:'#4a7fa5',ws:'#5a7ea0',sobeys:'#4a8a6a',sysco:'#6a7aaa',
+  chinese:'#7a6fa0',korea:'#5578a0',toronto:'#7a5a7a',fish:'#3a7a9e',
+  bulk:'#6a6a7e',beer:'#7a5f9e',wine:'#7a5f9e',whitewine:'#7a5f9e',
+  draft:'#3a7a9e',bargoods:'#7a5f9e',mcs:'#7a6a4a',sauce:'#4a8070',extras:'#5a7a8e'
 };
 let appData=JSON.parse(JSON.stringify(D));
 let fb=null, addTarget=null, mlSelColor='red';
@@ -1125,7 +1121,6 @@ function renderTbl(sec){
     }else{
       tr.className='';
       tr.style.cssText='background:#ffffff;';
-    }
     }
 
     const active=inML(row.name);
