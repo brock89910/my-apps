@@ -940,8 +940,21 @@ function init(){
         const v=snap.val();
         if(v){
           const prevSuppressed=appData._suppressed||[];
-          appData={...D,...v};
-          // Merge suppressed arrays — union of both
+          // For each section: use Firebase data only if it has items, else keep defaults
+          const sections=['costco','ws','sobeys','sysco','chinese','korea','toronto',
+            'fish','bulk','beer','wine','whitewine','draft','bargoods','mcs','sauce',
+            'extras','masterlist'];
+          appData={...D};
+          sections.forEach(sec=>{
+            if(v[sec]&&Array.isArray(v[sec])&&v[sec].length>0){
+              appData[sec]=v[sec];
+            }
+            // if Firebase has empty/null for a section, keep the default D data
+          });
+          // Preserve non-section keys (like _suppressed)
+          Object.keys(v).forEach(k=>{
+            if(!sections.includes(k))appData[k]=v[k];
+          });
           const merged=[...new Set([...prevSuppressed,...(v._suppressed||[])])];
           appData._suppressed=merged;
         }
@@ -956,7 +969,22 @@ function init(){
       document.getElementById('srchDrop').classList.remove('show');
   });
 }
-function loadLocal(){try{const s=localStorage.getItem('ohv4');if(s)appData={...D,...JSON.parse(s)};}catch(e){}}
+function loadLocal(){
+  try{
+    const s=localStorage.getItem('ohv4');
+    if(s){
+      const v=JSON.parse(s);
+      const sections=['costco','ws','sobeys','sysco','chinese','korea','toronto',
+        'fish','bulk','beer','wine','whitewine','draft','bargoods','mcs','sauce',
+        'extras','masterlist'];
+      appData={...D};
+      sections.forEach(sec=>{
+        if(v[sec]&&Array.isArray(v[sec])&&v[sec].length>0)appData[sec]=v[sec];
+      });
+      Object.keys(v).forEach(k=>{if(!sections.includes(k))appData[k]=v[k];});
+    }
+  }catch(e){}
+}
 function save(){
   if(fb&&fb.ok)fb.set(fb.ref(fb.db,'osakahibachi/stock'),appData);
   else localStorage.setItem('ohv4',JSON.stringify(appData));
