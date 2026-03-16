@@ -1193,6 +1193,67 @@ async function purgeExpiredHolds() {
   }
 }
 
+/* ── MIDNIGHT CARD WIPE ── */
+// At 23:59 each day, strip card number and expiry from all reservations on that day.
+// The reservation record itself is kept — only the card data is removed.
+// A single audit log entry records how many cards were wiped.
+
+async function wipeCardsForDate(dk) {
+  if (!window._db) return;
+  try {
+    const snap = await window._get(window._ref(window._db, `reservations/${dk}`));
+    const data = snap.val();
+    if (!data) return;
+
+    let wiped = 0;
+    for (const [id, r] of Object.entries(data)) {
+      if (!r.card && !r.expiry) continue; // nothing to wipe
+      // Remove card fields by setting them to null (Firebase deletes null keys)
+      await window._set(window._ref(window._db, `reservations/${dk}/${id}/card`), null);
+      await window._set(window._ref(window._db, `reservations/${dk}/${id}/expiry`), null);
+      wiped++;
+    }
+
+    if (wiped > 0) {
+      const monthKey = dk.slice(0, 7);
+      await window._push(window._ref(window._db, `auditlog/${monthKey}`), {
+        action: 'edit',
+        details: `AUTO CARD WIPE — ${wiped} card${wiped !== 1 ? 's' : ''} erased from ${dk} at end of day`,
+        staff: 'AUTO',
+        date: dk,
+        ts: Date.now()
+      });
+      console.log(`[Card Wipe] Erased ${wiped} card(s) from ${dk}`);
+    }
+  } catch(e) {
+    console.warn('[Card Wipe] Failed for', dk, e);
+  }
+}
+
+// Schedules the wipe to fire at exactly 23:59:00 today,
+// then reschedules itself for the next day's 23:59.
+function scheduleMidnightCardWipe() {
+  const now = new Date();
+  const target = new Date(now);
+  target.setHours(23, 59, 0, 0); // 23:59:00 today
+
+  // If 23:59 has already passed today, schedule for tomorrow
+  if (now >= target) {
+    target.setDate(target.getDate() + 1);
+  }
+
+  const msUntilWipe = target - now;
+
+  setTimeout(async () => {
+    const dk = dateKey(new Date()); // capture today's date at fire time
+    await wipeCardsForDate(dk);
+    // Also run hold purge at end of day
+    await purgeExpiredHolds();
+    // Reschedule for next day
+    scheduleMidnightCardWipe();
+  }, msUntilWipe);
+}
+
 function cardRequired(guests, bookingDateKey) {
   const isToday = bookingDateKey === dateKey(new Date());
   if (isToday && guests <= CARD_SAMEDAY_MAX_NO_CARD) return false;
@@ -3578,6 +3639,7 @@ function startApp() {
   document.getElementById('liveStatus').style.display = window._fbReady ? 'flex' : 'none';
   subscribeToDate();
   purgeExpiredHolds();
+  scheduleMidnightCardWipe();
 }
 
 /* ── GUEST NAME DISPLAY ── */
