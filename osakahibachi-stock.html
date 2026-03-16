@@ -3,11 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#1a1916">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Osaka Inventory">
-<link rel="manifest" href="manifest.json">
 <title>Osakahibachi 물품대장목록</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 
@@ -1378,50 +1373,6 @@ function switchTab(name,btn){
 }
 
 init();
-
-// ── PWA: Register service worker ──
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('sw.js')
-      .then(()=>console.log('SW registered'))
-      .catch(e=>console.log('SW failed:', e));
-  });
-}
-
-// ── AUTO-SYNC ON RECONNECT ──
-// When signal returns (Costco, walk-in freezer), push local data to Firebase immediately
-window.addEventListener('online', ()=>{
-  const dot=document.getElementById('syncDot');
-  const lbl=document.getElementById('syncLbl');
-  if(dot)dot.className='sync-dot';
-  if(lbl)lbl.textContent='Reconnecting...';
-
-  // Give Firebase a moment to re-establish connection, then push local data up
-  setTimeout(()=>{
-    const fb=window._fb;
-    if(fb&&fb.ok){
-      // Push current appData (which has all offline changes) to Firebase
-      fb.set(fb.ref(fb.db,'osakahibachi/stock'), appData)
-        .then(()=>{
-          if(dot)dot.className='sync-dot live';
-          if(lbl)lbl.textContent='Synced ✓';
-          setTimeout(()=>{ if(lbl)lbl.textContent='Live'; },2000);
-        })
-        .catch(()=>{
-          if(dot)dot.className='sync-dot local';
-          if(lbl)lbl.textContent='Local';
-        });
-    }
-  }, 1500);
-});
-
-// Update dot when going offline
-window.addEventListener('offline', ()=>{
-  const dot=document.getElementById('syncDot');
-  const lbl=document.getElementById('syncLbl');
-  if(dot)dot.className='sync-dot local';
-  if(lbl)lbl.textContent='Offline';
-});
 </script>
 </body>
 </html>
