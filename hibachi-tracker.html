@@ -1818,13 +1818,39 @@ function grillStatus(dateStr, grill) {
 }
 
 /**
- * AUTO-ASSIGN:
- * - 1–14 guests: single grill (combine with existing groups if possible)
- * - 15–30 guests: double grill (paired 1+2 or 3+4)
- *   - Solo on double (no other groups): up to 30
- *   - Combined on double (other groups join): up to 24 total across both grills
- * Chef cap only applies to NEW grills starting at the exact same slot.
+ * AUTO-ASSIGN — CHEF & GRILL RULES:
+ *
+ * A chef/grill is COMMITTED for a candidate slot if ANY existing booking overlaps
+ * the cook window in EITHER direction:
+ *   - Existing booking started before candidate: blocks for COOK_BLOCK_MINUTES forward
+ *   - Existing booking starts after candidate: would still be cooking within COOK_BLOCK_MINUTES
+ *
+ * This means: a 5:00 PM booking blocks a chef for both 4:30 PM (chef needs to be there)
+ * and 5:30 PM (chef is still cooking). A 4:30 slot checks all bookings within ±60 min.
+ *
+ * For a candidate slot to be bookable:
+ *   - At least one grill must have a chef not already committed (bidirectional cook window)
+ *   - That grill must not be physically occupied (seating window, 0–90 min prior/post)
+ *   - The grill must have capacity for the group
+ *
+ * Tight warning (90–120 min): grill may technically be free but turnover is close.
  */
+function getChefsCommittedAtSlot(all, slotMins) {
+  // Returns a Set of 'chef_N' strings for chefs committed within ±COOK_BLOCK_MINUTES of slotMins
+  const committed = new Set();
+  for (const r of all) {
+    const rMins = timeToMinutes(r.slot);
+    // Forward block: existing booking starts before candidate and is still cooking
+    const forwardOverlap = rMins <= slotMins && slotMins < rMins + COOK_BLOCK_MINUTES;
+    // Backward block: existing booking starts after candidate but within cook window
+    // (chef must be present before cooking starts — i.e. candidate slot is within cook window of future booking)
+    const backwardOverlap = rMins > slotMins && rMins < slotMins + COOK_BLOCK_MINUTES;
+    if (!forwardOverlap && !backwardOverlap) continue;
+    for (const g of grillsUsedByRes(r)) committed.add('chef_' + g);
+  }
+  return committed;
+}
+
 function autoAssignGrill(dateStr, slot, guests, chefs, excludeId) {
   const slotMins = timeToMinutes(slot);
   const all = getAllResForDate(dateStr).filter(r => !excludeId || r.id !== excludeId);
@@ -1832,10 +1858,8 @@ function autoAssignGrill(dateStr, slot, guests, chefs, excludeId) {
   // ── DOUBLE GRILL PATH (15+ guests) ──────────────────────────
   if (guests >= DOUBLE_GRILL_MIN_GUESTS) {
     for (const [g1, g2] of GRILL_PAIRS) {
-      // Use dedicated double-grill availability check (chef cap + cooldown + cook-block)
       if (!isPairAvailableForDouble(dateStr, g1, g2, slotMins, excludeId, chefs)) continue;
 
-      // Groups sharing this pair at the EXACT same slot (for combined capacity check)
       const pairGroups = all.filter(r => {
         const rMins = timeToMinutes(r.slot);
         return rMins === slotMins &&
@@ -1858,44 +1882,71 @@ function autoAssignGrill(dateStr, slot, guests, chefs, excludeId) {
   }
 
   // ── SINGLE GRILL PATH (1–14 guests) ─────────────────────────
+
+  // Count chefs committed within the bidirectional cook window around this slot
+  const chefsCommitted = getChefsCommittedAtSlot(all, slotMins);
+  const freeChefsAtSlot = chefs - chefsCommitted.size;
+
+  // Build per-grill state
   const grillState = [];
   for (let g = 1; g <= 4; g++) {
-    const blocked  = isGrillBlockedExcluding(dateStr, g, slotMins, excludeId);
+    // Physical grill block: seating window (0–90 min prior — chef/guests still present)
+    const blocked = isGrillBlockedExcluding(dateStr, g, slotMins, excludeId);
     const isHardBlocked = blocked && blocked.reason !== 'tight';
     const isTight       = blocked && blocked.reason === 'tight';
-    const groups   = getGroupsAtGrillAtSlot(dateStr, g, slotMins, excludeId);
-    // Grill unavailable if a double-grill booking (new or legacy) occupies it at this slot
+
+    // Also block if this grill has a FUTURE booking starting within the cook window
+    // (chef is already pre-committed to that upcoming table)
+    const futureCommitted = all.some(r => {
+      if (r.grill !== g) return false;
+      const rMins = timeToMinutes(r.slot);
+      // Future booking within cook window — chef already belongs to them
+      return rMins > slotMins && rMins < slotMins + COOK_BLOCK_MINUTES;
+    });
+
+    // Is this grill occupied by a double-booking at the same slot?
     const hasDouble = all.some(r => {
       const rMins = timeToMinutes(r.slot);
       if (rMins !== slotMins) return false;
       return grillsUsedByRes(r).includes(g);
     });
+
+    const groups = getGroupsAtGrillAtSlot(dateStr, g, slotMins, excludeId);
     const totalGuests = groups.reduce((s,r) => s+(r.guests||0), 0);
     const cap  = getSingleGrillCap(groups.length);
     const room = cap - totalGuests;
-    grillState.push({ g, blocked: isHardBlocked, isTight, hasDouble, groups, totalGuests, cap, room });
+
+    // A grill can only be used at this slot if its chef is free (not committed elsewhere)
+    const chefFree = !chefsCommitted.has('chef_' + g);
+
+    grillState.push({
+      g,
+      blocked: isHardBlocked || futureCommitted, // hard-block includes future cook-window conflicts
+      isTight,
+      hasDouble,
+      chefFree,
+      groups,
+      totalGuests,
+      cap,
+      room
+    });
   }
 
-  // Count how many chef-grills are already committed at this exact slot
-  // (using grillsUsedByRes to handle legacy data)
-  const chefsCommittedAtSlot = new Set(
-    all.filter(r => timeToMinutes(r.slot) === slotMins)
-       .flatMap(r => grillsUsedByRes(r).map(g => `chef_${g}`))
-  );
-  const freeChefsAtSlot = chefs - chefsCommittedAtSlot.size;
-
-  // Pass 1: combine into existing grill with room (no extra chef needed)
+  // Pass 1: join an existing grill that already has its chef committed at this slot
+  // (no extra chef needed — chef is already cooking for the same slot)
   for (const state of grillState) {
     if (state.blocked || state.hasDouble) continue;
-    if (state.groups.length === 0) continue;
+    if (!state.chefFree && state.groups.length === 0) continue; // chef busy but no one here — skip
+    if (state.groups.length === 0) continue; // empty grill needs a free chef — handle in Pass 2
     if (state.room >= guests) return { grill: state.g, isDouble: false, tightTiming: state.isTight };
   }
 
-  // Pass 2: open a fresh empty grill (needs 1 free chef)
+  // Pass 2: open a fresh empty grill — requires a free chef
   if (freeChefsAtSlot >= 1) {
     for (const state of grillState) {
       if (state.blocked || state.hasDouble) continue;
-      if (state.groups.length > 0) continue;
+      if (!state.chefFree) continue; // this grill's chef is already elsewhere
+      if (state.groups.length > 0) continue; // has groups — handled in Pass 1
       if (getSingleGrillCap(0) >= guests) return { grill: state.g, isDouble: false, tightTiming: state.isTight };
     }
   }
