@@ -925,6 +925,21 @@ const STORE_BG={
 let appData=JSON.parse(JSON.stringify(D));
 let fb=null, addTarget=null, mlSelColor='red';
 
+// One-time wipe of any corrupted localStorage from previous bad saves
+(function(){
+  try{
+    const s=localStorage.getItem('ohv4');
+    if(s){
+      const v=JSON.parse(s);
+      // If costco exists but is empty or an empty object, it's corrupted — clear it
+      if(v.costco!==undefined){
+        const arr=Array.isArray(v.costco)?v.costco:Object.values(v.costco||{});
+        if(arr.length===0)localStorage.removeItem('ohv4');
+      }
+    }
+  }catch(e){localStorage.removeItem('ohv4');}
+})();
+
 function init(){
   const d=new Date();
   document.getElementById('todayDate').textContent=`${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
@@ -935,22 +950,19 @@ function init(){
         const v=snap.val();
         if(v){
           const prevSuppressed=appData._suppressed||[];
-          // For each section: use Firebase data only if it has items, else keep defaults
           const sections=['costco','ws','sobeys','sysco','chinese','korea','toronto',
             'fish','bulk','beer','wine','whitewine','draft','bargoods','mcs','sauce',
             'extras','masterlist'];
           appData={...D};
           sections.forEach(sec=>{
-            if(v[sec]&&Array.isArray(v[sec])&&v[sec].length>0){
-              appData[sec]=v[sec];
+            if(v[sec]){
+              // Firebase returns arrays as objects {0:{},1:{}} OR real arrays — handle both
+              const raw=v[sec];
+              const arr=Array.isArray(raw)?raw:Object.values(raw);
+              if(arr.length>0)appData[sec]=arr;
             }
-            // if Firebase has empty/null for a section, keep the default D data
           });
-          // Preserve non-section keys (like _suppressed)
-          Object.keys(v).forEach(k=>{
-            if(!sections.includes(k))appData[k]=v[k];
-          });
-          const merged=[...new Set([...prevSuppressed,...(v._suppressed||[])])];
+          const merged=[...new Set([...prevSuppressed,...(Array.isArray(v._suppressed)?v._suppressed:[])])];
           appData._suppressed=merged;
         }
         renderAll();
@@ -967,18 +979,23 @@ function init(){
 function loadLocal(){
   try{
     const s=localStorage.getItem('ohv4');
-    if(s){
-      const v=JSON.parse(s);
-      const sections=['costco','ws','sobeys','sysco','chinese','korea','toronto',
-        'fish','bulk','beer','wine','whitewine','draft','bargoods','mcs','sauce',
-        'extras','masterlist'];
-      appData={...D};
-      sections.forEach(sec=>{
-        if(v[sec]&&Array.isArray(v[sec])&&v[sec].length>0)appData[sec]=v[sec];
-      });
-      Object.keys(v).forEach(k=>{if(!sections.includes(k))appData[k]=v[k];});
-    }
-  }catch(e){}
+    if(!s)return;
+    const v=JSON.parse(s);
+    const sections=['costco','ws','sobeys','sysco','chinese','korea','toronto',
+      'fish','bulk','beer','wine','whitewine','draft','bargoods','mcs','sauce',
+      'extras','masterlist'];
+    appData={...D};
+    sections.forEach(sec=>{
+      if(v[sec]){
+        const raw=v[sec];
+        const arr=Array.isArray(raw)?raw:Object.values(raw);
+        if(arr.length>0)appData[sec]=arr;
+      }
+    });
+    if(Array.isArray(v._suppressed))appData._suppressed=v._suppressed;
+  }catch(e){
+    localStorage.removeItem('ohv4'); // wipe corrupted data
+  }
 }
 function save(){
   if(fb&&fb.ok)fb.set(fb.ref(fb.db,'osakahibachi/stock'),appData);
