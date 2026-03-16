@@ -660,18 +660,174 @@ body {
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ── LOGIN SCREEN ── */
+#loginScreen {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+
+.login-box {
+  width: 100%; max-width: 360px;
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+}
+
+.login-flame {
+  font-size: 2.4rem;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 4px 12px rgba(245,166,35,0.4));
+}
+
+.login-title {
+  font-family: var(--mono); font-size: 0.88rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 4px;
+}
+
+.login-sub {
+  font-family: var(--mono); font-size: 0.62rem;
+  color: var(--text3); letter-spacing: 0.06em;
+  margin-bottom: 32px;
+}
+
+.login-card {
+  width: 100%;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 24px;
+  margin-bottom: 12px;
+}
+
+.login-card-title {
+  font-family: var(--mono); font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text2); margin-bottom: 10px;
+}
+
+.login-input {
+  width: 100%; background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--r); padding: 11px 13px;
+  color: var(--text); font-family: var(--mono); font-size: 1rem;
+  letter-spacing: 0.25em; outline: none;
+  transition: border-color 0.15s;
+  margin-bottom: 8px;
+  -webkit-appearance: none;
+}
+
+.login-input:focus { border-color: rgba(245,166,35,0.5); }
+
+.login-err {
+  font-family: var(--mono); font-size: 0.65rem;
+  color: var(--red); min-height: 16px;
+  margin-bottom: 10px; letter-spacing: 0.04em;
+}
+
+.login-btn-staff {
+  width: 100%; padding: 13px;
+  background: var(--gold); color: #fff;
+  font-family: var(--mono); font-size: 0.8rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  border: none; border-radius: var(--r); cursor: pointer;
+  transition: background 0.15s;
+}
+.login-btn-staff:active { background: var(--gold2); }
+
+.login-divider {
+  font-family: var(--mono); font-size: 0.58rem;
+  color: var(--text3); letter-spacing: 0.1em;
+  text-align: center; margin: 4px 0;
+}
+
+.login-btn-guest {
+  width: 100%; padding: 13px;
+  background: transparent; color: var(--text2);
+  font-family: var(--mono); font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  border: 1px solid var(--border); border-radius: var(--r); cursor: pointer;
+  transition: all 0.15s;
+}
+.login-btn-guest:active { background: var(--bg3); }
+
+.login-note {
+  font-family: var(--mono); font-size: 0.58rem;
+  color: var(--text3); text-align: center;
+  letter-spacing: 0.04em; line-height: 1.6;
+  margin-top: 4px;
+}
+
+/* ── MODE INDICATOR ── */
+#modeIndicator {
+  display: none;
+  font-family: var(--mono); font-size: 0.6rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 10px;
+}
+#modeIndicator.staff {
+  display: inline-flex; align-items: center; gap: 5px;
+  color: var(--green); background: rgba(94,203,126,0.12);
+  border: 1px solid rgba(94,203,126,0.3);
+}
+#modeIndicator.guest {
+  display: inline-flex; align-items: center; gap: 5px;
+  color: var(--blue); background: rgba(90,171,240,0.12);
+  border: 1px solid rgba(90,171,240,0.3);
+}
+
+/* ── GUEST MODE — mask sensitive fields ── */
+body.guest-mode .res-row-name .real-name { display: none; }
+body.guest-mode .guest-name-only { display: inline; }
+body.staff-mode .guest-name-only { display: none; }
+body.staff-mode .real-name { display: inline; }
+
 </style>
 </head>
 <body>
 
+<!-- ════ LOGIN SCREEN ════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <span class="login-flame">🔥</span>
+    <div class="login-title">Hibachi Tracker</div>
+    <div class="login-sub">Osaka Hibachi · Moncton, NB</div>
+
+    <div class="login-card">
+      <div class="login-card-title">🔑 Staff Login</div>
+      <input class="login-input" id="staffPin" type="password"
+        inputmode="numeric" placeholder="••••" maxlength="8" autocomplete="off"
+        onkeydown="if(event.key==='Enter')submitStaffPin()">
+      <div class="login-err" id="staffPinErr"></div>
+      <button class="login-btn-staff" onclick="submitStaffPin()">Enter as Staff</button>
+    </div>
+
+    <div class="login-divider">— or —</div>
+
+    <div class="login-card" style="margin-top:4px">
+      <div class="login-card-title">👥 Guest View</div>
+      <div style="font-family:var(--mono);font-size:0.65rem;color:var(--text3);line-height:1.6;margin-bottom:12px">
+        View today's available time slots and booking counts. Guest names are replaced with generic placeholders for privacy.
+      </div>
+      <button class="login-btn-guest" onclick="enterGuestMode()">Continue as Guest</button>
+    </div>
+
+    <div class="login-note">
+      Staff PIN required to create, edit, or view reservation details.
+    </div>
+  </div>
+</div>
+
 <!-- ════ APP ════════════════════════════════════════════════ -->
-<div id="app">
+<div id="app" style="display:none">
 
   <!-- HEADER -->
   <div class="app-header">
     <div class="header-top">
       <div class="app-title">🔥 Hibachi Tracker</div>
-      <div class="live-dot" id="liveStatus">LIVE</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span id="modeIndicator"></span>
+        <div class="live-dot" id="liveStatus">LIVE</div>
+      </div>
     </div>
     <div class="date-nav">
       <button class="date-nav-btn" onclick="changeDay(-1)">‹</button>
@@ -1784,6 +1940,18 @@ function renderWeekStrip() {
 function renderHibachi() {
   renderWeekStrip();
   renderTimeSlots();
+  // Hide interactive controls in guest mode
+  if (appMode === 'guest') {
+    document.querySelectorAll('.time-add-btn, .block-btn').forEach(b => b.style.display = 'none');
+    // Show guest note once
+    if (!document.getElementById('guestModeNote')) {
+      const note = document.createElement('div');
+      note.id = 'guestModeNote';
+      note.style.cssText = 'padding:12px 16px 20px;font-family:var(--mono);font-size:0.62rem;color:var(--text3);line-height:1.7;text-align:center;letter-spacing:0.03em;';
+      note.innerHTML = '\uD83D\uDEC8 Guest view \u2014 names shown are generic placeholders, not real guest names. Group sizes and time slots are accurate.';
+      document.getElementById('timeSlots').parentNode.appendChild(note);
+    }
+  }
   // Async-load week data in background (won't block render)
   loadWeekData();
 }
@@ -1937,17 +2105,28 @@ function renderTimeSlots() {
         const isSoon = isToday && nowMins >= rSlotMins - 10 && nowMins <= rSlotMins + 5;
         if (isSoon) row.classList.add('seated-soon');
 
-        row.innerHTML = `
-          <div class="res-row-meta" style="flex-shrink:0">
-            <span style="font-weight:700;color:var(--text);font-size:0.82rem">👥 ${r.guests}</span>
-          </div>
-          <div class="res-row-name">${escHtml(r.name||'Guest')}${r.isDouble ? ' <span style="font-size:0.6rem;color:var(--amber);font-weight:600">🔥×2</span>' : ''}${r.holdUntil ? ' <span style="font-size:0.58rem;color:var(--amber);font-weight:700;background:rgba(245,166,35,0.15);border:1px solid rgba(245,166,35,0.35);padding:1px 5px;border-radius:3px">📌 HOLD</span>' : ''}</div>
-          <div class="res-row-meta">
-            ${isSoon ? '<span class="soon-badge">🪑 SEAT NOW</span>' : ''}
-            ${r.phone ? '<span>' + escHtml(r.phone) + '</span>' : ''}
-            ${r.initials ? '<span class="res-row-badge">' + escHtml(r.initials) + '</span>' : ''}
-          </div>`;
-        row.onclick = () => openHibachiModal(slot, r.id);
+        const displayName = getDisplayName(r.id, r.name, key);
+        const isGuest = appMode === 'guest';
+
+        row.innerHTML = '<div class="res-row-meta" style="flex-shrink:0">'
+          + '<span style="font-weight:700;color:var(--text);font-size:0.82rem">\uD83D\uDC65 ' + (r.guests||'') + '</span>'
+          + '</div>'
+          + '<div class="res-row-name">'
+          + escHtml(displayName)
+          + (r.isDouble ? ' <span style="font-size:0.6rem;color:var(--amber);font-weight:600">\uD83D\uDD25\xD72</span>' : '')
+          + (r.holdUntil ? ' <span style="font-size:0.58rem;color:var(--amber);font-weight:700;background:rgba(245,166,35,0.15);border:1px solid rgba(245,166,35,0.35);padding:1px 5px;border-radius:3px">\uD83D\uDCCC HOLD</span>' : '')
+          + '</div>'
+          + '<div class="res-row-meta">'
+          + (isSoon ? '<span class="soon-badge">\uD83E\uDE91 SEAT NOW</span>' : '')
+          + (!isGuest && r.phone ? '<span>' + escHtml(r.phone) + '</span>' : '')
+          + (!isGuest && r.initials ? '<span class="res-row-badge">' + escHtml(r.initials) + '</span>' : '')
+          + '</div>';
+
+        if (!isGuest) {
+          row.onclick = () => openHibachiModal(slot, r.id);
+        } else {
+          row.style.cursor = 'default';
+        }
         listDiv.appendChild(row);
       });
     }
@@ -1969,17 +2148,27 @@ function renderDining() {
     return;
   }
 
-  all.sort(([,a],[,b]) => (a.name||'').localeCompare(b.name||''));
+  // Sort by time, then name for ties
+  all.sort(([,a],[,b]) => {
+    const ta = a.time || '99:99';
+    const tb = b.time || '99:99';
+    if (ta !== tb) return ta.localeCompare(tb);
+    return (a.name||'').localeCompare(b.name||'');
+  });
+
   all.forEach(([id,r]) => {
     const card = document.createElement('div');
     card.className = 'dining-card';
-    card.innerHTML = `
-      <div class="dining-name">${escHtml(r.name||'Guest')}</div>
-      <div class="dining-detail">
-        <span>👥 ${r.guests} guests</span>
-        ${r.phone ? `<span>📞 ${escHtml(r.phone)}</span>` : ''}
-      </div>
-      ${r.notes ? `<div class="dining-note">${escHtml(r.notes)}</div>` : ''}`;
+    const timeStr = r.time ? displayTime(r.time) : '';
+    card.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'
+      + '<div class="dining-name">' + escHtml(r.name||'Guest') + '</div>'
+      + (timeStr ? '<span style="font-family:var(--mono);font-size:0.75rem;font-weight:700;color:var(--gold);letter-spacing:0.04em">' + timeStr + '</span>' : '')
+      + '</div>'
+      + '<div class="dining-detail">'
+      + '<span>\uD83D\uDC65 ' + r.guests + ' guests</span>'
+      + (r.phone ? '<span>\uD83D\uDCDE ' + escHtml(r.phone) + '</span>' : '')
+      + '</div>'
+      + (r.notes ? '<div class="dining-note">' + escHtml(r.notes) + '</div>' : '');
     card.onclick = () => openDiningModal({id,...r});
     list.appendChild(card);
   });
@@ -2565,31 +2754,55 @@ async function deleteRes(dk, id) {
 /* ── DINING MODAL ── */
 function openDiningModal(existing) {
   document.getElementById('modalTitle').textContent = existing ? 'Edit Dining Reservation' : 'Dining Room';
-  document.getElementById('modalBody').innerHTML = `
-    <div class="form-row">
-      <label class="form-label">Guest Name *</label>
-      <input class="form-input" id="dName" type="text" placeholder="Last name or full name" value="${escHtml(existing?.name||'')}">
-    </div>
-    <div class="form-grid">
-      <div class="form-row" style="margin:0">
-        <label class="form-label">Party Size *</label>
-        <input class="form-input" id="dGuests" type="number" min="1" placeholder="e.g. 3" value="${existing?.guests||''}">
-      </div>
-      <div class="form-row" style="margin:0">
-        <label class="form-label">Phone</label>
-        <input class="form-input" id="dPhone" type="tel" placeholder="506-555-0100" value="${escHtml(existing?.phone||'')}">
-      </div>
-    </div>
-    <div class="form-row">
-      <label class="form-label">Notes</label>
-      <textarea class="form-textarea" id="dNotes" placeholder="Allergies, preferences, time preference…">${escHtml(existing?.notes||'')}</textarea>
-    </div>
-    <div id="formErr"></div>
-    <button class="btn-gold" onclick="saveDining('${dateKey(currentDate)}','${existing?.id||''}')">
-      ${existing ? '✓ Update' : '✓ Add to Dining'}
-    </button>
-    ${existing ? `<button class="btn-danger" onclick="deleteDining('${dateKey(currentDate)}','${existing.id}')">✕ Remove</button>` : ''}
-  `;
+
+  // Build time options — 30-min increments 11:00 AM to 10:00 PM
+  const timeSlots = [];
+  for (let h = 11; h <= 22; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      if (h === 22 && m > 0) break;
+      const hh = String(h).padStart(2,'0');
+      const mm = String(m).padStart(2,'0');
+      timeSlots.push(hh + ':' + mm);
+    }
+  }
+  const timeOptions = timeSlots.map(t => {
+    const sel = (existing && existing.time === t) ? ' selected' : (!existing && t === '18:00') ? ' selected' : '';
+    return '<option value="' + t + '"' + sel + '>' + displayTime(t) + '</option>';
+  }).join('');
+
+  const deleteBtn = existing
+    ? '<button class="btn-danger" onclick="deleteDining(\'' + dateKey(currentDate) + '\',\'' + existing.id + '\')">&#10005; Remove</button>'
+    : '';
+
+  document.getElementById('modalBody').innerHTML = ''
+    + '<div class="form-row">'
+    + '<label class="form-label">Guest Name *</label>'
+    + '<input class="form-input" id="dName" type="text" placeholder="Last name or full name" value="' + escHtml(existing ? existing.name||'' : '') + '">'
+    + '</div>'
+    + '<div class="form-grid">'
+    + '<div class="form-row" style="margin:0">'
+    + '<label class="form-label">Party Size *</label>'
+    + '<input class="form-input" id="dGuests" type="number" min="1" placeholder="e.g. 3" value="' + (existing ? existing.guests||'' : '') + '">'
+    + '</div>'
+    + '<div class="form-row" style="margin:0">'
+    + '<label class="form-label">Time *</label>'
+    + '<select class="form-select" id="dTime">' + timeOptions + '</select>'
+    + '</div>'
+    + '</div>'
+    + '<div class="form-row">'
+    + '<label class="form-label">Phone</label>'
+    + '<input class="form-input" id="dPhone" type="tel" placeholder="506-555-0100" value="' + escHtml(existing ? existing.phone||'' : '') + '">'
+    + '</div>'
+    + '<div class="form-row">'
+    + '<label class="form-label">Notes</label>'
+    + '<textarea class="form-textarea" id="dNotes" placeholder="Allergies, preferences\u2026">' + escHtml(existing ? existing.notes||'' : '') + '</textarea>'
+    + '</div>'
+    + '<div id="formErr"></div>'
+    + '<button class="btn-gold" onclick="saveDining(\'' + dateKey(currentDate) + '\',\'' + (existing ? existing.id||'' : '') + '\')">'
+    + (existing ? '\u2713 Update' : '\u2713 Add to Dining')
+    + '</button>'
+    + deleteBtn;
+
   showModal();
 }
 
@@ -2598,16 +2811,20 @@ async function saveDining(dk, editId) {
   const guests = parseInt(document.getElementById('dGuests').value)||0;
   const phone  = document.getElementById('dPhone').value.trim();
   const notes  = document.getElementById('dNotes').value.trim();
+  const time   = document.getElementById('dTime').value;
 
   if (!name)   return showErr('Guest name is required.');
   if (!guests) return showErr('Party size required.');
+  if (!time)   return showErr('Time is required.');
 
-  const data = { name, guests, phone, notes, updatedAt: Date.now() };
+  const data = { name, guests, phone, notes, time, updatedAt: Date.now() };
   try {
     if (editId) {
       await window._set(window._ref(window._db, `dining/${dk}/${editId}`), data);
+      await logAudit('edit', 'Dining: ' + name + ' \xB7 ' + guests + 'p \xB7 ' + displayTime(time), '');
     } else {
       await window._push(window._ref(window._db, `dining/${dk}`), data);
+      await logAudit('create', 'Dining: ' + name + ' \xB7 ' + guests + 'p \xB7 ' + displayTime(time), '');
     }
     closeModal();
   } catch(e) { showErr('Firebase error: '+e.message); }
@@ -3186,6 +3403,97 @@ async function syncToSheet() {
   }
 }
 
+/* ── LOGIN & ACCESS MODE ── */
+// Hashed staff PIN (1599)
+const STAFF_PIN_HASH = '8e57858ab42fef1ee804b572421beb315e9fb3bd562f10f2f1c9ccf0384e8d99';
+
+// Generic names pool — cycle through per-day, restart if exhausted
+// Note: these are generic placeholder names, not real guests
+const GENERIC_NAMES = [
+  'John','Kyle','Steve','Brittany','Kevin','Jane','Alexandra','Keith',
+  'Glenn','William','LeBlank','Cormiur','Grant','Cody','Claude','Sam',
+  'Pam','Trevor','Brou','Saskatoon','Gouda','Javier','Panda','April',
+  'Kucherov','Guest1','Alice','Jessica','Crosby'
+];
+
+let appMode = null; // 'staff' | 'guest'
+
+// Per-day generic name assignment: maps realName+date → generic name
+// Stored in memory only — resets on page reload
+let genericNameMap = {}; // key: 'YYYY-MM-DD:firebaseId' → generic name
+let genericNameCounters = {}; // key: 'YYYY-MM-DD' → next index
+
+function getGenericName(dateKey, resId) {
+  const mapKey = dateKey + ':' + resId;
+  if (genericNameMap[mapKey]) return genericNameMap[mapKey];
+  // Assign next name for this day
+  const counter = genericNameCounters[dateKey] || 0;
+  const name = GENERIC_NAMES[counter % GENERIC_NAMES.length];
+  genericNameMap[mapKey] = name;
+  genericNameCounters[dateKey] = counter + 1;
+  return name;
+}
+
+async function submitStaffPin() {
+  const pin = document.getElementById('staffPin').value;
+  const h = await hashPassword(pin);
+  if (h !== STAFF_PIN_HASH) {
+    const err = document.getElementById('staffPinErr');
+    err.textContent = '\u2715 Incorrect PIN';
+    document.getElementById('staffPin').value = '';
+    document.getElementById('staffPin').focus();
+    setTimeout(() => { err.textContent = ''; }, 2500);
+    return;
+  }
+  enterStaffMode();
+}
+
+function enterStaffMode() {
+  appMode = 'staff';
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = '';
+  document.body.classList.remove('guest-mode');
+  document.body.classList.add('staff-mode');
+  const ind = document.getElementById('modeIndicator');
+  ind.className = 'staff';
+  ind.textContent = '\u2713 Staff';
+  startApp();
+}
+
+function enterGuestMode() {
+  appMode = 'guest';
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = '';
+  document.body.classList.remove('staff-mode');
+  document.body.classList.add('guest-mode');
+  const ind = document.getElementById('modeIndicator');
+  ind.className = 'guest';
+  ind.textContent = '\uD83D\uDC64 Guest';
+
+  // Guest mode: hide staff-only tabs
+  document.getElementById('tab-history').style.display = 'none';
+  document.getElementById('tab-export').style.display = 'none';
+  // Hide add buttons and block buttons — guests can't modify anything
+  document.querySelectorAll('.time-add-btn, .block-btn').forEach(b => b.style.display = 'none');
+
+  startApp();
+}
+
+function startApp() {
+  renderDateHeader();
+  document.getElementById('liveStatus').style.display = window._fbReady ? 'flex' : 'none';
+  subscribeToDate();
+  purgeExpiredHolds();
+}
+
+/* ── GUEST NAME DISPLAY ── */
+// In guest mode, reservation names are replaced with generic names.
+// The renderTimeSlots function calls getDisplayName() to get what to show.
+function getDisplayName(resId, realName, dateStr) {
+  if (appMode === 'staff') return realName || 'Guest';
+  return getGenericName(dateStr, resId);
+}
+
 /* ── MISC ── */
 function escHtml(str) {
   return String(str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -3193,11 +3501,9 @@ function escHtml(str) {
 
 /* ── INIT ── */
 function init() {
-  renderDateHeader();
-  document.getElementById('liveStatus').style.display = window._fbReady ? 'flex' : 'none';
-  subscribeToDate();
-  // Purge any expired holds on load
-  purgeExpiredHolds();
+  // Show login screen — startApp() is called after mode is chosen
+  // (loginScreen is shown by default in HTML, app is hidden)
+  document.getElementById('staffPin')?.focus();
 }
 
 if (window._fbReady) {
@@ -3206,9 +3512,8 @@ if (window._fbReady) {
   document.addEventListener('fbReady', init);
   setTimeout(() => {
     if (!window._fbReady) {
-      reservations = {}; diningReservations = {};
-      renderDateHeader();
-      renderHibachi();
+      // Firebase didn't load — still show login, app will work offline-ish
+      document.getElementById('staffPin')?.focus();
     }
   }, 2000);
 }
