@@ -1156,8 +1156,9 @@ async function unlockCardDetails(editId) {
     </div>`;
 }
 const WARN_GUESTS = 10;
-const COOK_BLOCK_MINUTES = 60;
-const SEAT_BLOCK_MINUTES = 90;
+const COOK_BLOCK_MINUTES = 60;   // chef unavailable — grill hard-blocked for this window
+const SEAT_BLOCK_MINUTES = 90;   // guests still seated — grill hard-blocked
+const SEAT_WARN_MINUTES  = 120;  // 90–120 min: grill available but tight-timing warning shown
 const CARD_REQUIRED_MIN = 4;
 const CARD_SAMEDAY_MAX_NO_CARD = 5;
 const HOLD_DAYS_OPTIONS = [1, 2];
@@ -1650,9 +1651,13 @@ function isGrillBlocked(dateStr, grill, slotMins) {
   for (const r of all) {
     if (r.grill !== grill) continue;
     const rMins = timeToMinutes(r.slot);
-    // Block if a prior booking's chef is still cooking or guests are still seated
+    // Hard block: chef cooking (0–60 min) or guests still seated (60–90 min)
     if (rMins < slotMins && slotMins < rMins + SEAT_BLOCK_MINUTES) {
       return { reason: rMins + COOK_BLOCK_MINUTES > slotMins ? 'cook' : 'seat', bookedAt: r.slot };
+    }
+    // Soft warning: 90–120 min — grill is technically free but timing is tight
+    if (rMins < slotMins && slotMins < rMins + SEAT_WARN_MINUTES) {
+      return { reason: 'tight', bookedAt: r.slot };
     }
   }
   return null;
@@ -1665,6 +1670,9 @@ function isGrillBlockedExcluding(dateStr, grill, slotMins, excludeId) {
     const rMins = timeToMinutes(r.slot);
     if (rMins < slotMins && slotMins < rMins + SEAT_BLOCK_MINUTES) {
       return { reason: rMins + COOK_BLOCK_MINUTES > slotMins ? 'cook' : 'seat', bookedAt: r.slot };
+    }
+    if (rMins < slotMins && slotMins < rMins + SEAT_WARN_MINUTES) {
+      return { reason: 'tight', bookedAt: r.slot };
     }
   }
   return null;
@@ -1792,6 +1800,8 @@ function autoAssignGrill(dateStr, slot, guests, chefs, excludeId) {
   const grillState = [];
   for (let g = 1; g <= 4; g++) {
     const blocked  = isGrillBlockedExcluding(dateStr, g, slotMins, excludeId);
+    const isHardBlocked = blocked && blocked.reason !== 'tight';
+    const isTight       = blocked && blocked.reason === 'tight';
     const groups   = getGroupsAtGrillAtSlot(dateStr, g, slotMins, excludeId);
     // Grill unavailable if a double-grill booking (new or legacy) occupies it at this slot
     const hasDouble = all.some(r => {
@@ -1802,7 +1812,7 @@ function autoAssignGrill(dateStr, slot, guests, chefs, excludeId) {
     const totalGuests = groups.reduce((s,r) => s+(r.guests||0), 0);
     const cap  = getSingleGrillCap(groups.length);
     const room = cap - totalGuests;
-    grillState.push({ g, blocked, hasDouble, groups, totalGuests, cap, room });
+    grillState.push({ g, blocked: isHardBlocked, isTight, hasDouble, groups, totalGuests, cap, room });
   }
 
   // Count how many chef-grills are already committed at this exact slot
@@ -1817,7 +1827,7 @@ function autoAssignGrill(dateStr, slot, guests, chefs, excludeId) {
   for (const state of grillState) {
     if (state.blocked || state.hasDouble) continue;
     if (state.groups.length === 0) continue;
-    if (state.room >= guests) return { grill: state.g, isDouble: false };
+    if (state.room >= guests) return { grill: state.g, isDouble: false, tightTiming: state.isTight };
   }
 
   // Pass 2: open a fresh empty grill (needs 1 free chef)
@@ -1825,7 +1835,7 @@ function autoAssignGrill(dateStr, slot, guests, chefs, excludeId) {
     for (const state of grillState) {
       if (state.blocked || state.hasDouble) continue;
       if (state.groups.length > 0) continue;
-      if (getSingleGrillCap(0) >= guests) return { grill: state.g, isDouble: false };
+      if (getSingleGrillCap(0) >= guests) return { grill: state.g, isDouble: false, tightTiming: state.isTight };
     }
   }
 
@@ -2427,6 +2437,62 @@ async function applyNoCardOverride(dk, editId) {
   if (btn) btn.click();
 }
 
+function confirmTightTiming(dk, editId) {
+  // Inject a hidden marker so saveHibachi skips the tight-timing gate on re-call
+  const marker = document.createElement('input');
+  marker.type = 'hidden';
+  marker.id = 'tightTimingConfirmed';
+  marker.value = '1';
+  document.getElementById('formErr').innerHTML = '';
+  document.getElementById('formErr').parentNode.appendChild(marker);
+  saveHibachi(dk, editId);
+}
+
+function showCardOnFilePrompt(dk, editId) {
+  if (document.getElementById('cardOnFilePrompt')) return;
+  const err = document.getElementById('formErr');
+  err.innerHTML = '';
+  const div = document.createElement('div');
+  div.id = 'cardOnFilePrompt';
+  div.innerHTML = '<div style="background:rgba(90,171,240,0.08);border:1px solid rgba(90,171,240,0.35);border-radius:var(--r);padding:14px;margin-bottom:12px">'
+    + '<div style="font-family:var(--mono);font-size:0.72rem;font-weight:700;color:var(--blue);margin-bottom:8px">\uD83D\uDCB3 Card on File</div>'
+    + '<div style="font-family:var(--mono);font-size:0.68rem;color:var(--text2);line-height:1.6;margin-bottom:12px">'
+    + 'This booking has a card on file. Enter the manager password (0709) to confirm it\'s still valid, then the update will save with just your initials.'
+    + '</div>'
+    + '<div style="display:flex;gap:8px;align-items:center">'
+    + '<input type="password" id="cardOnFilePwd" placeholder="Manager password"'
+    + ' style="flex:1;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--mono);font-size:0.8rem;color:var(--text);outline:none"'
+    + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();verifyCardOnFile(\'' + dk + '\',\'' + editId + '\');}">'
+    + '<button onclick="verifyCardOnFile(\'' + dk + '\',\'' + editId + '\')"'
+    + ' style="padding:8px 16px;background:rgba(90,171,240,0.12);border:1px solid rgba(90,171,240,0.35);border-radius:var(--r);font-family:var(--mono);font-size:0.75rem;font-weight:700;color:var(--blue);cursor:pointer;white-space:nowrap">'
+    + '\u2713 Verify & Save'
+    + '</button>'
+    + '</div>'
+    + '<div id="cardOnFileErr" style="display:none;font-family:var(--mono);font-size:0.68rem;color:var(--red);margin-top:6px"></div>'
+    + '</div>';
+  err.parentNode.insertBefore(div, err);
+  document.getElementById('cardOnFilePwd')?.focus();
+  div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+async function verifyCardOnFile(dk, editId) {
+  const pwd = document.getElementById('cardOnFilePwd')?.value || '';
+  const ok = await checkPassword(pwd, PWD_HASH_LARGE); // 0709
+  if (!ok) {
+    const errEl = document.getElementById('cardOnFileErr');
+    if (errEl) { errEl.textContent = '\u2715 Incorrect password'; errEl.style.display = 'block'; }
+    return;
+  }
+  // Verified — inject marker and re-save
+  document.getElementById('cardOnFilePrompt')?.remove();
+  const marker = document.createElement('input');
+  marker.type = 'hidden';
+  marker.id = 'cardOnFileVerified';
+  marker.value = '1';
+  document.getElementById('formErr').parentNode.appendChild(marker);
+  saveHibachi(dk, editId);
+}
+
 function checkHalfHourWarn() {
   const slot = document.getElementById('fSlot')?.value;
   const warn = document.getElementById('halfHourWarn');
@@ -2546,46 +2612,58 @@ async function saveHibachi(dk, editId) {
   if (cardRequired(guests, dk)) {
     const cardMissing = !card || card.replace(/\s/g,'').length < 12 || !expiry || expiry.length < 5;
     const overrideGranted = !!document.getElementById('noCardOverrideGranted');
+
     if (cardMissing && !overrideGranted) {
-      // Check if user has chosen a hold option
-      const holdDays = parseInt(document.getElementById('fHoldDays')?.value || '0');
-      if (!holdDays) {
-        // Show hold warning UI
-        showHoldWarning(dk, editId);
+      // EDIT MODE: if group ≥ 4, allow update with just initials if manager verifies card on file
+      if (editId) {
+        const oldR = (reservations[dk]||{})[editId];
+        const cardOnFile = !!(oldR && oldR.card);
+        const cardVerified = !!document.getElementById('cardOnFileVerified');
+
+        if (cardOnFile && !cardVerified) {
+          // Show card-on-file verification prompt
+          showCardOnFilePrompt(dk, editId);
+          return;
+        }
+        if (!cardOnFile && !cardVerified) {
+          // No card on file — fall through to hold/override flow
+          const holdDays = parseInt(document.getElementById('fHoldDays')?.value || '0');
+          if (!holdDays) { showHoldWarning(dk, editId); return; }
+        }
+        // cardVerified or no card required — fall through to save
+      } else {
+        // NEW reservation — hold/override flow
+        const holdDays = parseInt(document.getElementById('fHoldDays')?.value || '0');
+        if (!holdDays) {
+          showHoldWarning(dk, editId);
+          return;
+        }
+        // Hold path — save without card, with holdUntil date
+        const holdUntilDate = new Date();
+        holdUntilDate.setDate(holdUntilDate.getDate() + holdDays);
+        const holdUntil = dateKey(holdUntilDate);
+        const slotMins2 = timeToMinutes(slot);
+        const dow2 = currentDate.getDay();
+        const chefs2 = getChefsAtTime(dow2, slotMins2);
+        const assign2 = autoAssignGrill(dk, slot, guests, chefs2, editId || undefined);
+        if (!assign2) { return showErr('No grill availability for this slot.'); }
+        const fmtPhone2 = phone.length === 10
+          ? '(' + phone.slice(0,3) + ') ' + phone.slice(3,6) + '-' + phone.slice(6)
+          : phone.slice(0,3) + '-' + phone.slice(3);
+        const holdData = {
+          name, guests, phone: fmtPhone2, initials, bookedOn, notes, slot,
+          grill: assign2.grill, grill2: assign2.grill2 || null,
+          isDouble: assign2.isDouble || false,
+          holdUntil, updatedAt: Date.now()
+        };
+        try {
+          await window._push(window._ref(window._db, `reservations/${dk}`), holdData);
+          const gl = assign2.isDouble ? 'Grills ' + assign2.grill + '+' + assign2.grill2 : 'Grill ' + assign2.grill;
+          await logAudit('create', 'HOLD ' + holdDays + 'd — ' + name + ' \xB7 ' + guests + 'p \xB7 ' + displayTime(slot) + ' \xB7 ' + gl + ' \xB7 expires ' + holdUntil, initials);
+          closeModal();
+        } catch(e) { showErr('Firebase error: ' + e.message); }
         return;
       }
-      // Hold path — save without card, with holdUntil date
-      const holdUntilDate = new Date();
-      holdUntilDate.setDate(holdUntilDate.getDate() + holdDays);
-      const holdUntil = dateKey(holdUntilDate);
-      // Fall through to save with holdUntil set
-      const slotMins2 = timeToMinutes(slot);
-      const dow2 = currentDate.getDay();
-      const chefs2 = getChefsAtTime(dow2, slotMins2);
-      const assign2 = autoAssignGrill(dk, slot, guests, chefs2, editId || undefined);
-      if (!assign2) {
-        return showErr('No grill availability for this slot.');
-      }
-      const fmtPhone2 = phone.length === 10
-        ? `(${phone.slice(0,3)}) ${phone.slice(3,6)}-${phone.slice(6)}`
-        : `${phone.slice(0,3)}-${phone.slice(3)}`;
-      const holdData = {
-        name, guests, phone: fmtPhone2, initials, bookedOn, notes, slot,
-        grill: assign2.grill, grill2: assign2.grill2 || null,
-        isDouble: assign2.isDouble || false,
-        holdUntil, updatedAt: Date.now()
-      };
-      try {
-        if (editId) {
-          await window._set(window._ref(window._db, `reservations/${dk}/${editId}`), holdData);
-        } else {
-          await window._push(window._ref(window._db, `reservations/${dk}`), holdData);
-        }
-        const gl = assign2.isDouble ? `Grills ${assign2.grill}+${assign2.grill2}` : `Grill ${assign2.grill}`;
-        await logAudit('create', `HOLD ${holdDays}d — ${name} · ${guests}p · ${displayTime(slot)} · ${gl} · expires ${holdUntil}`, initials);
-        closeModal();
-      } catch(e) { showErr('Firebase error: ' + e.message); }
-      return;
     }
   }
 
@@ -2630,8 +2708,23 @@ async function saveHibachi(dk, editId) {
     const existingGuests = existingGroups.reduce((s,r)=>s+(r.guests||0),0);
     const cap = getSingleGrillCap(existingGroups.length);
     if (existingGuests + guests > cap) {
-      return showErr(`Station full: ${existingGuests}+${guests}=${existingGuests+guests} exceeds max ${cap} for ${existingGroups.length+1} groups.`);
+      return showErr('Station full: ' + existingGuests + '+' + guests + '=' + (existingGuests+guests) + ' exceeds max ' + cap + ' for ' + (existingGroups.length+1) + ' groups.');
     }
+  }
+
+  // Tight-timing warning — grill is available but previous seating may still be finishing up
+  if (assign.tightTiming && !document.getElementById('tightTimingConfirmed')) {
+    const errEl = document.getElementById('formErr');
+    if (errEl) {
+      errEl.innerHTML = '<div class="warn-banner" style="flex-direction:column;gap:10px">'
+        + '<div>\u26A0 Timing may be tight — a previous group on this grill seated within the last 2 hours. The grill should be free but the turnover may be close.</div>'
+        + '<div style="display:flex;gap:10px;flex-wrap:wrap">'
+        + '<button onclick="confirmTightTiming(\'' + dk + '\',\'' + (editId||'') + '\')" style="padding:8px 18px;background:rgba(245,200,66,0.15);border:1px solid rgba(245,200,66,0.4);border-radius:var(--r);font-family:var(--mono);font-size:0.75rem;font-weight:700;color:var(--amber);cursor:pointer">\u26A0 Book Anyway</button>'
+        + '<button onclick="document.getElementById(\'formErr\').innerHTML=\'\'" style="padding:8px 18px;background:transparent;border:1px solid var(--border);border-radius:var(--r);font-family:var(--mono);font-size:0.75rem;color:var(--text2);cursor:pointer">Cancel</button>'
+        + '</div>'
+        + '</div>';
+    }
+    return;
   }
 
   // Format phone
@@ -2646,11 +2739,12 @@ async function saveHibachi(dk, editId) {
     isDouble: assign.isDouble || false,
     updatedAt: Date.now()
   };
-  // If card info is provided, store it and clear any hold flag
+  // If card info is provided in the form, store it and clear any hold flag
   if (card) { data.card = card; data.expiry = expiry; data.holdUntil = null; }
-  // Preserve holdUntil if no card and editing an existing hold
   else if (editId) {
     const oldR = (reservations[dk]||{})[editId];
+    // Preserve existing card if verified via card-on-file flow
+    if (oldR?.card) { data.card = oldR.card; data.expiry = oldR.expiry || ''; }
     if (oldR?.holdUntil) data.holdUntil = oldR.holdUntil;
   }
 
@@ -2900,12 +2994,12 @@ async function toggleBlockSlot(slot) {
 
   if (isBlocked) {
     const pwd = prompt('Enter manager password to unblock this slot:');
-    if (!pwd || !(await checkPassword(pwd, PWD_HASH_CARD))) { alert('Incorrect password.'); return; }
+    if (!pwd || !(await checkPassword(pwd, PWD_HASH_LARGE))) { alert('Incorrect password.'); return; }
     window._remove(window._ref(window._db, `blockedSlots/${key}/${slotKey}`));
     logAudit('edit', `Unblocked slot ${displayTime(slot)}`, '??');
   } else {
     const pwd = prompt(`Block ${displayTime(slot)} — enter manager password:`);
-    if (!pwd || !(await checkPassword(pwd, PWD_HASH_CARD))) { alert('Incorrect password.'); return; }
+    if (!pwd || !(await checkPassword(pwd, PWD_HASH_LARGE))) { alert('Incorrect password.'); return; }
     const reason = prompt('Reason (optional, shown on slot):') || '';
     const initials = (prompt('Your initials:') || '?').toUpperCase();
     window._set(window._ref(window._db, `blockedSlots/${key}/${slotKey}`), {
