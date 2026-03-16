@@ -62,7 +62,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 /* TABS */
 .tabs{display:flex;background:var(--surface);border-bottom:2px solid var(--border);padding:0 10px;overflow-x:auto;scrollbar-width:none;gap:1px;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab-btn{padding:9px 15px;border:none;background:none;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:500;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap;transition:all .15s;margin-bottom:-2px;}
+.tab-btn{padding:10px 16px;border:none;background:none;font-family:'Noto Sans KR',sans-serif;font-size:15px;font-weight:500;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap;transition:all .15s;margin-bottom:-2px;}
 .tab-btn:hover{color:var(--text);background:var(--bg);}
 .tab-btn.active{color:var(--text);border-bottom-color:var(--accent);}
 .tab-star{color:#b45309!important;font-weight:700!important;margin-left:auto;}
@@ -73,20 +73,20 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
 
-/* SECTION HEADERS */
-.s-title{color:#fff;padding:6px 12px;font-size:13px;font-weight:700;border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:space-between;}
-.s-costco{background:#c8102e;}.s-ws{background:#2a5298;}.s-chinese{background:#d4380d;}
-.s-sobeys{background:#006241;}.s-korea{background:#1a4fa0;}.s-bulk{background:#4a4a4a;}
-.s-liquor{background:#5b2d8e;}.s-sauce{background:#1a6b3a;}.s-mcs{background:#8b4513;}
-.s-extras{background:#607d8b;}.s-sysco{background:#c0392b;}.s-toronto{background:#880e4f;}
-.s-fish{background:#0277bd;}
-.store-block{margin-bottom:12px;border-radius:4px;overflow:hidden;border:1px solid var(--border);}
+/* SECTION HEADERS — softer, easier on the eyes */
+.s-title{color:#fff;padding:8px 14px;font-size:14px;font-weight:700;border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:space-between;}
+.s-costco{background:#b5313a;}.s-ws{background:#3d6b9e;}.s-chinese{background:#c05a2a;}
+.s-sobeys{background:#2e7d5e;}.s-korea{background:#3a6fa8;}.s-bulk{background:#5c5c6e;}
+.s-liquor{background:#6b4f8e;}.s-sauce{background:#3a7a52;}.s-mcs{background:#7a5230;}
+.s-extras{background:#5c7a8e;}.s-sysco{background:#b04040;}.s-toronto{background:#8a3a6a;}
+.s-fish{background:#2a7aaa;}
+.store-block{margin-bottom:14px;border-radius:6px;overflow:hidden;border:1px solid var(--border);}
 
-/* TABLE */
-.tbl{width:100%;border-collapse:collapse;background:var(--surface);font-size:12px;}
-.tbl th{background:#3b5bdb;color:#fff;padding:5px 8px;font-weight:600;text-align:center;border:1px solid #2a4ab5;font-size:11px;}
+/* TABLE — bigger, easier to read */
+.tbl{width:100%;border-collapse:collapse;background:var(--surface);font-size:14px;}
+.tbl th{background:#4a6fa8;color:#fff;padding:8px 10px;font-weight:700;text-align:center;border:1px solid #3a5a90;font-size:13px;}
 .tbl th.lft{text-align:left;}
-.tbl td{padding:4px 8px;border:1px solid var(--bl);vertical-align:middle;}
+.tbl td{padding:7px 10px;border:1px solid var(--bl);vertical-align:middle;}
 .tbl td.num{text-align:center;font-family:'IBM Plex Mono',monospace;}
 .tbl td.cc{text-align:center;}
 .rY{background:var(--yellow)!important;}
@@ -94,9 +94,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .rG{background:var(--green)!important;}
 .rO{background:var(--orange)!important;}
 .rCat{background:#f0ede6!important;font-weight:700;}
-.cRed{background:var(--red)!important;color:#fff!important;font-weight:700;}
-.cBlue{background:var(--blue-dark)!important;color:#fff!important;}
-.cGreen{background:var(--green-b)!important;color:#fff!important;}
+.cRed{background:#e05555!important;color:#fff!important;font-weight:700;}
+.cBlue{background:#3a6fa8!important;color:#fff!important;}
+.cGreen{background:#3a9a3a!important;color:#fff!important;}
+
+/* HILITE ROW — #FFEF99 soft yellow highlight */
+.hilite-row td{background:#FFEF99!important;}
+.hilite-row td.iname{font-weight:700;}
 
 /* Star button cell always white, even on key rows */
 .key-row td:last-child{background:#ffffff!important;}
@@ -292,24 +296,24 @@ tr.tbl-drag-over{outline:2px solid #f59e0b;}
         <tbody id="tb-beer"></tbody></table>
         <button class="add-btn-row" onclick="openAdd('beer','Liquor')">+ Add item</button>
       </div>
-      <div class="store-block"><div class="s-title s-liquor" style="background:#7b3fa0">🍾 Bar 용소모품</div>
+      <div class="store-block"><div class="s-title s-liquor" style="background:#7a5a9e">🍾 Bar 용소모품</div>
         <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
         <tbody id="tb-bargoods"></tbody></table>
         <button class="add-btn-row" onclick="openAdd('bargoods','Liquor')">+ Add item</button>
       </div>
     </div>
     <div>
-      <div class="store-block"><div class="s-title s-liquor" style="background:#c0392b">🍷 Wine 4B</div>
+      <div class="store-block"><div class="s-title s-liquor" style="background:#a84040">🍷 Wine 4B</div>
         <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
         <tbody id="tb-wine"></tbody></table>
         <button class="add-btn-row" onclick="openAdd('wine','Liquor')">+ Add item</button>
       </div>
-      <div class="store-block"><div class="s-title s-liquor" style="background:#c0392b">🥂 White Wine</div>
+      <div class="store-block"><div class="s-title s-liquor" style="background:#a84040">🥂 White Wine</div>
         <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
         <tbody id="tb-whitewine"></tbody></table>
         <button class="add-btn-row" onclick="openAdd('whitewine','Liquor')">+ Add item</button>
       </div>
-      <div class="store-block"><div class="s-title s-liquor" style="background:#2c6e9e">🍶 피 맥</div>
+      <div class="store-block"><div class="s-title s-liquor" style="background:#2a7aaa">🍶 피 맥</div>
         <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
         <tbody id="tb-draft"></tbody></table>
         <button class="add-btn-row" onclick="openAdd('draft','Liquor')">+ Add item</button>
@@ -648,14 +652,14 @@ const D={
   ],
 
   costco:[
-    {id:'cc1',name:'Avocado',qty:'',stock:'',color:'',cell:'',key:true,note:''},
-    {id:'cc2',name:'Cucumber',qty:'',stock:'',color:'',cell:'',key:true,note:''},
+    {id:'cc1',name:'Avocado',qty:'',stock:'',color:'',cell:'',key:true,note:'',hilite:true},
+    {id:'cc2',name:'Cucumber',qty:'',stock:'',color:'',cell:'',key:true,note:'',hilite:true},
     {id:'cc3',name:'Yellow MicroFibre',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc4',name:'Orange',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc5',name:'Lemon',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc6',name:'Lime',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc7',name:'Kiwi',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc8',name:'Mango',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc8',name:'Mango',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
     {id:'cc9',name:'Salad Dressing',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
     {id:'cc10',name:'Banana',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc11',name:'Red Onion',qty:'',stock:'',color:'',cell:'',key:false,note:''},
@@ -712,7 +716,7 @@ const D={
     {id:'cc62',name:'Napkin (To-go)',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
     {id:'cc63',name:'Shread Mozza',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc64',name:'Block Mozza',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc65',name:'Philadelphia',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc65',name:'Philadelphia',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
     {id:'cc66',name:'Frozen Corn',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc67',name:'Frozen Pea',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc68',name:'Beef Sausage',qty:'',stock:'',color:'',cell:'',key:false,note:''},
@@ -720,8 +724,8 @@ const D={
     {id:'cc70',name:'Cocktail Shrimp',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc71',name:'Smoked Salmon',qty:'',stock:'',color:'rB',cell:'',key:true,note:''},
     {id:'cc72',name:'Pancake Mix',qty:'',stock:'',color:'',cell:'',key:true,note:''},
-    {id:'cc73',name:"Vinegar Allen's",qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc74',name:'Mayo',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc73',name:"Vinegar Allen's",qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
+    {id:'cc74',name:'Mayo',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
     {id:'cc75',name:'Salt',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc76',name:'GF SoySauce',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc77',name:'Blk Pepper Coarse',qty:'',stock:'',color:'',cell:'',key:false,note:''},
@@ -737,8 +741,8 @@ const D={
     {id:'ws2',name:'마늘',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ws3',name:'산발소스',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ws4',name:'쓰리라자',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws5',name:'스시비닐장갑(M)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws6',name:'스시비닐장갑(L/XL)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws5',name:'스시비닐장갑(M)',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
+    {id:'ws6',name:'스시비닐장갑(L/XL)',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
     {id:'ws7',name:'빨대',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ws8',name:'마늘 파우더',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
     {id:'ws9',name:'양파 파우더',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
@@ -757,21 +761,21 @@ const D={
     {id:'ws22',name:'Parsley Flake',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ws23',name:'Sugar',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ws24',name:'Mustard',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws25',name:'Sriacha(Gluten Free)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws25',name:'Sriacha(Gluten Free)',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
     {id:'ws26',name:'Ketchup',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ws27',name:'초코시럽',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ws28',name:'Lobster',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
     {id:'ws29',name:'Flour',qty:'',stock:'',color:'',cell:'',key:false,note:''},
   ],
   sobeys:[
-    {id:'sob1',name:'비트',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'sob1',name:'비트',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
     {id:'sob2',name:'단호박',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'sob3',name:'할라피뇨',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'sob4',name:'파슬리',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'sob5',name:'민트',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'sob6',name:'적채',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'sob7',name:'고수',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'sob8',name:'케일',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'sob8',name:'케일',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
     {id:'sob9',name:'하버네로',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'sob10',name:'Club Soda',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'sob11',name:'7UP (2L)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
@@ -792,13 +796,13 @@ const D={
     {id:'ch8',name:'Nappa',qty:'1박스',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch9',name:'Ginger',qty:'1박스',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch10',name:'Tofu',qty:'1박스',stock:'',color:'',cell:'cRed',key:false,note:''},
-    {id:'ch11',name:'무우',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ch11',name:'무우',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
     {id:'ch12',name:'Osaka Spring Roll Skin',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch13',name:'LR-28 Fried Rice',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch14',name:'NB-38 Bibimbap',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch15',name:'S-32 팜뽕국물용기',qty:'2박스',stock:'',color:'rB',cell:'',key:false,note:''},
     {id:'ch16',name:'S-24 Curry',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ch17',name:'RC-24 Sushi Pizza',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ch17',name:'RC-24 Sushi Pizza',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
     {id:'ch18',name:'JR-48 회 비빔밥용기',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch19',name:'Soy Sauce (20L)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch20',name:'Clear 1oz(작은용기)',qty:'2박',stock:'',color:'',cell:'',key:false,note:''},
@@ -911,66 +915,76 @@ const D={
     {id:'ex7',name:'Shichimi',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ex8',name:'Steak Sauce',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ex9',name:'Pine / Grenadine',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ex10',name:'Relish (Diana sauce pickle)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ex10',name:'Relish (Diana sauce pickle)',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
   ],
 };
 
 // Store → solid bg color for key items
 const STORE_BG={
-  costco:'#c8102e',ws:'#2a5298',sobeys:'#006241',sysco:'#c0392b',
-  chinese:'#d4380d',korea:'#1a4fa0',toronto:'#880e4f',fish:'#0277bd',
-  bulk:'#4a4a4a',beer:'#5b2d8e',wine:'#c0392b',whitewine:'#c0392b',
-  draft:'#2c6e9e',bargoods:'#7b3fa0',mcs:'#8b4513',sauce:'#1a6b3a',extras:'#607d8b'
+  costco:'#b5313a',ws:'#3d6b9e',sobeys:'#2e7d5e',sysco:'#b04040',
+  chinese:'#c05a2a',korea:'#3a6fa8',toronto:'#8a3a6a',fish:'#2a7aaa',
+  bulk:'#5c5c6e',beer:'#6b4f8e',wine:'#b04040',whitewine:'#b04040',
+  draft:'#2a7aaa',bargoods:'#6b4f8e',mcs:'#7a5230',sauce:'#3a7a52',extras:'#5c7a8e'
 };
 let appData=JSON.parse(JSON.stringify(D));
 let fb=null, addTarget=null, mlSelColor='red';
 
-// One-time wipe of any corrupted localStorage from previous bad saves
-(function(){
+// Wipe ALL old localStorage keys that could have bad data
+['ohv4','ohv3','ohv2','ohv1'].forEach(k=>{
   try{
-    const s=localStorage.getItem('ohv4');
+    const s=localStorage.getItem(k);
     if(s){
       const v=JSON.parse(s);
-      // If costco exists but is empty or an empty object, it's corrupted — clear it
-      if(v.costco!==undefined){
-        const arr=Array.isArray(v.costco)?v.costco:Object.values(v.costco||{});
-        if(arr.length===0)localStorage.removeItem('ohv4');
+      const raw=v.costco;
+      if(raw!==undefined){
+        const arr=Array.isArray(raw)?raw:Object.values(raw||{});
+        if(arr.length===0){localStorage.removeItem(k);}
       }
     }
-  }catch(e){localStorage.removeItem('ohv4');}
-})();
+  }catch(e){localStorage.removeItem(k);}
+});
 
 function init(){
   const d=new Date();
   document.getElementById('todayDate').textContent=`${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
-  setTimeout(()=>{
+
+  // Step 1: Always render defaults immediately so items show right away
+  loadSuppressed();
+  renderAll();
+
+  // Step 2: Try to connect Firebase — poll until window._fb is ready (max 5s)
+  let attempts=0;
+  const tryConnect=()=>{
+    attempts++;
     fb=window._fb;
     if(fb&&fb.ok){
       fb.onValue(fb.ref(fb.db,'osakahibachi/stock'),snap=>{
         const v=snap.val();
+        const sections=['costco','ws','sobeys','sysco','chinese','korea','toronto',
+          'fish','bulk','beer','wine','whitewine','draft','bargoods','mcs','sauce',
+          'extras','masterlist'];
         if(v){
-          const prevSuppressed=appData._suppressed||[];
-          const sections=['costco','ws','sobeys','sysco','chinese','korea','toronto',
-            'fish','bulk','beer','wine','whitewine','draft','bargoods','mcs','sauce',
-            'extras','masterlist'];
-          appData={...D};
+          // Only update sections that have actual data — never reset to empty
           sections.forEach(sec=>{
             if(v[sec]){
-              // Firebase returns arrays as objects {0:{},1:{}} OR real arrays — handle both
               const raw=v[sec];
               const arr=Array.isArray(raw)?raw:Object.values(raw);
               if(arr.length>0)appData[sec]=arr;
             }
           });
-          const merged=[...new Set([...prevSuppressed,...(Array.isArray(v._suppressed)?v._suppressed:[])])];
-          appData._suppressed=merged;
+          // _suppressed is LOCAL ONLY — never pull from Firebase
+          // This prevents race condition where suppress gets wiped on sync
         }
         renderAll();
         document.getElementById('syncDot').className='sync-dot live';
         document.getElementById('syncLbl').textContent='Live';
-      },()=>{loadLocal();renderAll();});
-    }else{loadLocal();renderAll();}
-  },400);
+      },()=>{});
+    } else if(attempts<25){
+      setTimeout(tryConnect, 200);
+    }
+  };
+  setTimeout(tryConnect, 200);
+
   document.addEventListener('click',e=>{
     if(!document.getElementById('srchWrap').contains(e.target))
       document.getElementById('srchDrop').classList.remove('show');
@@ -998,8 +1012,22 @@ function loadLocal(){
   }
 }
 function save(){
-  if(fb&&fb.ok)fb.set(fb.ref(fb.db,'osakahibachi/stock'),appData);
-  else localStorage.setItem('ohv4',JSON.stringify(appData));
+  // Always save suppressed list locally
+  try{localStorage.setItem('ohv4_sup',JSON.stringify(appData._suppressed||[]));}catch(e){}
+  if(fb&&fb.ok){
+    // Strip _suppressed before sending to Firebase — it's local-only
+    const toSave={...appData};
+    delete toSave._suppressed;
+    fb.set(fb.ref(fb.db,'osakahibachi/stock'),toSave);
+  } else {
+    localStorage.setItem('ohv4',JSON.stringify(appData));
+  }
+}
+function loadSuppressed(){
+  try{
+    const s=localStorage.getItem('ohv4_sup');
+    if(s)appData._suppressed=JSON.parse(s);
+  }catch(e){}
 }
 
 // ── SEARCH ──
@@ -1087,13 +1115,17 @@ function renderTbl(sec){
   rows.forEach((row,idx)=>{
     const tr=document.createElement('tr');
     tr.dataset.id=row.id;tr.dataset.sec=sec;tr.dataset.idx=idx;
-    // key items: solid store color; ALL other rows: white, no color classes
+    // key items: solid store color; hilite items: #FFEF99; everything else: white
     if(row.key){
       tr.className='key-row';
       tr.style.background=bgColor;
+    }else if(row.hilite){
+      tr.className='hilite-row';
+      tr.style.cssText='background:#FFEF99;';
     }else{
       tr.className='';
       tr.style.cssText='background:#ffffff;';
+    }
     }
 
     const active=inML(row.name);
