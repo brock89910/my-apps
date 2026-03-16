@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Osaka Hibachi — Moncton, NB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ── RESET & ROOT ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink:     #0e0b08;
+  --ink2:    #3a2e22;
+  --ink3:    #7a6a58;
+  --paper:   #f5f0e8;
+  --paper2:  #ede6d6;
+  --paper3:  #e2d8c4;
+  --ember:   #c84b1a;
+  --ember2:  #e86030;
+  --gold:    #a07830;
+  --gold2:   #c09448;
+  --line:    rgba(60,40,20,0.12);
+  --serif:   'Cormorant Garamond', Georgia, serif;
+  --mono:    'IBM Plex Mono', monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(245,240,232,0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  padding: 0 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 60px;
+}
+
+.nav-logo {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex; gap: 32px; list-style: none;
+}
+
+.nav-links a {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink2);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--ember); }
+
+.nav-reserve {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 8px 18px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.nav-reserve:hover { background: var(--ember); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 120px 24px 80px;
+  position: relative;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 59px, var(--line) 59px, var(--line) 60px),
+    repeating-linear-gradient(90deg, transparent, transparent 59px, var(--line) 59px, var(--line) 60px);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ember);
+  margin-bottom: 24px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.2s ease forwards;
+}
+
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(3.2rem, 9vw, 7rem);
+  font-weight: 300;
+  line-height: 1.0;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 8px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.35s ease forwards;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--ember);
+}
+
+.hero-sub {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--ink3);
+  margin-bottom: 48px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.5s ease forwards;
+}
+
+.hero-divider {
+  width: 1px; height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+  margin: 0 auto 48px;
+  opacity: 0;
+  animation: fadeIn 1s 0.7s ease forwards;
+}
+
+.hero-meta {
+  display: flex; gap: 40px; justify-content: center; flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  opacity: 0;
+  animation: fadeUp 0.8s 0.85s ease forwards;
+}
+
+.hero-meta span { display: flex; align-items: center; gap: 8px; }
+.hero-meta span::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--gold); display: block; }
+
+.hero-cta {
+  margin-top: 40px;
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 0.8s 1s ease forwards;
+}
+
+.btn-primary {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 14px 32px;
+  border: 1px solid var(--ink);
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn-primary:hover { background: var(--ember); border-color: var(--ember); }
+
+.btn-outline {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--ink);
+  padding: 14px 32px;
+  border: 1px solid var(--ink2);
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn-outline:hover { border-color: var(--ember); color: var(--ember); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── SECTION SHELL ── */
+section { padding: 96px 24px; max-width: 1100px; margin: 0 auto; }
+
+.section-divider {
+  width: 100%; height: 1px;
+  background: var(--line);
+  max-width: 1100px; margin: 0 auto;
+}
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ember);
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 300;
+  line-height: 1.15;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+
+.section-title em { font-style: italic; color: var(--gold); }
+
+.section-body {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 300;
+  color: var(--ink2);
+  line-height: 1.8;
+  max-width: 580px;
+}
+
+/* ── ABOUT ── */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.about-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin-top: 48px;
+}
+
+.stat {
+  background: var(--paper);
+  padding: 24px;
+}
+
+.stat-num {
+  font-family: var(--serif);
+  font-size: 2.8rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--ember);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-lbl {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink3);
+}
+
+.about-visual {
+  position: relative;
+}
+
+.about-ornament {
+  width: 100%;
+  aspect-ratio: 4/5;
+  background: var(--paper2);
+  border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-ornament::before {
+  content: '大阪';
+  font-size: 9rem;
+  color: var(--line);
+  font-weight: 900;
+  position: absolute;
+  right: -10px; bottom: -20px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.about-ornament-inner {
+  text-align: center;
+  padding: 40px;
+  position: relative; z-index: 1;
+}
+
+.flame-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 4px 16px rgba(200,75,26,0.3));
+}
+
+.about-ornament-inner p {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--ink2);
+  line-height: 1.6;
+}
+
+/* ── MENU / PRICING ── */
+.pricing-wrap { background: var(--paper2); padding: 96px 24px; }
+.pricing-inner { max-width: 1100px; margin: 0 auto; }
+
+.pricing-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 48px; flex-wrap: wrap; gap: 16px;
+}
+
+.manager-gate-btn {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  background: none;
+  border: 1px solid var(--line);
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.manager-gate-btn:hover { border-color: var(--ember); color: var(--ember); }
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.pricing-card {
+  background: var(--paper);
+  padding: 32px;
+}
+
+.pricing-card-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ember);
+  margin-bottom: 12px;
+}
+
+.pricing-card-title {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.pricing-items { list-style: none; }
+
+.pricing-item {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--line);
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  color: var(--ink2);
+  gap: 12px;
+}
+
+.pricing-item:last-child { border-bottom: none; }
+
+.pricing-item-name { flex: 1; }
+
+.pricing-item-price {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  transition: all 0.3s;
+}
+
+.pricing-item-price.editing {
+  background: var(--paper3);
+  border: 1px solid var(--gold);
+  padding: 2px 8px;
+  outline: none;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink);
+  width: 80px;
+  text-align: right;
+  border-radius: 2px;
+}
+
+/* manager edit mode */
+.manager-active .pricing-item-price:not(.editing) {
+  cursor: pointer;
+  border-bottom: 1px dashed var(--gold);
+}
+
+.manager-badge {
+  display: none;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(160,120,48,0.1);
+  border: 1px solid rgba(160,120,48,0.3);
+  padding: 3px 10px;
+  margin-left: 12px;
+}
+
+.manager-active .manager-badge { display: inline; }
+
+/* ── MANAGER MODAL ── */
+.mgr-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(14,11,8,0.6);
+  backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center;
+  padding: 24px;
+}
+
+.mgr-overlay.open { display: flex; }
+
+.mgr-modal {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 40px;
+  max-width: 380px; width: 100%;
+  animation: fadeUp 0.25s ease;
+}
+
+.mgr-modal h3 {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 400;
+  margin-bottom: 6px;
+}
+
+.mgr-modal p {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--ink3);
+  letter-spacing: 0.06em;
+  margin-bottom: 24px;
+}
+
+.mgr-input {
+  width: 100%;
+  background: var(--paper2);
+  border: 1px solid var(--line);
+  padding: 12px 16px;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  color: var(--ink);
+  outline: none;
+  letter-spacing: 0.15em;
+  margin-bottom: 8px;
+  transition: border-color 0.2s;
+}
+
+.mgr-input:focus { border-color: var(--gold); }
+
+.mgr-err {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--ember);
+  min-height: 18px;
+  margin-bottom: 16px;
+  letter-spacing: 0.05em;
+}
+
+.mgr-actions { display: flex; gap: 12px; }
+
+.mgr-btn {
+  flex: 1; padding: 12px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mgr-btn:hover { background: var(--ember); border-color: var(--ember); }
+
+.mgr-btn-cancel {
+  flex: 1; padding: 12px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--ink2);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mgr-btn-cancel:hover { border-color: var(--ink2); }
+
+/* ── HOURS ── */
+.hours-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.hours-table { width: 100%; border-collapse: collapse; }
+
+.hours-table tr { border-bottom: 1px solid var(--line); }
+
+.hours-table tr:last-child { border-bottom: none; }
+
+.hours-table td {
+  padding: 12px 0;
+  font-family: var(--serif);
+  font-size: 1rem;
+  color: var(--ink2);
+}
+
+.hours-table td:last-child {
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+
+.hours-table tr.today td { color: var(--ember); font-weight: 600; }
+.hours-table tr.closed td { color: var(--ink3); }
+.hours-table tr.closed td:last-child { letter-spacing: 0; }
+
+.contact-block {
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+.contact-item {
+  display: flex; flex-direction: column; gap: 4px;
+}
+
+.contact-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ember);
+}
+
+.contact-value {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+
+.contact-value a { color: inherit; text-decoration: none; }
+.contact-value a:hover { color: var(--ember); }
+
+/* ── MAP ── */
+.map-wrap {
+  background: var(--paper2);
+  padding: 96px 24px;
+}
+
+.map-inner {
+  max-width: 1100px; margin: 0 auto;
+}
+
+.map-header {
+  margin-bottom: 32px;
+}
+
+.map-container {
+  position: relative;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  background: #e8e0d0;
+  height: 340px;
+}
+
+/* Static map rendered as SVG — 100m radius around 599 Main St Moncton */
+.map-svg {
+  width: 100%; height: 100%;
+}
+
+.map-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to top, rgba(245,240,232,0.95) 0%, transparent 100%);
+  padding: 20px 24px 24px;
+  display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+}
+
+.map-address {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink2);
+  line-height: 1.6;
+}
+
+.map-directions {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ember);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  transition: opacity 0.2s;
+}
+
+.map-directions:hover { opacity: 0.7; }
+
+/* ── RESERVATION ── */
+.reservation-wrap {
+  background: var(--ink);
+  padding: 96px 24px;
+  color: var(--paper);
+}
+
+.reservation-inner {
+  max-width: 700px; margin: 0 auto; text-align: center;
+}
+
+.reservation-inner .section-label { color: var(--ember2); }
+
+.reservation-inner .section-title { color: var(--paper); }
+
+.reservation-inner .section-title em { color: var(--gold2); }
+
+.reservation-inner .section-body { color: rgba(245,240,232,0.65); max-width: none; }
+
+.reservation-contact {
+  margin-top: 48px;
+  display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+}
+
+.res-contact-card {
+  flex: 1; min-width: 200px; max-width: 260px;
+  border: 1px solid rgba(245,240,232,0.15);
+  padding: 28px 24px;
+  text-align: center;
+}
+
+.res-contact-icon { font-size: 1.6rem; margin-bottom: 12px; display: block; }
+
+.res-contact-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(245,240,232,0.45);
+  margin-bottom: 6px;
+}
+
+.res-contact-value {
+  font-family: var(--serif);
+  font-size: 1rem;
+  color: var(--paper);
+}
+
+.res-contact-value a { color: inherit; text-decoration: none; }
+.res-contact-value a:hover { color: var(--gold2); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--ink);
+  border-top: 1px solid rgba(245,240,232,0.08);
+  padding: 32px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 16px;
+  color: rgba(245,240,232,0.35);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+footer a { color: inherit; text-decoration: none; }
+footer a:hover { color: rgba(245,240,232,0.7); }
+
+/* ── MOBILE ── */
+@media (max-width: 680px) {
+  nav { padding: 0 16px; }
+  .nav-links { display: none; }
+  .about-grid { grid-template-columns: 1fr; gap: 40px; }
+  .hours-grid { grid-template-columns: 1fr; gap: 40px; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .about-ornament { aspect-ratio: 3/2; }
+  section { padding: 64px 16px; }
+}
+
+@media (max-width: 480px) {
+  .hero-meta { gap: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Osaka Hibachi</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#hours">Visit</a></li>
+  </ul>
+  <a href="#reserve" class="nav-reserve">Reserve</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" style="max-width:none;">
+  <div class="hero-eyebrow">Moncton, New Brunswick · Est. 2010</div>
+  <h1 class="hero-title">Osaka<br><em>Hibachi</em></h1>
+  <p class="hero-sub">Japanese &amp; Korean cuisine, teppanyaki grills</p>
+  <div class="hero-divider"></div>
+  <div class="hero-meta">
+    <span>599 Main St, Moncton</span>
+    <span>(506) 853-8855</span>
+    <span>Teppanyaki · Sushi · Sake Bar</span>
+  </div>
+  <div class="hero-cta">
+    <a href="#reserve" class="btn-primary">Make a Reservation</a>
+    <a href="#menu" class="btn-outline">View Menu & Pricing</a>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-grid">
+    <div>
+      <div class="section-label">Our Story</div>
+      <h2 class="section-title">Where fire meets <em>craft</em></h2>
+      <p class="section-body">
+        Osaka Hibachi brings the theatre of teppanyaki to the heart of Moncton. Our chefs cook at your table on open iron grills — AAA steaks, fresh seafood, and vibrant vegetables prepared with skill and a touch of showmanship.<br><br>
+        Beyond the hibachi, our kitchen crafts traditional Japanese and Korean dishes: handmade sushi rolls, premium sashimi, bento boxes, and a curated sake selection. Every meal here is an occasion.
+      </p>
+      <div class="about-stats">
+        <div class="stat">
+          <div class="stat-num">4</div>
+          <div class="stat-lbl">Teppanyaki Grills</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">15+</div>
+          <div class="stat-lbl">Years in Moncton</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">100+</div>
+          <div class="stat-lbl">Menu Items</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">2</div>
+          <div class="stat-lbl">Phone Lines</div>
+        </div>
+      </div>
+    </div>
+    <div class="about-visual">
+      <div class="about-ornament">
+        <div class="about-ornament-inner">
+          <span class="flame-icon">🔥</span>
+          <p>"A place where food and coziness complement each other."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- MENU / PRICING -->
+<div class="pricing-wrap" id="menu">
+  <div class="pricing-inner">
+    <div class="pricing-header">
+      <div>
+        <div class="section-label">Menu &amp; Pricing</div>
+        <h2 class="section-title" style="margin-bottom:0">Our <em>selections</em>
+          <span class="manager-badge" id="managerBadge">Manager Mode</span>
+        </h2>
+      </div>
+      <button class="manager-gate-btn" id="managerGateBtn" onclick="openManagerModal()">
+        🔒 Manage Prices
+      </button>
+    </div>
+
+    <div class="pricing-grid" id="pricingGrid">
+      <!-- HIBACHI -->
+      <div class="pricing-card">
+        <div class="pricing-card-label">Teppanyaki Grills</div>
+        <div class="pricing-card-title">Hibachi<br>Dinner</div>
+        <ul class="pricing-items" id="cat-hibachi">
+          <li class="pricing-item"><span class="pricing-item-name">Chicken</span><span class="pricing-item-price" data-key="hibachi-chicken">$32</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Steak</span><span class="pricing-item-price" data-key="hibachi-steak">$42</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Salmon</span><span class="pricing-item-price" data-key="hibachi-salmon">$38</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Shrimp</span><span class="pricing-item-price" data-key="hibachi-shrimp">$38</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Scallops</span><span class="pricing-item-price" data-key="hibachi-scallops">$40</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Lobster Tail</span><span class="pricing-item-price" data-key="hibachi-lobster">$58</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Steak &amp; Shrimp</span><span class="pricing-item-price" data-key="hibachi-combo1">$48</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Steak &amp; Scallop</span><span class="pricing-item-price" data-key="hibachi-combo2">$52</span></li>
+        </ul>
+        <p style="margin-top:16px;font-family:var(--mono);font-size:0.6rem;color:var(--ink3);letter-spacing:0.05em;line-height:1.6">Served with clear soup, house salad, hibachi vegetables, fried noodles &amp; steamed rice.</p>
+      </div>
+
+      <!-- SUSHI -->
+      <div class="pricing-card">
+        <div class="pricing-card-label">Signature Rolls</div>
+        <div class="pricing-card-title">Maki &amp;<br>Sashimi</div>
+        <ul class="pricing-items" id="cat-sushi">
+          <li class="pricing-item"><span class="pricing-item-name">California Maki (8 pcs)</span><span class="pricing-item-price" data-key="sushi-california">$12</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Fire Maki (6 pcs)</span><span class="pricing-item-price" data-key="sushi-fire">$16</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Osaka Hibachi Roll (8 pcs)</span><span class="pricing-item-price" data-key="sushi-osaka">$18</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Dragon Roll (8 pcs)</span><span class="pricing-item-price" data-key="sushi-dragon">$19</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Salmon Sashimi (6 pcs)</span><span class="pricing-item-price" data-key="sushi-sashimi">$18</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Monkey Bomb Roll (8 pcs)</span><span class="pricing-item-price" data-key="sushi-monkey">$21</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Lobster Tail Roll (8 pcs)</span><span class="pricing-item-price" data-key="sushi-lobster-roll">$24</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Sushi Combo (25 pcs)</span><span class="pricing-item-price" data-key="sushi-combo">$38</span></li>
+        </ul>
+      </div>
+
+      <!-- KITCHEN -->
+      <div class="pricing-card">
+        <div class="pricing-card-label">Kitchen Dishes</div>
+        <div class="pricing-card-title">Mains &amp;<br>Sides</div>
+        <ul class="pricing-items" id="cat-kitchen">
+          <li class="pricing-item"><span class="pricing-item-name">Bento Box — Chicken</span><span class="pricing-item-price" data-key="kitchen-bento-chicken">$22</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Bento Box — Salmon</span><span class="pricing-item-price" data-key="kitchen-bento-salmon">$26</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Assorted Tempura</span><span class="pricing-item-price" data-key="kitchen-tempura">$16</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Bibimbap</span><span class="pricing-item-price" data-key="kitchen-bibimbap">$18</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Korean Short Ribs</span><span class="pricing-item-price" data-key="kitchen-ribs">$26</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Spicy Seafood Udon</span><span class="pricing-item-price" data-key="kitchen-udon">$20</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Miso Soup</span><span class="pricing-item-price" data-key="kitchen-miso">$4</span></li>
+          <li class="pricing-item"><span class="pricing-item-name">Osaka Spring Rolls (2 pcs)</span><span class="pricing-item-price" data-key="kitchen-springrolls">$8</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <p style="margin-top:20px;font-family:var(--mono);font-size:0.6rem;color:var(--ink3);letter-spacing:0.06em;line-height:1.7">
+      Prices may vary. HST not included. Items subject to availability. Ask your server about daily specials and seasonal offerings.
+    </p>
+  </div>
+</div>
+
+<!-- HOURS + CONTACT -->
+<section id="hours">
+  <div class="hours-grid">
+    <div>
+      <div class="section-label">Hours</div>
+      <h2 class="section-title">When to <em>visit</em></h2>
+      <table class="hours-table" id="hoursTable">
+        <tr><td>Sunday</td><td>12:00 PM – 9:00 PM</td></tr>
+        <tr><td>Monday</td><td>12:00 PM – 9:00 PM</td></tr>
+        <tr><td>Tuesday</td><td>12:00 PM – 9:00 PM</td></tr>
+        <tr><td>Wednesday</td><td>12:00 PM – 9:00 PM</td></tr>
+        <tr><td>Thursday</td><td>12:00 PM – 9:00 PM</td></tr>
+        <tr><td>Friday</td><td>12:00 PM – 10:00 PM</td></tr>
+        <tr><td>Saturday</td><td>12:00 PM – 10:00 PM</td></tr>
+      </table>
+    </div>
+    <div class="contact-block">
+      <div class="section-label">Contact &amp; Find Us</div>
+      <div class="contact-item">
+        <div class="contact-label">Address</div>
+        <div class="contact-value">599 Main St<br>Moncton, NB E1C 1C8</div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-label">Phone</div>
+        <div class="contact-value">
+          <a href="tel:+15068538855">(506) 853-8855</a><br>
+          <a href="tel:+15062048856">(506) 204-8856</a>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-label">Email</div>
+        <div class="contact-value"><a href="mailto:ohbc599@gmail.com">ohbc599@gmail.com</a></div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-label">Social</div>
+        <div class="contact-value"><a href="https://www.instagram.com/osakahibachimoncton/" target="_blank">@osakahibachimoncton</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- MAP — Static SVG approximating 100m radius around 599 Main St Moncton -->
+<div class="map-wrap">
+  <div class="map-inner">
+    <div class="map-header">
+      <div class="section-label">Location</div>
+      <h2 class="section-title">Find <em>us</em></h2>
+    </div>
+    <div class="map-container">
+      <svg class="map-svg" viewBox="0 0 800 340" xmlns="http://www.w3.org/2000/svg" style="display:block">
+        <!-- Background -->
+        <rect width="800" height="340" fill="#e8e0d0"/>
+
+        <!-- City blocks / parcels background -->
+        <rect x="0" y="0" width="800" height="340" fill="#ede8de"/>
+
+        <!-- Main St (runs roughly horizontal through center) -->
+        <rect x="0" y="152" width="800" height="28" fill="#d4cbbf"/>
+        <!-- Main St label -->
+        <text x="400" y="170" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#9a8f80" letter-spacing="2">MAIN STREET</text>
+
+        <!-- Crossroads: Botsford St (vertical, left) -->
+        <rect x="118" y="0" width="22" height="340" fill="#d4cbbf"/>
+        <text x="129" y="80" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#9a8f80" letter-spacing="1" transform="rotate(-90 129 80)">BOTSFORD ST</text>
+
+        <!-- Crossroads: Lutz St (vertical, right) ~100m right -->
+        <rect x="650" y="0" width="22" height="340" fill="#d4cbbf"/>
+        <text x="661" y="80" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#9a8f80" letter-spacing="1" transform="rotate(-90 661 80)">LUTZ ST</text>
+
+        <!-- Cross street above (Highfield) -->
+        <rect x="0" y="58" width="800" height="18" fill="#d4cbbf" opacity="0.6"/>
+        <text x="60" y="70" font-family="IBM Plex Mono,monospace" font-size="8" fill="#9a8f80" letter-spacing="1">HIGHFIELD ST</text>
+
+        <!-- Cross street below (Robinson) -->
+        <rect x="0" y="258" width="800" height="18" fill="#d4cbbf" opacity="0.6"/>
+        <text x="60" y="270" font-family="IBM Plex Mono,monospace" font-size="8" fill="#9a8f80" letter-spacing="1">ROBINSON ST</text>
+
+        <!-- Building blocks — north side of Main -->
+        <rect x="140" y="76" width="160" height="70" rx="2" fill="#d8d0c0" stroke="#c8bfaf" stroke-width="1"/>
+        <rect x="308" y="76" width="100" height="70" rx="2" fill="#d8d0c0" stroke="#c8bfaf" stroke-width="1"/>
+        <rect x="416" y="76" width="80" height="70" rx="2" fill="#d8d0c0" stroke="#c8bfaf" stroke-width="1"/>
+        <rect x="504" y="76" width="140" height="70" rx="2" fill="#d8d0c0" stroke="#c8bfaf" stroke-width="1"/>
+
+        <!-- Building blocks — south side of Main -->
+        <rect x="140" y="186" width="100" height="64" rx="2" fill="#d8d0c0" stroke="#c8bfaf" stroke-width="1"/>
+        <rect x="248" y="186" width="120" height="64" rx="2" fill="#d8d0c0" stroke="#c8bfaf" stroke-width="1"/>
+        <rect x="376" y="186" width="100" height="64" rx="2" fill="#d8d0c0" stroke="#c8bfaf" stroke-width="1"/>
+        <rect x="484" y="186" width="160" height="64" rx="2" fill="#d8d0c0" stroke="#c8bfaf" stroke-width="1"/>
+
+        <!-- PARKING LOT 1 — north, beside Botsford -->
+        <rect x="140" y="76" width="60" height="70" rx="2" fill="#cfc8b8" stroke="#bbb3a3" stroke-width="1" stroke-dasharray="4,2"/>
+        <text x="170" y="108" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7.5" fill="#9a8f80">P</text>
+        <text x="170" y="120" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6" fill="#9a8f80">PUBLIC</text>
+
+        <!-- PARKING LOT 2 — south, large lot -->
+        <rect x="248" y="186" width="120" height="64" rx="2" fill="#cfc8b8" stroke="#bbb3a3" stroke-width="1" stroke-dasharray="4,2"/>
+        <text x="308" y="216" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7.5" fill="#9a8f80">P</text>
+        <text x="308" y="228" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6" fill="#9a8f80">PARKING LOT</text>
+
+        <!-- PARKING LOT 3 — north far right -->
+        <rect x="504" y="76" width="80" height="70" rx="2" fill="#cfc8b8" stroke="#bbb3a3" stroke-width="1" stroke-dasharray="4,2"/>
+        <text x="544" y="108" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7.5" fill="#9a8f80">P</text>
+        <text x="544" y="120" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6" fill="#9a8f80">METERED</text>
+
+        <!-- 100m radius circle (dashed) — centered on restaurant -->
+        <circle cx="340" cy="166" r="110" fill="none" stroke="#c84b1a" stroke-width="1" stroke-dasharray="5,4" opacity="0.4"/>
+
+        <!-- RESTAURANT MARKER — 599 Main St -->
+        <rect x="308" y="76" width="100" height="70" rx="2" fill="#c84b1a" stroke="#a03012" stroke-width="1.5"/>
+        <text x="358" y="107" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="rgba(245,240,232,0.9)" letter-spacing="0.5">OSAKA</text>
+        <text x="358" y="118" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="rgba(245,240,232,0.9)" letter-spacing="0.5">HIBACHI</text>
+        <text x="358" y="130" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6.5" fill="rgba(245,240,232,0.7)">599 MAIN ST</text>
+
+        <!-- Pin marker on Main St -->
+        <circle cx="358" cy="155" r="6" fill="#c84b1a" stroke="#fff" stroke-width="1.5"/>
+        <circle cx="358" cy="155" r="2.5" fill="#fff"/>
+
+        <!-- Scale bar -->
+        <line x1="620" y1="310" x2="720" y2="310" stroke="#9a8f80" stroke-width="1.5"/>
+        <line x1="620" y1="305" x2="620" y2="315" stroke="#9a8f80" stroke-width="1.5"/>
+        <line x1="720" y1="305" x2="720" y2="315" stroke="#9a8f80" stroke-width="1.5"/>
+        <text x="670" y="326" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7.5" fill="#9a8f80">~100 m</text>
+
+        <!-- North arrow -->
+        <text x="756" y="52" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#9a8f80">N</text>
+        <line x1="756" y1="58" x2="756" y2="42" stroke="#9a8f80" stroke-width="1.5"/>
+        <polygon points="756,40 752,48 760,48" fill="#9a8f80"/>
+
+        <!-- Keg restaurant nearby (reference landmark) -->
+        <rect x="484" y="186" width="80" height="64" rx="2" fill="#d2c8b4" stroke="#c0b8a8" stroke-width="1"/>
+        <text x="524" y="216" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#9a8f80">THE KEG</text>
+        <text x="524" y="228" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6" fill="#9a8f80">ACROSS ST</text>
+      </svg>
+      <div class="map-overlay">
+        <div class="map-address">
+          599 Main St, Moncton NB E1C 1C8<br>
+          Across from The Keg · Street parking + public lots nearby
+        </div>
+        <a href="https://maps.google.com/?q=599+Main+St+Moncton+NB" target="_blank" class="map-directions">Get Directions ↗</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESERVE -->
+<div class="reservation-wrap" id="reserve">
+  <div class="reservation-inner">
+    <div class="section-label">Reservations</div>
+    <h2 class="section-title">Book your <em>table</em></h2>
+    <p class="section-body">
+      Teppanyaki reservations are strongly recommended, especially for groups of 4 or more. Call or email us directly — we'll confirm your time slot and grill assignment same day.
+    </p>
+    <div class="reservation-contact">
+      <div class="res-contact-card">
+        <span class="res-contact-icon">📞</span>
+        <div class="res-contact-label">Call Us</div>
+        <div class="res-contact-value">
+          <a href="tel:+15068538855">(506) 853-8855</a><br>
+          <a href="tel:+15062048856">(506) 204-8856</a>
+        </div>
+      </div>
+      <div class="res-contact-card">
+        <span class="res-contact-icon">✉</span>
+        <div class="res-contact-label">Email</div>
+        <div class="res-contact-value"><a href="mailto:ohbc599@gmail.com">ohbc599@gmail.com</a></div>
+      </div>
+      <div class="res-contact-card">
+        <span class="res-contact-icon">📸</span>
+        <div class="res-contact-label">Instagram</div>
+        <div class="res-contact-value"><a href="https://www.instagram.com/osakahibachimoncton/" target="_blank">@osakahibachimoncton</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 Osaka Hibachi — Moncton, NB</span>
+  <span>599 Main St · (506) 853-8855</span>
+  <a href="mailto:ohbc599@gmail.com">ohbc599@gmail.com</a>
+</footer>
+
+<!-- MANAGER MODAL -->
+<div class="mgr-overlay" id="mgrOverlay" onclick="closeMgrOverlayIfOutside(event)">
+  <div class="mgr-modal">
+    <h3>Manager Access</h3>
+    <p>Enter the manager password to edit menu prices. Changes are saved locally and persist across sessions.</p>
+    <input class="mgr-input" id="mgrPwd" type="password" placeholder="Password" autocomplete="off"
+      onkeydown="if(event.key==='Enter')submitManagerPwd()">
+    <div class="mgr-err" id="mgrErr"></div>
+    <div class="mgr-actions">
+      <button class="mgr-btn-cancel" onclick="closeManagerModal()">Cancel</button>
+      <button class="mgr-btn" onclick="submitManagerPwd()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── HIGHLIGHT TODAY ──
+(function() {
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const today = days[new Date().getDay()];
+  const rows = document.querySelectorAll('#hoursTable tr');
+  rows.forEach(row => {
+    if (row.cells[0] && row.cells[0].textContent.trim() === today) {
+      row.classList.add('today');
+    }
+  });
+})();
+
+// ── PRICE STORAGE ──
+// Prices are stored in localStorage under 'osakaPrices'
+// Keys match the data-key attributes on each .pricing-item-price element
+
+function loadPrices() {
+  try {
+    const stored = JSON.parse(localStorage.getItem('osakaPrices') || '{}');
+    document.querySelectorAll('.pricing-item-price').forEach(el => {
+      const key = el.dataset.key;
+      if (stored[key]) el.textContent = stored[key];
+    });
+  } catch(e) {}
+}
+
+function savePrice(key, value) {
+  try {
+    const stored = JSON.parse(localStorage.getItem('osakaPrices') || '{}');
+    stored[key] = value;
+    localStorage.setItem('osakaPrices', JSON.stringify(stored));
+  } catch(e) {}
+}
+
+loadPrices();
+
+// ── MANAGER PASSWORD (SHA-256, never stored plain) ──
+const MGR_HASH = '25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117';
+let managerUnlocked = false;
+
+async function hashStr(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function openManagerModal() {
+  if (managerUnlocked) {
+    lockManager();
+    return;
+  }
+  document.getElementById('mgrOverlay').classList.add('open');
+  document.getElementById('mgrErr').textContent = '';
+  document.getElementById('mgrPwd').value = '';
+  setTimeout(() => document.getElementById('mgrPwd').focus(), 80);
+}
+
+function closeManagerModal() {
+  document.getElementById('mgrOverlay').classList.remove('open');
+}
+
+function closeMgrOverlayIfOutside(e) {
+  if (e.target === document.getElementById('mgrOverlay')) closeManagerModal();
+}
+
+async function submitManagerPwd() {
+  const pwd = document.getElementById('mgrPwd').value;
+  const h = await hashStr(pwd);
+  if (h !== MGR_HASH) {
+    document.getElementById('mgrErr').textContent = '✕ Incorrect password';
+    document.getElementById('mgrPwd').value = '';
+    document.getElementById('mgrPwd').focus();
+    return;
+  }
+  managerUnlocked = true;
+  closeManagerModal();
+  enableManagerMode();
+}
+
+function enableManagerMode() {
+  document.getElementById('pricingGrid').classList.add('manager-active');
+  document.getElementById('managerBadge').style.display = 'inline';
+  document.getElementById('managerGateBtn').textContent = '🔓 Lock Prices';
+
+  // Make each price clickable → inline input
+  document.querySelectorAll('.pricing-item-price').forEach(el => {
+    el.title = 'Click to edit price';
+    el.onclick = () => startEditPrice(el);
+  });
+}
+
+function lockManager() {
+  managerUnlocked = false;
+  document.getElementById('pricingGrid').classList.remove('manager-active');
+  document.getElementById('managerBadge').style.display = 'none';
+  document.getElementById('managerGateBtn').textContent = '🔒 Manage Prices';
+  document.querySelectorAll('.pricing-item-price').forEach(el => {
+    el.onclick = null;
+    el.title = '';
+    // Restore any in-progress edits
+    if (el.classList.contains('editing')) cancelEditPrice(el);
+  });
+}
+
+function startEditPrice(el) {
+  if (el.classList.contains('editing')) return;
+  const current = el.textContent.trim();
+  el.classList.add('editing');
+  el.contentEditable = 'true';
+  el.focus();
+
+  // Select all text
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  window.getSelection().removeAllRanges();
+  window.getSelection().addRange(range);
+
+  el.onblur = () => commitEditPrice(el);
+  el.onkeydown = (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+    if (e.key === 'Escape') { e.preventDefault(); cancelEditPrice(el); }
+  };
+}
+
+function commitEditPrice(el) {
+  const raw = el.textContent.trim();
+  // Normalize: ensure $ prefix, strip extra chars
+  const num = raw.replace(/[^0-9.]/g, '');
+  const formatted = num ? '$' + parseFloat(num).toFixed(0) : el.dataset.original || el.textContent;
+  el.textContent = formatted;
+  el.classList.remove('editing');
+  el.contentEditable = 'false';
+  el.onblur = null;
+  el.onkeydown = null;
+  savePrice(el.dataset.key, formatted);
+}
+
+function cancelEditPrice(el) {
+  el.textContent = el.dataset.original || el.textContent;
+  el.classList.remove('editing');
+  el.contentEditable = 'false';
+  el.onblur = null;
+  el.onkeydown = null;
+}
+
+// Store original values as backup
+document.querySelectorAll('.pricing-item-price').forEach(el => {
+  el.dataset.original = el.textContent.trim();
+});
+</script>
+</body>
+</html>
