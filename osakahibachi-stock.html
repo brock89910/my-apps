@@ -1082,7 +1082,7 @@ function renderAll(){
 }
 
 function numInput(sec,id,field,val,extraClass){
-  return `<input type="text" inputmode="decimal" pattern="[0-9.]*"
+  return `<input type="text" 
     class="num-inp ${extraClass||''}"
     value="${val||''}"
     onblur="updField('${sec}','${id}','${field}',this.value.trim())"
