@@ -1,7 +1,7 @@
 // Osakahibachi Inventory — Service Worker
 // Caches the app so it loads instantly with no internet (Costco, walk-in freezer)
 
-const CACHE_NAME = 'osaka-inventory-v1';
+const CACHE_NAME = 'osaka-inventory-v2';
 
 // Everything the app needs to run offline
 const ASSETS = [
