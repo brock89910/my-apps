@@ -656,7 +656,30 @@ body {
 }
 .slot-cap-input:focus { border-color: rgba(245,166,35,0.5); display: block; }
 
-/* ── SCROLLBAR ── */
+/* ── OVERRIDE & LARGE GROUP ROW STYLES ── */
+.res-row.is-override {
+  border-left-color: #e86060;
+  background: rgba(232,96,96,0.06);
+}
+.res-row.is-large-group {
+  border-left-color: var(--amber);
+  background: rgba(245,200,66,0.06);
+}
+.res-row.is-override.is-large-group {
+  border-left-color: #e86060;
+  background: rgba(232,96,96,0.08);
+}
+.override-badge {
+  font-family: var(--mono); font-size: 0.58rem; font-weight: 700;
+  padding: 1px 6px; border-radius: 3px;
+  background: rgba(232,96,96,0.15); color: var(--red);
+  border: 1px solid rgba(232,96,96,0.4);
+  white-space: nowrap;
+}
+.large-group-badge {
+  font-family: var(--mono); font-size: 0.62rem;
+  white-space: nowrap;
+}
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -1035,32 +1058,34 @@ body.staff-mode .real-name { display: inline; }
 <!-- ════ SCRIPT ════════════════════════════════════════════════ -->
 <script>
 /* ── CHEF SCHEDULE ── */
-// chefs = how many chef/grill stations are active in that window
-// All 4 grills are always physically available; chef count limits simultaneous active grills
+// Named roster:
+//   Yom, Dede, Cipi
+// Late arrivals: Mon=Dede@4pm, Tue=Cipi@5pm, Wed=Cipi@5pm, Fri=Yom@4pm, Sat=Dede@4pm
+// Thu & Sun: both noon chefs since noon (2 chefs all day)
 const CHEF_SCHEDULE = {
-  0: [ // Sunday — last booking 8pm, chefs available through 9pm (cook window)
+  0: [ // Sunday — Yom + Dede since noon
     { start:'12:00', end:'21:00', chefs:2 }
   ],
-  1: [ // Monday
+  1: [ // Monday — Yom since noon, Dede arrives 4pm
     { start:'12:00', end:'16:00', chefs:1 },
     { start:'16:00', end:'21:00', chefs:2 }
   ],
-  2: [ // Tuesday
+  2: [ // Tuesday — Dede since noon, Cipi arrives 5pm
     { start:'12:00', end:'17:00', chefs:1 },
     { start:'17:00', end:'21:00', chefs:2 }
   ],
-  3: [ // Wednesday
+  3: [ // Wednesday — Dede since noon, Cipi arrives 5pm
     { start:'12:00', end:'17:00', chefs:1 },
     { start:'17:00', end:'21:00', chefs:2 }
   ],
-  4: [ // Thursday
+  4: [ // Thursday — Yom + Cipi since noon
     { start:'12:00', end:'21:00', chefs:2 }
   ],
-  5: [ // Friday — last booking 9pm, chefs through 10pm
+  5: [ // Friday — Dede + Cipi since noon, Yom arrives 4pm
     { start:'12:00', end:'16:00', chefs:2 },
     { start:'16:00', end:'22:00', chefs:3 }
   ],
-  6: [ // Saturday — last booking 9pm, chefs through 10pm
+  6: [ // Saturday — Yom + Cipi since noon, Dede arrives 4pm
     { start:'12:00', end:'16:00', chefs:2 },
     { start:'16:00', end:'22:00', chefs:3 }
   ]
@@ -1446,8 +1471,9 @@ function renderCalGrid() {
     // Guest count badge for current week days that have data
     if (isInWeek && hasData) {
       const badge = document.createElement('div');
-      badge.style.cssText = `font-family:var(--mono);font-size:0.5rem;font-weight:700;color:${isSel?'var(--gold)':'var(--amber)'};letter-spacing:0.02em;line-height:1`;
-      badge.textContent = `${cacheEntry.guests}p`;
+      const needsAttention = cacheEntry.hasOverride || cacheEntry.hasLargeGroup;
+      badge.style.cssText = 'font-family:var(--mono);font-size:0.5rem;font-weight:700;color:' + (isSel ? 'var(--gold)' : needsAttention ? 'var(--red)' : 'var(--amber)') + ';letter-spacing:0.02em;line-height:1';
+      badge.textContent = cacheEntry.guests + 'p' + (needsAttention ? ' !' : '');
       cell.appendChild(badge);
     }
 
@@ -1531,7 +1557,7 @@ function subscribeToDate() {
   if (!window._db) return;
   const key = dateKey(currentDate);
 
-  // Invalidate cache for current date so week strip reloads live data
+  // Invalidate cache for current date so week strip reloads live data including override/large group flags
   delete weekDataCache[key];
 
   // Hibachi
@@ -1938,20 +1964,23 @@ async function loadWeekData() {
   const days = getWeekDays();
   const promises = days.map(async (d) => {
     const dk = dateKey(d);
-    if (weekDataCache[dk] !== undefined) return; // already loaded
+    if (weekDataCache[dk] !== undefined) return;
     try {
       const snap = await window._get(window._ref(window._db, `reservations/${dk}`));
       const data = snap.val() || {};
-      const bookings = Object.keys(data).length;
-      const guests = Object.values(data).reduce((s, r) => s + (r.guests || 0), 0);
-      weekDataCache[dk] = { guests, bookings };
+      const vals = Object.values(data);
+      const bookings = vals.length;
+      const guests = vals.reduce((s, r) => s + (r.guests || 0), 0);
+      const hasOverride = vals.some(r => r.managerOverride || r.overrideBooked);
+      const hasLargeGroup = vals.some(r => (r.guests || 0) >= DOUBLE_GRILL_MIN_GUESTS);
+      weekDataCache[dk] = { guests, bookings, hasOverride, hasLargeGroup };
     } catch(e) {
-      weekDataCache[dk] = { guests: 0, bookings: 0 };
+      weekDataCache[dk] = { guests: 0, bookings: 0, hasOverride: false, hasLargeGroup: false };
     }
   });
   await Promise.all(promises);
   renderWeekStrip();
-  renderCalGrid(); // refresh cal dots if open
+  renderCalGrid();
 }
 
 function renderWeekStrip() {
@@ -2005,8 +2034,9 @@ function renderWeekStrip() {
     dateLbl.textContent = d.getDate();
 
     const guestLbl = document.createElement('div');
-    guestLbl.style.cssText = `font-family:var(--mono);font-size:0.58rem;font-weight:600;margin-top:2px;color:${isSel?'rgba(255,255,255,0.85)':hasBkg?'var(--amber)':'var(--text3)'}`;
-    guestLbl.textContent = hasBkg ? `${guests}p` : '—';
+    const needsAttention = weekDataCache[dk] && (weekDataCache[dk].hasOverride || weekDataCache[dk].hasLargeGroup);
+    guestLbl.style.cssText = 'font-family:var(--mono);font-size:0.58rem;font-weight:600;margin-top:2px;color:' + (isSel ? 'rgba(255,255,255,0.85)' : needsAttention ? 'var(--red)' : hasBkg ? 'var(--amber)' : 'var(--text3)') + '';
+    guestLbl.textContent = hasBkg ? guests + 'p' + (needsAttention ? ' !' : '') : '\u2014';
 
     cell.appendChild(dayLbl);
     cell.appendChild(dateLbl);
@@ -2147,8 +2177,8 @@ function renderTimeSlots() {
       + '</div>';
 
     head.innerHTML = '<div class="time-label" style="' + (isManuallyBlocked ? 'color:var(--red)' : isSecondary ? 'color:var(--text3)' : slotFull ? 'color:var(--red)' : '') + '">' + displayTime(slot) + '</div>'
-      + '<div class="time-chef-info">' + chefs + ' chef' + (chefs!==1?'s':'') + ' \xB7 ' + allRecs.length + ' group' + (allRecs.length!==1?'s':'') + ' \xB7 ' + totalAtSlot + ' guests' + slotLabel + fullTag + '</div>'
       + capWidget
+      + '<div class="time-chef-info">' + chefs + ' chef' + (chefs!==1?'s':'') + ' \xB7 ' + allRecs.length + ' group' + (allRecs.length!==1?'s':'') + ' \xB7 ' + totalAtSlot + ' guests' + slotLabel + fullTag + '</div>'
       + '<button class="block-btn ' + (isManuallyBlocked ? 'is-blocked' : '') + '" onclick="toggleBlockSlot(\'' + slot + '\')" title="' + (isManuallyBlocked ? 'Unblock slot' : 'Block slot') + '">' + (isManuallyBlocked ? '\uD83D\uDD13' : '\uD83D\uDD12') + '</button>'
       + (isManuallyBlocked ? '' : '<button class="time-add-btn" onclick="openHibachiModal(\'' + slot + '\',null)" aria-label="Add reservation">+</button>');
     block.appendChild(head);
@@ -2188,6 +2218,11 @@ function renderTimeSlots() {
 
         const displayName = getDisplayName(r.id, r.name, key);
         const isGuest = appMode === 'guest';
+        const isOverride = !!r.managerOverride || !!r.overrideBooked;
+        const isLargeGroup = (r.guests || 0) >= DOUBLE_GRILL_MIN_GUESTS;
+
+        if (isOverride) row.classList.add('is-override');
+        if (isLargeGroup) row.classList.add('is-large-group');
 
         row.innerHTML = '<div class="res-row-meta" style="flex-shrink:0">'
           + '<span style="font-weight:700;color:var(--text);font-size:0.82rem">\uD83D\uDC65 ' + (r.guests||'') + '</span>'
@@ -2195,6 +2230,8 @@ function renderTimeSlots() {
           + '<div class="res-row-name">'
           + escHtml(displayName)
           + (r.isDouble ? ' <span style="font-size:0.6rem;color:var(--amber);font-weight:600">\uD83D\uDD25\xD72</span>' : '')
+          + (isLargeGroup ? ' <span class="large-group-badge">\uD83D\uDEA8</span>' : '')
+          + (isOverride ? ' <span class="override-badge">\u26A0 OVERRIDE</span>' : '')
           + (r.holdUntil ? ' <span style="font-size:0.58rem;color:var(--amber);font-weight:700;background:rgba(245,166,35,0.15);border:1px solid rgba(245,166,35,0.35);padding:1px 5px;border-radius:3px">\uD83D\uDCCC HOLD</span>' : '')
           + '</div>'
           + '<div class="res-row-meta">'
@@ -2810,6 +2847,12 @@ async function saveHibachi(dk, editId) {
     isDouble: assign.isDouble || false,
     updatedAt: Date.now()
   };
+  // Flag manager override — persists to Firebase so badge shows after reload
+  if (document.getElementById('noCardOverrideGranted') ||
+      document.getElementById('tightTimingConfirmed') ||
+      document.getElementById('cardOnFileVerified')) {
+    data.managerOverride = true;
+  }
   // If card info is provided in the form, store it and clear any hold flag
   if (card) { data.card = card; data.expiry = expiry; data.holdUntil = null; }
   else if (editId) {
@@ -2817,6 +2860,8 @@ async function saveHibachi(dk, editId) {
     // Preserve existing card if verified via card-on-file flow
     if (oldR?.card) { data.card = oldR.card; data.expiry = oldR.expiry || ''; }
     if (oldR?.holdUntil) data.holdUntil = oldR.holdUntil;
+    // Preserve existing override flag unless newly set
+    if (oldR?.managerOverride && !data.managerOverride) data.managerOverride = true;
   }
 
   const oldData = editId ? (reservations[dk]||{})[editId] : null;
