@@ -2148,10 +2148,14 @@ function renderTimeSlots() {
 
     // ── CAP WIDGET ──
     const slotKey = slot.replace(':','_');
-    const defaultCap = getSlotDefaultCap(chefs);
+    // Use free chefs at this slot (bidirectional ±60 min) for the cap calculation
+    const allResForCap = getAllResForDate(key);
+    const chefsCommittedForCap = getChefsCommittedAtSlot(allResForCap, slotMins);
+    const freeChefsForCap = Math.max(0, chefs - chefsCommittedForCap.size);
+    const defaultCap = getSlotDefaultCap(freeChefsForCap);
     const manualCap  = slotCaps[key]?.[slotKey];
     const effectiveCap = (manualCap !== undefined && manualCap !== null) ? manualCap : defaultCap;
-    const remaining  = effectiveCap - totalAtSlot;
+    const remaining  = Math.max(0, effectiveCap - totalAtSlot);
     const isCustom   = (manualCap !== undefined && manualCap !== null);
 
     let capCls, capText;
