@@ -795,7 +795,7 @@ body.staff-mode .real-name { display: inline; }
     <div class="login-card">
       <div class="login-card-title">🔑 Staff Login</div>
       <input class="login-input" id="staffPin" type="password"
-        inputmode="numeric" placeholder="••••" maxlength="8" autocomplete="off"
+        placeholder="Enter staff PIN" autocomplete="off"
         onkeydown="if(event.key==='Enter')submitStaffPin()">
       <div class="login-err" id="staffPinErr"></div>
       <button class="login-btn-staff" onclick="submitStaffPin()">Enter as Staff</button>
@@ -1094,12 +1094,12 @@ const GRILL_COLORS_HEX = ['#1a7040','#1a40a0','#9a6010','#7a1a9a'];
 //   Combined groups on 2 grills → max 24 total
 // Password required for bookings ≥ 30 guests (needs 3 chefs)
 const SINGLE_GRILL_CAP = { 1: 14, 2: 13, default: 12 };
-const DOUBLE_GRILL_SOLO_MAX  = 30;  // 1 group taking both grills, alone — normal booking
-const DOUBLE_GRILL_COMBINED_MAX = 24; // multiple groups sharing 2 grills
+const DOUBLE_GRILL_SOLO_MAX  = 30;
+const DOUBLE_GRILL_COMBINED_MAX = 24;
 const DOUBLE_GRILL_MIN_GUESTS = 15;
-const DOUBLE_GRILL_COOLDOWN_MINUTES = 150; // 2.5 hrs between double-grill bookings on same pair
-const OVERRIDE_MAX_GUESTS = 50; // manager override absolute max
-const CHEF_FULL_BUFFER_MINUTES = 30; // when all chefs are at capacity, block 30 min before+after
+const DOUBLE_GRILL_BLOCK_MINUTES = 120;  // < 2 hrs between doubles → blocked
+const DOUBLE_GRILL_WARN_MINUTES  = 150;  // 2–2.5 hrs between doubles → tight warning + 0709
+const OVERRIDE_MAX_GUESTS = 50;
 const LARGE_GROUP_PASSWORD_MIN = 30;
 
 // Session-unlocked reservations (by editId) — cleared on modal close
@@ -1739,64 +1739,6 @@ function isGrillBlockedExcluding(dateStr, grill, slotMins, excludeId) {
   return null;
 }
 
-// Check if a grill PAIR is available for a double-grill booking.
-// A double-grill ties up 2 chefs for COOK_BLOCK_MINUTES (60 min).
-// Additional rule: when ALL chefs are at capacity at a given slot, the 30 min before
-// AND after that slot are also blocked (buffer zone for prep/turnover).
-function isPairAvailableForDouble(dateStr, g1, g2, slotMins, excludeId, chefs) {
-  const all = getAllResForDate(dateStr).filter(r => !excludeId || r.id !== excludeId);
-  const effectiveChefs = chefs || 4;
-
-  // Count chefs committed within cook window overlap (bidirectional)
-  // Uses grillsUsedByRes() to handle legacy data without isDouble flag
-  const chefsCommitted = new Set();
-  for (const r of all) {
-    const rMins = timeToMinutes(r.slot);
-    const overlap =
-      (rMins <= slotMins && slotMins < rMins + COOK_BLOCK_MINUTES) ||
-      (rMins > slotMins && rMins < slotMins + COOK_BLOCK_MINUTES);
-    if (!overlap) continue;
-    for (const g of grillsUsedByRes(r)) chefsCommitted.add(`chef_${g}`);
-  }
-  if (effectiveChefs - chefsCommitted.size < 2) return false;
-
-  // Buffer zone: ±30 min when all chefs are at capacity
-  const bufferSlots = [-CHEF_FULL_BUFFER_MINUTES, CHEF_FULL_BUFFER_MINUTES];
-  for (const offset of bufferSlots) {
-    const checkMins = slotMins + offset;
-    const chefsBusy = new Set();
-    for (const r of all) {
-      const rMins = timeToMinutes(r.slot);
-      const overlapsCheck =
-        (rMins <= checkMins && checkMins < rMins + COOK_BLOCK_MINUTES) ||
-        (rMins > checkMins && rMins < checkMins + COOK_BLOCK_MINUTES);
-      if (!overlapsCheck) continue;
-      for (const g of grillsUsedByRes(r)) chefsBusy.add(`chef_${g}`);
-    }
-    if (chefsBusy.size >= effectiveChefs) return false;
-  }
-
-  // Pair-specific rules
-  for (const r of all) {
-    const rMins = timeToMinutes(r.slot);
-    const usedGrills = grillsUsedByRes(r);
-    const onPair = usedGrills.some(g => g === g1 || g === g2);
-    if (!onPair) continue;
-
-    // Block: another double on this pair within cooldown (either direction)
-    if (usedGrills.length >= 2) {
-      const tooClose =
-        (rMins < slotMins && slotMins < rMins + DOUBLE_GRILL_COOLDOWN_MINUTES) ||
-        (rMins > slotMins && rMins < slotMins + DOUBLE_GRILL_COOLDOWN_MINUTES) ||
-        rMins === slotMins;
-      if (tooClose) return false;
-    }
-    // Block: exact same slot on either grill of target pair
-    if (rMins === slotMins && (usedGrills.includes(g1) || usedGrills.includes(g2))) return false;
-  }
-  return true;
-}
-
 function grillStatus(dateStr, grill) {
   // Use current time for today, start of day for other days
   const dow = currentDate.getDay();
@@ -1818,93 +1760,119 @@ function grillStatus(dateStr, grill) {
 }
 
 /**
- * AUTO-ASSIGN — CHEF & GRILL RULES:
+ * CHEF & GRILL AVAILABILITY RULES
  *
- * A chef/grill is COMMITTED for a candidate slot if ANY existing booking overlaps
- * the cook window in EITHER direction:
- *   - Existing booking started before candidate: blocks for COOK_BLOCK_MINUTES forward
- *   - Existing booking starts after candidate: would still be cooking within COOK_BLOCK_MINUTES
+ * A chef is OCCUPIED for slot X if they have any booking within ±COOK_BLOCK_MINUTES (60 min).
+ * This applies in both directions:
+ *   - Past booking within 60 min: still cooking
+ *   - Future booking within 60 min: must be present, cannot take another table
  *
- * This means: a 5:00 PM booking blocks a chef for both 4:30 PM (chef needs to be there)
- * and 5:30 PM (chef is still cooking). A 4:30 slot checks all bookings within ±60 min.
+ * Free chefs at slot X = scheduledChefs − chefs with any booking within ±60 min of X.
  *
- * For a candidate slot to be bookable:
- *   - At least one grill must have a chef not already committed (bidirectional cook window)
- *   - That grill must not be physically occupied (seating window, 0–90 min prior/post)
- *   - The grill must have capacity for the group
+ * DOUBLE GRILL cooldown (measured start-to-start, bidirectional):
+ *   < 2 hrs  → hard blocked
+ *   2–2.5 hrs → tight warning + 0709 override
+ *   ≥ 2.5 hrs → clean
  *
- * Tight warning (90–120 min): grill may technically be free but turnover is close.
+ * When a double grill runs, Chef C (the spare) is NOT allowed to take a simultaneous
+ * single grill at the same slot — too many people at once for a small town.
+ * Exception: 31+ guests already requires the 30+ manager override.
  */
+
+// Returns Set of 'chef_N' for all chefs occupied within ±COOK_BLOCK_MINUTES of slotMins
 function getChefsCommittedAtSlot(all, slotMins) {
-  // Returns a Set of 'chef_N' strings for chefs committed within ±COOK_BLOCK_MINUTES of slotMins
   const committed = new Set();
   for (const r of all) {
     const rMins = timeToMinutes(r.slot);
-    // Forward block: existing booking starts before candidate and is still cooking
-    const forwardOverlap = rMins <= slotMins && slotMins < rMins + COOK_BLOCK_MINUTES;
-    // Backward block: existing booking starts after candidate but within cook window
-    // (chef must be present before cooking starts — i.e. candidate slot is within cook window of future booking)
-    const backwardOverlap = rMins > slotMins && rMins < slotMins + COOK_BLOCK_MINUTES;
-    if (!forwardOverlap && !backwardOverlap) continue;
+    const forward  = rMins <= slotMins && slotMins < rMins + COOK_BLOCK_MINUTES;
+    const backward = rMins >  slotMins && rMins < slotMins + COOK_BLOCK_MINUTES;
+    if (!forward && !backward) continue;
     for (const g of grillsUsedByRes(r)) committed.add('chef_' + g);
   }
   return committed;
+}
+
+// Check double-grill cooldown against all other doubles in both directions
+// Returns: 'blocked' | 'tight' | 'ok'
+function checkDoubleCooldown(all, slotMins, excludeId) {
+  for (const r of all) {
+    if (excludeId && r.id === excludeId) continue;
+    // Only care about double-grill bookings
+    if (!r.grill2 && (r.guests || 0) < DOUBLE_GRILL_MIN_GUESTS) continue;
+    const rMins = timeToMinutes(r.slot);
+    const gap = Math.abs(rMins - slotMins);
+    if (gap === 0) return 'blocked'; // exact same slot
+    if (gap < DOUBLE_GRILL_BLOCK_MINUTES) return 'blocked';
+    if (gap < DOUBLE_GRILL_WARN_MINUTES)  return 'tight';
+  }
+  return 'ok';
 }
 
 function autoAssignGrill(dateStr, slot, guests, chefs, excludeId) {
   const slotMins = timeToMinutes(slot);
   const all = getAllResForDate(dateStr).filter(r => !excludeId || r.id !== excludeId);
 
-  // ── DOUBLE GRILL PATH (15+ guests) ──────────────────────────
+  // ── CHEF AVAILABILITY ─────────────────────────────────────────
+  const chefsCommitted = getChefsCommittedAtSlot(all, slotMins);
+  const freeChefsAtSlot = chefs - chefsCommitted.size;
+
+  // ── DOUBLE GRILL PATH (15–30 guests) ─────────────────────────
   if (guests >= DOUBLE_GRILL_MIN_GUESTS) {
+    // Need 2 free chefs
+    if (freeChefsAtSlot < 2) return null;
+
+    // Check cooldown against other doubles
+    const cooldown = checkDoubleCooldown(all, slotMins, excludeId);
+    if (cooldown === 'blocked') return null;
+
+    // When a double runs, no simultaneous single is allowed (Chef C held back)
+    // So we need exactly freeChefsAtSlot >= 2 AND no other booking at this exact slot
+    const bookingsAtSlot = all.filter(r => timeToMinutes(r.slot) === slotMins);
+    if (bookingsAtSlot.length > 0) {
+      // There are already bookings at this slot — a double cannot share the floor
+      // (Exception: 31+ already goes through the 30+ override path before reaching here)
+      return null;
+    }
+
+    // Find a free grill pair
     for (const [g1, g2] of GRILL_PAIRS) {
-      if (!isPairAvailableForDouble(dateStr, g1, g2, slotMins, excludeId, chefs)) continue;
+      // Both grills must be physically free (not seating-blocked)
+      const b1 = isGrillBlockedExcluding(dateStr, g1, slotMins, excludeId);
+      const b2 = isGrillBlockedExcluding(dateStr, g2, slotMins, excludeId);
+      if (b1 && b1.reason !== 'tight') continue;
+      if (b2 && b2.reason !== 'tight') continue;
 
-      const pairGroups = all.filter(r => {
-        const rMins = timeToMinutes(r.slot);
-        return rMins === slotMins &&
-          (r.grill === g1 || r.grill === g2 || r.grill2 === g1 || r.grill2 === g2);
-      });
+      const isTight = (b1 && b1.reason === 'tight') || (b2 && b2.reason === 'tight')
+                    || cooldown === 'tight';
 
-      const totalOnPair = pairGroups.reduce((s,r) => s+(r.guests||0), 0);
-
-      if (pairGroups.length === 0) {
-        if (guests <= DOUBLE_GRILL_SOLO_MAX) {
-          return { grill: g1, grill2: g2, isDouble: true };
-        }
-      } else {
-        if (totalOnPair + guests <= DOUBLE_GRILL_COMBINED_MAX) {
-          return { grill: g1, grill2: g2, isDouble: true };
-        }
+      if (guests <= DOUBLE_GRILL_SOLO_MAX) {
+        return { grill: g1, grill2: g2, isDouble: true, tightTiming: isTight };
       }
     }
     return null;
   }
 
-  // ── SINGLE GRILL PATH (1–14 guests) ─────────────────────────
+  // ── SINGLE GRILL PATH (1–14 guests) ──────────────────────────
+  if (freeChefsAtSlot < 1) return null; // no free chef at all
 
-  // Count chefs committed within the bidirectional cook window around this slot
-  const chefsCommitted = getChefsCommittedAtSlot(all, slotMins);
-  const freeChefsAtSlot = chefs - chefsCommitted.size;
+  // Check if a double grill is running at this exact slot
+  // If so, Chef C is the only free chef — only 1 grill allowed regardless
+  const doubleAtSlot = all.some(r => {
+    return timeToMinutes(r.slot) === slotMins && (r.grill2 || (r.guests||0) >= DOUBLE_GRILL_MIN_GUESTS);
+  });
+  const effectiveFreeChefs = doubleAtSlot ? 1 : freeChefsAtSlot;
 
   // Build per-grill state
   const grillState = [];
   for (let g = 1; g <= 4; g++) {
-    // Physical grill block: seating window (0–90 min prior — chef/guests still present)
     const blocked = isGrillBlockedExcluding(dateStr, g, slotMins, excludeId);
     const isHardBlocked = blocked && blocked.reason !== 'tight';
     const isTight       = blocked && blocked.reason === 'tight';
 
-    // Also block if this grill has a FUTURE booking starting within the cook window
-    // (chef is already pre-committed to that upcoming table)
-    const futureCommitted = all.some(r => {
-      if (r.grill !== g) return false;
-      const rMins = timeToMinutes(r.slot);
-      // Future booking within cook window — chef already belongs to them
-      return rMins > slotMins && rMins < slotMins + COOK_BLOCK_MINUTES;
-    });
+    // Grill's chef is committed elsewhere — can't use it for a new seating
+    const chefBusy = chefsCommitted.has('chef_' + g);
 
-    // Is this grill occupied by a double-booking at the same slot?
+    // Occupied by a double at the same slot
     const hasDouble = all.some(r => {
       const rMins = timeToMinutes(r.slot);
       if (rMins !== slotMins) return false;
@@ -1916,37 +1884,28 @@ function autoAssignGrill(dateStr, slot, guests, chefs, excludeId) {
     const cap  = getSingleGrillCap(groups.length);
     const room = cap - totalGuests;
 
-    // A grill can only be used at this slot if its chef is free (not committed elsewhere)
-    const chefFree = !chefsCommitted.has('chef_' + g);
-
-    grillState.push({
-      g,
-      blocked: isHardBlocked || futureCommitted, // hard-block includes future cook-window conflicts
-      isTight,
-      hasDouble,
-      chefFree,
-      groups,
-      totalGuests,
-      cap,
-      room
-    });
+    grillState.push({ g, blocked: isHardBlocked, isTight, chefBusy, hasDouble, groups, totalGuests, cap, room });
   }
 
-  // Pass 1: join an existing grill that already has its chef committed at this slot
-  // (no extra chef needed — chef is already cooking for the same slot)
+  // Count how many fresh grills we've already opened at this slot (each needs its own chef)
+  const grillsOpenedAtSlot = new Set(
+    all.filter(r => timeToMinutes(r.slot) === slotMins)
+       .flatMap(r => grillsUsedByRes(r))
+  ).size;
+  const canOpenMoreGrills = grillsOpenedAtSlot < effectiveFreeChefs;
+
+  // Pass 1: join an existing grill that already has a chef cooking at this slot
   for (const state of grillState) {
-    if (state.blocked || state.hasDouble) continue;
-    if (!state.chefFree && state.groups.length === 0) continue; // chef busy but no one here — skip
-    if (state.groups.length === 0) continue; // empty grill needs a free chef — handle in Pass 2
+    if (state.blocked || state.hasDouble || state.chefBusy) continue;
+    if (state.groups.length === 0) continue; // empty — needs a chef opened fresh
     if (state.room >= guests) return { grill: state.g, isDouble: false, tightTiming: state.isTight };
   }
 
-  // Pass 2: open a fresh empty grill — requires a free chef
-  if (freeChefsAtSlot >= 1) {
+  // Pass 2: open a fresh empty grill (uses one more free chef slot)
+  if (canOpenMoreGrills) {
     for (const state of grillState) {
-      if (state.blocked || state.hasDouble) continue;
-      if (!state.chefFree) continue; // this grill's chef is already elsewhere
-      if (state.groups.length > 0) continue; // has groups — handled in Pass 1
+      if (state.blocked || state.hasDouble || state.chefBusy) continue;
+      if (state.groups.length > 0) continue; // not empty
       if (getSingleGrillCap(0) >= guests) return { grill: state.g, isDouble: false, tightTiming: state.isTight };
     }
   }
