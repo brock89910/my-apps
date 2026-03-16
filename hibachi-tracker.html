@@ -1124,7 +1124,7 @@ const DOUBLE_GRILL_COMBINED_MAX = 24;
 const DOUBLE_GRILL_MIN_GUESTS = 15;
 const DOUBLE_GRILL_BLOCK_MINUTES = 120;  // < 2 hrs between doubles → blocked
 const DOUBLE_GRILL_WARN_MINUTES  = 150;  // 2–2.5 hrs between doubles → tight warning + 0709
-const OVERRIDE_MAX_GUESTS = 50;
+const OVERRIDE_MAX_GUESTS = 42; // 3 grills × 14 solo max
 const LARGE_GROUP_PASSWORD_MIN = 30;
 
 // Session-unlocked reservations (by editId) — cleared on modal close
@@ -3049,8 +3049,11 @@ async function deleteDining(dk, id) {
 /* ── BLOCK SLOT ── */
 /* ── SLOT CAP ── */
 function getSlotDefaultCap(chefs) {
-  // Default capacity = chefs × 12 (conservative shared cap per grill)
-  return chefs * 12;
+  // 1 chef = 1 grill = 12 standard / 14 solo
+  // 2+ chefs = 2 grills = 24 standard / 28 solo
+  // 3rd chef simultaneously requires override (up to 42 = 3×14)
+  if (chefs <= 1) return 12;
+  return 24;
 }
 
 function toggleCapInput(slot) {
