@@ -1,0 +1,1 @@
+Lets up the security, use environment variables, use edge functions everyime you can, sanitize all user input, add rate limiting to my api routes. Im using firebase atm but i hear lots about supabase. Explain to me why. Also tell me if this will beef up security enough or i should integrate cloudflare/crowdstrike
