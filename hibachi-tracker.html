@@ -211,7 +211,6 @@ body {
   padding: 8px 16px;
   background: var(--bg2);
   border-bottom: 1px solid var(--border2);
-  position: sticky; top: 0; z-index: 5;
 }
 
 .slot-full .time-header {
@@ -220,6 +219,43 @@ body {
 
 .slot-nearly .time-header {
   background: rgba(245,200,66,0.05);
+}
+
+/* ── NOTE BADGES ── */
+.note-badge {
+  display: inline-block;
+  font-family: var(--mono); font-size: 0.58rem; font-weight: 700;
+  padding: 1px 6px; border-radius: 3px;
+  white-space: nowrap; cursor: default;
+  position: relative;
+}
+.note-badge.allergy {
+  background: rgba(232,96,96,0.18); color: var(--red);
+  border: 1px solid rgba(232,96,96,0.45);
+}
+.note-badge.restriction {
+  background: rgba(245,200,66,0.15); color: var(--amber);
+  border: 1px solid rgba(245,200,66,0.4);
+}
+.note-badge[title]:hover::after {
+  content: attr(title);
+  position: fixed;
+  background: var(--bg2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  font-weight: 400;
+  white-space: pre;
+  z-index: 999;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  max-width: 220px;
+  line-height: 1.5;
 }
 
 .time-label {
@@ -2046,6 +2082,128 @@ function renderWeekStrip() {
   });
 
   container.appendChild(strip);
+
+  // Print button — to the right of all day cells
+  const printBtn = document.createElement('button');
+  printBtn.style.cssText = 'flex-shrink:0;margin:6px 8px 6px 4px;padding:5px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;font-family:var(--mono);font-size:0.62rem;font-weight:600;color:var(--text2);cursor:pointer;white-space:nowrap;letter-spacing:0.04em;align-self:center';
+  printBtn.textContent = '\uD83D\uDCC4 Daily Sheet';
+  printBtn.onclick = printDailySheet;
+
+  const stripWrap = document.createElement('div');
+  stripWrap.style.cssText = 'display:flex;align-items:center;overflow-x:auto;-webkit-overflow-scrolling:touch';
+  stripWrap.appendChild(strip);
+  stripWrap.appendChild(printBtn);
+  container.innerHTML = '';
+  container.appendChild(stripWrap);
+}
+
+function printDailySheet() {
+  const dk = dateKey(currentDate);
+  const dow = currentDate.getDay();
+  const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const allRes = getAllResForDate(dk);
+  const allDining = Object.values(diningReservations[dk]||{});
+
+  // Sort hibachi by slot time
+  const hibachi = allRes.slice().sort((a,b) => (a.slot||'').localeCompare(b.slot||''));
+  // Sort dining by time
+  const dining = allDining.slice().sort((a,b) => (a.time||'').localeCompare(b.time||''));
+
+  const dateStr = currentDate.toLocaleDateString('en-CA', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+
+  let html = '<!DOCTYPE html><html><head><meta charset="UTF-8">'
+    + '<title>Daily Sheet — ' + dateStr + '</title>'
+    + '<style>'
+    + 'body{font-family:"IBM Plex Mono",monospace;font-size:12px;color:#111;background:#fff;padding:24px;max-width:720px;margin:0 auto}'
+    + 'h1{font-size:16px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin:0 0 4px}'
+    + 'h2{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#888;margin:20px 0 8px;border-bottom:1px solid #ddd;padding-bottom:4px}'
+    + 'table{width:100%;border-collapse:collapse;margin-bottom:8px}'
+    + 'th{text-align:left;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#666;padding:4px 8px;border-bottom:2px solid #111}'
+    + 'td{padding:5px 8px;border-bottom:1px solid #eee;vertical-align:top}'
+    + 'tr:last-child td{border-bottom:none}'
+    + '.slot{font-weight:700;white-space:nowrap}'
+    + '.badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:2px;margin-left:4px}'
+    + '.allergy{background:#fee;color:#c00;border:1px solid #faa}'
+    + '.restriction{background:#fff8e1;color:#a60;border:1px solid #fcc}'
+    + '.note{font-size:10px;color:#444;font-style:italic}'
+    + '.total{font-size:11px;font-weight:700;margin-top:12px;padding:6px 8px;background:#f5f5f5;border:1px solid #ddd}'
+    + '@media print{body{padding:12px}.no-print{display:none}}'
+    + '</style></head><body>'
+    + '<h1>Osaka Hibachi — Daily Sheet</h1>'
+    + '<div style="font-size:11px;color:#555;margin-bottom:16px">' + dateStr + '</div>';
+
+  // Hibachi section
+  html += '<h2>Hibachi Reservations</h2>';
+  if (hibachi.length) {
+    html += '<table><thead><tr>'
+      + '<th style="width:70px">Time</th>'
+      + '<th style="width:40px">#</th>'
+      + '<th>Name</th>'
+      + '<th>Phone</th>'
+      + '<th>Grill</th>'
+      + '<th>Note</th>'
+      + '</tr></thead><tbody>';
+    hibachi.forEach(r => {
+      const noteBadge = r.noteType === 'allergy'
+        ? '<span class="badge allergy">ALLERGY</span>'
+        : r.noteType === 'restriction'
+        ? '<span class="badge restriction">RESTRICTION</span>'
+        : '';
+      const noteDetail = (r.noteType === 'allergy' || r.noteType === 'restriction') && r.noteText
+        ? '<div class="note">' + escHtml(r.noteText) + '</div>' : '';
+      const grillStr = r.grill2 ? 'G' + r.grill + '+G' + r.grill2 : 'G' + (r.grill||'?');
+      html += '<tr>'
+        + '<td class="slot">' + (r.slot ? displayTime(r.slot) : '?') + '</td>'
+        + '<td>' + (r.guests||'?') + '</td>'
+        + '<td>' + escHtml(r.name||'Guest') + noteBadge + noteDetail + '</td>'
+        + '<td>' + escHtml(r.phone||'') + '</td>'
+        + '<td>' + grillStr + '</td>'
+        + '<td>' + (r.noteType && r.noteType !== 'allergy' && r.noteType !== 'restriction' ? escHtml(r.noteType + (r.noteText ? ': '+r.noteText : '')) : '') + '</td>'
+        + '</tr>';
+    });
+    html += '</tbody></table>';
+    const totalGuests = hibachi.reduce((s,r)=>s+(r.guests||0),0);
+    html += '<div class="total">Total: ' + hibachi.length + ' group' + (hibachi.length!==1?'s':'') + ' · ' + totalGuests + ' guests</div>';
+  } else {
+    html += '<div style="color:#888;font-size:11px;padding:8px">No hibachi reservations.</div>';
+  }
+
+  // Dining section
+  html += '<h2>Dining Room</h2>';
+  if (dining.length) {
+    html += '<table><thead><tr>'
+      + '<th style="width:70px">Time</th>'
+      + '<th style="width:40px">#</th>'
+      + '<th>Name</th>'
+      + '<th>Phone</th>'
+      + '<th>Notes</th>'
+      + '</tr></thead><tbody>';
+    dining.forEach(r => {
+      html += '<tr>'
+        + '<td class="slot">' + (r.time ? displayTime(r.time) : '—') + '</td>'
+        + '<td>' + (r.guests||'?') + '</td>'
+        + '<td>' + escHtml(r.name||'Guest') + '</td>'
+        + '<td>' + escHtml(r.phone||'') + '</td>'
+        + '<td>' + escHtml(r.notes||'') + '</td>'
+        + '</tr>';
+    });
+    html += '</tbody></table>';
+    const totalDining = dining.reduce((s,r)=>s+(r.guests||0),0);
+    html += '<div class="total">Total: ' + dining.length + ' group' + (dining.length!==1?'s':'') + ' · ' + totalDining + ' guests</div>';
+  } else {
+    html += '<div style="color:#888;font-size:11px;padding:8px">No dining reservations.</div>';
+  }
+
+  html += '<div style="margin-top:24px;font-size:10px;color:#aaa;border-top:1px solid #eee;padding-top:8px">Generated ' + new Date().toLocaleString('en-CA') + ' · Osaka Hibachi</div>';
+  html += '</body></html>';
+
+  const win = window.open('', '_blank');
+  if (win) {
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 400);
+  }
 }
 
 function renderHibachi() {
@@ -2195,17 +2353,17 @@ function renderTimeSlots() {
       em.className = 'slot-empty';
       if (isManuallyBlocked) {
         em.style.color = 'var(--red)';
-        em.textContent = '🔒 Slot manually blocked — no bookings allowed';
+        em.textContent = '\uD83D\uDD12 Slot blocked';
       } else if (preferHourly) {
         if (halfHourBiased && !isHalfHourSlot(slot)) {
-          em.textContent = 'Prefer :30 slots today — tap + only if needed';
+          em.textContent = 'Prefer :30 slots today';
         } else if (!halfHourBiased && isHalfHourSlot(slot)) {
           em.textContent = 'Off-peak — prefer hour slots first';
         } else {
-          em.textContent = 'No bookings yet — tap + to add';
+          em.textContent = '';
         }
       } else {
-        em.textContent = 'No bookings yet — tap + to add';
+        em.textContent = '';
       }
       listDiv.appendChild(em);
     } else {
@@ -2237,6 +2395,8 @@ function renderTimeSlots() {
           + (isLargeGroup ? ' <span class="large-group-badge">\uD83D\uDEA8</span>' : '')
           + (isOverride ? ' <span class="override-badge">\u26A0 OVERRIDE</span>' : '')
           + (r.holdUntil ? ' <span style="font-size:0.58rem;color:var(--amber);font-weight:700;background:rgba(245,166,35,0.15);border:1px solid rgba(245,166,35,0.35);padding:1px 5px;border-radius:3px">\uD83D\uDCCC HOLD</span>' : '')
+          + (r.noteType === 'allergy' ? ' <span class="note-badge allergy" title="' + escHtml(r.noteText||r.notes||'') + '">ALLERGY</span>' : '')
+          + (r.noteType === 'restriction' ? ' <span class="note-badge restriction" title="' + escHtml(r.noteText||r.notes||'') + '">RESTRICTION</span>' : '')
           + '</div>'
           + '<div class="res-row-meta">'
           + (isSoon ? '<span class="soon-badge">\uD83E\uDE91 SEAT NOW</span>' : '')
@@ -2421,8 +2581,21 @@ function openHibachiModal(slot, editId) {
     + '</div>'
     + '</div>'
     + '<div class="form-row">'
-    + '<label class="form-label">Notes</label>'
-    + '<textarea class="form-textarea" id="fNotes" placeholder="Allergies, special requests, birthday\u2026">' + escHtml(existing ? existing.notes||'' : '') + '</textarea>'
+    + '<label class="form-label">Note Type</label>'
+    + '<div style="display:flex;gap:8px">'
+    + '<select class="form-select" id="fNoteType" style="flex:0 0 150px" onchange="checkNoteWordLimit()">'
+    + '<option value=""' + (!(existing && existing.noteType) ? ' selected' : '') + '>— None —</option>'
+    + '<option value="allergy"' + (existing && existing.noteType==='allergy' ? ' selected' : '') + '>🔴 Allergy</option>'
+    + '<option value="restriction"' + (existing && existing.noteType==='restriction' ? ' selected' : '') + '>🟡 Restriction</option>'
+    + '<option value="chef"' + (existing && existing.noteType==='chef' ? ' selected' : '') + '>Chef Request</option>'
+    + '<option value="table"' + (existing && existing.noteType==='table' ? ' selected' : '') + '>Table Request</option>'
+    + '<option value="other"' + (existing && existing.noteType==='other' ? ' selected' : '') + '>Other</option>'
+    + '</select>'
+    + '<input class="form-input" id="fNoteText" type="text" placeholder="Max 10 words\u2026" maxlength="80"'
+    + ' value="' + escHtml(existing ? existing.noteText||'' : '') + '"'
+    + ' oninput="checkNoteWordLimit()">'
+    + '</div>'
+    + '<div id="noteWordErr" style="font-family:var(--mono);font-size:0.62rem;color:var(--red);margin-top:4px;display:none">Max 10 words</div>'
     + '</div>'
     + '<div id="formErr"></div>'
     + '<button class="btn-gold" onclick="saveHibachi(\'' + key + '\',\'' + (editId||'') + '\')">' + saveLbl + '</button>'
@@ -2605,6 +2778,19 @@ async function verifyCardOnFile(dk, editId) {
   saveHibachi(dk, editId);
 }
 
+function checkNoteWordLimit() {
+  const input = document.getElementById('fNoteText');
+  const errEl = document.getElementById('noteWordErr');
+  if (!input || !errEl) return;
+  const words = input.value.trim().split(/\s+/).filter(Boolean);
+  if (words.length > 10) {
+    // Truncate to 10 words
+    input.value = words.slice(0, 10).join(' ');
+    errEl.style.display = 'block';
+    setTimeout(() => { errEl.style.display = 'none'; }, 1800);
+  }
+}
+
 function checkHalfHourWarn() {
   const slot = document.getElementById('fSlot')?.value;
   const warn = document.getElementById('halfHourWarn');
@@ -2692,7 +2878,9 @@ async function saveHibachi(dk, editId) {
   const phone    = document.getElementById('fPhone').value.replace(/\D/g,'');
   const initials = document.getElementById('fInitials').value.trim().toUpperCase();
   const bookedOn = document.getElementById('fBookedOn').value;
-  const notes    = document.getElementById('fNotes').value.trim();
+  const noteType = document.getElementById('fNoteType')?.value || '';
+  const noteText = document.getElementById('fNoteText')?.value.trim() || '';
+  const notes    = noteText;
   const slot     = document.getElementById('fSlot').value;
   const err      = document.getElementById('formErr');
   err.innerHTML  = '';
@@ -2845,7 +3033,7 @@ async function saveHibachi(dk, editId) {
     : `${phone.slice(0,3)}-${phone.slice(3)}`;
 
   const data = {
-    name, guests, phone: fmtPhoneVal, initials, bookedOn, notes, slot,
+    name, guests, phone: fmtPhoneVal, initials, bookedOn, notes, noteType, noteText, slot,
     grill: assign.grill,
     grill2: assign.grill2 || null,
     isDouble: assign.isDouble || false,
@@ -2908,7 +3096,9 @@ async function saveHibachiOverride(dk, editId) {
   const phone    = document.getElementById('fPhone').value.replace(/\D/g,'');
   const initials = document.getElementById('fInitials').value.trim().toUpperCase();
   const bookedOn = document.getElementById('fBookedOn').value;
-  const notes    = document.getElementById('fNotes').value.trim();
+  const noteType = document.getElementById('fNoteType')?.value || '';
+  const noteText = document.getElementById('fNoteText')?.value.trim() || '';
+  const notes    = noteText;
   const slot     = document.getElementById('fSlot').value;
 
   if (!name || !guests || !initials || !phone) {
@@ -2926,7 +3116,7 @@ async function saveHibachiOverride(dk, editId) {
     : `${phone.slice(0,3)}-${phone.slice(3)}`;
 
   const data = {
-    name, guests, phone: fmtPhoneVal, initials, bookedOn, notes, slot,
+    name, guests, phone: fmtPhoneVal, initials, bookedOn, notes, noteType, noteText, slot,
     grill: g1,
     grill2: isDouble ? g2 : null,
     isDouble,
