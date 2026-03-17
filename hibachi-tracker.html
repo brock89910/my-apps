@@ -1954,9 +1954,17 @@ function isGrillBlockedExcluding(dateStr,grill,slotMins,excludeId) {
   for (const r of all) {
     if (Number(r.grill)!==g) continue;
     const rMins=timeToMinutes(r.slot);
+    // Backward block: existing booking started before, still cooking
     if (rMins<slotMins && slotMins<rMins+SEAT_BLOCK_MINUTES)
       return {reason:rMins+COOK_BLOCK_MINUTES>slotMins?'cook':'seat',bookedAt:r.slot};
     if (rMins<slotMins && slotMins<rMins+SEAT_WARN_MINUTES)
+      return {reason:'tight',bookedAt:r.slot};
+    // Forward block: future booking on this grill — chef must be free to START it
+    // Can't open a new group at slotMins if chef needs to start another grill at rMins
+    // within COOK_BLOCK_MINUTES (they'd be mid-cook for the slotMins group)
+    if (rMins>slotMins && rMins<slotMins+COOK_BLOCK_MINUTES)
+      return {reason:'cook',bookedAt:r.slot};
+    if (rMins>slotMins && rMins<slotMins+SEAT_WARN_MINUTES)
       return {reason:'tight',bookedAt:r.slot};
   }
   return null;
@@ -2401,7 +2409,8 @@ function openHibachiModal(slot, editId) {
   const key=dateKey(currentDate);
   // Editing an existing reservation requires staff password + initials
   if (editId) { openEditAuthModal(slot, editId); return; }
-  // All accounts use step-by-step flow for NEW reservations
+  // Manager uses original full-form modal; all other accounts use stepped flow
+  if (isManager()) { _openHibachiModalInner(slot, null); return; }
   openSteppedModal(slot);
 }
 
@@ -3746,7 +3755,8 @@ function startApp() {
 }
 
 function getDisplayName(resId,realName,dateStr) {
-  return appMode==='staff'?(realName||'Guest'):getGenericName(dateStr,resId);
+  // Generic names only for guest mode — all staff/manager modes see real names
+  return appMode==='guest' ? getGenericName(dateStr,resId) : (realName||'Guest');
 }
 
 function escHtml(str) {
