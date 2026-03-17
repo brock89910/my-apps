@@ -44,24 +44,24 @@
    Type: Cormorant Garamond (display) · DM Sans (body) · DM Mono (data)
    ══════════════════════════════════════════════ */
 :root {
-  --bg:        #111010;
-  --bg2:       #1a1918;
-  --bg3:       #201e1c;
+  --bg:        #0e0d0c;
+  --bg2:       #1e1c1a;
+  --bg3:       #252220;
   --panel:     #1a1918;
-  --lift:      #2a2724;
-  --border:    rgba(196,158,84,0.2);
-  --border2:   rgba(196,158,84,0.1);
-  --gold:      #c49e54;
-  --gold2:     #a8832e;
+  --lift:      #302c28;
+  --border:    rgba(210,175,100,0.28);
+  --border2:   rgba(210,175,100,0.15);
+  --gold:      #d4a843;
+  --gold2:     #b8922e;
   --gold3:     rgba(196,158,84,0.12);
-  --gold-light:#e8d4a0;
-  --text:      #f0e8d8;
-  --text2:     #a89878;
-  --text3:     #5a5040;
-  --green:     #6db87e;
-  --red:       #c04040;
+  --gold-light:#f5e4b0;
+  --text:      #faf4e8;
+  --text2:     #d8c8a8;
+  --text3:     #a89880;
+  --green:     #72d080;
+  --red:       #e04040;
   --red-deep:  #8a1a1a;
-  --amber:     #c8962a;
+  --amber:     #e0a830;
   --blue:      #5a90c8;
   --r:         6px;
   --serif:     'Cormorant Garamond', Georgia, serif;
@@ -75,7 +75,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: 16px;
   height: 100%;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -107,8 +107,8 @@ body::before {
 
 .app-title {
   font-family: var(--serif);
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: var(--gold-light);
   letter-spacing: 0.06em;
   line-height: 1;
@@ -116,8 +116,8 @@ body::before {
 
 .app-title-sub {
   font-family: var(--mono);
-  font-size: 0.55rem;
-  color: var(--text3);
+  font-size: 0.65rem;
+  color: var(--text2);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   margin-top: 2px;
@@ -125,8 +125,8 @@ body::before {
 
 .live-dot {
   display: flex; align-items: center; gap: 5px;
-  font-family: var(--mono); font-size: 0.6rem;
-  color: var(--text3); letter-spacing: 0.06em;
+  font-family: var(--mono); font-size: 0.72rem;
+  color: var(--text2); letter-spacing: 0.06em;
 }
 
 .live-dot::before {
@@ -163,15 +163,15 @@ body::before {
 
 .date-label {
   font-family: var(--serif);
-  font-weight: 600;
-  font-size: 1rem;
+  font-weight: 700;
+  font-size: 1.1rem;
   color: var(--text);
   letter-spacing: 0.03em;
 }
 
 .date-sub {
-  font-family: var(--mono); font-size: 0.58rem;
-  color: var(--text3); letter-spacing: 0.1em; text-transform:uppercase;
+  font-family: var(--mono); font-size: 0.7rem;
+  color: var(--text2); letter-spacing: 0.08em; text-transform:uppercase;
 }
 
 /* ── TABS ── */
@@ -184,17 +184,17 @@ body::before {
 
 .tab-btn {
   padding: 8px 16px 7px;
-  font-family: var(--mono); font-size: 0.7rem; font-weight: 500;
-  letter-spacing: 0.06em; text-transform: uppercase;
+  font-family: var(--sans); font-size: 0.85rem; font-weight: 600;
+  letter-spacing: 0.03em;
   border: none; background: transparent;
-  color: var(--text3); cursor: pointer;
-  border-bottom: 1px solid transparent;
+  color: var(--text2); cursor: pointer;
+  border-bottom: 2px solid transparent;
   transition: all 0.15s;
 }
 
 .tab-btn.active {
   color: var(--gold-light);
-  border-bottom-color: var(--gold);
+  border-bottom-color: var(--gold-light);
 }
 
 /* ── SCROLL AREA ── */
@@ -206,13 +206,13 @@ body::before {
 
 /* ── TIME SLOT ── */
 .time-block {
-  border-bottom: 1px solid var(--border2);
+  border-bottom: 1px solid var(--border);
 }
 
 /* Full: strong red signal */
 .time-block.slot-full {
-  border-left: 3px solid rgba(160,30,30,0.8);
-  background: rgba(120,20,20,0.1);
+  border-left: 4px solid #e04040;
+  background: rgba(140,20,20,0.14);
 }
 
 /* Nearly full: removed — no longer used */
@@ -221,17 +221,17 @@ body::before {
   display: flex; align-items: center;
   padding: 7px 14px;
   background: var(--bg2);
-  border-bottom: 1px solid var(--border2);
+  border-bottom: 1px solid var(--border);
 }
 
 .slot-full .time-header {
-  background: rgba(100,15,15,0.25);
+  background: rgba(130,20,20,0.3);
 }
 
 /* ── NOTE BADGES ── */
 .note-badge {
   display: inline-block;
-  font-family: var(--mono); font-size: 0.56rem; font-weight: 500;
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 600;
   padding: 1px 6px; border-radius: 2px;
   white-space: nowrap; cursor: default;
   position: relative;
@@ -268,16 +268,16 @@ body::before {
 
 .time-label {
   font-family: var(--serif);
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--gold);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--gold-light);
   letter-spacing: 0.04em;
   min-width: 52px;
 }
 
 .time-chef-info {
-  font-family: var(--mono); font-size: 0.6rem;
-  color: var(--text3); margin-left: 10px; letter-spacing: 0.03em;
+  font-family: var(--mono); font-size: 0.78rem;
+  color: var(--text2); margin-left: 10px; letter-spacing: 0.01em;
 }
 
 .time-add-btn {
@@ -306,19 +306,32 @@ body::before {
   border: 1px solid var(--border);
   border-radius: var(--r); padding: 8px 12px;
   cursor: pointer; transition: all 0.15s;
-  border-left: 2px solid var(--gold2);
+  border-left: 3px solid var(--gold);
 }
 
 .res-row:active { opacity: 0.75; }
 
+/* Full slot — all reservation rows turn red */
+.slot-full .res-row {
+  border-left-color: #e04040;
+  background: rgba(140,20,20,0.18);
+  border-color: rgba(200,60,60,0.35);
+}
+.slot-full .res-row-name {
+  color: #ff8080;
+}
+.slot-full .res-row-meta {
+  color: #d06060;
+}
+
 .res-row-name {
-  font-family: var(--sans); font-size: 0.82rem; font-weight: 500;
+  font-family: var(--sans); font-size: 0.95rem; font-weight: 600;
   color: var(--text); flex: 1; min-width: 0;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
 .res-row-meta {
-  font-family: var(--mono); font-size: 0.62rem;
+  font-family: var(--mono); font-size: 0.8rem;
   color: var(--text2); display: flex; gap: 7px; align-items: center; flex-shrink: 0;
 }
 
@@ -331,8 +344,8 @@ body::before {
 
 .slot-empty {
   padding: 5px 10px 8px;
-  font-family: var(--mono); font-size: 0.62rem;
-  color: var(--text3); font-style: italic;
+  font-family: var(--mono); font-size: 0.8rem;
+  color: var(--text2); font-style: italic;
 }
 
 /* ── HISTORY TAB ── */
@@ -347,7 +360,7 @@ body::before {
 .history-entry {
   background: var(--bg3); border: 1px solid var(--border);
   border-radius: var(--r); padding: 9px 12px;
-  font-family: var(--mono); font-size: 0.68rem; line-height: 1.6;
+  font-family: var(--mono); font-size: 0.82rem; line-height: 1.7;
 }
 
 .history-entry .h-action {
@@ -362,7 +375,7 @@ body::before {
 
 .history-entry .h-who  { color: var(--gold2); font-weight: 600; }
 .history-entry .h-detail { color: var(--text2); }
-.history-entry .h-time   { color: var(--text3); font-size: 0.58rem; float: right; }
+.history-entry .h-time   { color: var(--text2); font-size: 0.7rem; float: right; }
 
 /* ── MODAL ── */
 .modal-overlay {
@@ -399,7 +412,7 @@ body::before {
 }
 
 .modal-title {
-  font-family: var(--serif); font-size: 1.05rem; font-weight: 600;
+  font-family: var(--serif); font-size: 1.2rem; font-weight: 700;
   color: var(--gold-light); letter-spacing: 0.04em;
 }
 
@@ -417,8 +430,8 @@ body::before {
 .form-row { margin-bottom: 12px; }
 
 .form-label {
-  font-family: var(--mono); font-size: 0.6rem; font-weight: 500;
-  color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase;
+  font-family: var(--mono); font-size: 0.7rem; font-weight: 500;
+  color: var(--text2); letter-spacing: 0.08em; text-transform: uppercase;
   margin-bottom: 5px; display: block;
 }
 
@@ -426,7 +439,7 @@ body::before {
   width: 100%; background: var(--bg3);
   border: 1px solid var(--border);
   border-radius: var(--r); padding: 10px 12px;
-  color: var(--text); font-family: var(--sans); font-size: 0.88rem;
+  color: var(--text); font-family: var(--sans); font-size: 1rem;
   outline: none; transition: border-color 0.15s;
   -webkit-appearance: none; appearance: none;
 }
@@ -447,8 +460,8 @@ body::before {
 .btn-gold {
   width: 100%; padding: 12px;
   background: var(--gold); color: var(--bg);
-  font-family: var(--mono); font-size: 0.78rem; font-weight: 500;
-  letter-spacing: 0.08em; text-transform: uppercase;
+  font-family: var(--sans); font-size: 0.95rem; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase;
   border: none; border-radius: var(--r); cursor: pointer;
   transition: all 0.15s;
 }
@@ -520,8 +533,8 @@ body::before {
 /* ── EMPTY STATE ── */
 .empty-slot {
   padding: 8px 14px;
-  font-family: var(--mono); font-size: 0.62rem;
-  color: var(--text3); font-style: italic;
+  font-family: var(--mono); font-size: 0.8rem;
+  color: var(--text2); font-style: italic;
 }
 
 /* ── DINING ROOM ── */
@@ -537,16 +550,16 @@ body::before {
 .dining-card:active { border-color: rgba(196,158,84,0.7); }
 
 .dining-name {
-  font-family: var(--sans); font-size: 0.88rem; font-weight: 500; color: var(--text);
+  font-family: var(--sans); font-size: 0.95rem; font-weight: 600; color: var(--text);
 }
 
 .dining-detail {
-  font-family: var(--mono); font-size: 0.62rem; color: var(--text2);
+  font-family: var(--mono); font-size: 0.72rem; color: var(--text2);
   margin-top: 3px; display: flex; gap: 10px;
 }
 
 .dining-note {
-  font-size: 0.66rem; color: var(--text3); margin-top: 4px;
+  font-size: 0.74rem; color: var(--text2); margin-top: 4px;
   font-style: italic; line-height: 1.4;
 }
 
@@ -619,8 +632,8 @@ body::before {
   margin-left: 6px; flex-shrink: 0;
 }
 .slot-cap-label {
-  font-family: var(--mono); font-size: 0.58rem; font-weight: 500;
-  letter-spacing: 0.04em; white-space: nowrap;
+  font-family: var(--mono); font-size: 0.8rem; font-weight: 700;
+  letter-spacing: 0.02em; white-space: nowrap;
   padding: 2px 6px; border-radius: 3px;
   cursor: pointer; transition: all 0.15s;
 }
@@ -643,7 +656,7 @@ body::before {
 .res-row.is-override.is-large-group { border-left-color: #c04040; background: rgba(192,64,64,0.07); }
 
 .override-badge {
-  font-family: var(--mono); font-size: 0.56rem; font-weight: 500;
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 600;
   padding: 1px 5px; border-radius: 2px;
   background: rgba(192,64,64,0.12); color: #c04040;
   border: 1px solid rgba(192,64,64,0.35);
@@ -1289,6 +1302,7 @@ function changeDay(dir) {
 }
 
 function toggleCalendar() {
+  if (appMode==='guest') return; // guests cannot open calendar
   const drop = document.getElementById('calDropdown');
   if (drop.style.display === 'none') {
     calViewYear = currentDate.getFullYear();
@@ -1663,6 +1677,7 @@ function renderWeekStrip() {
   pb.style.cssText='flex-shrink:0;margin:5px 8px 5px 4px;padding:5px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;font-family:var(--mono);font-size:0.6rem;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap;letter-spacing:0.04em;align-self:center';
   pb.textContent='Daily Sheet';
   pb.onclick=printDailySheet;
+  if (appMode==='guest') pb.style.display='none';
   stripWrap.appendChild(strip);
   stripWrap.appendChild(pb);
   container.innerHTML='';
@@ -1701,19 +1716,18 @@ function printDailySheet() {
 }
 
 function renderHibachi() {
-  renderWeekStrip();
+  if (appMode==='guest') {
+    document.getElementById('weekStrip').style.display='none';
+    document.getElementById('calDropdown').style.display='none';
+    const dc=document.getElementById('dateSub'); if(dc) dc.style.cursor='default';
+  } else {
+    document.getElementById('weekStrip').style.display='';
+    loadWeekData();
+  }
   renderTimeSlots();
   if (appMode==='guest') {
     document.querySelectorAll('.time-add-btn,.block-btn').forEach(b=>b.style.display='none');
-    if (!document.getElementById('guestModeNote')) {
-      const note=document.createElement('div');
-      note.id='guestModeNote';
-      note.style.cssText='padding:10px 14px 18px;font-family:var(--mono);font-size:0.6rem;color:var(--text3);line-height:1.7;text-align:center;letter-spacing:0.03em;';
-      note.innerHTML='Guest view — names shown are generic placeholders. Group sizes and times are accurate.';
-      document.getElementById('timeSlots').parentNode.appendChild(note);
-    }
   }
-  loadWeekData();
 }
 
 function renderTimeSlots() {
@@ -1795,12 +1809,17 @@ function renderTimeSlots() {
       +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();saveSlotCap(\''+slot+'\','+chefs+');}if(event.key===\'Escape\'){event.preventDefault();toggleCapInput(\''+slot+'\');}"'
       +' placeholder="'+defaultCap+'"></div>';
 
-    head.innerHTML='<div class="time-label" style="'+(isManuallyBlocked?'color:#c04040':slotFull?'color:#c04040':isSecondary?'color:var(--text3)':'')+'">'
-      +displayTime(slot)+'</div>'
-      +capWidget
-      +'<div class="time-chef-info">'+chefs+' chef'+(chefs!==1?'s':'')+' · '+allRecs.length+' grp · '+totalAtSlot+'p'+slotLabel+fullTag+'</div>'
-      +'<button class="block-btn '+(isManuallyBlocked?'is-blocked':'')+'" onclick="toggleBlockSlot(\''+slot+'\')" title="'+(isManuallyBlocked?'Unblock':'Block')+' slot">'+(isManuallyBlocked?'🔓':'🔒')+'</button>'
-      +(isManuallyBlocked?'':`<button class="time-add-btn" onclick="openHibachiModal('${slot}',null)" aria-label="Add">+</button>`);
+    const isGuest=appMode==='guest';
+    if (isGuest) {
+      head.innerHTML='<div class="time-label" style="'+(slotFull||isManuallyBlocked?'color:#c04040':'')+'">'+displayTime(slot)+'</div>'+capWidget;
+    } else {
+      head.innerHTML='<div class="time-label" style="'+(isManuallyBlocked?'color:#c04040':slotFull?'color:#c04040':isSecondary?'color:var(--text3)':'')+'">'
+        +displayTime(slot)+'</div>'
+        +capWidget
+        +'<div class="time-chef-info">'+chefs+' chef'+(chefs!==1?'s':'')+' · '+allRecs.length+' grp · '+totalAtSlot+'p'+slotLabel+fullTag+'</div>'
+        +'<button class="block-btn '+(isManuallyBlocked?'is-blocked':'')+'" onclick="toggleBlockSlot(\''+slot+'\')" title="'+(isManuallyBlocked?'Unblock':'Block')+' slot">'+(isManuallyBlocked?'🔓':'🔒')+'</button>'
+        +(isManuallyBlocked?'':`<button class="time-add-btn" onclick="openHibachiModal('${slot}',null)" aria-label="Add">+</button>`);
+    }
 
     block.appendChild(head);
     const listDiv=document.createElement('div');
@@ -1814,37 +1833,38 @@ function renderTimeSlots() {
       }
       listDiv.appendChild(em);
     } else {
-      allRecs.sort((a,b)=>(a.name||'').localeCompare(b.name||'')).forEach(r=>{
-        const row=document.createElement('div'); row.className='res-row';
-        const nowMins=new Date().getHours()*60+new Date().getMinutes();
-        const rSlotMins=timeToMinutes(r.slot);
-        const isToday=dateKey(currentDate)===dateKey(new Date());
-        const isSoon=isToday&&nowMins>=rSlotMins-10&&nowMins<=rSlotMins+5;
-        if (isSoon) row.classList.add('seated-soon');
-        const displayName=getDisplayName(r.id,r.name,key);
-        const isGuest=appMode==='guest';
-        const isOverride=!!r.managerOverride||!!r.overrideBooked;
-        const isLargeGroup=(r.guests||0)>=DOUBLE_GRILL_MIN_GUESTS;
-        if (isOverride) row.classList.add('is-override');
-        if (isLargeGroup) row.classList.add('is-large-group');
-        row.innerHTML='<div class="res-row-meta" style="flex-shrink:0"><span style="font-weight:600;color:var(--text);font-size:0.8rem">'+( r.guests||'')+'p</span></div>'
-          +'<div class="res-row-name">'+escHtml(displayName)
-          +(r.isDouble?' <span style="font-size:0.58rem;color:var(--amber)">×2</span>':'')
-          +(isLargeGroup?' <span class="large-group-badge">⚡</span>':'')
-          +(isOverride?' <span class="override-badge">OVERRIDE</span>':'')
-          +(r.holdUntil?' <span style="font-size:0.56rem;color:var(--amber);font-weight:600;background:rgba(200,150,42,0.12);border:1px solid rgba(200,150,42,0.3);padding:1px 5px;border-radius:2px">HOLD</span>':'')
-          +(r.noteType==='allergy'?' <span class="note-badge allergy" title="'+escHtml(r.noteText||r.notes||'')+'">ALLERGY</span>':'')
-          +(r.noteType==='restriction'?' <span class="note-badge restriction" title="'+escHtml(r.noteText||r.notes||'')+'">REST.</span>':'')
-          +'</div>'
-          +'<div class="res-row-meta">'
-          +(isSoon?'<span class="soon-badge">SEAT NOW</span>':'')
-          +(!isGuest&&r.phone?'<span style="font-size:0.6rem">'+escHtml(r.phone)+'</span>':'')
-          +(!isGuest&&r.initials?'<span class="res-row-badge">'+escHtml(r.initials)+'</span>':'')
-          +'</div>';
-        if (!isGuest) row.onclick=()=>openHibachiModal(slot,r.id);
-        else row.style.cursor='default';
-        listDiv.appendChild(row);
-      });
+      if (!isGuest) {
+        allRecs.sort((a,b)=>(a.name||'').localeCompare(b.name||'')).forEach(r=>{
+          const row=document.createElement('div'); row.className='res-row';
+          const nowMins=new Date().getHours()*60+new Date().getMinutes();
+          const rSlotMins=timeToMinutes(r.slot);
+          const isToday=dateKey(currentDate)===dateKey(new Date());
+          const isSoon=isToday&&nowMins>=rSlotMins-10&&nowMins<=rSlotMins+5;
+          if (isSoon) row.classList.add('seated-soon');
+          const displayName=getDisplayName(r.id,r.name,key);
+          const isOverride=!!r.managerOverride||!!r.overrideBooked;
+          const isLargeGroup=(r.guests||0)>=DOUBLE_GRILL_MIN_GUESTS;
+          if (isOverride) row.classList.add('is-override');
+          if (isLargeGroup) row.classList.add('is-large-group');
+          row.innerHTML='<div class="res-row-meta" style="flex-shrink:0"><span style="font-weight:600;color:var(--text);font-size:0.8rem">'+(r.guests||'')+'p</span></div>'
+            +'<div class="res-row-name">'+escHtml(displayName)
+            +(r.isDouble?' <span style="font-size:0.58rem;color:var(--amber)">×2</span>':'')
+            +(isLargeGroup?' <span class="large-group-badge">⚡</span>':'')
+            +(isOverride?' <span class="override-badge">OVERRIDE</span>':'')
+            +(r.holdUntil?' <span style="font-size:0.56rem;color:var(--amber);font-weight:600;background:rgba(200,150,42,0.12);border:1px solid rgba(200,150,42,0.3);padding:1px 5px;border-radius:2px">HOLD</span>':'')
+            +(r.noteType==='allergy'?' <span class="note-badge allergy" title="'+escHtml(r.noteText||r.notes||'')+'">ALLERGY</span>':'')
+            +(r.noteType==='restriction'?' <span class="note-badge restriction" title="'+escHtml(r.noteText||r.notes||'')+'">REST.</span>':'')
+            +'</div>'
+            +'<div class="res-row-meta">'
+            +(isSoon?'<span class="soon-badge">SEAT NOW</span>':'')
+            +(r.phone?'<span style="font-size:0.6rem">'+escHtml(r.phone)+'</span>':'')
+            +(r.initials?'<span class="res-row-badge">'+escHtml(r.initials)+'</span>':'')
+            +'</div>';
+          row.onclick=()=>openHibachiModal(slot,r.id);
+          listDiv.appendChild(row);
+        });
+      }
+      // Guest mode: no individual reservation rows shown at all
     }
     block.appendChild(listDiv);
     container.appendChild(block);
