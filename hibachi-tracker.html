@@ -2194,8 +2194,20 @@ function renderTimeSlots() {
     const isManuallyBlocked=!!(blockedSlots[key]&&blockedSlots[key][slot.replace(':','_')]);
 
     const grillsBookedAtSlot=new Set(allRecs.flatMap(r=>r.isDouble?[r.grill,r.grill2]:[r.grill])).size;
-    // slotFull deferred — computed after cap calc so it's based on guest count, not grill count
-    // Nearly full REMOVED — no slotNearly class
+
+    // ── Compute cap & slotFull FIRST so all downstream code can use it ──
+    const totalAtSlot=allRecs.reduce((s,r)=>s+(r.guests||0),0);
+    const slotKey=slot.replace(':','_');
+    const allResForCap=getAllResForDate(key);
+    const chefsCommittedForCap=getChefsCommittedAtSlot(allResForCap,slotMins);
+    const freeChefsForCap=Math.max(0,chefs-chefsCommittedForCap.size);
+    const defaultCap=getSlotDefaultCap(freeChefsForCap);
+    const manualCap=slotCaps[key]?.[slotKey];
+    const effectiveCap=(manualCap!==undefined&&manualCap!==null)?manualCap:defaultCap;
+    const remaining=Math.max(0,effectiveCap-totalAtSlot);
+    const isCustom=(manualCap!==undefined&&manualCap!==null);
+    // FULL only when guest count hits cap — not when grills-used >= chefs
+    const slotFull = !isManuallyBlocked && remaining <= 0 && hasBookings;
 
     let isSecondary=false;
     if (preferHourly&&!hasBookings) {
@@ -2208,7 +2220,6 @@ function renderTimeSlots() {
 
     const head=document.createElement('div');
     head.className='time-header';
-    const totalAtSlot=allRecs.reduce((s,r)=>s+(r.guests||0),0);
 
     // Slot label hints (hourly preference)
     let slotLabel='';
@@ -2224,20 +2235,6 @@ function renderTimeSlots() {
       : slotFull
       ? '<span style="font-family:var(--mono);font-size:0.56rem;font-weight:700;color:#e03030;background:rgba(120,20,20,0.2);border:1px solid rgba(160,30,30,0.55);padding:1px 7px;border-radius:3px;margin-left:7px;letter-spacing:0.04em">FULL</span>'
       : '';
-
-    // Cap widget
-    const slotKey=slot.replace(':','_');
-    const allResForCap=getAllResForDate(key);
-    const chefsCommittedForCap=getChefsCommittedAtSlot(allResForCap,slotMins);
-    const freeChefsForCap=Math.max(0,chefs-chefsCommittedForCap.size);
-    const defaultCap=getSlotDefaultCap(freeChefsForCap);
-    const manualCap=slotCaps[key]?.[slotKey];
-    const effectiveCap=(manualCap!==undefined&&manualCap!==null)?manualCap:defaultCap;
-    const remaining=Math.max(0,effectiveCap-totalAtSlot);
-    const isCustom=(manualCap!==undefined&&manualCap!==null);
-
-    // slotFull: true only when guests have actually filled the cap
-    const slotFull = !isManuallyBlocked && remaining <= 0 && hasBookings;
 
     let capCls,capText;
     if (isManuallyBlocked) { capCls='none'; capText='—'; }
