@@ -1216,6 +1216,7 @@ let unlockedCardIds = new Set();
 const PWD_HASH_CARD   = '25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117';
 const PWD_HASH_LARGE  = '53d6668b995a4117d05d7799f6563672f4659d05f9f9fd45f961164de256b5d0';
 const PWD_HASH_EXPORT = '25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117';
+const PWD_HASH_CHEF   = '25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117'; // chef day removal
 
 async function hashPassword(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
@@ -1620,32 +1621,81 @@ function getBaseChefs() {
 async function promptRemoveChef() {
   if (appMode !== 'staff') return;
   const dk = dateKey(currentDate);
-  const existing = chefDayOverrides[dk];
-  if (existing) { alert('A chef has already been removed for today. Restore them first.'); return; }
-  const initials = prompt('Remove a chef for today — enter your initials to confirm:');
-  if (!initials || !initials.trim()) return;
-  const clean = initials.trim().toUpperCase().slice(0, 4);
-  // Sanitize: only letters
-  if (!/^[A-Z]{1,4}$/.test(clean)) { alert('Initials must be letters only (max 4).'); return; }
+  if (chefDayOverrides[dk]) { alert('A chef has already been removed for today. Restore them first.'); return; }
+  // Show password modal
+  document.getElementById('modalTitle').textContent = 'Remove Chef for Today';
+  document.getElementById('modalBody').innerHTML =
+    '<div style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);line-height:1.7;margin-bottom:14px">'
+    + 'This removes 1 chef from today\'s schedule only.<br>'
+    + 'Staff must do this manually each time. Not recurring.'
+    + '</div>'
+    + '<div class="form-row"><label class="form-label">Manager Password *</label>'
+    + '<input class="form-input" id="chefRemovePwd" type="password" placeholder="Enter password" autocomplete="off"'
+    + ' style="letter-spacing:0.15em"'
+    + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();confirmRemoveChef()}">'
+    + '</div>'
+    + '<div class="form-row"><label class="form-label">Your Initials *</label>'
+    + '<input class="form-input" id="chefRemoveInitials" type="text" maxlength="4" placeholder="JS" autocomplete="off"'
+    + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();confirmRemoveChef()}">'
+    + '</div>'
+    + '<div id="chefRemoveErr" style="font-family:var(--mono);font-size:0.67rem;color:#c04040;min-height:14px;margin-bottom:8px"></div>'
+    + '<button class="btn-gold" onclick="confirmRemoveChef()">Remove Chef for Today</button>';
+  showModal();
+  setTimeout(() => document.getElementById('chefRemovePwd')?.focus(), 80);
+}
+
+async function confirmRemoveChef() {
+  const pwd = document.getElementById('chefRemovePwd')?.value || '';
+  const initials = sanitizeInitials(document.getElementById('chefRemoveInitials')?.value || '');
+  const errEl = document.getElementById('chefRemoveErr');
+  if (!initials) { if(errEl) errEl.textContent = 'Initials required.'; return; }
+  const ok = await checkPassword(pwd, PWD_HASH_CHEF);
+  if (!ok) { if(errEl) errEl.textContent = '✕ Incorrect password.'; document.getElementById('chefRemovePwd').value=''; document.getElementById('chefRemovePwd').focus(); return; }
+  const dk = dateKey(currentDate);
   try {
     await window._set(window._ref(window._db, `chefOverrides/${dk}`), {
-      removed: true, initials: clean, removedAt: Date.now()
+      removed: true, initials, removedAt: Date.now()
     });
-    await logAudit('edit', 'CHEF REMOVED for day — schedule reduced by 1', clean);
-  } catch(e) { alert('Error: ' + e.message); }
+    await logAudit('edit', 'CHEF REMOVED for day — schedule reduced by 1', initials);
+    closeModal();
+  } catch(e) { if(errEl) errEl.textContent = 'Error: ' + e.message; }
 }
 
 async function restoreChefForDay() {
   if (appMode !== 'staff') return;
+  document.getElementById('modalTitle').textContent = 'Restore Chef';
+  document.getElementById('modalBody').innerHTML =
+    '<div style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);line-height:1.7;margin-bottom:14px">'
+    + 'Restore the removed chef to today\'s schedule.'
+    + '</div>'
+    + '<div class="form-row"><label class="form-label">Manager Password *</label>'
+    + '<input class="form-input" id="chefRestorePwd" type="password" placeholder="Enter password" autocomplete="off"'
+    + ' style="letter-spacing:0.15em"'
+    + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();confirmRestoreChef()}">'
+    + '</div>'
+    + '<div class="form-row"><label class="form-label">Your Initials *</label>'
+    + '<input class="form-input" id="chefRestoreInitials" type="text" maxlength="4" placeholder="JS" autocomplete="off"'
+    + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();confirmRestoreChef()}">'
+    + '</div>'
+    + '<div id="chefRestoreErr" style="font-family:var(--mono);font-size:0.67rem;color:#c04040;min-height:14px;margin-bottom:8px"></div>'
+    + '<button class="btn-gold" onclick="confirmRestoreChef()">Restore Chef</button>';
+  showModal();
+  setTimeout(() => document.getElementById('chefRestorePwd')?.focus(), 80);
+}
+
+async function confirmRestoreChef() {
+  const pwd = document.getElementById('chefRestorePwd')?.value || '';
+  const initials = sanitizeInitials(document.getElementById('chefRestoreInitials')?.value || '');
+  const errEl = document.getElementById('chefRestoreErr');
+  if (!initials) { if(errEl) errEl.textContent = 'Initials required.'; return; }
+  const ok = await checkPassword(pwd, PWD_HASH_CHEF);
+  if (!ok) { if(errEl) errEl.textContent = '✕ Incorrect password.'; document.getElementById('chefRestorePwd').value=''; document.getElementById('chefRestorePwd').focus(); return; }
   const dk = dateKey(currentDate);
-  const initials = prompt('Restore chef for today — enter your initials:');
-  if (!initials || !initials.trim()) return;
-  const clean = initials.trim().toUpperCase().slice(0, 4);
-  if (!/^[A-Z]{1,4}$/.test(clean)) { alert('Initials must be letters only (max 4).'); return; }
   try {
     await window._remove(window._ref(window._db, `chefOverrides/${dk}`));
-    await logAudit('edit', 'CHEF RESTORED for day — schedule back to normal', clean);
-  } catch(e) { alert('Error: ' + e.message); }
+    await logAudit('edit', 'CHEF RESTORED for day — schedule back to normal', initials);
+    closeModal();
+  } catch(e) { if(errEl) errEl.textContent = 'Error: ' + e.message; }
 }
 
 /* ── CONFIRM RESERVATION ── */
@@ -2144,7 +2194,7 @@ function renderTimeSlots() {
     const isManuallyBlocked=!!(blockedSlots[key]&&blockedSlots[key][slot.replace(':','_')]);
 
     const grillsBookedAtSlot=new Set(allRecs.flatMap(r=>r.isDouble?[r.grill,r.grill2]:[r.grill])).size;
-    const slotFull=hasBookings&&grillsBookedAtSlot>=chefs;
+    // slotFull deferred — computed after cap calc so it's based on guest count, not grill count
     // Nearly full REMOVED — no slotNearly class
 
     let isSecondary=false;
@@ -2185,6 +2235,9 @@ function renderTimeSlots() {
     const effectiveCap=(manualCap!==undefined&&manualCap!==null)?manualCap:defaultCap;
     const remaining=Math.max(0,effectiveCap-totalAtSlot);
     const isCustom=(manualCap!==undefined&&manualCap!==null);
+
+    // slotFull: true only when guests have actually filled the cap
+    const slotFull = !isManuallyBlocked && remaining <= 0 && hasBookings;
 
     let capCls,capText;
     if (isManuallyBlocked) { capCls='none'; capText='—'; }
