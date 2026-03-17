@@ -3670,6 +3670,11 @@ async function submitPin() {
     enterStaffMode();
     return;
   }
+  if (h === STAFF2_PIN_HASH) {
+    clearLockState();
+    enterStaff2Mode();
+    return;
+  }
 
   // Wrong password
   const attempts = recordFailedAttempt();
