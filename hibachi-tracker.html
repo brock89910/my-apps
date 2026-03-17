@@ -1595,10 +1595,30 @@ function autoAssignGrill(dateStr,slot,guests,chefs,excludeId) {
 let weekDataCache = {};
 
 function getRolling7Days() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const sel   = new Date(currentDate); sel.setHours(0,0,0,0);
+
+  // Is selected date within today's rolling 7-day window?
+  const todayPlus6 = new Date(today); todayPlus6.setDate(today.getDate() + 6);
+  const isThisWeek = sel >= today && sel <= todayPlus6;
+
+  let start;
+  if (isThisWeek) {
+    // Lock strip to start from today
+    start = new Date(today);
+  } else {
+    // Selected date is further out — show Mon–Sun of that week
+    const dow = sel.getDay(); // 0=Sun
+    const daysFromMon = (dow + 6) % 7;
+    start = new Date(sel);
+    start.setDate(sel.getDate() - daysFromMon);
+    start.setHours(0,0,0,0);
+  }
+
   const days = [];
   for (let i = 0; i < 7; i++) {
-    const d = new Date(currentDate);
-    d.setDate(currentDate.getDate() + i);
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
     d.setHours(0,0,0,0);
     days.push(d);
   }
@@ -1657,16 +1677,16 @@ function renderWeekStrip() {
   items.forEach(({d,dk,label,guests,bookings})=>{
     const isSel=dk===selKey, isToday=dk===todayKey, hasBkg=bookings>0;
     const cell=document.createElement('button');
-    cell.style.cssText=`display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5px 8px;border-radius:7px;border:1px solid;cursor:pointer;min-width:42px;background:${isSel?'var(--gold)':isToday?'rgba(196,158,84,0.1)':'transparent'};border-color:${isSel?'var(--gold)':isToday?'rgba(196,158,84,0.35)':'var(--border2)'};transition:all 0.15s;`;
+    cell.style.cssText=`display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 10px;border-radius:8px;border:1px solid;cursor:pointer;min-width:48px;background:${isSel?'var(--gold)':isToday?'rgba(210,175,100,0.14)':'transparent'};border-color:${isSel?'var(--gold)':isToday?'rgba(210,175,100,0.4)':'var(--border)'};transition:all 0.15s;`;
     const dl=document.createElement('div');
-    dl.style.cssText=`font-family:var(--mono);font-size:0.56rem;font-weight:600;letter-spacing:0.06em;color:${isSel?'var(--bg)':isToday?'var(--gold)':'var(--text3)'}`;
+    dl.style.cssText=`font-family:var(--mono);font-size:0.65rem;font-weight:700;letter-spacing:0.06em;color:${isSel?'var(--bg)':isToday?'var(--gold)':'var(--text2)'}`;
     dl.textContent=label;
     const dd=document.createElement('div');
-    dd.style.cssText=`font-family:var(--serif);font-size:0.95rem;font-weight:${isSel||isToday?'600':'400'};color:${isSel?'var(--bg)':isToday?'var(--gold)':'var(--text)'}`;
+    dd.style.cssText=`font-family:var(--serif);font-size:1.1rem;font-weight:${isSel||isToday?'700':'500'};color:${isSel?'var(--bg)':isToday?'var(--gold)':'var(--text)'}`;
     dd.textContent=d.getDate();
     const gl=document.createElement('div');
     const na=weekDataCache[dk]&&(weekDataCache[dk].hasOverride||weekDataCache[dk].hasLargeGroup);
-    gl.style.cssText='font-family:var(--mono);font-size:0.55rem;font-weight:600;margin-top:1px;color:'+(isSel?'rgba(17,16,16,0.75)':na?'#c04040':hasBkg?'var(--amber)':'var(--text3)');
+    gl.style.cssText='font-family:var(--mono);font-size:0.72rem;font-weight:700;margin-top:2px;color:'+(isSel?'rgba(17,16,16,0.85)':na?'#e04040':hasBkg?'var(--gold-light)':'var(--text3)');
     gl.textContent=hasBkg?guests+'p'+(na?' !':''):'—';
     cell.appendChild(dl); cell.appendChild(dd); cell.appendChild(gl);
     cell.onclick=()=>pickDate(dk);
@@ -1725,9 +1745,59 @@ function renderHibachi() {
     loadWeekData();
   }
   renderTimeSlots();
+  renderDailyTally();
   if (appMode==='guest') {
     document.querySelectorAll('.time-add-btn,.block-btn').forEach(b=>b.style.display='none');
   }
+}
+
+function renderDailyTally() {
+  const key = dateKey(currentDate);
+  const allRes = getAllResForDate(key);
+  const totalGroups = allRes.length;
+  const totalGuests = allRes.reduce((s,r)=>s+(r.guests||0),0);
+
+  // Remove existing tally
+  const existing = document.getElementById('dailyTally');
+  if (existing) existing.remove();
+  if (!totalGroups) return;
+
+  const tally = document.createElement('div');
+  tally.id = 'dailyTally';
+  tally.style.cssText = [
+    'display:flex',
+    'align-items:center',
+    'justify-content:center',
+    'gap:20px',
+    'padding:10px 16px',
+    'background:linear-gradient(135deg, rgba(212,168,67,0.12) 0%, rgba(212,168,67,0.06) 100%)',
+    'border-bottom:1px solid rgba(212,168,67,0.25)',
+    'border-top:1px solid rgba(212,168,67,0.1)',
+  ].join(';');
+
+  const makeBlock = (value, label) => {
+    const b = document.createElement('div');
+    b.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:1px';
+    const v = document.createElement('div');
+    v.style.cssText = 'font-family:var(--serif);font-size:2rem;font-weight:700;color:var(--gold-light);line-height:1';
+    v.textContent = value;
+    const l = document.createElement('div');
+    l.style.cssText = 'font-family:var(--mono);font-size:0.65rem;font-weight:600;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase';
+    l.textContent = label;
+    b.appendChild(v); b.appendChild(l);
+    return b;
+  };
+
+  const divider = document.createElement('div');
+  divider.style.cssText = 'width:1px;height:36px;background:rgba(212,168,67,0.25)';
+
+  tally.appendChild(makeBlock(totalGuests, 'Guests Today'));
+  tally.appendChild(divider);
+  tally.appendChild(makeBlock(totalGroups, 'Groups Today'));
+
+  // Insert above #timeSlots
+  const timeSlotsEl = document.getElementById('timeSlots');
+  timeSlotsEl.parentNode.insertBefore(tally, timeSlotsEl);
 }
 
 function renderTimeSlots() {
@@ -1846,8 +1916,7 @@ function renderTimeSlots() {
           const isLargeGroup=(r.guests||0)>=DOUBLE_GRILL_MIN_GUESTS;
           if (isOverride) row.classList.add('is-override');
           if (isLargeGroup) row.classList.add('is-large-group');
-          row.innerHTML='<div class="res-row-meta" style="flex-shrink:0"><span style="font-weight:600;color:var(--text);font-size:0.8rem">'+(r.guests||'')+'p</span></div>'
-            +'<div class="res-row-name">'+escHtml(displayName)
+          row.innerHTML='<div class="res-row-name">'+escHtml(displayName)
             +(r.isDouble?' <span style="font-size:0.58rem;color:var(--amber)">×2</span>':'')
             +(isLargeGroup?' <span class="large-group-badge">⚡</span>':'')
             +(isOverride?' <span class="override-badge">OVERRIDE</span>':'')
