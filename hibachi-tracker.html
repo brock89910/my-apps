@@ -926,6 +926,11 @@ body::before {
   color: var(--blue); background: rgba(90,144,200,0.1);
   border: 1px solid rgba(90,144,200,0.25);
 }
+#modeIndicator.manager {
+  display: inline-flex; align-items: center; gap: 4px;
+  color: var(--gold-light); background: rgba(196,158,84,0.12);
+  border: 1px solid rgba(196,158,84,0.35);
+}
 
 /* ── GUEST MODE ── */
 body.guest-mode .res-row-name .real-name { display: none; }
@@ -965,12 +970,12 @@ body.staff-mode .real-name { display: inline; }
     <div class="login-rule"></div>
 
     <div class="login-card">
-      <div class="login-card-title">Staff Access</div>
+      <div class="login-card-title">Access</div>
       <input class="login-input" id="staffPin" type="password"
-        placeholder="Enter staff PIN" autocomplete="off"
-        onkeydown="if(event.key==='Enter')submitStaffPin()">
+        placeholder="Enter password" autocomplete="off"
+        onkeydown="if(event.key==='Enter')submitPin()">
       <div class="login-err" id="staffPinErr"></div>
-      <button class="login-btn-staff" onclick="submitStaffPin()">Enter as Staff</button>
+      <button class="login-btn-staff" onclick="submitPin()">Enter</button>
     </div>
 
     <div class="login-divider">— or —</div>
@@ -984,7 +989,7 @@ body.staff-mode .real-name { display: inline; }
     </div>
 
     <div class="login-note">
-      Staff PIN required to create, edit, or view reservation details.
+      Password required to create, edit, or view reservation details.
     </div>
   </div>
 </div>
@@ -1038,7 +1043,7 @@ body.staff-mode .real-name { display: inline; }
     <button class="tab-btn active" id="tab-hibachi" onclick="switchTab('hibachi')">Hibachi</button>
     <button class="tab-btn"        id="tab-dining"  onclick="switchTab('dining')">Dining</button>
     <button class="tab-btn"        id="tab-history" onclick="switchTab('history')">History</button>
-    <button class="tab-btn"        id="tab-export"  onclick="switchTab('export')">Export</button>
+    <button class="tab-btn"        id="tab-export"  onclick="switchTab('export')" style="display:none">Export</button>
   </div>
 
   <!-- ═══ HIBACHI TAB ═══ -->
@@ -2126,11 +2131,14 @@ function renderWeekStrip() {
     const gl=document.createElement('div');
     const na=weekDataCache[dk]&&(weekDataCache[dk].hasOverride||weekDataCache[dk].hasLargeGroup);
     gl.style.cssText='font-family:var(--mono);font-size:0.72rem;font-weight:700;margin-top:2px;color:'+(isSel?'rgba(17,16,16,0.85)':'var(--gold-light)');
-    if (hasBkg) {
+    if (hasBkg && isToday) {
+      // Only show guest tally on TODAY's cell
+      gl.innerHTML=guests+'p'+(na?'<span style="color:#e04040"> !</span>':'');
+    } else if (hasBkg && isSel && !isToday) {
+      // Selected non-today: show tally since staff navigated there
       gl.innerHTML=guests+'p'+(na?'<span style="color:#e04040"> !</span>':'');
     } else {
-      gl.textContent='—';
-      gl.style.color=isSel?'rgba(17,16,16,0.85)':'var(--text3)';
+      gl.textContent='';
     }
     cell.appendChild(dl); cell.appendChild(dd); cell.appendChild(gl);
     cell.onclick=()=>pickDate(dk);
@@ -2302,7 +2310,7 @@ function renderTimeSlots() {
         +displayTime(slot)+'</div>'
         +capWidget
         +'<div class="time-chef-info">'+chefs+' chef'+(chefs!==1?'s':'')+' · '+allRecs.length+' grp'+slotLabel+fullTag+'</div>'
-        +'<button class="block-btn '+(isManuallyBlocked?'is-blocked':'')+'" onclick="toggleBlockSlot(\''+slot+'\')" title="'+(isManuallyBlocked?'Unblock':'Block')+' slot">'+(isManuallyBlocked?'🔓':'🔒')+'</button>'
+        +(isManuallyBlocked?'<span style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);padding:0 6px">🔒</span>':'')
         +(isManuallyBlocked?'':`<button class="time-add-btn" onclick="openHibachiModal('${slot}',null)" aria-label="Add">+</button>`);
     }
 
@@ -2337,14 +2345,7 @@ function renderTimeSlots() {
             +'<div class="res-row-name"><span style="color:var(--gold);font-weight:700;margin-right:6px">'+(r.guests||'')+'p</span>'+escHtml(displayName)
             +(r.isDouble?' <span style="font-size:0.58rem;color:var(--amber)">×2</span>':'')
             +(isLargeGroup?' <span class="large-group-badge">⚡</span>':'')
-            +(isOverride
-  ? r.overrideType==='no-card'
-    ? ' <span class="override-badge">OR No-Card</span>'
-    : r.overrideType==='too-many'
-      ? ' <span class="override-badge" style="color:#e06060">OR Too Many</span>'
-      : ' <span class="override-badge">OVERRIDE</span>'
-  : '')
-+(r.wasEdited&&!isOverride?' <span style="font-size:0.56rem;font-weight:600;color:var(--gold);background:rgba(196,158,84,0.1);border:1px solid rgba(196,158,84,0.3);padding:1px 5px;border-radius:2px">CHANGED</span>':'')
+            // override/changed badges hidden from staff view
             +(r.holdUntil?' <span style="font-size:0.56rem;color:var(--amber);font-weight:600;background:rgba(200,150,42,0.12);border:1px solid rgba(200,150,42,0.3);padding:1px 5px;border-radius:2px">HOLD</span>':'')
             +(r.noteType==='allergy'?' <span class="note-badge allergy" title="'+escHtml(r.noteText||r.notes||'')+'">ALLERGY</span>':'')
             +(r.noteType==='restriction'?' <span class="note-badge restriction" title="'+escHtml(r.noteText||r.notes||'')+'">REST.</span>':'')
@@ -3185,7 +3186,76 @@ async function syncToSheet() {
 }
 
 /* ── LOGIN & ACCESS MODE ── */
-const STAFF_PIN_HASH='8e57858ab42fef1ee804b572421beb315e9fb3bd562f10f2f1c9ccf0384e8d99';
+const STAFF_PIN_HASH    ='8e57858ab42fef1ee804b572421beb315e9fb3bd562f10f2f1c9ccf0384e8d99'; // 1599 — staff
+const MANAGER_PIN_HASH_A='ed6757a399e37c0d2187b60c621deb5b4a152dc0a933a4d6135940ddc383f56b'; // g14022603
+const MANAGER_PIN_HASH_B='0bc0cfbf5519843daa9883b48fc41cc40a56ae51cc0b8f473084e31324cd6f18'; // nathanongame
+const BYPASS_LOCKOUT_HASH='168e204ed507530307d8ad02e65708a126e58979d0251b04e64b62100c6539cd'; // Funorange34 — bypass lockout only
+
+const LOGIN_MAX_ATTEMPTS = 3;
+const LOGIN_LOCKOUT_MS   = 60 * 60 * 1000; // 1 hour
+const LOGIN_STORAGE_KEY  = 'osaka_login_lock';
+
+function getLockState() {
+  try {
+    const raw = localStorage.getItem(LOGIN_STORAGE_KEY);
+    if (!raw) return { attempts: 0, lockedUntil: 0 };
+    return JSON.parse(raw);
+  } catch(e) { return { attempts: 0, lockedUntil: 0 }; }
+}
+
+function saveLockState(state) {
+  try { localStorage.setItem(LOGIN_STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function clearLockState() {
+  try { localStorage.removeItem(LOGIN_STORAGE_KEY); } catch(e) {}
+}
+
+function isLockedOut() {
+  const s = getLockState();
+  return s.lockedUntil && Date.now() < s.lockedUntil;
+}
+
+function getRemainingLockMinutes() {
+  const s = getLockState();
+  if (!s.lockedUntil) return 0;
+  return Math.ceil((s.lockedUntil - Date.now()) / 60000);
+}
+
+function recordFailedAttempt() {
+  const s = getLockState();
+  s.attempts = (s.attempts || 0) + 1;
+  if (s.attempts >= LOGIN_MAX_ATTEMPTS) {
+    s.lockedUntil = Date.now() + LOGIN_LOCKOUT_MS;
+  }
+  saveLockState(s);
+  return s.attempts;
+}
+
+function updateLockoutUI() {
+  const pin = document.getElementById('staffPin');
+  const btn = document.querySelector('.login-btn-staff');
+  const err = document.getElementById('staffPinErr');
+  if (!pin || !err) return;
+  if (isLockedOut()) {
+    const mins = getRemainingLockMinutes();
+    pin.disabled = true;
+    pin.placeholder = 'Device locked';
+    if (btn) btn.disabled = true;
+    err.textContent = '⚠ Too many attempts — locked for ' + mins + ' min' + (mins !== 1 ? 's' : '');
+    err.style.color = '#e04040';
+    // Tick every 30s to update the countdown
+    setTimeout(updateLockoutUI, 30000);
+  } else if (getLockState().lockedUntil && Date.now() >= getLockState().lockedUntil) {
+    // Lock just expired — clear it
+    clearLockState();
+    pin.disabled = false;
+    pin.placeholder = 'Enter password';
+    if (btn) btn.disabled = false;
+    err.textContent = '';
+    err.style.color = '';
+  }
+}
 const GENERIC_NAMES=['John','Kyle','Steve','Brittany','Kevin','Jane','Alexandra','Keith','Glenn','William','LeBlank','Cormiur','Grant','Cody','Claude','Sam','Pam','Trevor','Brou','Saskatoon','Gouda','Javier','Panda','April','Kucherov','Guest1','Alice','Jessica','Crosby'];
 let appMode=null;
 let genericNameMap={}, genericNameCounters={};
@@ -3199,25 +3269,79 @@ function getGenericName(dk,resId) {
   return name;
 }
 
-async function submitStaffPin() {
-  const pin=document.getElementById('staffPin').value;
-  const h=await hashPassword(pin);
-  if (h!==STAFF_PIN_HASH) {
-    const err=document.getElementById('staffPinErr');
-    err.textContent='✕ Incorrect PIN';
-    document.getElementById('staffPin').value=''; document.getElementById('staffPin').focus();
-    setTimeout(()=>{err.textContent='';},2500);
+async function submitPin() {
+  const pin = document.getElementById('staffPin').value;
+  const err = document.getElementById('staffPinErr');
+  const h   = await hashPassword(pin);
+
+  // Bypass lockout — accepts even while locked
+  if (h === BYPASS_LOCKOUT_HASH) {
+    clearLockState();
+    const pinEl = document.getElementById('staffPin');
+    const btn   = document.querySelector('.login-btn-staff');
+    pinEl.disabled = false; pinEl.placeholder = 'Enter password';
+    if (btn) btn.disabled = false;
+    err.textContent = '✓ Lockout cleared'; err.style.color = 'var(--green)';
+    pinEl.value = '';
+    setTimeout(() => { err.textContent = ''; err.style.color = ''; }, 2000);
     return;
   }
-  enterStaffMode();
+
+  // Hard block if locked out
+  if (isLockedOut()) {
+    updateLockoutUI();
+    return;
+  }
+
+  // Check valid passwords
+  if (h === MANAGER_PIN_HASH_A || h === MANAGER_PIN_HASH_B) {
+    clearLockState(); // successful login resets counter
+    enterManagerMode();
+    return;
+  }
+  if (h === STAFF_PIN_HASH) {
+    clearLockState();
+    enterStaffMode();
+    return;
+  }
+
+  // Wrong password
+  const attempts = recordFailedAttempt();
+  const remaining = LOGIN_MAX_ATTEMPTS - attempts;
+  document.getElementById('staffPin').value = '';
+  document.getElementById('staffPin').focus();
+
+  if (isLockedOut()) {
+    updateLockoutUI();
+  } else {
+    err.style.color = '#e04040';
+    err.textContent = remaining > 0
+      ? '✕ Incorrect password — ' + remaining + ' attempt' + (remaining !== 1 ? 's' : '') + ' left'
+      : '✕ Incorrect password';
+    setTimeout(() => { if (!isLockedOut()) { err.textContent = ''; err.style.color = ''; } }, 3000);
+  }
 }
+
+// Keep old name as alias
+async function submitStaffPin() { return submitPin(); }
 
 function enterStaffMode() {
   appMode='staff';
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('app').style.display='';
-  document.body.classList.remove('guest-mode'); document.body.classList.add('staff-mode');
+  document.body.classList.remove('guest-mode','manager-mode'); document.body.classList.add('staff-mode');
   const ind=document.getElementById('modeIndicator'); ind.className='staff'; ind.textContent='✓ Staff';
+  startApp();
+}
+
+function enterManagerMode() {
+  appMode='manager';
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').style.display='';
+  document.body.classList.remove('guest-mode','staff-mode'); document.body.classList.add('manager-mode','staff-mode');
+  const ind=document.getElementById('modeIndicator'); ind.className='manager'; ind.textContent='✓ Manager';
+  // Manager sees export tab
+  document.getElementById('tab-export').style.display='';
   startApp();
 }
 
@@ -3228,7 +3352,7 @@ function enterGuestMode() {
   document.body.classList.remove('staff-mode'); document.body.classList.add('guest-mode');
   const ind=document.getElementById('modeIndicator'); ind.className='guest'; ind.textContent='Guest';
   document.getElementById('tab-history').style.display='none';
-  document.getElementById('tab-export').style.display='none';
+  // export already hidden for all non-manager users
   document.querySelectorAll('.time-add-btn,.block-btn').forEach(b=>b.style.display='none');
   startApp();
 }
@@ -3266,7 +3390,10 @@ function sanitizeGuests(val) {
 }
 
 /* ── INIT ── */
-function init() { document.getElementById('staffPin')?.focus(); }
+function init() {
+  updateLockoutUI();
+  if (!isLockedOut()) document.getElementById('staffPin')?.focus();
+}
 
 if (window._fbReady) { init(); }
 else {
