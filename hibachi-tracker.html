@@ -1259,17 +1259,21 @@ async function hashPassword(str) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
+function isManager() { return appMode === 'manager'; }
+
 async function checkPassword(inputVal, expectedHash) {
   return (await hashPassword(inputVal)) === expectedHash;
 }
 
 async function unlockCardDetails(editId) {
-  const pwd = document.getElementById('cardUnlockPwd')?.value || '';
-  const ok = await checkPassword(pwd, PWD_HASH_CARD);
-  if (!ok) {
-    const errEl = document.getElementById('cardUnlockErr');
-    if (errEl) { errEl.textContent = '✕ Incorrect password'; errEl.style.display = 'block'; setTimeout(() => { errEl.style.display = 'none'; }, 2000); }
-    return;
+  if (!isManager()) {
+    const pwd = document.getElementById('cardUnlockPwd')?.value || '';
+    const ok = await checkPassword(pwd, PWD_HASH_CARD);
+    if (!ok) {
+      const errEl = document.getElementById('cardUnlockErr');
+      if (errEl) { errEl.textContent = '✕ Incorrect password'; errEl.style.display = 'block'; setTimeout(() => { errEl.style.display = 'none'; }, 2000); }
+      return;
+    }
   }
   unlockedCardIds.add(editId);
   const section = document.getElementById('cardSection');
@@ -1538,6 +1542,7 @@ function showExportLock() {
 }
 
 async function unlockExport() {
+  if (isManager()) { exportUnlocked=true; switchTab('export'); return; }
   const pwd = document.getElementById('exportLockPwd')?.value||'';
   if (!await checkPassword(pwd, PWD_HASH_EXPORT)) {
     const err=document.getElementById('exportLockErr');
@@ -1656,21 +1661,22 @@ function getBaseChefs() {
 }
 
 async function promptRemoveChef() {
-  if (appMode !== 'staff') return;
+  if (appMode !== 'staff' && appMode !== 'manager') return;
   const dk = dateKey(currentDate);
   if (chefDayOverrides[dk]) { alert('A chef has already been removed for today. Restore them first.'); return; }
   // Show password modal
   document.getElementById('modalTitle').textContent = 'Remove Chef for Today';
+  const _pwRowRm = isManager() ? '' :
+    '<div class="form-row"><label class="form-label">Manager Password *</label>'
+    +'<input class="form-input" id="chefRemovePwd" type="password" placeholder="Enter password" autocomplete="off"'
+    +' style="letter-spacing:0.15em"'
+    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();confirmRemoveChef()}">'
+    +'</div>';
   document.getElementById('modalBody').innerHTML =
     '<div style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);line-height:1.7;margin-bottom:14px">'
-    + 'This removes 1 chef from today\'s schedule only.<br>'
-    + 'Staff must do this manually each time. Not recurring.'
+    + 'Removes 1 chef from today\'s schedule only. Not recurring.'
     + '</div>'
-    + '<div class="form-row"><label class="form-label">Manager Password *</label>'
-    + '<input class="form-input" id="chefRemovePwd" type="password" placeholder="Enter password" autocomplete="off"'
-    + ' style="letter-spacing:0.15em"'
-    + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();confirmRemoveChef()}">'
-    + '</div>'
+    + _pwRowRm
     + '<div class="form-row"><label class="form-label">Your Initials *</label>'
     + '<input class="form-input" id="chefRemoveInitials" type="text" maxlength="4" placeholder="JS" autocomplete="off"'
     + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();confirmRemoveChef()}">'
@@ -1682,12 +1688,14 @@ async function promptRemoveChef() {
 }
 
 async function confirmRemoveChef() {
-  const pwd = document.getElementById('chefRemovePwd')?.value || '';
   const initials = sanitizeInitials(document.getElementById('chefRemoveInitials')?.value || '');
   const errEl = document.getElementById('chefRemoveErr');
   if (!initials) { if(errEl) errEl.textContent = 'Initials required.'; return; }
-  const ok = await checkPassword(pwd, PWD_HASH_CHEF);
-  if (!ok) { if(errEl) errEl.textContent = '✕ Incorrect password.'; document.getElementById('chefRemovePwd').value=''; document.getElementById('chefRemovePwd').focus(); return; }
+  if (!isManager()) {
+    const pwd = document.getElementById('chefRemovePwd')?.value || '';
+    const ok = await checkPassword(pwd, PWD_HASH_CHEF);
+    if (!ok) { if(errEl) errEl.textContent = '✕ Incorrect password.'; document.getElementById('chefRemovePwd').value=''; document.getElementById('chefRemovePwd').focus(); return; }
+  }
   const dk = dateKey(currentDate);
   try {
     await window._set(window._ref(window._db, `reservations/${dk}/__chefRemoved`), {
@@ -1701,15 +1709,17 @@ async function confirmRemoveChef() {
 async function restoreChefForDay() {
   if (appMode !== 'staff') return;
   document.getElementById('modalTitle').textContent = 'Restore Chef';
+  const _pwRowRs = isManager() ? '' :
+    '<div class="form-row"><label class="form-label">Manager Password *</label>'
+    +'<input class="form-input" id="chefRestorePwd" type="password" placeholder="Enter password" autocomplete="off"'
+    +' style="letter-spacing:0.15em"'
+    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();confirmRestoreChef()}">'
+    +'</div>';
   document.getElementById('modalBody').innerHTML =
     '<div style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);line-height:1.7;margin-bottom:14px">'
     + 'Restore the removed chef to today\'s schedule.'
     + '</div>'
-    + '<div class="form-row"><label class="form-label">Manager Password *</label>'
-    + '<input class="form-input" id="chefRestorePwd" type="password" placeholder="Enter password" autocomplete="off"'
-    + ' style="letter-spacing:0.15em"'
-    + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();confirmRestoreChef()}">'
-    + '</div>'
+    + _pwRowRs
     + '<div class="form-row"><label class="form-label">Your Initials *</label>'
     + '<input class="form-input" id="chefRestoreInitials" type="text" maxlength="4" placeholder="JS" autocomplete="off"'
     + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();confirmRestoreChef()}">'
@@ -1721,12 +1731,14 @@ async function restoreChefForDay() {
 }
 
 async function confirmRestoreChef() {
-  const pwd = document.getElementById('chefRestorePwd')?.value || '';
   const initials = sanitizeInitials(document.getElementById('chefRestoreInitials')?.value || '');
   const errEl = document.getElementById('chefRestoreErr');
   if (!initials) { if(errEl) errEl.textContent = 'Initials required.'; return; }
-  const ok = await checkPassword(pwd, PWD_HASH_CHEF);
-  if (!ok) { if(errEl) errEl.textContent = '✕ Incorrect password.'; document.getElementById('chefRestorePwd').value=''; document.getElementById('chefRestorePwd').focus(); return; }
+  if (!isManager()) {
+    const pwd = document.getElementById('chefRestorePwd')?.value || '';
+    const ok = await checkPassword(pwd, PWD_HASH_CHEF);
+    if (!ok) { if(errEl) errEl.textContent = '✕ Incorrect password.'; document.getElementById('chefRestorePwd').value=''; document.getElementById('chefRestorePwd').focus(); return; }
+  }
   const dk = dateKey(currentDate);
   try {
     await window._remove(window._ref(window._db, `reservations/${dk}/__chefRemoved`));
@@ -2131,11 +2143,8 @@ function renderWeekStrip() {
     const gl=document.createElement('div');
     const na=weekDataCache[dk]&&(weekDataCache[dk].hasOverride||weekDataCache[dk].hasLargeGroup);
     gl.style.cssText='font-family:var(--mono);font-size:0.72rem;font-weight:700;margin-top:2px;color:'+(isSel?'rgba(17,16,16,0.85)':'var(--gold-light)');
-    if (hasBkg && isToday) {
-      // Only show guest tally on TODAY's cell
-      gl.innerHTML=guests+'p'+(na?'<span style="color:#e04040"> !</span>':'');
-    } else if (hasBkg && isSel && !isToday) {
-      // Selected non-today: show tally since staff navigated there
+    if (hasBkg && (isManager() || isToday || isSel)) {
+      // Manager: always show tally. Staff: only today + selected day
       gl.innerHTML=guests+'p'+(na?'<span style="color:#e04040"> !</span>':'');
     } else {
       gl.textContent='';
@@ -2392,6 +2401,8 @@ function openHibachiModal(slot, editId) {
   const key=dateKey(currentDate);
   // Editing an existing reservation requires staff password + initials
   if (editId) { openEditAuthModal(slot, editId); return; }
+  // staff2: use step-by-step flow for NEW reservations
+  if (appMode==='staff2') { openSteppedModal(slot); return; }
   _openHibachiModalInner(slot, editId);
 }
 
@@ -2399,29 +2410,41 @@ function openEditAuthModal(slot, editId) {
   const key=dateKey(currentDate);
   const r=(reservations[key]||{})[editId];
   document.getElementById('modalTitle').textContent='Edit Reservation';
-  document.getElementById('modalBody').innerHTML=
-    '<div style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);line-height:1.7;margin-bottom:14px">'
-    +escHtml((r&&r.name)||'Guest')+' · '+((r&&r.guests)||'?')+'p · '+((r&&r.slot)?displayTime(r.slot):'')
-    +'</div>'
-    +'<div class="form-row"><label class="form-label">Staff Password *</label>'
-    +'<input class="form-input" id="editAuthPwd" type="password" placeholder="Enter password" autocomplete="off" style="letter-spacing:0.15em"'
-    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();submitEditAuth(\''+slot+'\',\''+editId+'\')}"></div>'
-    +'<div class="form-row"><label class="form-label">Your Initials *</label>'
+  const info='<div style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);line-height:1.7;margin-bottom:14px">'
+    +escHtml((r&&r.name)||'Guest')+' · '+((r&&r.guests)||'?')+'p · '+((r&&r.slot)?displayTime(r.slot):'')+'</div>';
+  const initialsRow='<div class="form-row"><label class="form-label">Your Initials *</label>'
     +'<input class="form-input" id="editAuthInitials" type="text" maxlength="4" placeholder="JS" autocomplete="off"'
-    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();submitEditAuth(\''+slot+'\',\''+editId+'\')}"></div>'
-    +'<div id="editAuthErr" style="font-family:var(--mono);font-size:0.67rem;color:#c04040;min-height:14px;margin-bottom:8px"></div>'
+    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();submitEditAuth(\''+slot+'\',\''+editId+'\')}">'
+    +'</div>';
+  const errDiv='<div id="editAuthErr" style="font-family:var(--mono);font-size:0.67rem;color:#c04040;min-height:14px;margin-bottom:8px"></div>';
+  const submitBtn='<button class="btn-gold" style="width:100%;padding:14px" onclick="submitEditAuth(\''+slot+'\',\''+editId+'\')">Edit Reservation</button>';
+  if (isManager()) {
+    // Manager: initials only
+    document.getElementById('modalBody').innerHTML=info+initialsRow+errDiv+submitBtn;
+    showModal();
+    setTimeout(()=>document.getElementById('editAuthInitials')?.focus(),80);
+    return;
+  }
+  // Staff: password + initials
+  const pwdRow='<div class="form-row"><label class="form-label">Staff Password *</label>'
+    +'<input class="form-input" id="editAuthPwd" type="password" placeholder="Enter password" autocomplete="off" style="letter-spacing:0.15em"'
+    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();submitEditAuth(\''+slot+'\',\''+editId+'\')}">'
+    +'</div>';
+  document.getElementById('modalBody').innerHTML=info+pwdRow+initialsRow+errDiv
     +'<button class="btn-gold" style="width:100%;padding:14px" onclick="submitEditAuth(\''+slot+'\',\''+editId+'\')">🔓 Unlock to Edit</button>';
   showModal();
   setTimeout(()=>document.getElementById('editAuthPwd')?.focus(),80);
 }
 
 async function submitEditAuth(slot, editId) {
-  const pwd=document.getElementById('editAuthPwd')?.value||'';
   const initials=sanitizeInitials(document.getElementById('editAuthInitials')?.value||'');
   const errEl=document.getElementById('editAuthErr');
   if (!initials){if(errEl)errEl.textContent='Initials required.';return;}
-  const ok=await checkPassword(pwd,PWD_HASH_EDIT);
-  if (!ok){if(errEl){errEl.textContent='✕ Incorrect password.';document.getElementById('editAuthPwd').value='';document.getElementById('editAuthPwd').focus();}return;}
+  if (!isManager()) {
+    const pwd=document.getElementById('editAuthPwd')?.value||'';
+    const ok=await checkPassword(pwd,PWD_HASH_EDIT);
+    if (!ok){if(errEl){errEl.textContent='✕ Incorrect password.';document.getElementById('editAuthPwd').value='';document.getElementById('editAuthPwd').focus();}return;}
+  }
   closeModal();
   _openHibachiModalInner(slot,editId);
 }
@@ -2526,6 +2549,337 @@ function _openHibachiModalInner(slot, editId) {
   showModal();
 }
 
+/* ══════════════════════════════════════════════
+   STEPPED RESERVATION FLOW — staff2 mode
+   State held in _sr (stepped reservation) object
+   ══════════════════════════════════════════════ */
+let _sr = {}; // stepped reservation working state
+
+function _srDateLabel() {
+  const d = currentDate;
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return days[d.getDay()]+', '+months[d.getMonth()]+' '+d.getDate();
+}
+
+function _srHeader() {
+  return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0 14px;border-bottom:1px solid var(--border2);margin-bottom:16px">'
+    +'<div style="font-family:var(--serif);font-size:1.05rem;font-weight:700;color:var(--gold-light)">'+_srDateLabel()+'</div>'
+    +'<div style="font-family:var(--mono);font-size:0.9rem;font-weight:600;color:var(--gold)">'+displayTime(_sr.slot)+'</div>'
+    +'</div>';
+}
+
+function _srProgress(step) {
+  // step: 1=guests 2=name 3=phone 4=card 5=expiry 6=initials
+  const steps = _sr.needCard
+    ? ['#','Name','Phone','Card','Exp','Init']
+    : ['#','Name','Phone','Init'];
+  return '<div style="display:flex;gap:3px;margin-bottom:16px">'
+    + steps.map((s,i)=>{
+        const n=i+1;
+        const done=n<step, active=n===step;
+        return '<div style="flex:1;text-align:center;font-family:var(--mono);font-size:0.55rem;letter-spacing:0.04em;'
+          +'color:'+(active?'var(--gold-light)':done?'var(--green)':'var(--text3)')+';'
+          +'border-bottom:2px solid '+(active?'var(--gold)':done?'var(--green)':'transparent')+';padding-bottom:3px">'
+          +(done?'✓ ':'')+s+'</div>';
+      }).join('')
+    +'</div>';
+}
+
+function _srErr(msg) {
+  const el=document.getElementById('srErr');
+  if(el){el.textContent=msg;el.style.display=msg?'block':'none';}
+}
+
+function _srContinueBtn(label, fn) {
+  return '<button class="btn-gold" style="width:100%;padding:14px;margin-top:6px" onclick="'+fn+'()">'+label+' →</button>';
+}
+
+function openSteppedModal(slot) {
+  const dow = currentDate.getDay();
+  const slotMins = timeToMinutes(slot);
+  const chefs = getChefsAtTime(dow, slotMins);
+  _sr = { slot, dow, slotMins, chefs, needCard: false,
+          guests:0, name:'', phone:'', card:'', expiry:'', initials:'',
+          noteType:'', noteText:'' };
+  _srStep1();
+}
+
+/* ── STEP 1: Party size ── */
+function _srStep1() {
+  document.getElementById('modalTitle').textContent = 'New Reservation';
+  document.getElementById('modalBody').innerHTML =
+    _srHeader()
+    + _srProgress(1)
+    +'<div class="form-row"><label class="form-label" style="font-size:0.85rem;margin-bottom:8px">How many guests?</label>'
+    +'<input class="form-input" id="srGuests" type="number" min="1" max="50" placeholder="e.g. 4"'
+    +' style="font-size:1.4rem;text-align:center;padding:14px;letter-spacing:0.1em"'
+    +' oninput="checkLargeGroupPwd()"'
+    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srNext1()}">'
+    +'</div>'
+    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:8px"></div>'
+    + _srContinueBtn('Continue','srNext1');
+  showModal();
+  setTimeout(()=>document.getElementById('srGuests')?.focus(),80);
+}
+
+async function srNext1() {
+  const g = sanitizeGuests(document.getElementById('srGuests')?.value);
+  if (!g||g<1) return _srErr('Enter the number of guests.');
+  if (g>30 && !isManager()) {
+    const pwd=document.getElementById('fLargeGroupPwd')?.value||'';
+    const ok=await checkPassword(pwd,PWD_HASH_LARGE);
+    if (!ok) {
+      if (!document.getElementById('fLargeGroupPwd')) {
+        const err=document.getElementById('srErr');
+        err.style.display='block';
+        err.textContent='';
+        const div=document.createElement('div');div.style.cssText='margin-bottom:10px';
+        div.innerHTML='<label class="form-label">Manager Password (required for 30+ guests)</label>'
+          +'<input class="form-input" id="fLargeGroupPwd" type="password" placeholder="Enter password" style="letter-spacing:0.2em"'
+          +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srNext1()}">';
+        err.parentNode.insertBefore(div,err);
+        document.getElementById('fLargeGroupPwd').focus();
+      }
+      return _srErr('Groups of 30+ require manager approval.');
+    }
+  }
+  // Check grill availability now so we fail fast
+  const key=dateKey(currentDate);
+  const assign=autoAssignGrill(key,_sr.slot,g,_sr.chefs,undefined);
+  if (!assign) return _srErr('⚠ No availability for '+g+' guests at '+displayTime(_sr.slot)+'.');
+  _sr.guests=g;
+  _sr.assign=assign;
+  _sr.needCard=cardRequired(g,key);
+  _srStep2();
+}
+
+/* ── STEP 2: Name ── */
+function _srStep2() {
+  document.getElementById('modalTitle').textContent = 'New Reservation';
+  document.getElementById('modalBody').innerHTML =
+    _srHeader()
+    + _srProgress(2)
+    +'<div style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);margin-bottom:14px">'
+    +'<span style="color:var(--gold);font-weight:700">'+_sr.guests+'p</span>'
+    +' · '+(_sr.assign.isDouble?'Grills '+_sr.assign.grill+'+'+_sr.assign.grill2:'Grill '+_sr.assign.grill)
+    +'</div>'
+    +'<div class="form-row"><label class="form-label" style="font-size:0.85rem;margin-bottom:8px">Guest name</label>'
+    +'<input class="form-input" id="srName" type="text" placeholder="Last name or full name"'
+    +' style="font-size:1.1rem;padding:13px"'
+    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srNext2()}">'
+    +'</div>'
+    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:8px"></div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button class="btn-outline" style="flex:0 0 80px;padding:12px" onclick="_srStep1()">← Back</button>'
+    + _srContinueBtn('Continue','srNext2')
+    +'</div>';
+  showModal();
+  setTimeout(()=>document.getElementById('srName')?.focus(),80);
+}
+
+function srNext2() {
+  const n=sanitizeText(document.getElementById('srName')?.value,80);
+  if (!n) return _srErr('Guest name is required.');
+  _sr.name=n;
+  _srStep3();
+}
+
+/* ── STEP 3: Phone ── */
+function _srStep3() {
+  document.getElementById('modalTitle').textContent = 'New Reservation';
+  document.getElementById('modalBody').innerHTML =
+    _srHeader()
+    + _srProgress(3)
+    +'<div style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);margin-bottom:14px">'
+    +'<span style="color:var(--gold);font-weight:700">'+_sr.guests+'p</span>'
+    +' · <span style="color:var(--text)">'+escHtml(_sr.name)+'</span>'
+    +'</div>'
+    +'<div class="form-row"><label class="form-label" style="font-size:0.85rem;margin-bottom:8px">Phone number</label>'
+    +'<input class="form-input" id="srPhone" type="tel" placeholder="(506) 555-0100" maxlength="14"'
+    +' style="font-size:1.1rem;padding:13px"'
+    +' oninput="fmtPhone(this)"'
+    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srNext3()}">'
+    +'</div>'
+    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:8px"></div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button class="btn-outline" style="flex:0 0 80px;padding:12px" onclick="_srStep2()">← Back</button>'
+    + _srContinueBtn('Continue','srNext3')
+    +'</div>';
+  showModal();
+  setTimeout(()=>document.getElementById('srPhone')?.focus(),80);
+}
+
+function srNext3() {
+  const raw=document.getElementById('srPhone')?.value.replace(/\D/g,'')||'';
+  if (!raw||( raw.length!==7&&raw.length!==10)) return _srErr('Phone must be 7 digits (local) or 10 digits (with area code).');
+  _sr.phoneRaw=raw;
+  _sr.phone=raw.length===10?'('+raw.slice(0,3)+') '+raw.slice(3,6)+'-'+raw.slice(6):raw.slice(0,3)+'-'+raw.slice(3);
+  if (_sr.needCard) { _srStep4(); } else { _srStep6(); }
+}
+
+/* ── STEP 4: Card number (if needed) ── */
+function _srStep4() {
+  document.getElementById('modalTitle').textContent = 'New Reservation';
+  document.getElementById('modalBody').innerHTML =
+    _srHeader()
+    + _srProgress(4)
+    +'<div style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);margin-bottom:14px">'
+    +'<span style="color:var(--gold);font-weight:700">'+_sr.guests+'p</span>'
+    +' · <span style="color:var(--text)">'+escHtml(_sr.name)+'</span>'
+    +' · <span>'+escHtml(_sr.phone)+'</span>'
+    +'</div>'
+    +'<div class="form-row"><label class="form-label" style="font-size:0.85rem;margin-bottom:8px">Card number <span style="color:var(--red)">*</span></label>'
+    +'<input class="form-input" id="srCard" type="text" maxlength="19" placeholder="•••• •••• •••• ••••"'
+    +' style="font-size:1.1rem;padding:13px;letter-spacing:0.08em"'
+    +' oninput="fmtCard(this)"'
+    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srNext4()}">'
+    +'</div>'
+    +'<div style="font-family:var(--mono);font-size:0.62rem;color:var(--text3);margin-bottom:12px">Required for groups of '+_sr.guests+'.</div>'
+    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:8px"></div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button class="btn-outline" style="flex:0 0 80px;padding:12px" onclick="_srStep3()">← Back</button>'
+    + _srContinueBtn('Continue','srNext4')
+    +'</div>'
+    +'<button onclick="srSkipCard()" style="width:100%;margin-top:8px;padding:10px;background:transparent;border:1px solid var(--border);border-radius:var(--r);font-family:var(--mono);font-size:0.67rem;color:var(--text3);cursor:pointer">Place hold instead (no card now)</button>';
+  showModal();
+  setTimeout(()=>document.getElementById('srCard')?.focus(),80);
+}
+
+function srNext4() {
+  const c=document.getElementById('srCard')?.value.trim()||'';
+  if (!c||c.replace(/\s/g,'').length<12) return _srErr('Enter a valid card number (at least 12 digits).');
+  _sr.card=c;
+  _srStep5();
+}
+
+function srSkipCard() {
+  _sr.card=''; _sr.expiry=''; _sr.isHold=true;
+  _srStep6();
+}
+
+/* ── STEP 5: Expiry ── */
+function _srStep5() {
+  document.getElementById('modalTitle').textContent = 'New Reservation';
+  document.getElementById('modalBody').innerHTML =
+    _srHeader()
+    + _srProgress(5)
+    +'<div style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);margin-bottom:14px">'
+    +'<span style="color:var(--gold);font-weight:700">'+_sr.guests+'p</span>'
+    +' · <span style="color:var(--text)">'+escHtml(_sr.name)+'</span>'
+    +'</div>'
+    +'<div class="form-row"><label class="form-label" style="font-size:0.85rem;margin-bottom:8px">Card expiry <span style="color:var(--red)">*</span></label>'
+    +'<input class="form-input" id="srExpiry" type="text" maxlength="5" placeholder="MM/YY"'
+    +' style="font-size:1.4rem;text-align:center;padding:14px;letter-spacing:0.15em"'
+    +' oninput="fmtExpiry(this)"'
+    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srNext5()}">'
+    +'</div>'
+    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:8px"></div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button class="btn-outline" style="flex:0 0 80px;padding:12px" onclick="_srStep4()">← Back</button>'
+    + _srContinueBtn('Continue','srNext5')
+    +'</div>';
+  showModal();
+  setTimeout(()=>document.getElementById('srExpiry')?.focus(),80);
+}
+
+function srNext5() {
+  const e=document.getElementById('srExpiry')?.value.trim()||'';
+  if (!e||e.length<5) return _srErr('Enter expiry as MM/YY.');
+  _sr.expiry=e;
+  _srStep6();
+}
+
+/* ── STEP 6: Initials (final) ── */
+function _srStep6() {
+  const stepNum = _sr.needCard ? 6 : 4;
+  const totalSteps = _sr.needCard ? 6 : 4;
+  document.getElementById('modalTitle').textContent = 'New Reservation';
+  document.getElementById('modalBody').innerHTML =
+    _srHeader()
+    + _srProgress(stepNum)
+    +'<div style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);margin-bottom:14px;line-height:1.8">'
+    +'<div><span style="color:var(--gold);font-weight:700">'+_sr.guests+'p</span>'
+    +' · <span style="color:var(--text)">'+escHtml(_sr.name)+'</span></div>'
+    +'<div>'+escHtml(_sr.phone)
+    +(_sr.card?' · <span style="color:var(--green)">Card ✓</span>':_sr.needCard?' · <span style="color:var(--amber)">Hold</span>':'')
+    +'</div>'
+    +'</div>'
+    +'<div class="form-row"><label class="form-label" style="font-size:0.85rem;margin-bottom:8px">Your initials</label>'
+    +'<input class="form-input" id="srInitials" type="text" maxlength="4" placeholder="JS" autocomplete="off"'
+    +' style="font-size:1.4rem;text-align:center;padding:14px;letter-spacing:0.2em;text-transform:uppercase"'
+    +' oninput="this.value=this.value.toUpperCase()"'
+    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srSave()}">'
+    +'</div>'
+    +'<div class="form-row"><label class="form-label">Note (optional)</label>'
+    +'<div style="display:flex;gap:7px">'
+    +'<select class="form-select" id="srNoteType" style="flex:0 0 130px">'
+    +'<option value="">— None —</option>'
+    +'<option value="allergy">Allergy</option>'
+    +'<option value="restriction">Restriction</option>'
+    +'<option value="chef">Chef Request</option>'
+    +'<option value="table">Table Request</option>'
+    +'<option value="other">Other</option>'
+    +'</select>'
+    +'<input class="form-input" id="srNoteText" type="text" placeholder="Max 10 words…" maxlength="80" oninput="checkNoteWordLimit_sr()">'
+    +'</div>'
+    +'<div id="noteWordErr" style="font-family:var(--mono);font-size:0.6rem;color:#c04040;margin-top:3px;display:none">Max 10 words</div>'
+    +'</div>'
+    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:8px"></div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button class="btn-outline" style="flex:0 0 80px;padding:12px" onclick="'
+    +(_sr.needCard&&!_sr.isHold?'_srStep5':'_srStep3')+'()">← Back</button>'
+    +'<button class="btn-gold" style="flex:1;padding:14px" onclick="srSave()">✓ Confirm Reservation</button>'
+    +'</div>';
+  showModal();
+  setTimeout(()=>document.getElementById('srInitials')?.focus(),80);
+}
+
+function checkNoteWordLimit_sr() {
+  const input=document.getElementById('srNoteText');
+  const errEl=document.getElementById('noteWordErr');
+  if (!input||!errEl) return;
+  const words=input.value.trim().split(/\s+/).filter(Boolean);
+  if (words.length>10) { input.value=words.slice(0,10).join(' '); errEl.style.display='block'; setTimeout(()=>{errEl.style.display='none';},1800); }
+}
+
+async function srSave() {
+  const initials=sanitizeInitials(document.getElementById('srInitials')?.value||'');
+  if (!initials) return _srErr('Your initials are required.');
+  _sr.initials=initials;
+  _sr.noteType=document.getElementById('srNoteType')?.value||'';
+  _sr.noteText=sanitizeText(document.getElementById('srNoteText')?.value,120);
+
+  const key=dateKey(currentDate);
+  const assign=_sr.assign;
+
+  // Re-verify grill still available (someone may have booked while we were stepping)
+  const freshAssign=autoAssignGrill(key,_sr.slot,_sr.guests,_sr.chefs,undefined);
+  if (!freshAssign) return _srErr('⚠ This slot was just filled. Please go back and choose another time.');
+
+  const data={
+    name:_sr.name, guests:_sr.guests, phone:_sr.phone,
+    initials:_sr.initials, bookedOn:new Date().toISOString().slice(0,10),
+    notes:_sr.noteText, noteType:_sr.noteType, noteText:_sr.noteText,
+    slot:_sr.slot, grill:freshAssign.grill, grill2:freshAssign.grill2||null,
+    isDouble:freshAssign.isDouble||false, updatedAt:Date.now()
+  };
+
+  if (_sr.card) { data.card=_sr.card; data.expiry=_sr.expiry; }
+  else if (_sr.isHold) {
+    const holdUntilDate=new Date(); holdUntilDate.setDate(holdUntilDate.getDate()+1);
+    data.holdUntil=dateKey(holdUntilDate);
+  }
+
+  try {
+    await safeWrite(window._ref(window._db,`reservations/${key}`),data,'push');
+    const grillStr=freshAssign.isDouble?'Grills '+freshAssign.grill+'+'+freshAssign.grill2:'Grill '+freshAssign.grill;
+    await logAudit('create',_sr.name+' · '+_sr.guests+'p · '+displayTime(_sr.slot)+' · '+grillStr,initials);
+    closeModal();
+  } catch(e) { _srErr('Error saving: '+e.message); }
+}
+
+
 function confirmDelete(dk,id) {
   const err=document.getElementById('formErr');
   err.innerHTML='<div class="warn-banner" style="flex-direction:column;gap:7px"><div>Confirm deletion — enter your initials to proceed:</div>'
@@ -2577,12 +2931,14 @@ function showHoldWarning(dk,editId) {
 }
 
 async function applyNoCardOverride(dk,editId) {
-  const pwd=document.getElementById('noCardOverridePwd')?.value||'';
-  const ok=await checkPassword(pwd,PWD_HASH_LARGE);
-  if (!ok) {
-    const errEl=document.getElementById('noCardOverrideErr');
-    if(errEl){errEl.textContent='✕ Incorrect password';errEl.style.display='block';}
-    return;
+  if (!isManager()) {
+    const pwd=document.getElementById('noCardOverridePwd')?.value||'';
+    const ok=await checkPassword(pwd,PWD_HASH_LARGE);
+    if (!ok) {
+      const errEl=document.getElementById('noCardOverrideErr');
+      if(errEl){errEl.textContent='✕ Incorrect password';errEl.style.display='block';}
+      return;
+    }
   }
   document.getElementById('holdWarningBlock')?.remove();
   const marker=document.createElement('input');
@@ -2616,9 +2972,11 @@ function showCardOnFilePrompt(dk,editId) {
 }
 
 async function verifyCardOnFile(dk,editId) {
-  const pwd=document.getElementById('cardOnFilePwd')?.value||'';
-  const ok=await checkPassword(pwd,PWD_HASH_LARGE);
-  if (!ok) { const e=document.getElementById('cardOnFileErr'); if(e){e.textContent='✕ Incorrect password';e.style.display='block';} return; }
+  if (!isManager()) {
+    const pwd=document.getElementById('cardOnFilePwd')?.value||'';
+    const ok=await checkPassword(pwd,PWD_HASH_LARGE);
+    if (!ok) { const e=document.getElementById('cardOnFileErr'); if(e){e.textContent='✕ Incorrect password';e.style.display='block';} return; }
+  }
   document.getElementById('cardOnFilePrompt')?.remove();
   const marker=document.createElement('input');
   marker.type='hidden'; marker.id='cardOnFileVerified'; marker.value='1';
@@ -2724,7 +3082,7 @@ async function saveHibachi(dk,editId) {
   if (!initials)           return showErr('Staff initials are required.');
   if (!phone||(phone.length!==7&&phone.length!==10)) return showErr('Phone must be 7 digits (local) or 10 digits (with area code).');
 
-  if (guests>=LARGE_GROUP_PASSWORD_MIN) {
+  if (guests>=LARGE_GROUP_PASSWORD_MIN && !isManager()) {
     const pwd=document.getElementById('fLargeGroupPwd')?.value||'';
     const ok=await checkPassword(pwd,PWD_HASH_LARGE);
     if (!ok) { showLargeGroupPwdField(); return showErr('⚠ Groups of 30 require manager approval.'); }
@@ -2823,10 +3181,12 @@ async function saveHibachi(dk,editId) {
 }
 
 async function saveHibachiOverride(dk,editId) {
-  const pwd=document.getElementById('overridePwd')?.value||'';
   const oeEl=document.getElementById('overrideErr');
-  const ok=await checkPassword(pwd,PWD_HASH_CARD);
-  if (!ok) { if(oeEl){oeEl.textContent='✕ Incorrect password';oeEl.style.display='block';} return; }
+  if (!isManager()) {
+    const pwd=document.getElementById('overridePwd')?.value||'';
+    const ok=await checkPassword(pwd,PWD_HASH_CARD);
+    if (!ok) { if(oeEl){oeEl.textContent='✕ Incorrect password';oeEl.style.display='block';} return; }
+  }
   if (oeEl) oeEl.style.display='none';
   const pairVal=document.getElementById('overridePair')?.value||'1,2';
   const [g1,g2]=pairVal.split(',').map(Number);
@@ -2951,15 +3311,20 @@ async function toggleBlockSlot(slot) {
   const slotKey=slot.replace(':','_');
   const isBlocked=!!(blockedSlots[key]?.[slotKey]);
   if (isBlocked) {
-    const pwd=prompt('Enter manager password to unblock:');
-    if (!pwd||!await checkPassword(pwd,PWD_HASH_LARGE)) { alert('Incorrect password.'); return; }
+    if (!isManager()) {
+      const pwd=prompt('Enter manager password to unblock:');
+      if (!pwd||!await checkPassword(pwd,PWD_HASH_LARGE)) { alert('Incorrect password.'); return; }
+    }
+    const initials=(prompt('Your initials:')||'?').toUpperCase().slice(0,4);
     window._remove(window._ref(window._db,`blockedSlots/${key}/${slotKey}`));
-    logAudit('edit','Unblocked slot '+displayTime(slot),'??');
+    logAudit('edit','Unblocked slot '+displayTime(slot),initials);
   } else {
-    const pwd=prompt('Block '+displayTime(slot)+' — enter manager password:');
-    if (!pwd||!await checkPassword(pwd,PWD_HASH_LARGE)) { alert('Incorrect password.'); return; }
+    if (!isManager()) {
+      const pwd=prompt('Block '+displayTime(slot)+' — enter manager password:');
+      if (!pwd||!await checkPassword(pwd,PWD_HASH_LARGE)) { alert('Incorrect password.'); return; }
+    }
     const reason=prompt('Reason (optional):')||'';
-    const initials=(prompt('Your initials:')||'?').toUpperCase();
+    const initials=(prompt('Your initials:')||'?').toUpperCase().slice(0,4);
     window._set(window._ref(window._db,`blockedSlots/${key}/${slotKey}`),{by:initials,reason,ts:Date.now()});
     logAudit('edit','Blocked slot '+displayTime(slot)+(reason?' — '+reason:''),initials);
   }
@@ -3187,6 +3552,7 @@ async function syncToSheet() {
 
 /* ── LOGIN & ACCESS MODE ── */
 const STAFF_PIN_HASH    ='8e57858ab42fef1ee804b572421beb315e9fb3bd562f10f2f1c9ccf0384e8d99'; // 1599 — staff
+const STAFF2_PIN_HASH   ='533099ac357e5586238f6be92e706eacb5dea6559fa61b979069c39c5efe8cee'; // 2599 — staff2
 const MANAGER_PIN_HASH_A='ed6757a399e37c0d2187b60c621deb5b4a152dc0a933a4d6135940ddc383f56b'; // g14022603
 const MANAGER_PIN_HASH_B='0bc0cfbf5519843daa9883b48fc41cc40a56ae51cc0b8f473084e31324cd6f18'; // nathanongame
 const BYPASS_LOCKOUT_HASH='168e204ed507530307d8ad02e65708a126e58979d0251b04e64b62100c6539cd'; // Funorange34 — bypass lockout only
@@ -3324,6 +3690,15 @@ async function submitPin() {
 
 // Keep old name as alias
 async function submitStaffPin() { return submitPin(); }
+
+function enterStaff2Mode() {
+  appMode='staff2';
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').style.display='';
+  document.body.classList.remove('guest-mode','manager-mode'); document.body.classList.add('staff-mode');
+  const ind=document.getElementById('modeIndicator'); ind.className='staff'; ind.textContent='✓ Staff';
+  startApp();
+}
 
 function enterStaffMode() {
   appMode='staff';
