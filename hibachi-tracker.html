@@ -2012,6 +2012,8 @@ function autoAssignGrill(dateStr,slot,guests,chefs,excludeId) {
   const canOpenMoreGrills=grillsOpenedAtSlot<effectiveFreeChefs;
 
   // FIRST: try adding to an already-open grill (chef already there — always allowed)
+  console.log('[autoAssign] slot='+slot+' guests='+guests+' chefs='+chefs+' free='+freeChefsAtSlot);
+  console.log('[autoAssign] grillState:', JSON.stringify(grillState.map(s=>({g:s.g,blocked:s.blocked,groups:s.groups.length,room:s.room,chefBusy:s.chefBusy,hasDouble:s.hasDouble}))));
   for (const state of grillState) {
     if (state.blocked||state.hasDouble) continue;
     if (state.groups.length===0) continue; // grill not yet open at this slot
@@ -2237,9 +2239,13 @@ function renderTimeSlots() {
     // ── Compute cap & slotFull FIRST so all downstream code can use it ──
     const totalAtSlot=allRecs.reduce((s,r)=>s+(r.guests||0),0);
     const slotKey=slot.replace(':','_');
-    // Use total scheduled chefs for cap display — committed chefs are still at their grill
-    // and can seat additional groups there, so don't penalise capacity for them
+    // Use total scheduled chefs for cap display
     const defaultCap=getSlotDefaultCap(chefs);
+    // Detect cook-blocked: chef is occupied at adjacent slot, nothing booked here yet
+    const allResForBlock=getAllResForDate(key);
+    const chefsCommittedHere=getChefsCommittedAtSlot(allResForBlock,slotMins);
+    const freeChefsHere=Math.max(0,chefs-chefsCommittedHere.size);
+    const isChefBlocked=!isManuallyBlocked&&!hasBookings&&freeChefsHere<1;
     const manualCap=slotCaps[key]?.[slotKey];
     const effectiveCap=(manualCap!==undefined&&manualCap!==null)?manualCap:defaultCap;
     const remaining=Math.max(0,effectiveCap-totalAtSlot);
@@ -2276,10 +2282,11 @@ function renderTimeSlots() {
 
     let capCls,capText;
     if (isManuallyBlocked) { capCls='none'; capText='—'; }
-    else if (remaining<=0) { capCls='none'; capText='full'; }
+    else if (isChefBlocked) { capCls='none'; capText='Not Available'; }
+    else if (remaining<=0) { capCls='none'; capText='Full'; }
     else if (remaining<=3) { capCls='low'; capText=remaining+' left'; }
     else { capCls=isCustom?'custom':'plenty'; capText=remaining+' left'; }
-    if (isCustom&&remaining>0) capText+=' ✎';
+    if (isCustom&&remaining>0&&capCls!=='none') capText+=' ✎';
 
     const capWidget='<div class="slot-cap">'
       +'<span id="capLabel_'+slotKey+'" class="slot-cap-label '+capCls+'" onclick="toggleCapInput(\''+slot+'\')" title="Tap to set capacity">'+capText+'</span>'
