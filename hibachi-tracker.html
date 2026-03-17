@@ -1358,14 +1358,15 @@ function getSingleGrillCap(existingGroupCount) {
 }
 
 function grillsUsedByRes(r) {
-  if (r.grill2) return [r.grill, r.grill2];
+  const g=Number(r.grill);
+  if (r.grill2) return [g, Number(r.grill2)];
   if ((r.guests||0) >= DOUBLE_GRILL_MIN_GUESTS) {
     for (const [ga,gb] of [[1,2],[3,4]]) {
-      if (r.grill===ga) return [ga,gb];
-      if (r.grill===gb) return [gb,ga];
+      if (g===ga) return [ga,gb];
+      if (g===gb) return [gb,ga];
     }
   }
-  return [r.grill];
+  return [g];
 }
 
 let grillLabels = { G1:'Grill 1', G2:'Grill 2', G3:'Grill 3', G4:'Grill 4' };
@@ -1573,7 +1574,7 @@ function subscribeToDate() {
     auditLog[mk]=snap.val()||{}; if(activeTab==='history') renderHistory();
   });
   if (fbChefOverrideListener) fbChefOverrideListener();
-  fbChefOverrideListener=window._onValue(window._ref(window._db,`blockedSlots/${key}/__chef`), snap=>{
+  fbChefOverrideListener=window._onValue(window._ref(window._db,`reservations/${key}/__chefRemoved`), snap=>{
     const val=snap.val();
     if (val && val.removed) {
       chefDayOverrides[key]=1;
@@ -1684,7 +1685,7 @@ async function confirmRemoveChef() {
   if (!ok) { if(errEl) errEl.textContent = '✕ Incorrect password.'; document.getElementById('chefRemovePwd').value=''; document.getElementById('chefRemovePwd').focus(); return; }
   const dk = dateKey(currentDate);
   try {
-    await window._set(window._ref(window._db, `blockedSlots/${dk}/__chef`), {
+    await window._set(window._ref(window._db, `reservations/${dk}/__chefRemoved`), {
       removed: true, initials, removedAt: Date.now()
     });
     await logAudit('edit', 'CHEF REMOVED for day — schedule reduced by 1', initials);
@@ -1723,7 +1724,7 @@ async function confirmRestoreChef() {
   if (!ok) { if(errEl) errEl.textContent = '✕ Incorrect password.'; document.getElementById('chefRestorePwd').value=''; document.getElementById('chefRestorePwd').focus(); return; }
   const dk = dateKey(currentDate);
   try {
-    await window._remove(window._ref(window._db, `blockedSlots/${dk}/__chef`));
+    await window._remove(window._ref(window._db, `reservations/${dk}/__chefRemoved`));
     await logAudit('edit', 'CHEF RESTORED for day — schedule back to normal', initials);
     closeModal();
   } catch(e) { if(errEl) errEl.textContent = 'Error: ' + e.message; }
@@ -1917,20 +1918,24 @@ async function loadMoreHistory() {
 
 /* ── BOOKING HELPERS ── */
 function getAllResForDate(dateStr) {
-  return Object.entries(reservations[dateStr]||{}).map(([id,r])=>({id,...r}));
+  return Object.entries(reservations[dateStr]||{})
+    .filter(([id]) => id !== '__chefRemoved') // exclude chef override marker
+    .map(([id,r])=>({id,...r}));
 }
 
 function getGroupsAtGrillAtSlot(dateStr,grill,slotMins,excludeId) {
+  const g=Number(grill);
   return getAllResForDate(dateStr).filter(r=>{
     if (excludeId && r.id===excludeId) return false;
-    return r.grill===grill && timeToMinutes(r.slot)===slotMins;
+    return Number(r.grill)===g && timeToMinutes(r.slot)===slotMins;
   });
 }
 
 function isGrillBlockedExcluding(dateStr,grill,slotMins,excludeId) {
+  const g=Number(grill);
   const all=getAllResForDate(dateStr).filter(r=>r.id!==excludeId);
   for (const r of all) {
-    if (r.grill!==grill) continue;
+    if (Number(r.grill)!==g) continue;
     const rMins=timeToMinutes(r.slot);
     if (rMins<slotMins && slotMins<rMins+SEAT_BLOCK_MINUTES)
       return {reason:rMins+COOK_BLOCK_MINUTES>slotMins?'cook':'seat',bookedAt:r.slot};
@@ -1996,7 +2001,7 @@ function autoAssignGrill(dateStr,slot,guests,chefs,excludeId) {
     const isHardBlocked=blocked&&blocked.reason!=='tight';
     const isTight=blocked&&blocked.reason==='tight';
     const chefBusy=chefsCommitted.has('chef_'+g);
-    const hasDouble=all.some(r=>timeToMinutes(r.slot)===slotMins&&grillsUsedByRes(r).includes(g));
+    const hasDouble=all.some(r=>timeToMinutes(r.slot)===slotMins&&grillsUsedByRes(r).includes(Number(g)));
     const groups=getGroupsAtGrillAtSlot(dateStr,g,slotMins,excludeId);
     const totalGuests=groups.reduce((s,r)=>s+(r.guests||0),0);
     const cap=getSingleGrillCap(groups.length);
