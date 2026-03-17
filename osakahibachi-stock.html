@@ -51,6 +51,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .srch-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:11px;opacity:.55;pointer-events:none;}
 .srch-x{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.55);cursor:pointer;font-size:12px;display:none;}
 .srch-drop{position:absolute;top:calc(100% + 5px);left:0;right:0;background:#fff;border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.18);z-index:500;max-height:300px;overflow-y:auto;border:1px solid var(--border);display:none;}
+.layout-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;white-space:nowrap;font-family:'Noto Sans KR',sans-serif;}
+.layout-btn:hover{background:rgba(255,255,255,.28);}
 .srch-drop.show{display:block;}
 .sr-row{padding:7px 12px;cursor:pointer;border-bottom:1px solid var(--bl);display:flex;align-items:center;gap:7px;font-size:12px;}
 .sr-row:last-child{border-bottom:none;}
@@ -134,6 +136,12 @@ tr.tbl-drag-over{outline:2px solid #f59e0b;}
 .ml-del-all{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:5px;padding:2px 9px;font-size:11px;cursor:pointer;white-space:nowrap;}
 .ml-del-all:hover{background:rgba(255,255,255,.32);}
 
+/* STORES GRID — stacked default, side-by-side toggle */
+.stores-grid{display:flex;flex-direction:column;gap:12px;}
+.stores-grid.side-by-side{flex-direction:row;flex-wrap:wrap;align-items:flex-start;}
+.stores-grid.side-by-side .store-block{flex:1 1 340px;min-width:300px;}
+.stores-grid .store-block{width:100%;}
+
 /* GRID */
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 @media(max-width:680px){.two-col{grid-template-columns:1fr;}}
@@ -206,18 +214,17 @@ tr.tbl-drag-over{outline:2px solid #f59e0b;}
       <button class="srch-x" id="srchX" onclick="clrSearch()">✕</button>
       <div class="srch-drop" id="srchDrop"></div>
     </div>
+    <button class="layout-btn" id="layoutBtn" onclick="toggleLayout()" title="Toggle layout">⊞ Side by Side</button>
     <div class="sync-st"><span class="sync-dot" id="syncDot"></span><span id="syncLbl">Local</span></div>
     <div class="t-date" id="todayDate"></div>
   </div>
 </div>
 
 <div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('costco',this)">Costco</button>
-  <button class="tab-btn" onclick="switchTab('wholesale',this)">Whole Sale</button>
-  <button class="tab-btn" onclick="switchTab('liquor',this)">Liquor</button>
-  <button class="tab-btn" onclick="switchTab('mcs',this)">MCS</button>
-  <button class="tab-btn" onclick="switchTab('sauce',this)">Sauce</button>
-  <button class="tab-btn" onclick="switchTab('extras',this)">Extras</button>
+  <button class="tab-btn active" onclick="switchTab('costco',this)">🛒 Costco</button>
+  <button class="tab-btn" onclick="switchTab('wholesale',this)">🏪 Wholesale</button>
+  <button class="tab-btn" onclick="switchTab('chinese',this)">🥬 Chinese / Korea</button>
+  <button class="tab-btn" onclick="switchTab('others',this)">📦 Others</button>
   <button class="tab-btn tab-star" onclick="switchTab('masterlist',this)">⭐ Master List</button>
 </div>
 
@@ -225,129 +232,133 @@ tr.tbl-drag-over{outline:2px solid #f59e0b;}
 
 <!-- COSTCO -->
 <div id="tab-costco" class="tab-panel active">
-  <div class="store-block">
-    <div class="s-title s-costco">🛒 Costco</div>
-    <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
-    <tbody id="tb-costco"></tbody></table>
-    <button class="add-btn-row" onclick="openAdd('costco','Costco')">+ Add item</button>
+  <div class="stores-grid" id="gridCostco">
+    <div class="store-block">
+      <div class="s-title s-costco">🛒 Costco</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-costco"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('costco','Costco')">+ Add item</button>
+    </div>
   </div>
 </div>
 
-<!-- WHOLE SALE -->
+<!-- WHOLESALE + SOBEYS + SYSCO + FISH + BULK + TORONTO -->
 <div id="tab-wholesale" class="tab-panel">
-  <div class="two-col">
-    <div>
-      <div class="store-block"><div class="s-title s-ws">🏪 Whole Sale</div>
-        <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
-        <tbody id="tb-ws"></tbody></table>
-        <button class="add-btn-row" onclick="openAdd('ws','Whole Sale')">+ Add item</button>
-      </div>
-      <div class="store-block"><div class="s-title s-sobeys">🍃 Sobeys</div>
-        <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
-        <tbody id="tb-sobeys"></tbody></table>
-        <button class="add-btn-row" onclick="openAdd('sobeys','Sobeys')">+ Add item</button>
-      </div>
-      <div class="store-block"><div class="s-title s-sysco">🚚 Sysco</div>
-        <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
-        <tbody id="tb-sysco"></tbody></table>
-        <button class="add-btn-row" onclick="openAdd('sysco','Sysco')">+ Add item</button>
-      </div>
+  <div class="stores-grid" id="gridWholesale">
+    <div class="store-block">
+      <div class="s-title s-ws">🏪 Whole Sale</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-ws"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('ws','Whole Sale')">+ Add item</button>
     </div>
-    <div>
-      <div class="store-block"><div class="s-title s-chinese">🥬 Chinese Market</div>
-        <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
-        <tbody id="tb-chinese"></tbody></table>
-        <button class="add-btn-row" onclick="openAdd('chinese','Chinese Market')">+ Add item</button>
-      </div>
-      <div class="store-block"><div class="s-title s-korea">🇰🇷 Korea Mart</div>
-        <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
-        <tbody id="tb-korea"></tbody></table>
-        <button class="add-btn-row" onclick="openAdd('korea','Korea Mart')">+ Add item</button>
-      </div>
-      <div class="store-block"><div class="s-title s-toronto">🥩 Toronto 정육점</div>
-        <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
-        <tbody id="tb-toronto"></tbody></table>
-        <button class="add-btn-row" onclick="openAdd('toronto','Toronto 정육점')">+ Add item</button>
-      </div>
-      <div class="store-block"><div class="s-title s-fish">🐟 Fish Market</div>
-        <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
-        <tbody id="tb-fish"></tbody></table>
-        <button class="add-btn-row" onclick="openAdd('fish','Fish Market')">+ Add item</button>
-      </div>
-      <div class="store-block"><div class="s-title s-bulk">📦 Bulk Barn</div>
-        <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
-        <tbody id="tb-bulk"></tbody></table>
-        <button class="add-btn-row" onclick="openAdd('bulk','Bulk Barn')">+ Add item</button>
-      </div>
+    <div class="store-block">
+      <div class="s-title s-sobeys">🍃 Sobeys</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-sobeys"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('sobeys','Sobeys')">+ Add item</button>
     </div>
   </div>
 </div>
 
-<!-- LIQUOR -->
-<div id="tab-liquor" class="tab-panel">
-  <div class="two-col">
-    <div>
-      <div class="store-block"><div class="s-title s-liquor">🍺 Beer 135</div>
-        <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
-        <tbody id="tb-beer"></tbody></table>
-        <button class="add-btn-row" onclick="openAdd('beer','Liquor')">+ Add item</button>
-      </div>
-      <div class="store-block"><div class="s-title s-liquor" style="background:#7a5f9e">🍾 Bar 용소모품</div>
-        <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
-        <tbody id="tb-bargoods"></tbody></table>
-        <button class="add-btn-row" onclick="openAdd('bargoods','Liquor')">+ Add item</button>
-      </div>
+<!-- CHINESE MARKET + KOREA MART -->
+<div id="tab-chinese" class="tab-panel">
+  <div class="stores-grid" id="gridChinese">
+    <div class="store-block">
+      <div class="s-title s-chinese">🥬 Chinese Market</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-chinese"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('chinese','Chinese Market')">+ Add item</button>
     </div>
-    <div>
-      <div class="store-block"><div class="s-title s-liquor" style="background:#7a5f9e">🍷 Wine 4B</div>
-        <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
-        <tbody id="tb-wine"></tbody></table>
-        <button class="add-btn-row" onclick="openAdd('wine','Liquor')">+ Add item</button>
-      </div>
-      <div class="store-block"><div class="s-title s-liquor" style="background:#7a5f9e">🥂 White Wine</div>
-        <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
-        <tbody id="tb-whitewine"></tbody></table>
-        <button class="add-btn-row" onclick="openAdd('whitewine','Liquor')">+ Add item</button>
-      </div>
-      <div class="store-block"><div class="s-title s-liquor" style="background:#3a7a9e">🍶 피 맥</div>
-        <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
-        <tbody id="tb-draft"></tbody></table>
-        <button class="add-btn-row" onclick="openAdd('draft','Liquor')">+ Add item</button>
-      </div>
+    <div class="store-block">
+      <div class="s-title s-korea">🇰🇷 Korea Mart</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-korea"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('korea','Korea Mart')">+ Add item</button>
     </div>
   </div>
 </div>
 
-<!-- MCS -->
-<div id="tab-mcs" class="tab-panel">
-  <div class="store-block"><div class="s-title s-mcs">🧂 MCS</div>
-    <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
-    <tbody id="tb-mcs"></tbody></table>
-    <button class="add-btn-row" onclick="openAdd('mcs','MCS')">+ Add item</button>
-  </div>
-</div>
-
-<!-- SAUCE -->
-<div id="tab-sauce" class="tab-panel">
-  <div class="store-block"><div class="s-title s-sauce">🫙 소스류 재고 현황</div>
-    <table class="tbl"><thead><tr>
-      <th style="width:28px"></th><th class="lft">ITEMS</th>
-      <th class="sauce-th" style="width:55px">용량</th>
-      <th class="sauce-th" style="width:60px">제조일</th>
-      <th class="sauce-th" style="width:55px">수량</th>
-      <th style="width:40px">⭐</th>
-    </tr></thead>
-    <tbody id="tb-sauce"></tbody></table>
-    <button class="add-btn-row" onclick="openAdd('sauce','Sauce')">+ Add item</button>
-  </div>
-</div>
-
-<!-- EXTRAS -->
-<div id="tab-extras" class="tab-panel">
-  <div class="store-block"><div class="s-title s-extras">📋 Extras / Uncategorized</div>
-    <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
-    <tbody id="tb-extras"></tbody></table>
-    <button class="add-btn-row" onclick="openAdd('extras','Extras')">+ Add item</button>
+<!-- OTHERS: Sysco, Toronto, Fish, Bulk, Beer, Wine, White Wine, Draft, Bar, MCS, Sauce, Extras -->
+<div id="tab-others" class="tab-panel">
+  <div class="stores-grid" id="gridOthers">
+    <div class="store-block">
+      <div class="s-title s-sysco">🚚 Sysco</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-sysco"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('sysco','Sysco')">+ Add item</button>
+    </div>
+    <div class="store-block">
+      <div class="s-title s-toronto">🥩 Toronto 정육점</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-toronto"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('toronto','Toronto 정육점')">+ Add item</button>
+    </div>
+    <div class="store-block">
+      <div class="s-title s-fish">🐟 Fish Market</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-fish"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('fish','Fish Market')">+ Add item</button>
+    </div>
+    <div class="store-block">
+      <div class="s-title s-bulk">📦 Bulk Barn</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-bulk"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('bulk','Bulk Barn')">+ Add item</button>
+    </div>
+    <div class="store-block">
+      <div class="s-title s-liquor">🍺 Beer 135</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-beer"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('beer','Liquor')">+ Add item</button>
+    </div>
+    <div class="store-block">
+      <div class="s-title s-liquor" style="background:#7a5f9e">🍷 Wine 4B</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-wine"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('wine','Liquor')">+ Add item</button>
+    </div>
+    <div class="store-block">
+      <div class="s-title s-liquor" style="background:#7a5f9e">🥂 White Wine</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-whitewine"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('whitewine','Liquor')">+ Add item</button>
+    </div>
+    <div class="store-block">
+      <div class="s-title s-liquor" style="background:#3a7a9e">🍶 피 맥</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-draft"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('draft','Liquor')">+ Add item</button>
+    </div>
+    <div class="store-block">
+      <div class="s-title s-liquor" style="background:#7a5f9e">🍾 Bar 용소모품</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-bargoods"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('bargoods','Liquor')">+ Add item</button>
+    </div>
+    <div class="store-block">
+      <div class="s-title s-mcs">🧂 MCS</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-mcs"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('mcs','MCS')">+ Add item</button>
+    </div>
+    <div class="store-block">
+      <div class="s-title s-sauce">🫙 소스류 재고 현황</div>
+      <table class="tbl"><thead><tr>
+        <th style="width:28px"></th><th class="lft">ITEMS</th>
+        <th class="sauce-th" style="width:55px">용량</th>
+        <th class="sauce-th" style="width:60px">제조일</th>
+        <th class="sauce-th" style="width:55px">수량</th>
+        <th style="width:40px">⭐</th>
+      </tr></thead>
+      <tbody id="tb-sauce"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('sauce','Sauce')">+ Add item</button>
+    </div>
+    <div class="store-block">
+      <div class="s-title s-extras">📋 Extras / Uncategorized</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-extras"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('extras','Extras')">+ Add item</button>
+    </div>
   </div>
 </div>
 
@@ -648,130 +659,151 @@ const D={
   ],
 
   costco:[
-    {id:'cc1',name:'Avocado',qty:'',stock:'',color:'',cell:'',key:true,note:'',hilite:true},
-    {id:'cc2',name:'Cucumber',qty:'',stock:'',color:'',cell:'',key:true,note:'',hilite:true},
-    {id:'cc3',name:'Yellow MicroFibre',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc4',name:'Orange',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc5',name:'Lemon',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc6',name:'Lime',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc7',name:'Kiwi',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc8',name:'Mango',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
-    {id:'cc9',name:'Salad Dressing',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
-    {id:'cc10',name:'Banana',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc11',name:'Red Onion',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc12',name:'Potato',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc13',name:'Strawberry',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc14',name:'Croissant',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc15',name:'Tender Loin',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
+    // 육류/해물 Meat & Seafood
     {id:'cc16',name:'Strip Loin',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
+    {id:'cc15',name:'Tender Loin',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
     {id:'cc17',name:'Chicken Breast',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
+    {id:'cc20',name:'Pork Tender',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc18',name:'Pork Louisiana Ribs',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
     {id:'cc19',name:'Brisket',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc20',name:'Pork Tender',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc21',name:'Green Bean',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc69',name:'Scallop',qty:'',stock:'',color:'rB',cell:'',key:true,note:''},
+    {id:'cc30',name:'Mussel',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // 스시 야채 Sushi Vegetables
+    {id:'cc1',name:'Avocado',qty:'',stock:'',color:'',cell:'',key:true,note:'',hilite:true},
+    {id:'cc2',name:'Cucumber',qty:'',stock:'',color:'',cell:'',key:true,note:'',hilite:true},
     {id:'cc22',name:'Asparagus',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc23',name:'Celery',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc24',name:'SpringMix',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc25',name:'Green Onion',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc26',name:'Zuchini',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc27',name:'Brocoli',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc28',name:'Mushroom',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc26',name:'Zuchini',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc24',name:'SpringMix',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc21',name:'Green Bean',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc23',name:'Celery',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc11',name:'Red Onion',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc12',name:'Potato',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc25',name:'Green Onion',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // 과일 Fruit
+    {id:'cc8',name:'Mango',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
+    {id:'cc5',name:'Lemon',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc6',name:'Lime',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc4',name:'Orange',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc13',name:'Strawberry',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc7',name:'Kiwi',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc10',name:'Banana',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // 냉동/냉장 Frozen & Refrigerated
+    {id:'cc71',name:'Smoked Salmon',qty:'',stock:'',color:'rB',cell:'',key:true,note:''},
+    {id:'cc70',name:'Cocktail Shrimp',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc29',name:'Tilapia',qty:'',stock:'',color:'rB',cell:'',key:false,note:''},
-    {id:'cc30',name:'Mussel',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc63',name:'Shread Mozza',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc64',name:'Block Mozza',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc68',name:'Beef Sausage',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc65',name:'Philadelphia',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
+    {id:'cc66',name:'Frozen Corn',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc67',name:'Frozen Pea',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc31',name:'Butter',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc32',name:'Egg',qty:'2판',stock:'',color:'rY',cell:'',key:true,note:''},
     {id:'cc33',name:'Whip Cream',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc34',name:'Bounty',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc35',name:'Sponge Towel',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc32',name:'Egg',qty:'2판',stock:'',color:'rY',cell:'',key:true,note:''},
+    {id:'cc14',name:'Croissant',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc9',name:'Salad Dressing',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
+    // 호일/랲 Wrap & Foil
+    {id:'cc58',name:'Small Wrap',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc59',name:'Large Wrap',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc60',name:'Cooking Paper',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // 음료 Drinks
     {id:'cc36',name:'Chocolate Milk',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc37',name:'Non-Alc Beer',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc38',name:'Diet Coke',qty:'',stock:'',color:'rB',cell:'',key:true,note:''},
     {id:'cc39',name:'Coca',qty:'',stock:'',color:'rB',cell:'',key:true,note:''},
     {id:'cc40',name:'Fuze',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc37',name:'Non-Alc Beer',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc41',name:'Ginger Ale',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc42',name:'Diet Pep',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc43',name:'Pepsi',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc44',name:'7UP',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc45',name:'Crush',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc46',name:'Rootbeer',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc47',name:'Bleach',qty:'',stock:'',color:'',cell:'',key:true,note:''},
-    {id:'cc48',name:'Palmolive',qty:'',stock:'',color:'',cell:'',key:true,note:''},
-    {id:'cc49',name:'Oxi',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc50',name:'Mr. Clean',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc51',name:'Spray9',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc52',name:'Gain',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc53',name:'Windex',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // 서버 Napkins
+    {id:'cc61',name:'Napkin (Hall)',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
+    {id:'cc62',name:'Napkin (To-go)',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
+    // 키친 Kitchen Supplies
+    {id:'cc34',name:'Bounty',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc35',name:'Sponge Towel',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // 쓰레기봉투 Trash Bags
     {id:'cc54',name:'10 Gal Trash',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc55',name:'Blue recycle Trash',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc56',name:'30 Gal Trash',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
     {id:'cc57',name:'55 Gal Trash',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
-    {id:'cc58',name:'Small Wrap',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc59',name:'Large Wrap',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc60',name:'Cooking Paper',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc61',name:'Napkin (Hall)',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
-    {id:'cc62',name:'Napkin (To-go)',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
-    {id:'cc63',name:'Shread Mozza',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc64',name:'Block Mozza',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc65',name:'Philadelphia',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
-    {id:'cc66',name:'Frozen Corn',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc67',name:'Frozen Pea',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc68',name:'Beef Sausage',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc69',name:'Scallop',qty:'',stock:'',color:'rB',cell:'',key:true,note:''},
-    {id:'cc70',name:'Cocktail Shrimp',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc71',name:'Smoked Salmon',qty:'',stock:'',color:'rB',cell:'',key:true,note:''},
-    {id:'cc72',name:'Pancake Mix',qty:'',stock:'',color:'',cell:'',key:true,note:''},
-    {id:'cc73',name:"Vinegar Allen's",qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
-    {id:'cc74',name:'Mayo',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
+    // 파란 장갑 Gloves
+    {id:'cc3',name:'Yellow MicroFibre',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // 주방용품 Cleaning
+    {id:'cc47',name:'Bleach',qty:'',stock:'',color:'',cell:'',key:true,note:''},
+    {id:'cc48',name:'Palmolive',qty:'',stock:'',color:'',cell:'',key:true,note:''},
+    {id:'cc49',name:'Oxi',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc52',name:'Gain',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc50',name:'Mr. Clean',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc51',name:'Spray9',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc53',name:'Windex',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // 기타 Condiments & Dry Goods
     {id:'cc75',name:'Salt',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc76',name:'GF SoySauce',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc77',name:'Blk Pepper Coarse',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc78',name:'Blk Pepper Fine',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc79',name:'Montreal Steak',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'cc80',name:"Dad's BBQ",qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc72',name:'Pancake Mix',qty:'',stock:'',color:'',cell:'',key:true,note:''},
     {id:'cc81',name:'Olive Oil',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc82',name:'Spray Oil',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc83',name:'Honey',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc74',name:'Mayo',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
+    {id:'cc73',name:"Vinegar Allen's",qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
+    {id:'cc76',name:'GF SoySauce',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc79',name:'Montreal Steak',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc77',name:'Blk Pepper Coarse',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc78',name:'Blk Pepper Fine',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc80',name:"Dad's BBQ",qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'cc9a',name:'Jasmin Rice',qty:'',stock:'',color:'',cell:'',key:false,note:''},
   ],
   ws:[
+    // 소스 Sauces
+    {id:'ws3',name:'산발소스',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws4',name:'쓰리라자',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
+    {id:'ws26',name:'Ketchup',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws25',name:'Sriacha(Gluten Free)',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
+    {id:'ws10',name:'초코/카라엔시럽',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws27',name:'초코시럽',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws18',name:'소스 통(튜브)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // 야채 Vegetables
     {id:'ws1',name:'양상추',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
     {id:'ws2',name:'마늘',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws3',name:'산발소스',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws4',name:'쓰리라자',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws5',name:'스시비닐장갑(M)',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
-    {id:'ws6',name:'스시비닐장갑(L/XL)',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
-    {id:'ws7',name:'빨대',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws8',name:'마늘 파우더',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
-    {id:'ws9',name:'양파 파우더',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
-    {id:'ws10',name:'초코/카라엔시럽',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // 스시 Sushi Supplies
+    {id:'ws28',name:'Lobster',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
+    {id:'ws21',name:'레몬주스',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // 장갑 Gloves
+    {id:'ws5',name:'스시비닐장갑(M)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws6',name:'스시비닐장갑(L/XL)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // 키친 Kitchen
+    {id:'ws16',name:'식용유',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
     {id:'ws11',name:'신라면',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws7',name:'빨대',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // Togo 일회용
     {id:'ws12',name:'Plastic Knife',qty:'1박스',stock:'',color:'rB',cell:'',key:false,note:''},
     {id:'ws13',name:'Plastic Fork',qty:'1박스',stock:'',color:'rB',cell:'',key:false,note:''},
     {id:'ws14',name:'Plastic Spoon',qty:'2박스',stock:'',color:'rB',cell:'',key:false,note:''},
     {id:'ws15',name:'아재봉지(12L)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws16',name:'식용유',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
-    {id:'ws17',name:'Storage container for rice',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws18',name:'소스 통(튜브)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws19',name:'댐뿌라종이',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ws20',name:'케잘 일회용(두고)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws21',name:'레몬주스',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws22',name:'Parsley Flake',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws17',name:'Storage container for rice',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws19',name:'댐뿌라종이',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // 파우더 Powder
+    {id:'ws8',name:'마늘 파우더',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
+    {id:'ws9',name:'양파 파우더',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
     {id:'ws23',name:'Sugar',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // 기타 Other
+    {id:'ws22',name:'Parsley Flake',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ws24',name:'Mustard',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws25',name:'Sriacha(Gluten Free)',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
-    {id:'ws26',name:'Ketchup',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws27',name:'초코시럽',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws28',name:'Lobster',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
     {id:'ws29',name:'Flour',qty:'',stock:'',color:'',cell:'',key:false,note:''},
   ],
   sobeys:[
     {id:'sob1',name:'비트',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
     {id:'sob2',name:'단호박',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'sob3',name:'할라피뇨',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'sob6',name:'적채',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'sob8',name:'케일',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
+    {id:'sob7',name:'고수',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'sob4',name:'파슬리',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'sob5',name:'민트',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'sob6',name:'적채',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'sob7',name:'고수',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'sob8',name:'케일',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
+    {id:'sob3',name:'할라피뇨',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'sob9',name:'하버네로',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'sob10',name:'Club Soda',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'sob11',name:'7UP (2L)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
@@ -782,6 +814,7 @@ const D={
     {id:'sy3',name:'초코푸지케익',qty:'16개',stock:'',color:'',cell:'',key:false,note:''},
   ],
   chinese:[
+    // 야채 Vegetables
     {id:'ch1',name:'Onion',qty:'1무',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch2',name:'Carrot',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch3',name:'Red Pepper',qty:'',stock:'',color:'',cell:'cRed',key:false,note:''},
@@ -793,17 +826,21 @@ const D={
     {id:'ch9',name:'Ginger',qty:'1박스',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch10',name:'Tofu',qty:'1박스',stock:'',color:'',cell:'cRed',key:false,note:''},
     {id:'ch11',name:'무우',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
+    // 스시 Sushi items
     {id:'ch12',name:'Osaka Spring Roll Skin',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ch19',name:'Soy Sauce (20L)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // LR/NB 용기 Containers
     {id:'ch13',name:'LR-28 Fried Rice',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch14',name:'NB-38 Bibimbap',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch15',name:'S-32 팜뽕국물용기',qty:'2박스',stock:'',color:'rB',cell:'',key:false,note:''},
     {id:'ch16',name:'S-24 Curry',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch17',name:'RC-24 Sushi Pizza',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
     {id:'ch18',name:'JR-48 회 비빔밥용기',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ch19',name:'Soy Sauce (20L)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // Paper 소스용기
     {id:'ch20',name:'Clear 1oz(작은용기)',qty:'2박',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch21',name:'Clear 2oz(기본소스용기)',qty:'2박',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch22',name:'Clear 4oz(템프라소스용기)',qty:'1박',stock:'',color:'',cell:'',key:false,note:''},
+    // EM 용기
     {id:'ch23',name:'EM-551(소)',qty:'1박스',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch24',name:'EM-963(중)',qty:'2박스',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch25',name:'HLC881BG(대)',qty:'2박스',stock:'',color:'',cell:'',key:false,note:''},
@@ -872,12 +909,14 @@ const D={
     {id:'bg8',name:'Mier coconut',qty:'',stock:'',color:'',cell:'',key:false,note:''},
   ],
   mcs:[
+    // 파우더 Powders
     {id:'mcs1',name:'생강파우더',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
     {id:'mcs2',name:'마늘파우더',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
     {id:'mcs3',name:'양파파우더',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
     {id:'mcs4',name:'후추',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'mcs5',name:'카이엔 페퍼',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'mcs6',name:'소금',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    // 오일/소스
     {id:'mcs7',name:'참기름',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
     {id:'mcs8',name:'식용유',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
     {id:'mcs9',name:'간장',qty:'',stock:'',color:'',cell:'',key:false,note:''},
@@ -1409,11 +1448,41 @@ function confirmAdd(){
 document.getElementById('addModal').addEventListener('click',function(e){if(e.target===this)closeAdd();});
 
 // tab switch
+const TAB_GRIDS={costco:'gridCostco',wholesale:'gridWholesale',chinese:'gridChinese',others:'gridOthers'};
+let activeTab='costco';
 function switchTab(name,btn){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   if(btn)btn.classList.add('active');
+  activeTab=name;
+  // Show layout btn only on tabs that have a grid
+  const lb=document.getElementById('layoutBtn');
+  if(lb)lb.style.display=TAB_GRIDS[name]?'':'none';
+  // Sync new grid to current layout mode
+  if(TAB_GRIDS[name]){
+    const g=document.getElementById(TAB_GRIDS[name]);
+    if(g){
+      if(layoutMode==='side') g.classList.add('side-by-side');
+      else g.classList.remove('side-by-side');
+    }
+  }
+}
+
+// layout toggle — applies to all grids at once so mode is consistent
+let layoutMode='stacked';
+function toggleLayout(){
+  const btn=document.getElementById('layoutBtn');
+  const grids=document.querySelectorAll('.stores-grid');
+  if(layoutMode==='stacked'){
+    layoutMode='side';
+    grids.forEach(g=>g.classList.add('side-by-side'));
+    btn.textContent='☰ Stacked';
+  } else {
+    layoutMode='stacked';
+    grids.forEach(g=>g.classList.remove('side-by-side'));
+    btn.textContent='⊞ Side by Side';
+  }
 }
 
 init();
