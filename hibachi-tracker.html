@@ -3118,7 +3118,7 @@ function escHtml(str) {
 
 /* ── INPUT SANITIZATION ── Strips control chars, trims, max length ── */
 function sanitizeText(val, maxLen) {
-  return String(val||'').replace(/[ -]/g,'').trim().slice(0, maxLen||200);
+  var s=String(val||''); var out=''; for(var i=0;i<s.length;i++){var c=s.charCodeAt(i); if(c>=32&&c!==127) out+=s[i];} return out.trim().slice(0,maxLen||200);
 }
 function sanitizeInitials(val) {
   return String(val||'').replace(/[^A-Za-z]/g,'').toUpperCase().slice(0,4);
