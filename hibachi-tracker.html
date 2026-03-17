@@ -2265,17 +2265,17 @@ function renderTimeSlots() {
     const slotKey=slot.replace(':','_');
     // Use total scheduled chefs for cap display
     const defaultCap=getSlotDefaultCap(chefs);
-    // Detect cook-blocked: chef is occupied at adjacent slot, nothing booked here yet
-    const allResForBlock=getAllResForDate(key);
-    const chefsCommittedHere=getChefsCommittedAtSlot(allResForBlock,slotMins);
-    const freeChefsHere=Math.max(0,chefs-chefsCommittedHere.size);
-    const isChefBlocked=!isManuallyBlocked&&!hasBookings&&freeChefsHere<1;
     const manualCap=slotCaps[key]?.[slotKey];
     const effectiveCap=(manualCap!==undefined&&manualCap!==null)?manualCap:defaultCap;
     const remaining=Math.max(0,effectiveCap-totalAtSlot);
     const isCustom=(manualCap!==undefined&&manualCap!==null);
-    // FULL only when guest count hits cap — not when grills-used >= chefs
-    const slotFull = !isManuallyBlocked && remaining <= 0 && hasBookings;
+
+    // Can any new group be added? Try assigning even 1 guest
+    const canAddAny = !isManuallyBlocked && autoAssignGrill(key,slot,1,chefs,null)!==null;
+    // Chef-blocked with no bookings: nothing booked here but chef is occupied nearby
+    const isChefBlocked = !isManuallyBlocked && !hasBookings && !canAddAny;
+    // Slot is full if: guest cap hit OR (has bookings but chef can't take more AND no room on open grills)
+    const slotFull = !isManuallyBlocked && (remaining<=0 || (hasBookings && !canAddAny));
 
     let isSecondary=false;
     if (preferHourly&&!hasBookings) {
@@ -2578,10 +2578,10 @@ function _srHeader() {
 }
 
 function _srProgress(step) {
-  // step: 1=guests 2=name 3=phone 4=card 5=expiry 6=initials
+  // step: 1=guests 2=name 3=phone 4=card 5=expiry 6=initials 7=notes
   const steps = _sr.needCard
-    ? ['#','Name','Phone','Card','Exp','Init']
-    : ['#','Name','Phone','Init'];
+    ? ['#','Name','Phone','Card','Exp','Init','Note']
+    : ['#','Name','Phone','Init','Note'];
   return '<div style="display:flex;gap:3px;margin-bottom:16px">'
     + steps.map((s,i)=>{
         const n=i+1;
@@ -2798,14 +2798,12 @@ function srNext5() {
   _srStep6();
 }
 
-/* ── STEP 6: Initials (final) ── */
+/* ── STEP 6: Initials ── */
 function _srStep6() {
-  const stepNum = _sr.needCard ? 6 : 4;
-  const totalSteps = _sr.needCard ? 6 : 4;
   document.getElementById('modalTitle').textContent = 'New Reservation';
   document.getElementById('modalBody').innerHTML =
     _srHeader()
-    + _srProgress(stepNum)
+    + _srProgress(6)
     +'<div style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);margin-bottom:14px;line-height:1.8">'
     +'<div><span style="color:var(--gold);font-weight:700">'+_sr.guests+'p</span>'
     +' · <span style="color:var(--text)">'+escHtml(_sr.name)+'</span></div>'
@@ -2817,30 +2815,59 @@ function _srStep6() {
     +'<input class="form-input" id="srInitials" type="text" maxlength="4" placeholder="JS" autocomplete="off"'
     +' style="font-size:1.4rem;text-align:center;padding:14px;letter-spacing:0.2em;text-transform:uppercase"'
     +' oninput="this.value=this.value.toUpperCase()"'
-    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srSave()}">'
-    +'</div>'
-    +'<div class="form-row"><label class="form-label">Note (optional)</label>'
-    +'<div style="display:flex;gap:7px">'
-    +'<select class="form-select" id="srNoteType" style="flex:0 0 130px">'
-    +'<option value="">— None —</option>'
-    +'<option value="allergy">Allergy</option>'
-    +'<option value="restriction">Restriction</option>'
-    +'<option value="chef">Chef Request</option>'
-    +'<option value="table">Table Request</option>'
-    +'<option value="other">Other</option>'
-    +'</select>'
-    +'<input class="form-input" id="srNoteText" type="text" placeholder="Max 10 words…" maxlength="80" oninput="checkNoteWordLimit_sr()">'
-    +'</div>'
-    +'<div id="noteWordErr" style="font-family:var(--mono);font-size:0.6rem;color:#c04040;margin-top:3px;display:none">Max 10 words</div>'
+    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srNext6()}">'
     +'</div>'
     +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:8px"></div>'
     +'<div style="display:flex;gap:8px">'
     +'<button class="btn-outline" style="flex:0 0 80px;padding:12px" onclick="'
     +(_sr.needCard&&!_sr.isHold?'_srStep5':'_srStep3')+'()">← Back</button>'
-    +'<button class="btn-gold" style="flex:1;padding:14px" onclick="srSave()">✓ Confirm Reservation</button>'
+    + _srContinueBtn('Continue','srNext6')
     +'</div>';
   showModal();
   setTimeout(()=>document.getElementById('srInitials')?.focus(),80);
+}
+
+function srNext6() {
+  const initials=sanitizeInitials(document.getElementById('srInitials')?.value||'');
+  if (!initials) return _srErr('Your initials are required.');
+  _sr.initials=initials;
+  _srStep7();
+}
+
+/* ── STEP 7: Notes (skippable) ── */
+function _srStep7() {
+  document.getElementById('modalTitle').textContent = 'New Reservation';
+  document.getElementById('modalBody').innerHTML =
+    _srHeader()
+    + _srProgress(7)
+    +'<div style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);margin-bottom:14px;line-height:1.8">'
+    +'<span style="color:var(--gold);font-weight:700">'+_sr.guests+'p</span>'
+    +' · <span style="color:var(--text)">'+escHtml(_sr.name)+'</span>'
+    +' · <span style="color:var(--gold2)">'+_sr.initials+'</span>'
+    +'</div>'
+    +'<div class="form-row"><label class="form-label" style="font-size:0.85rem;margin-bottom:4px">Any notes?</label>'
+    +'<div style="font-family:var(--mono);font-size:0.62rem;color:var(--text3);margin-bottom:10px">Allergies, dietary restrictions, special requests — or skip.</div>'
+    +'<select class="form-select" id="srNoteType" style="margin-bottom:8px">'
+    +'<option value="">— No note —</option>'
+    +'<option value="allergy">🚨 Allergy</option>'
+    +'<option value="restriction">⚠ Dietary Restriction</option>'
+    +'<option value="chef">👨‍🍳 Chef Request</option>'
+    +'<option value="table">🪑 Table Request</option>'
+    +'<option value="other">📝 Other</option>'
+    +'</select>'
+    +'<input class="form-input" id="srNoteText" type="text" placeholder="Describe in max 10 words…" maxlength="80"'
+    +' oninput="checkNoteWordLimit_sr()"'
+    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srSave()}">'
+    +'<div id="noteWordErr" style="font-family:var(--mono);font-size:0.6rem;color:#c04040;margin-top:3px;display:none">Max 10 words</div>'
+    +'</div>'
+    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:8px"></div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button class="btn-outline" style="flex:0 0 80px;padding:12px" onclick="_srStep6()">← Back</button>'
+    +'<button class="btn-gold" style="flex:1;padding:14px" onclick="srSave()">✓ Confirm Reservation</button>'
+    +'</div>'
+    +'<button onclick="srSave()" style="width:100%;margin-top:8px;padding:11px;background:transparent;border:1px solid var(--border2);border-radius:var(--r);font-family:var(--mono);font-size:0.67rem;color:var(--text3);cursor:pointer">Skip — no notes</button>';
+  showModal();
+  setTimeout(()=>document.getElementById('srNoteType')?.focus(),80);
 }
 
 function checkNoteWordLimit_sr() {
@@ -2855,8 +2882,11 @@ async function srSave() {
   const initials=sanitizeInitials(document.getElementById('srInitials')?.value||'');
   if (!initials) return _srErr('Your initials are required.');
   _sr.initials=initials;
-  _sr.noteType=document.getElementById('srNoteType')?.value||'';
-  _sr.noteText=sanitizeText(document.getElementById('srNoteText')?.value,120);
+  // Note fields are on step 7 — read if present, else use whatever was stored
+  const noteTypeEl=document.getElementById('srNoteType');
+  const noteTextEl=document.getElementById('srNoteText');
+  if (noteTypeEl) _sr.noteType=noteTypeEl.value||'';
+  if (noteTextEl) _sr.noteText=sanitizeText(noteTextEl.value,120);
 
   const key=dateKey(currentDate);
   const assign=_sr.assign;
