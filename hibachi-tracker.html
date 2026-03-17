@@ -1671,7 +1671,7 @@ function openConfirmModal(dk, resId) {
       + escHtml(r.name || 'Guest') + ' · ' + (r.guests||'?') + 'p · ' + displayTime(r.slot) + '<br>'
       + '<span style="color:var(--green)">✓ Confirmed by ' + escHtml(r.confirmedBy || '?') + '</span>'
       + '</div>'
-      + '<button class="btn-outline" style="margin-bottom:8px" onclick="unconfirmRes('' + dk + '','' + resId + '')">↩ Un-confirm</button>';
+      + '<button class="btn-outline" style="margin-bottom:8px" onclick="unconfirmRes(\'' + dk + '\',\'' + resId + '\')">↩ Un-confirm</button>';
     showModal();
     return;
   }
@@ -1683,10 +1683,10 @@ function openConfirmModal(dk, resId) {
     + '</div>'
     + '<div class="form-row"><label class="form-label">Staff Initials *</label>'
     + '<input class="form-input" id="confirmInitials" type="text" maxlength="4" placeholder="JS" autocomplete="off"'
-    + ' onkeydown="if(event.key==='Enter'){event.preventDefault();saveConfirm('' + dk + '','' + resId + '')}">'
+    + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();saveConfirm(\''+dk+'\',\''+resId+'\')}">',
     + '</div>'
     + '<div id="confirmErr" style="font-family:var(--mono);font-size:0.67rem;color:#c04040;min-height:14px;margin-bottom:8px"></div>'
-    + '<button class="btn-gold" onclick="saveConfirm('' + dk + '','' + resId + '')">✓ Mark Confirmed</button>';
+    + '<button class="btn-gold" onclick="saveConfirm(\''+dk+'\',\''+resId+'\')">✓ Mark Confirmed</button>';
   showModal();
   setTimeout(() => document.getElementById('confirmInitials')?.focus(), 80);
 }
@@ -2308,7 +2308,7 @@ function openHibachiModal(slot, editId) {
     .map(s=>{
       const half=prefersHourlySlots(dow)&&isHalfHourSlot(s);
       const sel=s===slot?' selected':'';
-      return '<option value="'+s+'"'+sel+'>'+displayTime(s)+(half?' ·':'')+'</option>';
+      return '<option value="'+s+'"'+sel+'>'+displayTime(s)+'</option>';
     }).join('');
 
   let cardSectionHtml='';
@@ -2381,7 +2381,7 @@ function openHibachiModal(slot, editId) {
     +'<input class="form-input" id="fNoteText" type="text" placeholder="Max 10 words…" maxlength="80" value="'+escHtml(existing?existing.noteText||'':'')+'" oninput="checkNoteWordLimit()"></div>'
     +'<div id="noteWordErr" style="font-family:var(--mono);font-size:0.6rem;color:#c04040;margin-top:3px;display:none">Max 10 words</div></div>'
     +'<div id="formErr"></div>'
-    +'<button class="btn-gold" onclick="saveHibachi(\''+key+'\',\''+(editId||'')+'\'">'+saveLbl+'</button>'
+    +'<button class="btn-gold" onclick="saveHibachi(\''+key+'\',\''+(editId||'')+'\')">'+saveLbl+'</button>'
     +holdBanner+deleteBtn;
 
   if (existing) {
