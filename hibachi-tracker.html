@@ -2401,9 +2401,8 @@ function openHibachiModal(slot, editId) {
   const key=dateKey(currentDate);
   // Editing an existing reservation requires staff password + initials
   if (editId) { openEditAuthModal(slot, editId); return; }
-  // staff2: use step-by-step flow for NEW reservations
-  if (appMode==='staff2') { openSteppedModal(slot); return; }
-  _openHibachiModalInner(slot, editId);
+  // All accounts use step-by-step flow for NEW reservations
+  openSteppedModal(slot);
 }
 
 function openEditAuthModal(slot, editId) {
