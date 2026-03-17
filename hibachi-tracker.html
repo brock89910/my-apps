@@ -2001,7 +2001,7 @@ function autoAssignGrill(dateStr,slot,guests,chefs,excludeId) {
     const isHardBlocked=blocked&&blocked.reason!=='tight';
     const isTight=blocked&&blocked.reason==='tight';
     const chefBusy=chefsCommitted.has('chef_'+g);
-    const hasDouble=all.some(r=>timeToMinutes(r.slot)===slotMins&&grillsUsedByRes(r).includes(Number(g)));
+    const hasDouble=all.some(r=>timeToMinutes(r.slot)===slotMins&&(r.isDouble||r.grill2)&&grillsUsedByRes(r).includes(Number(g)));
     const groups=getGroupsAtGrillAtSlot(dateStr,g,slotMins,excludeId);
     const totalGuests=groups.reduce((s,r)=>s+(r.guests||0),0);
     const cap=getSingleGrillCap(groups.length);
@@ -2012,8 +2012,7 @@ function autoAssignGrill(dateStr,slot,guests,chefs,excludeId) {
   const canOpenMoreGrills=grillsOpenedAtSlot<effectiveFreeChefs;
 
   // FIRST: try adding to an already-open grill (chef already there — always allowed)
-  console.log('[autoAssign] slot='+slot+' guests='+guests+' chefs='+chefs+' free='+freeChefsAtSlot);
-  console.log('[autoAssign] grillState:', JSON.stringify(grillState.map(s=>({g:s.g,blocked:s.blocked,groups:s.groups.length,room:s.room,chefBusy:s.chefBusy,hasDouble:s.hasDouble}))));
+
   for (const state of grillState) {
     if (state.blocked||state.hasDouble) continue;
     if (state.groups.length===0) continue; // grill not yet open at this slot
