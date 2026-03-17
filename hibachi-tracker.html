@@ -725,6 +725,36 @@ body::before {
   color: var(--gold-light);
 }
 
+/* ── WEEK STRIP COLLAPSE ON SCROLL ── */
+#weekStrip {
+  transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease;
+  overflow: hidden;
+  max-height: 120px;
+}
+#weekStrip.strip-collapsed {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+  border-bottom: none;
+}
+.strip-toggle-btn {
+  display: none; /* shown dynamically when collapsed */
+  position: absolute;
+  top: 2px; right: 56px;
+  width: 26px; height: 18px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text3);
+  font-size: 0.55rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  font-family: var(--mono);
+  letter-spacing: 0.04em;
+}
+
 /* ── REMOVE CHEF BANNER ── */
 .chef-removed-banner {
   margin: 0 14px 0; padding: 7px 12px;
@@ -1213,10 +1243,11 @@ const CARD_SAMEDAY_MAX_NO_CARD   = 5;
 let unlockedCardIds = new Set();
 
 /* ── PASSWORDS (SHA-256) ── */
-const PWD_HASH_CARD   = '25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117';
-const PWD_HASH_LARGE  = '53d6668b995a4117d05d7799f6563672f4659d05f9f9fd45f961164de256b5d0';
-const PWD_HASH_EXPORT = '25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117';
-const PWD_HASH_CHEF   = '25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117'; // chef day removal
+const PWD_HASH_CARD   = '25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117'; // 2017040334 — view card details
+const PWD_HASH_LARGE  = '53d6668b995a4117d05d7799f6563672f4659d05f9f9fd45f961164de256b5d0'; // large group override
+const PWD_HASH_EXPORT = '25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117'; // 2017040334 — export tab
+const PWD_HASH_CHEF   = '25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117'; // 2017040334 — chef removal
+const PWD_HASH_EDIT   = '53d6668b995a4117d05d7799f6563672f4659d05f9f9fd45f961164de256b5d0'; // 0709 — edit existing reservation
 
 async function hashPassword(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
@@ -1725,10 +1756,10 @@ function openConfirmModal(dk, resId) {
     + '</div>'
     + '<div class="form-row"><label class="form-label">Staff Initials *</label>'
     + '<input class="form-input" id="confirmInitials" type="text" maxlength="4" placeholder="JS" autocomplete="off"'
-    + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();saveConfirm(\''+dk+'\',\''+resId+'\')}">',
+    + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();saveConfirm(\''+dk+'\',\''+resId+'\')}">'
     + '</div>'
     + '<div id="confirmErr" style="font-family:var(--mono);font-size:0.67rem;color:#c04040;min-height:14px;margin-bottom:8px"></div>'
-    + '<button class="btn-gold" onclick="saveConfirm(\''+dk+'\',\''+resId+'\')">✓ Mark Confirmed</button>';
+    + '<button class="btn-gold" style="width:100%;padding:14px;margin-top:4px" onclick="saveConfirm(\''+dk+'\',\''+resId+'\')">✓ Confirm</button>';
   showModal();
   setTimeout(() => document.getElementById('confirmInitials')?.focus(), 80);
 }
@@ -1957,7 +1988,6 @@ function autoAssignGrill(dateStr,slot,guests,chefs,excludeId) {
     }
     return null;
   }
-  if (freeChefsAtSlot<1) return null;
   const doubleAtSlot=all.some(r=>timeToMinutes(r.slot)===slotMins&&(r.grill2||(r.guests||0)>=DOUBLE_GRILL_MIN_GUESTS));
   const effectiveFreeChefs=doubleAtSlot?1:freeChefsAtSlot;
   const grillState=[];
@@ -1975,11 +2005,15 @@ function autoAssignGrill(dateStr,slot,guests,chefs,excludeId) {
   }
   const grillsOpenedAtSlot=new Set(all.filter(r=>timeToMinutes(r.slot)===slotMins).flatMap(r=>grillsUsedByRes(r))).size;
   const canOpenMoreGrills=grillsOpenedAtSlot<effectiveFreeChefs;
+
+  // FIRST: try adding to an already-open grill (chef already there — always allowed)
   for (const state of grillState) {
-    if (state.blocked||state.hasDouble||state.chefBusy) continue;
-    if (state.groups.length===0) continue;
+    if (state.blocked||state.hasDouble) continue;
+    if (state.groups.length===0) continue; // grill not yet open at this slot
     if (state.room>=guests) return {grill:state.g,isDouble:false,tightTiming:state.isTight};
   }
+  // SECOND: try opening a new grill (requires a free chef)
+  if (freeChefsAtSlot<1) return null; // no free chef to open a new grill
   if (canOpenMoreGrills) {
     for (const state of grillState) {
       if (state.blocked||state.hasDouble||state.chefBusy) continue;
@@ -2293,7 +2327,14 @@ function renderTimeSlots() {
             +'<div class="res-row-name"><span style="color:var(--gold);font-weight:700;margin-right:6px">'+(r.guests||'')+'p</span>'+escHtml(displayName)
             +(r.isDouble?' <span style="font-size:0.58rem;color:var(--amber)">×2</span>':'')
             +(isLargeGroup?' <span class="large-group-badge">⚡</span>':'')
-            +(isOverride?' <span class="override-badge">OVERRIDE</span>':'')
+            +(isOverride
+  ? r.overrideType==='no-card'
+    ? ' <span class="override-badge">OR No-Card</span>'
+    : r.overrideType==='too-many'
+      ? ' <span class="override-badge" style="color:#e06060">OR Too Many</span>'
+      : ' <span class="override-badge">OVERRIDE</span>'
+  : '')
++(r.wasEdited&&!isOverride?' <span style="font-size:0.56rem;font-weight:600;color:var(--gold);background:rgba(196,158,84,0.1);border:1px solid rgba(196,158,84,0.3);padding:1px 5px;border-radius:2px">CHANGED</span>':'')
             +(r.holdUntil?' <span style="font-size:0.56rem;color:var(--amber);font-weight:600;background:rgba(200,150,42,0.12);border:1px solid rgba(200,150,42,0.3);padding:1px 5px;border-radius:2px">HOLD</span>':'')
             +(r.noteType==='allergy'?' <span class="note-badge allergy" title="'+escHtml(r.noteText||r.notes||'')+'">ALLERGY</span>':'')
             +(r.noteType==='restriction'?' <span class="note-badge restriction" title="'+escHtml(r.noteText||r.notes||'')+'">REST.</span>':'')
@@ -2337,6 +2378,44 @@ function renderDining() {
 
 /* ── HIBACHI MODAL ── */
 function openHibachiModal(slot, editId) {
+  const key=dateKey(currentDate);
+  // Editing an existing reservation requires staff password + initials
+  if (editId) { openEditAuthModal(slot, editId); return; }
+  _openHibachiModalInner(slot, editId);
+}
+
+function openEditAuthModal(slot, editId) {
+  const key=dateKey(currentDate);
+  const r=(reservations[key]||{})[editId];
+  document.getElementById('modalTitle').textContent='Edit Reservation';
+  document.getElementById('modalBody').innerHTML=
+    '<div style="font-family:var(--mono);font-size:0.72rem;color:var(--text2);line-height:1.7;margin-bottom:14px">'
+    +escHtml((r&&r.name)||'Guest')+' · '+((r&&r.guests)||'?')+'p · '+((r&&r.slot)?displayTime(r.slot):'')
+    +'</div>'
+    +'<div class="form-row"><label class="form-label">Staff Password *</label>'
+    +'<input class="form-input" id="editAuthPwd" type="password" placeholder="Enter password" autocomplete="off" style="letter-spacing:0.15em"'
+    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();submitEditAuth(\''+slot+'\',\''+editId+'\')}"></div>'
+    +'<div class="form-row"><label class="form-label">Your Initials *</label>'
+    +'<input class="form-input" id="editAuthInitials" type="text" maxlength="4" placeholder="JS" autocomplete="off"'
+    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();submitEditAuth(\''+slot+'\',\''+editId+'\')}"></div>'
+    +'<div id="editAuthErr" style="font-family:var(--mono);font-size:0.67rem;color:#c04040;min-height:14px;margin-bottom:8px"></div>'
+    +'<button class="btn-gold" style="width:100%;padding:14px" onclick="submitEditAuth(\''+slot+'\',\''+editId+'\')">🔓 Unlock to Edit</button>';
+  showModal();
+  setTimeout(()=>document.getElementById('editAuthPwd')?.focus(),80);
+}
+
+async function submitEditAuth(slot, editId) {
+  const pwd=document.getElementById('editAuthPwd')?.value||'';
+  const initials=sanitizeInitials(document.getElementById('editAuthInitials')?.value||'');
+  const errEl=document.getElementById('editAuthErr');
+  if (!initials){if(errEl)errEl.textContent='Initials required.';return;}
+  const ok=await checkPassword(pwd,PWD_HASH_EDIT);
+  if (!ok){if(errEl){errEl.textContent='✕ Incorrect password.';document.getElementById('editAuthPwd').value='';document.getElementById('editAuthPwd').focus();}return;}
+  closeModal();
+  _openHibachiModalInner(slot,editId);
+}
+
+function _openHibachiModalInner(slot, editId) {
   const key=dateKey(currentDate);
   const dow=currentDate.getDay();
   const slotMins=slot?timeToMinutes(slot):0;
@@ -2707,7 +2786,9 @@ async function saveHibachi(dk,editId) {
 
   const fmtPhoneVal=phone.length===10?'('+phone.slice(0,3)+') '+phone.slice(3,6)+'-'+phone.slice(6):phone.slice(0,3)+'-'+phone.slice(3);
   const data={name,guests,phone:fmtPhoneVal,initials,bookedOn,notes,noteType,noteText,slot,grill:assign.grill,grill2:assign.grill2||null,isDouble:assign.isDouble||false,updatedAt:Date.now()};
-  if (document.getElementById('noCardOverrideGranted')||document.getElementById('tightTimingConfirmed')||document.getElementById('cardOnFileVerified')) data.managerOverride=true;
+  if (document.getElementById('noCardOverrideGranted')) { data.managerOverride=true; data.overrideType='no-card'; }
+  else if (document.getElementById('tightTimingConfirmed')||document.getElementById('cardOnFileVerified')) { data.managerOverride=true; }
+  if (editId && !data.managerOverride) data.wasEdited=true;
   if (card) { data.card=card; data.expiry=expiry; data.holdUntil=null; }
   else if (editId) {
     const oldR=(reservations[dk]||{})[editId];
@@ -2752,7 +2833,7 @@ async function saveHibachiOverride(dk,editId) {
   if (guests>OVERRIDE_MAX_GUESTS) { if(oeEl){oeEl.textContent='✕ Maximum '+OVERRIDE_MAX_GUESTS+' even with override.';oeEl.style.display='block';} return; }
   const isDouble=guests>=DOUBLE_GRILL_MIN_GUESTS;
   const fp=phone.length===10?'('+phone.slice(0,3)+') '+phone.slice(3,6)+'-'+phone.slice(6):phone.slice(0,3)+'-'+phone.slice(3);
-  const data={name,guests,phone:fp,initials,bookedOn,notes:noteText,noteType,noteText,slot,grill:g1,grill2:isDouble?g2:null,isDouble,overrideBooked:true,updatedAt:Date.now()};
+  const data={name,guests,phone:fp,initials,bookedOn,notes:noteText,noteType,noteText,slot,grill:g1,grill2:isDouble?g2:null,isDouble,overrideBooked:true,managerOverride:true,overrideType:'too-many',updatedAt:Date.now()};
   if (card) { data.card=card; data.expiry=expiry; }
   const grillStr=isDouble?'Grills '+g1+'+'+g2+' (OVERRIDE)':'Grill '+g1+' (OVERRIDE)';
   try {
@@ -3148,6 +3229,7 @@ function startApp() {
   subscribeToDate();
   purgeExpiredHolds();
   startMidnightWipePoller(); // polling-based, fires at 23:59 every day reliably
+  setTimeout(initStripScrollCollapse, 300); // after DOM is ready
 }
 
 function getDisplayName(resId,realName,dateStr) {
@@ -3183,6 +3265,28 @@ else {
 }
 
 setInterval(()=>{ if(activeTab==='hibachi') renderTimeSlots(); }, 60000);
+
+/* ── WEEK STRIP SCROLL COLLAPSE ── */
+let _stripCollapsed = false;
+let _lastScrollY = 0;
+
+function initStripScrollCollapse() {
+  const scroller = document.getElementById('hibachiScroll');
+  if (!scroller) return;
+  scroller.addEventListener('scroll', () => {
+    const y = scroller.scrollTop;
+    const strip = document.getElementById('weekStrip');
+    if (!strip) return;
+    if (y > 30 && !_stripCollapsed) {
+      _stripCollapsed = true;
+      strip.classList.add('strip-collapsed');
+    } else if (y <= 8 && _stripCollapsed) {
+      _stripCollapsed = false;
+      strip.classList.remove('strip-collapsed');
+    }
+    _lastScrollY = y;
+  }, { passive: true });
+}
 setInterval(()=>{ purgeExpiredHolds(); }, 60*60*1000);
 </script>
 </body>
