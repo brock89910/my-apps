@@ -1745,60 +1745,11 @@ function renderHibachi() {
     loadWeekData();
   }
   renderTimeSlots();
-  renderDailyTally();
   if (appMode==='guest') {
     document.querySelectorAll('.time-add-btn,.block-btn').forEach(b=>b.style.display='none');
   }
 }
 
-function renderDailyTally() {
-  const key = dateKey(currentDate);
-  const allRes = getAllResForDate(key);
-  const totalGroups = allRes.length;
-  const totalGuests = allRes.reduce((s,r)=>s+(r.guests||0),0);
-
-  // Remove existing tally
-  const existing = document.getElementById('dailyTally');
-  if (existing) existing.remove();
-  if (!totalGroups) return;
-
-  const tally = document.createElement('div');
-  tally.id = 'dailyTally';
-  tally.style.cssText = [
-    'display:flex',
-    'align-items:center',
-    'justify-content:center',
-    'gap:20px',
-    'padding:10px 16px',
-    'background:linear-gradient(135deg, rgba(212,168,67,0.12) 0%, rgba(212,168,67,0.06) 100%)',
-    'border-bottom:1px solid rgba(212,168,67,0.25)',
-    'border-top:1px solid rgba(212,168,67,0.1)',
-  ].join(';');
-
-  const makeBlock = (value, label) => {
-    const b = document.createElement('div');
-    b.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:1px';
-    const v = document.createElement('div');
-    v.style.cssText = 'font-family:var(--serif);font-size:2rem;font-weight:700;color:var(--gold-light);line-height:1';
-    v.textContent = value;
-    const l = document.createElement('div');
-    l.style.cssText = 'font-family:var(--mono);font-size:0.65rem;font-weight:600;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase';
-    l.textContent = label;
-    b.appendChild(v); b.appendChild(l);
-    return b;
-  };
-
-  const divider = document.createElement('div');
-  divider.style.cssText = 'width:1px;height:36px;background:rgba(212,168,67,0.25)';
-
-  tally.appendChild(makeBlock(totalGuests, 'Guests Today'));
-  tally.appendChild(divider);
-  tally.appendChild(makeBlock(totalGroups, 'Groups Today'));
-
-  // Insert above #timeSlots
-  const timeSlotsEl = document.getElementById('timeSlots');
-  timeSlotsEl.parentNode.insertBefore(tally, timeSlotsEl);
-}
 
 function renderTimeSlots() {
   const container=document.getElementById('timeSlots');
@@ -1886,7 +1837,7 @@ function renderTimeSlots() {
       head.innerHTML='<div class="time-label" style="'+(isManuallyBlocked?'color:#c04040':slotFull?'color:#c04040':isSecondary?'color:var(--text3)':'')+'">'
         +displayTime(slot)+'</div>'
         +capWidget
-        +'<div class="time-chef-info">'+chefs+' chef'+(chefs!==1?'s':'')+' · '+allRecs.length+' grp · '+totalAtSlot+'p'+slotLabel+fullTag+'</div>'
+        +'<div class="time-chef-info">'+chefs+' chef'+(chefs!==1?'s':'')+' · '+allRecs.length+' grp'+slotLabel+fullTag+'</div>'
         +'<button class="block-btn '+(isManuallyBlocked?'is-blocked':'')+'" onclick="toggleBlockSlot(\''+slot+'\')" title="'+(isManuallyBlocked?'Unblock':'Block')+' slot">'+(isManuallyBlocked?'🔓':'🔒')+'</button>'
         +(isManuallyBlocked?'':`<button class="time-add-btn" onclick="openHibachiModal('${slot}',null)" aria-label="Add">+</button>`);
     }
@@ -1916,7 +1867,7 @@ function renderTimeSlots() {
           const isLargeGroup=(r.guests||0)>=DOUBLE_GRILL_MIN_GUESTS;
           if (isOverride) row.classList.add('is-override');
           if (isLargeGroup) row.classList.add('is-large-group');
-          row.innerHTML='<div class="res-row-name">'+escHtml(displayName)
+          row.innerHTML='<div class="res-row-name"><span style="color:var(--gold-light);font-weight:700;margin-right:6px">'+(r.guests||'')+'p</span>'+escHtml(displayName)
             +(r.isDouble?' <span style="font-size:0.58rem;color:var(--amber)">×2</span>':'')
             +(isLargeGroup?' <span class="large-group-badge">⚡</span>':'')
             +(isOverride?' <span class="override-badge">OVERRIDE</span>':'')
