@@ -2879,7 +2879,8 @@ function checkNoteWordLimit_sr() {
 }
 
 async function srSave() {
-  const initials=sanitizeInitials(document.getElementById('srInitials')?.value||'');
+  // Initials already stored by srNext6() — srInitials input no longer exists on step 7
+  const initials=_sr.initials||sanitizeInitials(document.getElementById('srInitials')?.value||'');
   if (!initials) return _srErr('Your initials are required.');
   _sr.initials=initials;
   // Note fields are on step 7 — read if present, else use whatever was stored
