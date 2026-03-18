@@ -2666,13 +2666,68 @@ async function srNext1() {
       return _srErr('Groups of 30+ require manager approval.');
     }
   }
-  // Check grill availability now so we fail fast
+  // Check grill availability
   const key=dateKey(currentDate);
   const assign=autoAssignGrill(key,_sr.slot,g,_sr.chefs,undefined);
-  if (!assign) return _srErr('⚠ No availability for '+g+' guests at '+displayTime(_sr.slot)+'.');
+  if (!assign) {
+    // No automatic availability — show override option (staff pw required)
+    _srShowOverride(g);
+    return;
+  }
   _sr.guests=g;
   _sr.assign=assign;
   _sr.needCard=cardRequired(g,key);
+  _srStep2();
+}
+
+function _srShowOverride(g) {
+  const errEl=document.getElementById('srErr');
+  if (errEl) { errEl.style.display='none'; }
+  // Remove any existing override block first
+  document.getElementById('srOverrideBlock')?.remove();
+  const block=document.createElement('div');
+  block.id='srOverrideBlock';
+  block.innerHTML=
+    '<div style="background:rgba(138,26,26,0.08);border:1px solid rgba(138,26,26,0.35);border-radius:var(--r);padding:13px;margin-top:10px">'
+    +'<div style="font-family:var(--serif);font-size:0.95rem;font-weight:600;color:#e04040;margin-bottom:6px">No availability at '+displayTime(_sr.slot)+'</div>'
+    +'<div style="font-family:var(--mono);font-size:0.65rem;color:var(--text3);margin-bottom:12px;line-height:1.6">All grills or chefs are occupied. Enter the override password to force-book anyway.</div>'
+    +'<div style="display:flex;gap:7px;margin-bottom:8px">'
+    +'<select id="srOverridePair" style="flex:1;padding:9px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--mono);font-size:0.78rem;color:var(--text);outline:none">'
+    +'<option value="1,2">Grills 1 + 2</option>'
+    +'<option value="3,4">Grills 3 + 4</option>'
+    +'</select></div>'
+    +'<input class="form-input" id="srOverridePwd" type="password" placeholder="Override password" autocomplete="off"'
+    +' style="margin-bottom:8px;letter-spacing:0.15em"'
+    +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srApplyOverride('+g+')}">'
+    +'<div id="srOverrideErr" style="display:none;font-family:var(--mono);font-size:0.65rem;color:#c04040;margin-bottom:8px"></div>'
+    +'<button onclick="srApplyOverride('+g+')" style="width:100%;padding:11px;background:rgba(138,26,26,0.1);border:1px solid rgba(138,26,26,0.4);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:600;color:#e04040;cursor:pointer">Force Book</button>'
+    +'</div>';
+  const guestsInput=document.getElementById('srGuests');
+  if (guestsInput) guestsInput.closest('.form-row').after(block);
+  else document.getElementById('modalBody').appendChild(block);
+  setTimeout(()=>document.getElementById('srOverridePwd')?.focus(),80);
+}
+
+async function srApplyOverride(g) {
+  const pwd=document.getElementById('srOverridePwd')?.value||'';
+  const oeEl=document.getElementById('srOverrideErr');
+  const ok=await checkPassword(pwd,PWD_HASH_CARD);
+  if (!ok){
+    if(oeEl){oeEl.textContent='✕ Incorrect password.';oeEl.style.display='block';}
+    document.getElementById('srOverridePwd').value='';
+    document.getElementById('srOverridePwd').focus();
+    return;
+  }
+  // Parse chosen grill pair
+  const pairVal=document.getElementById('srOverridePair')?.value||'1,2';
+  const [g1,g2]=pairVal.split(',').map(Number);
+  const isDouble=g>=(15); // DOUBLE_GRILL_MIN_GUESTS
+  const key=dateKey(currentDate);
+  _sr.guests=g;
+  _sr.assign={grill:g1,grill2:isDouble?g2:null,isDouble,overrideBooked:true};
+  _sr.isOverride=true;
+  _sr.needCard=cardRequired(g,key);
+  document.getElementById('srOverrideBlock')?.remove();
   _srStep2();
 }
 
@@ -2904,19 +2959,23 @@ async function srSave() {
   if (noteTextEl) _sr.noteText=sanitizeText(noteTextEl.value,120);
 
   const key=dateKey(currentDate);
-  const assign=_sr.assign;
 
-  // Re-verify grill still available (someone may have booked while we were stepping)
-  const freshAssign=autoAssignGrill(key,_sr.slot,_sr.guests,_sr.chefs,undefined);
-  if (!freshAssign) return _srErr('⚠ This slot was just filled. Please go back and choose another time.');
+  // Use stored assign — re-verify only if not a manual override
+  let finalAssign=_sr.assign;
+  if (!_sr.isOverride) {
+    const freshAssign=autoAssignGrill(key,_sr.slot,_sr.guests,_sr.chefs,undefined);
+    if (!freshAssign) return _srErr('⚠ This slot was just filled. Please go back and choose another time.');
+    finalAssign=freshAssign;
+  }
 
   const data={
     name:_sr.name, guests:_sr.guests, phone:_sr.phone,
     initials:_sr.initials, bookedOn:new Date().toISOString().slice(0,10),
     notes:_sr.noteText, noteType:_sr.noteType, noteText:_sr.noteText,
-    slot:_sr.slot, grill:freshAssign.grill, grill2:freshAssign.grill2||null,
-    isDouble:freshAssign.isDouble||false, updatedAt:Date.now()
+    slot:_sr.slot, grill:finalAssign.grill, grill2:finalAssign.grill2||null,
+    isDouble:finalAssign.isDouble||false, updatedAt:Date.now()
   };
+  if (_sr.isOverride) { data.overrideBooked=true; data.managerOverride=true; data.overrideType='too-many'; }
 
   if (_sr.card) { data.card=_sr.card; data.expiry=_sr.expiry; }
   else if (_sr.isHold) {
