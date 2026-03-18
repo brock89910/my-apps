@@ -51,8 +51,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .srch-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:11px;opacity:.55;pointer-events:none;}
 .srch-x{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.55);cursor:pointer;font-size:12px;display:none;}
 .srch-drop{position:absolute;top:calc(100% + 5px);left:0;right:0;background:#fff;border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.18);z-index:500;max-height:300px;overflow-y:auto;border:1px solid var(--border);display:none;}
-.layout-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;white-space:nowrap;font-family:'Noto Sans KR',sans-serif;}
-.layout-btn:hover{background:rgba(255,255,255,.28);}
 .srch-drop.show{display:block;}
 .sr-row{padding:7px 12px;cursor:pointer;border-bottom:1px solid var(--bl);display:flex;align-items:center;gap:7px;font-size:12px;}
 .sr-row:last-child{border-bottom:none;}
@@ -82,6 +80,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .s-liquor{background:#7a5f9e;}.s-sauce{background:#4a8070;}.s-mcs{background:#7a6a4a;}
 .s-extras{background:#5a7a8e;}.s-sysco{background:#6a7aaa;}.s-toronto{background:#7a5a7a;}
 .s-fish{background:#3a7a9e;}
+.s-dollarama{background:#e63946;}
 .store-block{margin-bottom:14px;border-radius:6px;overflow:hidden;border:1px solid var(--border);}
 
 /* TABLE — bigger and easier to read */
@@ -135,12 +134,6 @@ tr.tbl-drag-over{outline:2px solid #f59e0b;}
 /* ML delete-all per stop */
 .ml-del-all{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:5px;padding:2px 9px;font-size:11px;cursor:pointer;white-space:nowrap;}
 .ml-del-all:hover{background:rgba(255,255,255,.32);}
-
-/* STORES GRID — stacked default, side-by-side toggle */
-.stores-grid{display:flex;flex-direction:column;gap:12px;}
-.stores-grid.side-by-side{flex-direction:row;flex-wrap:wrap;align-items:flex-start;}
-.stores-grid.side-by-side .store-block{flex:1 1 340px;min-width:300px;}
-.stores-grid .store-block{width:100%;}
 
 /* GRID */
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
@@ -200,6 +193,73 @@ tr.tbl-drag-over{outline:2px solid #f59e0b;}
 .color-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:6px;}
 .color-opt{height:26px;border-radius:5px;border:2px solid transparent;cursor:pointer;font-size:10px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;}
 .color-opt.sel{border-color:#1a1916;}
+/* STORES GRID */
+.stores-grid{display:flex;flex-direction:column;gap:12px;}
+.stores-grid.side-by-side{flex-direction:row;flex-wrap:wrap;align-items:flex-start;}
+.stores-grid.side-by-side .store-block{flex:1 1 340px;min-width:300px;}
+.stores-grid .store-block{width:100%;}
+/* LAYOUT BTN */
+.layout-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;white-space:nowrap;}
+.layout-btn:hover{background:rgba(255,255,255,.28);}
+
+
+/* ── MIC BTN ── */
+.mic-btn{background:#c0392b;border:none;color:#fff;border-radius:6px;padding:5px 11px;font-size:12px;cursor:pointer;white-space:nowrap;font-weight:600;}
+.mic-btn:hover{background:#a93226;}
+.mic-btn.recording{animation:mic-pulse 1s infinite;}
+@keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.6)}50%{box-shadow:0 0 0 7px rgba(192,57,43,0)}}
+
+/* ── VOICE LOGGER PANEL ── */
+.vl-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:flex;align-items:flex-end;justify-content:center;}
+.vl-overlay.hidden{display:none;}
+.vl-panel{background:#fff;width:100%;max-width:680px;border-radius:14px 14px 0 0;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 -6px 30px rgba(0,0,0,.2);}
+.vl-hdr{background:#1a1916;color:#fff;padding:13px 18px;border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:space-between;}
+.vl-hdr h3{font-size:14px;font-weight:700;}
+.vl-hdr button{background:none;border:none;color:rgba(255,255,255,.6);font-size:18px;cursor:pointer;padding:0 4px;line-height:1;}
+.vl-hdr button:hover{color:#fff;}
+.vl-body{padding:14px;overflow-y:auto;flex:1;}
+.vl-tx{width:100%;min-height:75px;padding:9px 11px;border:2px solid var(--border);border-radius:7px;font-size:13px;resize:vertical;line-height:1.6;background:#fafaf8;font-family:inherit;}
+.vl-tx:focus{outline:none;border-color:#5578a0;}
+.vl-tx.on{border-color:#e74c3c;background:#fff9f9;}
+.vl-live{font-size:10px;color:#e74c3c;font-weight:700;margin-left:8px;display:none;}
+.vl-live.show{display:inline;animation:pulse 1s infinite;}
+.vl-btns{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap;}
+.vl-rec{background:#c0392b;color:#fff;border:none;border-radius:7px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;}
+.vl-rec:hover{background:#a93226;}
+.vl-rec.stop{background:#555;}
+.vl-parse{background:#5578a0;color:#fff;border:none;border-radius:7px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;}
+.vl-parse:hover{background:#446690;}
+.vl-parse:disabled{background:#aaa;cursor:not-allowed;}
+.vl-clr{background:none;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:9px 13px;font-size:12px;cursor:pointer;}
+.vl-status{font-size:12px;color:var(--muted);min-height:16px;display:flex;align-items:center;gap:6px;margin-bottom:10px;}
+.vl-spinner{width:11px;height:11px;border:2px solid #ddd;border-top-color:#5578a0;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.vl-clarify{background:#fff9f0;border:1px solid #fcd34d;border-radius:8px;padding:11px 14px;margin-bottom:10px;display:none;}
+.vl-clarify.show{display:block;}
+.vl-clarify h4{font-size:12px;font-weight:700;color:#92400e;margin-bottom:8px;}
+.vl-cq{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:12px;flex-wrap:wrap;}
+.vl-cq label{color:var(--muted);flex:1;min-width:120px;}
+.vl-cq select{border:1px solid var(--border);border-radius:5px;padding:4px 7px;font-size:12px;font-family:inherit;}
+.vl-results{display:none;}
+.vl-results.show{display:block;}
+.vl-results-hdr{font-size:13px;font-weight:700;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+.vl-results-hdr small{font-weight:400;color:var(--muted);font-size:11px;}
+.vl-item{background:#f8f8f5;border:1px solid var(--bl);border-radius:7px;padding:9px 11px;margin-bottom:7px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.vl-item.has-order{border-left:3px solid #5578a0;}
+.vl-iname{font-weight:600;font-size:13px;flex:1;min-width:100px;}
+.vl-istore{font-size:10px;color:#fff;border-radius:9px;padding:1px 7px;background:#5578a0;white-space:nowrap;}
+.vl-fields{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end;}
+.vl-fg{display:flex;flex-direction:column;gap:2px;}
+.vl-fl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
+.vl-fi{border:1px solid var(--border);border-radius:5px;padding:4px 7px;font-size:12px;width:80px;font-family:inherit;}
+.vl-fi.order{border-color:#5578a0;}
+.vl-rm{background:none;border:none;color:#ccc;font-size:15px;cursor:pointer;padding:0 2px;line-height:1;}
+.vl-rm:hover{color:#e24b4a;}
+.vl-footer{padding:11px 14px;border-top:1px solid var(--bl);display:flex;gap:8px;background:#fff;border-radius:0 0 14px 14px;}
+.vl-save{flex:1;background:#1a1916;color:#fff;border:none;border-radius:7px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;}
+.vl-save:hover{background:#333;}
+.vl-save:disabled{background:#aaa;cursor:not-allowed;}
+.vl-cancel{background:none;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:11px 16px;font-size:13px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -214,7 +274,8 @@ tr.tbl-drag-over{outline:2px solid #f59e0b;}
       <button class="srch-x" id="srchX" onclick="clrSearch()">✕</button>
       <div class="srch-drop" id="srchDrop"></div>
     </div>
-    <button class="layout-btn" id="layoutBtn" onclick="toggleLayout()" title="Toggle layout">⊞ Side by Side</button>
+    <button class="layout-btn" id="layoutBtn" onclick="toggleLayout()">⊞ Side by Side</button>
+    <button class="mic-btn" id="micBtn" onclick="openVoiceLogger()">🎙️ Log</button>
     <div class="sync-st"><span class="sync-dot" id="syncDot"></span><span id="syncLbl">Local</span></div>
     <div class="t-date" id="todayDate"></div>
   </div>
@@ -233,8 +294,7 @@ tr.tbl-drag-over{outline:2px solid #f59e0b;}
 <!-- COSTCO -->
 <div id="tab-costco" class="tab-panel active">
   <div class="stores-grid" id="gridCostco">
-    <div class="store-block">
-      <div class="s-title s-costco">🛒 Costco</div>
+    <div class="store-block"><div class="s-title s-costco">🛒 Costco</div>
       <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
       <tbody id="tb-costco"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('costco','Costco')">+ Add item</button>
@@ -242,35 +302,36 @@ tr.tbl-drag-over{outline:2px solid #f59e0b;}
   </div>
 </div>
 
-<!-- WHOLESALE + SOBEYS + SYSCO + FISH + BULK + TORONTO -->
+<!-- WHOLESALE + SOBEYS -->
 <div id="tab-wholesale" class="tab-panel">
   <div class="stores-grid" id="gridWholesale">
-    <div class="store-block">
-      <div class="s-title s-ws">🏪 Whole Sale</div>
+    <div class="store-block"><div class="s-title s-ws">🏪 Whole Sale</div>
       <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
       <tbody id="tb-ws"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('ws','Whole Sale')">+ Add item</button>
     </div>
-    <div class="store-block">
-      <div class="s-title s-sobeys">🍃 Sobeys</div>
+    <div class="store-block"><div class="s-title s-sobeys">🍃 Sobeys</div>
       <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
       <tbody id="tb-sobeys"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('sobeys','Sobeys')">+ Add item</button>
     </div>
+    <div class="store-block"><div class="s-title s-dollarama">🛍️ Dollarama</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
+      <tbody id="tb-dollarama"></tbody></table>
+      <button class="add-btn-row" onclick="openAdd('dollarama','Dollarama')">+ Add item</button>
+    </div>
   </div>
 </div>
 
-<!-- CHINESE MARKET + KOREA MART -->
+<!-- CHINESE + KOREA -->
 <div id="tab-chinese" class="tab-panel">
   <div class="stores-grid" id="gridChinese">
-    <div class="store-block">
-      <div class="s-title s-chinese">🥬 Chinese Market</div>
+    <div class="store-block"><div class="s-title s-chinese">🥬 Chinese Market</div>
       <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
       <tbody id="tb-chinese"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('chinese','Chinese Market')">+ Add item</button>
     </div>
-    <div class="store-block">
-      <div class="s-title s-korea">🇰🇷 Korea Mart</div>
+    <div class="store-block"><div class="s-title s-korea">🇰🇷 Korea Mart</div>
       <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
       <tbody id="tb-korea"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('korea','Korea Mart')">+ Add item</button>
@@ -278,83 +339,68 @@ tr.tbl-drag-over{outline:2px solid #f59e0b;}
   </div>
 </div>
 
-<!-- OTHERS: Sysco, Toronto, Fish, Bulk, Beer, Wine, White Wine, Draft, Bar, MCS, Sauce, Extras -->
+<!-- OTHERS -->
 <div id="tab-others" class="tab-panel">
   <div class="stores-grid" id="gridOthers">
-    <div class="store-block">
-      <div class="s-title s-sysco">🚚 Sysco</div>
+    <div class="store-block"><div class="s-title s-sysco">🚚 Sysco</div>
       <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
       <tbody id="tb-sysco"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('sysco','Sysco')">+ Add item</button>
     </div>
-    <div class="store-block">
-      <div class="s-title s-toronto">🥩 Toronto 정육점</div>
+    <div class="store-block"><div class="s-title s-toronto">🥩 Toronto 정육점</div>
       <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
       <tbody id="tb-toronto"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('toronto','Toronto 정육점')">+ Add item</button>
     </div>
-    <div class="store-block">
-      <div class="s-title s-fish">🐟 Fish Market</div>
+    <div class="store-block"><div class="s-title s-fish">🐟 Fish Market</div>
       <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
       <tbody id="tb-fish"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('fish','Fish Market')">+ Add item</button>
     </div>
-    <div class="store-block">
-      <div class="s-title s-bulk">📦 Bulk Barn</div>
+    <div class="store-block"><div class="s-title s-bulk">📦 Bulk Barn</div>
       <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
       <tbody id="tb-bulk"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('bulk','Bulk Barn')">+ Add item</button>
     </div>
-    <div class="store-block">
-      <div class="s-title s-liquor">🍺 Beer 135</div>
+    <div class="store-block"><div class="s-title s-liquor">🍺 Beer 135</div>
       <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
       <tbody id="tb-beer"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('beer','Liquor')">+ Add item</button>
     </div>
-    <div class="store-block">
-      <div class="s-title s-liquor" style="background:#7a5f9e">🍷 Wine 4B</div>
+    <div class="store-block"><div class="s-title s-liquor" style="background:#7a5f9e">🍷 Wine 4B</div>
       <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
       <tbody id="tb-wine"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('wine','Liquor')">+ Add item</button>
     </div>
-    <div class="store-block">
-      <div class="s-title s-liquor" style="background:#7a5f9e">🥂 White Wine</div>
+    <div class="store-block"><div class="s-title s-liquor" style="background:#7a5f9e">🥂 White Wine</div>
       <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
       <tbody id="tb-whitewine"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('whitewine','Liquor')">+ Add item</button>
     </div>
-    <div class="store-block">
-      <div class="s-title s-liquor" style="background:#3a7a9e">🍶 피 맥</div>
+    <div class="store-block"><div class="s-title s-liquor" style="background:#3a7a9e">🍶 피 맥</div>
       <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
       <tbody id="tb-draft"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('draft','Liquor')">+ Add item</button>
     </div>
-    <div class="store-block">
-      <div class="s-title s-liquor" style="background:#7a5f9e">🍾 Bar 용소모품</div>
+    <div class="store-block"><div class="s-title s-liquor" style="background:#7a5f9e">🍾 Bar 용소모품</div>
       <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
       <tbody id="tb-bargoods"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('bargoods','Liquor')">+ Add item</button>
     </div>
-    <div class="store-block">
-      <div class="s-title s-mcs">🧂 MCS</div>
+    <div class="store-block"><div class="s-title s-mcs">🧂 MCS</div>
       <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
       <tbody id="tb-mcs"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('mcs','MCS')">+ Add item</button>
     </div>
-    <div class="store-block">
-      <div class="s-title s-sauce">🫙 소스류 재고 현황</div>
-      <table class="tbl"><thead><tr>
-        <th style="width:28px"></th><th class="lft">ITEMS</th>
-        <th class="sauce-th" style="width:55px">용량</th>
-        <th class="sauce-th" style="width:60px">제조일</th>
-        <th class="sauce-th" style="width:55px">수량</th>
-        <th style="width:40px">⭐</th>
+    <div class="store-block"><div class="s-title s-sauce">🫙 소스류 재고 현황</div>
+      <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">ITEMS</th>
+        <th class="sauce-th" style="width:55px">용량</th><th class="sauce-th" style="width:60px">제조일</th>
+        <th class="sauce-th" style="width:55px">수량</th><th style="width:40px">⭐</th>
       </tr></thead>
       <tbody id="tb-sauce"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('sauce','Sauce')">+ Add item</button>
     </div>
-    <div class="store-block">
-      <div class="s-title s-extras">📋 Extras / Uncategorized</div>
+    <div class="store-block"><div class="s-title s-extras">📋 Extras</div>
       <table class="tbl"><thead><tr><th style="width:28px"></th><th class="lft">품목</th><th style="width:60px">재고</th><th style="width:60px">수량</th><th style="width:40px">⭐</th></tr></thead>
       <tbody id="tb-extras"></tbody></table>
       <button class="add-btn-row" onclick="openAdd('extras','Extras')">+ Add item</button>
@@ -659,7 +705,6 @@ const D={
   ],
 
   costco:[
-    // 육류/해물 Meat & Seafood
     {id:'cc16',name:'Strip Loin',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
     {id:'cc15',name:'Tender Loin',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
     {id:'cc17',name:'Chicken Breast',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
@@ -668,7 +713,6 @@ const D={
     {id:'cc19',name:'Brisket',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc69',name:'Scallop',qty:'',stock:'',color:'rB',cell:'',key:true,note:''},
     {id:'cc30',name:'Mussel',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // 스시 야채 Sushi Vegetables
     {id:'cc1',name:'Avocado',qty:'',stock:'',color:'',cell:'',key:true,note:'',hilite:true},
     {id:'cc2',name:'Cucumber',qty:'',stock:'',color:'',cell:'',key:true,note:'',hilite:true},
     {id:'cc22',name:'Asparagus',qty:'',stock:'',color:'',cell:'',key:false,note:''},
@@ -681,7 +725,6 @@ const D={
     {id:'cc11',name:'Red Onion',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc12',name:'Potato',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc25',name:'Green Onion',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // 과일 Fruit
     {id:'cc8',name:'Mango',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
     {id:'cc5',name:'Lemon',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc6',name:'Lime',qty:'',stock:'',color:'',cell:'',key:false,note:''},
@@ -689,7 +732,6 @@ const D={
     {id:'cc13',name:'Strawberry',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc7',name:'Kiwi',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc10',name:'Banana',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // 냉동/냉장 Frozen & Refrigerated
     {id:'cc71',name:'Smoked Salmon',qty:'',stock:'',color:'rB',cell:'',key:true,note:''},
     {id:'cc70',name:'Cocktail Shrimp',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc29',name:'Tilapia',qty:'',stock:'',color:'rB',cell:'',key:false,note:''},
@@ -704,11 +746,9 @@ const D={
     {id:'cc32',name:'Egg',qty:'2판',stock:'',color:'rY',cell:'',key:true,note:''},
     {id:'cc14',name:'Croissant',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc9',name:'Salad Dressing',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
-    // 호일/랲 Wrap & Foil
     {id:'cc58',name:'Small Wrap',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc59',name:'Large Wrap',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc60',name:'Cooking Paper',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // 음료 Drinks
     {id:'cc36',name:'Chocolate Milk',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc38',name:'Diet Coke',qty:'',stock:'',color:'rB',cell:'',key:true,note:''},
     {id:'cc39',name:'Coca',qty:'',stock:'',color:'rB',cell:'',key:true,note:''},
@@ -720,20 +760,15 @@ const D={
     {id:'cc44',name:'7UP',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc45',name:'Crush',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc46',name:'Rootbeer',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // 서버 Napkins
     {id:'cc61',name:'Napkin (Hall)',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
     {id:'cc62',name:'Napkin (To-go)',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
-    // 키친 Kitchen Supplies
     {id:'cc34',name:'Bounty',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc35',name:'Sponge Towel',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // 쓰레기봉투 Trash Bags
     {id:'cc54',name:'10 Gal Trash',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc55',name:'Blue recycle Trash',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc56',name:'30 Gal Trash',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
     {id:'cc57',name:'55 Gal Trash',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
-    // 파란 장갑 Gloves
     {id:'cc3',name:'Yellow MicroFibre',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // 주방용품 Cleaning
     {id:'cc47',name:'Bleach',qty:'',stock:'',color:'',cell:'',key:true,note:''},
     {id:'cc48',name:'Palmolive',qty:'',stock:'',color:'',cell:'',key:true,note:''},
     {id:'cc49',name:'Oxi',qty:'',stock:'',color:'',cell:'',key:false,note:''},
@@ -741,7 +776,6 @@ const D={
     {id:'cc50',name:'Mr. Clean',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc51',name:'Spray9',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc53',name:'Windex',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // 기타 Condiments & Dry Goods
     {id:'cc75',name:'Salt',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'cc72',name:'Pancake Mix',qty:'',stock:'',color:'',cell:'',key:true,note:''},
     {id:'cc81',name:'Olive Oil',qty:'',stock:'',color:'',cell:'',key:false,note:''},
@@ -757,53 +791,47 @@ const D={
     {id:'cc9a',name:'Jasmin Rice',qty:'',stock:'',color:'',cell:'',key:false,note:''},
   ],
   ws:[
-    // 소스 Sauces
-    {id:'ws3',name:'산발소스',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws4',name:'쓰리라자',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
-    {id:'ws26',name:'Ketchup',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws25',name:'Sriacha(Gluten Free)',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
-    {id:'ws10',name:'초코/카라엔시럽',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws27',name:'초코시럽',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws18',name:'소스 통(튜브)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // 야채 Vegetables
     {id:'ws1',name:'양상추',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
     {id:'ws2',name:'마늘',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // 스시 Sushi Supplies
-    {id:'ws28',name:'Lobster',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
-    {id:'ws21',name:'레몬주스',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // 장갑 Gloves
-    {id:'ws5',name:'스시비닐장갑(M)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws6',name:'스시비닐장갑(L/XL)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // 키친 Kitchen
-    {id:'ws16',name:'식용유',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
-    {id:'ws11',name:'신라면',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws3',name:'산발소스',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws4',name:'쓰리라자',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws5',name:'스시비닐장갑(M)',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
+    {id:'ws6',name:'스시비닐장갑(L/XL)',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
     {id:'ws7',name:'빨대',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // Togo 일회용
+    {id:'ws8',name:'마늘 파우더',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
+    {id:'ws9',name:'양파 파우더',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
+    {id:'ws10',name:'초코/카라엔시럽',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws11',name:'신라면',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ws12',name:'Plastic Knife',qty:'1박스',stock:'',color:'rB',cell:'',key:false,note:''},
     {id:'ws13',name:'Plastic Fork',qty:'1박스',stock:'',color:'rB',cell:'',key:false,note:''},
     {id:'ws14',name:'Plastic Spoon',qty:'2박스',stock:'',color:'rB',cell:'',key:false,note:''},
     {id:'ws15',name:'아재봉지(12L)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ws20',name:'케잘 일회용(두고)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws16',name:'식용유',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
     {id:'ws17',name:'Storage container for rice',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws18',name:'소스 통(튜브)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ws19',name:'댐뿌라종이',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // 파우더 Powder
-    {id:'ws8',name:'마늘 파우더',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
-    {id:'ws9',name:'양파 파우더',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
-    {id:'ws23',name:'Sugar',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // 기타 Other
+    {id:'ws20',name:'케잘 일회용(두고)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws21',name:'레몬주스',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ws22',name:'Parsley Flake',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws23',name:'Sugar',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ws24',name:'Mustard',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws25',name:'Sriacha(Gluten Free)',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
+    {id:'ws26',name:'Ketchup',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws27',name:'초코시럽',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'ws28',name:'Lobster',qty:'',stock:'',color:'rY',cell:'',key:true,note:''},
     {id:'ws29',name:'Flour',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+  ],
+  dollarama:[
   ],
   sobeys:[
     {id:'sob1',name:'비트',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
     {id:'sob2',name:'단호박',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'sob6',name:'적채',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'sob8',name:'케일',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
-    {id:'sob7',name:'고수',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'sob3',name:'할라피뇨',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'sob4',name:'파슬리',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'sob5',name:'민트',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'sob3',name:'할라피뇨',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'sob6',name:'적채',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'sob7',name:'고수',qty:'',stock:'',color:'',cell:'',key:false,note:''},
+    {id:'sob8',name:'케일',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
     {id:'sob9',name:'하버네로',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'sob10',name:'Club Soda',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'sob11',name:'7UP (2L)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
@@ -814,7 +842,6 @@ const D={
     {id:'sy3',name:'초코푸지케익',qty:'16개',stock:'',color:'',cell:'',key:false,note:''},
   ],
   chinese:[
-    // 야채 Vegetables
     {id:'ch1',name:'Onion',qty:'1무',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch2',name:'Carrot',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch3',name:'Red Pepper',qty:'',stock:'',color:'',cell:'cRed',key:false,note:''},
@@ -826,21 +853,17 @@ const D={
     {id:'ch9',name:'Ginger',qty:'1박스',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch10',name:'Tofu',qty:'1박스',stock:'',color:'',cell:'cRed',key:false,note:''},
     {id:'ch11',name:'무우',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
-    // 스시 Sushi items
     {id:'ch12',name:'Osaka Spring Roll Skin',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    {id:'ch19',name:'Soy Sauce (20L)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // LR/NB 용기 Containers
     {id:'ch13',name:'LR-28 Fried Rice',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch14',name:'NB-38 Bibimbap',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch15',name:'S-32 팜뽕국물용기',qty:'2박스',stock:'',color:'rB',cell:'',key:false,note:''},
     {id:'ch16',name:'S-24 Curry',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch17',name:'RC-24 Sushi Pizza',qty:'',stock:'',color:'',cell:'',key:false,note:'',hilite:true},
     {id:'ch18',name:'JR-48 회 비빔밥용기',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // Paper 소스용기
+    {id:'ch19',name:'Soy Sauce (20L)',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch20',name:'Clear 1oz(작은용기)',qty:'2박',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch21',name:'Clear 2oz(기본소스용기)',qty:'2박',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch22',name:'Clear 4oz(템프라소스용기)',qty:'1박',stock:'',color:'',cell:'',key:false,note:''},
-    // EM 용기
     {id:'ch23',name:'EM-551(소)',qty:'1박스',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch24',name:'EM-963(중)',qty:'2박스',stock:'',color:'',cell:'',key:false,note:''},
     {id:'ch25',name:'HLC881BG(대)',qty:'2박스',stock:'',color:'',cell:'',key:false,note:''},
@@ -909,14 +932,12 @@ const D={
     {id:'bg8',name:'Mier coconut',qty:'',stock:'',color:'',cell:'',key:false,note:''},
   ],
   mcs:[
-    // 파우더 Powders
     {id:'mcs1',name:'생강파우더',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
     {id:'mcs2',name:'마늘파우더',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
     {id:'mcs3',name:'양파파우더',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
     {id:'mcs4',name:'후추',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'mcs5',name:'카이엔 페퍼',qty:'',stock:'',color:'',cell:'',key:false,note:''},
     {id:'mcs6',name:'소금',qty:'',stock:'',color:'',cell:'',key:false,note:''},
-    // 오일/소스
     {id:'mcs7',name:'참기름',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
     {id:'mcs8',name:'식용유',qty:'',stock:'',color:'rY',cell:'',key:false,note:''},
     {id:'mcs9',name:'간장',qty:'',stock:'',color:'',cell:'',key:false,note:''},
@@ -995,7 +1016,7 @@ function init(){
     if(fb&&fb.ok){
       fb.onValue(fb.ref(fb.db,'osakahibachi/stock'),snap=>{
         const v=snap.val();
-        const sections=['costco','ws','sobeys','sysco','chinese','korea','toronto',
+        const sections=['costco','ws','sobeys','dollarama','sysco','chinese','korea','toronto',
           'fish','bulk','beer','wine','whitewine','draft','bargoods','mcs','sauce',
           'extras','masterlist'];
         if(v){
@@ -1448,44 +1469,303 @@ function confirmAdd(){
 document.getElementById('addModal').addEventListener('click',function(e){if(e.target===this)closeAdd();});
 
 // tab switch
-const TAB_GRIDS={costco:'gridCostco',wholesale:'gridWholesale',chinese:'gridChinese',others:'gridOthers'};
-let activeTab='costco';
+let layoutMode='stacked';
 function switchTab(name,btn){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   if(btn)btn.classList.add('active');
-  activeTab=name;
-  // Show layout btn only on tabs that have a grid
   const lb=document.getElementById('layoutBtn');
-  if(lb)lb.style.display=TAB_GRIDS[name]?'':'none';
-  // Sync new grid to current layout mode
-  if(TAB_GRIDS[name]){
-    const g=document.getElementById(TAB_GRIDS[name]);
-    if(g){
-      if(layoutMode==='side') g.classList.add('side-by-side');
-      else g.classList.remove('side-by-side');
+  if(lb)lb.style.display=(name==='masterlist')?'none':'';
+  document.querySelectorAll('.stores-grid').forEach(g=>{
+    if(layoutMode==='side') g.classList.add('side-by-side');
+    else g.classList.remove('side-by-side');
+  });
+}
+function toggleLayout(){
+  const btn=document.getElementById('layoutBtn');
+  layoutMode=(layoutMode==='stacked')?'side':'stacked';
+  document.querySelectorAll('.stores-grid').forEach(g=>{
+    g.classList.toggle('side-by-side', layoutMode==='side');
+  });
+  btn.textContent=layoutMode==='side'?'☰ Stacked':'⊞ Side by Side';
+}
+
+
+// ═══════════════════════════════════════════════
+//  VOICE LOGGER
+// ═══════════════════════════════════════════════
+let _vlRec=null, _vlOn=false, _vlItems=[];
+
+function openVL(){document.getElementById('vlOverlay').classList.remove('hidden');}
+function closeVL(){vlStopRec();document.getElementById('vlOverlay').classList.add('hidden');}
+function openVoiceLogger(){openVL();}
+
+// ── Recording ──
+function vlToggleRec(){_vlOn?vlStopRec():vlStartRec();}
+
+function vlStartRec(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){vlSt('⚠️ Use Chrome for voice recording.');return;}
+  _vlRec=new SR();
+  _vlRec.continuous=true;
+  _vlRec.interimResults=true;
+  _vlRec.lang='en-US';
+  const tx=document.getElementById('vlTx');
+  const base=tx.value;
+  _vlRec.onresult=e=>{
+    let fin='',int='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)fin+=e.results[i][0].transcript+' ';
+      else int+=e.results[i][0].transcript;
     }
+    tx.value=(base+fin).trimStart()+(int||'');
+    tx.scrollTop=tx.scrollHeight;
+    vlEnableParse();
+  };
+  _vlRec.onerror=e=>{vlSt('Mic error: '+e.error);vlStopRec();};
+  _vlRec.onend=()=>{if(_vlOn)_vlRec.start();};
+  _vlRec.start();
+  _vlOn=true;
+  document.getElementById('vlRecBtn').textContent='⏹ Stop';
+  document.getElementById('vlRecBtn').classList.add('stop');
+  document.getElementById('vlTx').classList.add('on');
+  document.getElementById('vlLive').classList.add('show');
+  document.getElementById('micBtn').classList.add('recording');
+  vlSt('🔴 Recording…');
+}
+
+function vlStopRec(){
+  if(_vlRec){try{_vlRec.stop();}catch(e){}}
+  _vlOn=false;
+  document.getElementById('vlRecBtn').textContent='🎙️ Start Recording';
+  document.getElementById('vlRecBtn').classList.remove('stop');
+  document.getElementById('vlTx').classList.remove('on');
+  document.getElementById('vlLive').classList.remove('show');
+  document.getElementById('micBtn')&&document.getElementById('micBtn').classList.remove('recording');
+  vlEnableParse();
+  if(document.getElementById('vlTx').value.trim())vlSt('Done. Click ✨ Parse with AI.');
+  else vlSt('');
+}
+
+function vlEnableParse(){
+  document.getElementById('vlParseBtn').disabled=!document.getElementById('vlTx').value.trim();
+}
+
+function vlClear(){
+  document.getElementById('vlTx').value='';
+  document.getElementById('vlResults').classList.remove('show');
+  document.getElementById('vlClarify').classList.remove('show');
+  document.getElementById('vlSaveBtn').disabled=true;
+  document.getElementById('vlParseBtn').disabled=true;
+  _vlItems=[];vlSt('');
+}
+
+function vlSt(msg,spin=false){
+  document.getElementById('vlStatus').innerHTML=spin?'<span class="vl-spinner"></span>'+msg:msg;
+}
+
+// ── Build catalogue for AI ──
+function vlCatalogue(){
+  const MAP={costco:'Costco',ws:'Whole Sale',sobeys:'Sobeys',dollarama:'Dollarama',
+    sysco:'Sysco',chinese:'Chinese Market',korea:'Korea Mart',toronto:'Toronto 정육점',
+    fish:'Fish Market',bulk:'Bulk Barn',beer:'Beer',wine:'Wine',whitewine:'White Wine',
+    draft:'Draft',bargoods:'Bar Goods',mcs:'MCS',sauce:'Sauce',extras:'Extras'};
+  const out=[];
+  Object.keys(MAP).forEach(sec=>{
+    (appData[sec]||[]).forEach(r=>out.push({id:r.id,sec,name:r.name,store:MAP[sec]}));
+  });
+  return out;
+}
+
+// ── Parse with Claude ──
+async function vlParse(){
+  const transcript=document.getElementById('vlTx').value.trim();
+  if(!transcript)return;
+  vlStopRec();
+  vlSt('Parsing…',true);
+  document.getElementById('vlParseBtn').disabled=true;
+  document.getElementById('vlResults').classList.remove('show');
+  document.getElementById('vlClarify').classList.remove('show');
+  _vlItems=[];
+
+  const cat=vlCatalogue();
+  const catStr=cat.map(i=>'['+i.id+'] "'+i.name+'" ('+i.store+')').join('\n');
+
+  const sys=`You are a stock inventory parser for a Japanese restaurant called Osakahibachi.
+Parse the logger's transcript and match items to the inventory catalogue.
+
+RULES:
+1. Fuzzy match: "egg"=Egg, "strip"=Strip Loin, "tender"=Tender Loin, "chicken"=Chicken Breast, "brocoli/broccoli"=Brocoli, "avo"=Avocado, "mozza"=Mozza, etc.
+2. stock = current quantity on hand. Convert units: "6 plates"="6판", "1 box"="1박스", "half a box"="0.5박스", "3 packs"="3팩", "4 bags"="4봉", bare numbers stay as-is.
+3. orderQty = ONLY fill if logger says "need to buy", "need to order", "running low need", "get more", "order more". Otherwise leave "".
+4. If ambiguous (e.g. bare "sauce" with no context), set ambiguous:true, matchedId:null, provide ambiguousOptions as array of "id:name" strings from catalogue.
+5. If logger says "sauce, relish" or "sauce — relish" treat the word after as clarification and match directly.
+6. Ignore filler: alright, so, um, okay, let's see, etc.
+7. Return ONLY valid JSON array, no markdown, no explanation.
+
+CATALOGUE:
+${catStr}
+
+OUTPUT (JSON array):
+[{"matchedId":"cc32","name":"Egg","store":"Costco","sec":"costco","stock":"6판","orderQty":"","ambiguous":false,"ambiguousOptions":[]},
+ {"matchedId":null,"name":"sauce","store":null,"sec":null,"stock":"","orderQty":"","ambiguous":true,"ambiguousOptions":["s1:샐러드 소스","s8:다이나소스"]}]`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1500,
+        system:sys,
+        messages:[{role:'user',content:'Parse this transcript: "'+transcript+'"'}]
+      })
+    });
+    const data=await res.json();
+    const raw=data.content.map(b=>b.text||'').join('');
+    const clean=raw.replace(/```json|```/g,'').trim();
+    _vlItems=JSON.parse(clean);
+    vlRender(_vlItems);
+    const matched=_vlItems.filter(i=>!i.ambiguous&&i.matchedId).length;
+    const amb=_vlItems.filter(i=>i.ambiguous).length;
+    vlSt('✅ '+matched+' matched'+(amb?' · ⚠️ '+amb+' need clarification':''));
+  }catch(err){
+    vlSt('❌ Error: '+err.message);
+    document.getElementById('vlParseBtn').disabled=false;
   }
 }
 
-// layout toggle — applies to all grids at once so mode is consistent
-let layoutMode='stacked';
-function toggleLayout(){
-  const btn=document.getElementById('layoutBtn');
-  const grids=document.querySelectorAll('.stores-grid');
-  if(layoutMode==='stacked'){
-    layoutMode='side';
-    grids.forEach(g=>g.classList.add('side-by-side'));
-    btn.textContent='☰ Stacked';
-  } else {
-    layoutMode='stacked';
-    grids.forEach(g=>g.classList.remove('side-by-side'));
-    btn.textContent='⊞ Side by Side';
+// ── Render results ──
+function vlRender(items){
+  const matched=items.filter(i=>!i.ambiguous&&i.matchedId&&!i._removed);
+  const ambig=items.filter(i=>i.ambiguous&&!i._removed);
+
+  // Clarify
+  const cl=document.getElementById('vlClarifyList');
+  if(ambig.length>0){
+    cl.innerHTML=ambig.map((item,idx)=>{
+      const globalIdx=items.indexOf(item);
+      return '<div class="vl-cq"><label>What is "<strong>'+item.name+'</strong>"?</label>'+
+        '<select onchange="vlResolve('+globalIdx+',this.value)">'+
+        '<option value="">— select —</option>'+
+        item.ambiguousOptions.map(o=>{const[id,name]=o.split(':');return '<option value="'+id+'">'+name+'</option>';}).join('')+
+        '<option value="SKIP">Skip</option>'+
+        '</select></div>';
+    }).join('');
+    document.getElementById('vlClarify').classList.add('show');
+  }else{
+    document.getElementById('vlClarify').classList.remove('show');
   }
+
+  // Matched list
+  const list=document.getElementById('vlResultsList');
+  list.innerHTML='';
+  matched.forEach((item)=>{
+    const globalIdx=items.indexOf(item);
+    const div=document.createElement('div');
+    div.className='vl-item'+(item.orderQty?' has-order':'');
+    div.innerHTML=
+      '<div style="flex:1;min-width:0">'+
+        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">'+
+          '<span class="vl-iname">'+item.name+'</span>'+
+          '<span class="vl-istore">'+item.store+'</span>'+
+        '</div>'+
+        '<div class="vl-fields">'+
+          '<div class="vl-fg"><div class="vl-fl">현재고</div>'+
+            '<input class="vl-fi" value="'+(item.stock||'')+'" placeholder="e.g. 2박스" oninput="_vlItems['+globalIdx+'].stock=this.value">'+
+          '</div>'+
+          (item.orderQty?'<div class="vl-fg"><div class="vl-fl">주문수량</div>'+
+            '<input class="vl-fi order" value="'+item.orderQty+'" oninput="_vlItems['+globalIdx+'].orderQty=this.value">'+
+          '</div>':'')+'</div></div>'+
+      '<button class="vl-rm" onclick="vlRemove('+globalIdx+')" title="Remove">✕</button>';
+    list.appendChild(div);
+  });
+
+  document.getElementById('vlCount').textContent=matched.length+' item'+(matched.length!==1?'s':'');
+  document.getElementById('vlResults').classList.add('show');
+  document.getElementById('vlSaveBtn').disabled=matched.length===0;
 }
+
+function vlRemove(idx){
+  _vlItems[idx]._removed=true;
+  vlRender(_vlItems);
+}
+
+function vlResolve(idx,val){
+  const item=_vlItems[idx];
+  if(!item)return;
+  if(val==='SKIP'){item._removed=true;}
+  else if(val){
+    const cat=vlCatalogue();
+    const match=cat.find(c=>c.id===val);
+    if(match){item.matchedId=match.id;item.name=match.name;item.store=match.store;item.sec=match.sec;item.ambiguous=false;}
+  }
+  vlRender(_vlItems);
+}
+
+// ── Save to Firebase ──
+function vlCommit(){
+  const toSave=_vlItems.filter(i=>!i._removed&&!i.ambiguous&&i.matchedId);
+  if(!toSave.length){vlSt('Nothing to save.');return;}
+  const affected=new Set();
+  toSave.forEach(item=>{
+    const row=(appData[item.sec]||[]).find(r=>r.id===item.matchedId);
+    if(row){
+      if(item.stock!==undefined&&item.stock!=='')row.stock=item.stock;
+      if(item.orderQty&&item.orderQty!=='')row.qty=item.orderQty;
+      affected.add(item.sec);
+    }
+  });
+  save();
+  affected.forEach(sec=>renderTbl(sec));
+  renderML();
+  vlSt('✅ Saved '+toSave.length+' item'+(toSave.length!==1?'s':'')+' to inventory.');
+  document.getElementById('vlSaveBtn').disabled=true;
+  setTimeout(closeVL,1200);
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const tx=document.getElementById('vlTx');
+  if(tx)tx.addEventListener('input',vlEnableParse);
+});
+
 
 init();
 </script>
+
+<!-- VOICE LOGGER -->
+<div class="vl-overlay hidden" id="vlOverlay">
+  <div class="vl-panel">
+    <div class="vl-hdr">
+      <h3>🎙️ Voice Stock Logger</h3>
+      <button onclick="closeVL()">✕</button>
+    </div>
+    <div class="vl-body">
+      <div style="position:relative">
+        <textarea class="vl-tx" id="vlTx" placeholder="Tap mic and speak — or type here.&#10;&#10;e.g. &quot;egg 6 plates, butter 1 box, strip 3 boxes, tender 1, chicken 1.5 box, broccoli half a box, mushroom 4 packs, we need to buy more relish&quot;"></textarea>
+        <span class="vl-live" id="vlLive">● LIVE</span>
+      </div>
+      <div class="vl-btns">
+        <button class="vl-rec" id="vlRecBtn" onclick="vlToggleRec()">🎙️ Start Recording</button>
+        <button class="vl-parse" id="vlParseBtn" onclick="vlParse()" disabled>✨ Parse with AI</button>
+        <button class="vl-clr" onclick="vlClear()">Clear</button>
+      </div>
+      <div class="vl-status" id="vlStatus"></div>
+      <div class="vl-clarify" id="vlClarify">
+        <h4>⚠️ Needs clarification</h4>
+        <div id="vlClarifyList"></div>
+      </div>
+      <div class="vl-results" id="vlResults">
+        <div class="vl-results-hdr">Preview — confirm before saving <small id="vlCount"></small></div>
+        <div id="vlResultsList"></div>
+      </div>
+    </div>
+    <div class="vl-footer">
+      <button class="vl-cancel" onclick="closeVL()">Cancel</button>
+      <button class="vl-save" id="vlSaveBtn" onclick="vlCommit()" disabled>✅ Save to Inventory</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
