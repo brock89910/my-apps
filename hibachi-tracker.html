@@ -2263,8 +2263,22 @@ function renderTimeSlots() {
     // ── Compute cap & slotFull FIRST so all downstream code can use it ──
     const totalAtSlot=allRecs.reduce((s,r)=>s+(r.guests||0),0);
     const slotKey=slot.replace(':','_');
-    // Use total scheduled chefs for cap display
-    const defaultCap=getSlotDefaultCap(chefs);
+    // Cap display: based on grills actually open + one more that could open
+    // grillsBookedAtSlot = number of distinct grills with a booking at this time
+    // Each open grill contributes its per-group cap; no grills open = one grill's worth available
+    const openGrillsNow = grillsBookedAtSlot; // already computed above
+    // Compute realistic cap: sum capacity of open grills + capacity of one additional grill if a free chef exists
+    let defaultCap;
+    if (openGrillsNow === 0) {
+      // Nothing open yet — first group gets up to 14 (first-group cap)
+      defaultCap = SINGLE_GRILL_CAP[1]; // 14
+    } else {
+      // Add up what's already in each open grill, plus room for one more grill if free chef
+      const openGrillGuests = allRecs.reduce((s,r)=>s+(r.guests||0),0);
+      const grillsCanOpen = Math.min(openGrillsNow + (chefs > openGrillsNow ? 1 : 0), chefs);
+      // Each grill has roughly SINGLE_GRILL_CAP[2]=13 capacity when joining
+      defaultCap = grillsCanOpen * SINGLE_GRILL_CAP[2];
+    }
     const manualCap=slotCaps[key]?.[slotKey];
     const effectiveCap=(manualCap!==undefined&&manualCap!==null)?manualCap:defaultCap;
     const remaining=Math.max(0,effectiveCap-totalAtSlot);
