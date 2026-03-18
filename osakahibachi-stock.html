@@ -199,8 +199,79 @@ tr.tbl-drag-over{outline:2px solid #f59e0b;}
 .ml-del:hover{color:#e24b4a;}
 .color-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:6px;}
 .color-opt{height:26px;border-radius:5px;border:2px solid transparent;cursor:pointer;font-size:10px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;}
-.color-opt.sel{border-color:#1a1916;}
-</style>
+/* MIC BUTTON */
+.mic-btn{background:#c0392b;border:none;color:#fff;border-radius:6px;padding:5px 11px;font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;display:flex;align-items:center;gap:5px;transition:background .15s;}
+.mic-btn:hover{background:#a93226;}
+.mic-btn.recording{background:#e74c3c;animation:mic-pulse 1s infinite;}
+@keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,.5)}50%{box-shadow:0 0 0 8px rgba(231,76,60,0)}}
+
+/* VOICE LOGGER OVERLAY */
+.vl-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:600;display:flex;align-items:flex-end;justify-content:center;}
+.vl-overlay.hidden{display:none;}
+.vl-panel{background:#fff;width:100%;max-width:720px;border-radius:16px 16px 0 0;padding:0;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,.25);}
+.vl-header{background:#1a1916;color:#fff;padding:14px 18px;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.vl-header h3{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.vl-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:20px;cursor:pointer;line-height:1;padding:2px 6px;}
+.vl-close:hover{color:#fff;}
+.vl-body{padding:16px;overflow-y:auto;flex:1;}
+
+/* TRANSCRIPT BOX */
+.vl-transcript-wrap{position:relative;margin-bottom:14px;}
+.vl-transcript{width:100%;min-height:80px;padding:10px 12px;border:2px solid var(--border);border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:13px;resize:vertical;line-height:1.6;color:var(--text);background:#fafaf8;}
+.vl-transcript:focus{outline:none;border-color:#5578a0;}
+.vl-transcript.listening{border-color:#e74c3c;background:#fff8f8;}
+.vl-live{position:absolute;top:8px;right:10px;font-size:10px;color:#e74c3c;font-weight:700;display:none;}
+.vl-live.show{display:block;animation:pulse 1s infinite;}
+
+/* MIC CONTROLS */
+.vl-controls{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.vl-rec-btn{background:#c0392b;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Noto Sans KR',sans-serif;}
+.vl-rec-btn:hover{background:#a93226;}
+.vl-rec-btn.stop{background:#555;}
+.vl-rec-btn.stop:hover{background:#333;}
+.vl-parse-btn{background:#5578a0;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.vl-parse-btn:hover{background:#4a6a90;}
+.vl-parse-btn:disabled{background:#aaa;cursor:not-allowed;}
+.vl-clr-btn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:10px 14px;font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+
+/* STATUS */
+.vl-status{font-size:12px;color:var(--muted);margin-bottom:12px;min-height:18px;display:flex;align-items:center;gap:6px;}
+.vl-status .spinner{width:12px;height:12px;border:2px solid #ddd;border-top-color:#5578a0;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* RESULTS */
+.vl-results{display:none;}
+.vl-results.show{display:block;}
+.vl-results-hdr{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.vl-results-hdr span{font-size:11px;font-weight:400;color:var(--muted);}
+.vl-item{background:#f8f8f5;border:1px solid var(--bl);border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.vl-item.ambiguous{border-color:#f59e0b;background:#fffbf0;}
+.vl-item.order-flag{border-left:4px solid #5578a0;}
+.vl-item-name{font-weight:600;font-size:13px;flex:1;min-width:120px;}
+.vl-item-store{font-size:10px;color:#fff;border-radius:10px;padding:1px 7px;background:#5578a0;white-space:nowrap;}
+.vl-item-fields{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.vl-field-group{display:flex;flex-direction:column;gap:2px;}
+.vl-field-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.vl-field-input{border:1px solid var(--border);border-radius:5px;padding:4px 8px;font-size:12px;width:80px;font-family:'Noto Sans KR',sans-serif;}
+.vl-item-remove{background:none;border:none;color:#ccc;cursor:pointer;font-size:16px;line-height:1;padding:0 2px;}
+.vl-item-remove:hover{color:#e24b4a;}
+.vl-ambig-note{font-size:10px;color:#b45309;width:100%;margin-top:2px;}
+
+/* CLARIFY SECTION */
+.vl-clarify{background:#fff9f0;border:1px solid #fcd34d;border-radius:8px;padding:12px 14px;margin-bottom:12px;display:none;}
+.vl-clarify.show{display:block;}
+.vl-clarify h4{font-size:12px;font-weight:700;color:#92400e;margin-bottom:8px;}
+.vl-clarify-item{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;}
+.vl-clarify-item label{color:var(--muted);flex:1;}
+.vl-clarify-item select{border:1px solid var(--border);border-radius:5px;padding:4px 7px;font-size:12px;font-family:'Noto Sans KR',sans-serif;}
+
+/* COMMIT */
+.vl-commit-bar{padding:12px 16px;border-top:1px solid var(--bl);display:flex;gap:8px;flex-shrink:0;background:#fff;border-radius:0 0 0 0;}
+.vl-commit-btn{flex:1;background:#1a1916;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.vl-commit-btn:hover{background:#333;}
+.vl-commit-btn:disabled{background:#aaa;cursor:not-allowed;}
+.vl-cancel-btn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:12px 18px;font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+
 </head>
 <body>
 
@@ -215,6 +286,7 @@ tr.tbl-drag-over{outline:2px solid #f59e0b;}
       <div class="srch-drop" id="srchDrop"></div>
     </div>
     <button class="layout-btn" id="layoutBtn" onclick="toggleLayout()" title="Toggle layout">⊞ Side by Side</button>
+    <button class="mic-btn" id="micBtn" onclick="openVoiceLogger()" title="Voice Logger">🎙️ Log</button>
     <div class="sync-st"><span class="sync-dot" id="syncDot"></span><span id="syncLbl">Local</span></div>
     <div class="t-date" id="todayDate"></div>
   </div>
@@ -1485,7 +1557,368 @@ function toggleLayout(){
   }
 }
 
+
+// ============================================================
+//  VOICE LOGGER
+// ============================================================
+
+let vlRecognition=null, vlIsRecording=false, vlParsedItems=[];
+
+function openVoiceLogger(){
+  document.getElementById('vlOverlay').classList.remove('hidden');
+}
+function closeVoiceLogger(){
+  stopRec();
+  document.getElementById('vlOverlay').classList.add('hidden');
+}
+
+// --- Speech Recognition ---
+function toggleRec(){
+  if(vlIsRecording) stopRec();
+  else startRec();
+}
+
+function startRec(){
+  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SpeechRecognition){
+    setVlStatus('⚠️ Speech recognition not supported in this browser. Try Chrome.');
+    return;
+  }
+  vlRecognition=new SpeechRecognition();
+  vlRecognition.continuous=true;
+  vlRecognition.interimResults=true;
+  vlRecognition.lang='en-US';
+
+  const tx=document.getElementById('vlTranscript');
+  const base=tx.value;
+  let interim='';
+
+  vlRecognition.onresult=e=>{
+    let final='';
+    interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final+=e.results[i][0].transcript+' ';
+      else interim+=e.results[i][0].transcript;
+    }
+    tx.value=(base+final).trimStart();
+    if(interim) tx.value=tx.value+interim;
+    tx.scrollTop=tx.scrollHeight;
+    enableParseBtn();
+  };
+
+  vlRecognition.onerror=e=>{
+    setVlStatus('Mic error: '+e.error);
+    stopRec();
+  };
+  vlRecognition.onend=()=>{
+    if(vlIsRecording) vlRecognition.start(); // keep alive
+  };
+
+  vlRecognition.start();
+  vlIsRecording=true;
+  document.getElementById('vlRecBtn').textContent='⏹ Stop Recording';
+  document.getElementById('vlRecBtn').classList.add('stop');
+  document.getElementById('vlLive').classList.add('show');
+  document.getElementById('vlTranscript').classList.add('listening');
+  document.getElementById('micBtn').classList.add('recording');
+  setVlStatus('🔴 Recording… speak naturally.');
+}
+
+function stopRec(){
+  if(vlRecognition){try{vlRecognition.stop();}catch(e){}}
+  vlIsRecording=false;
+  document.getElementById('vlRecBtn').textContent='🎙️ Start Recording';
+  document.getElementById('vlRecBtn').classList.remove('stop');
+  document.getElementById('vlLive').classList.remove('show');
+  document.getElementById('vlTranscript').classList.remove('listening');
+  document.getElementById('micBtn').classList.remove('recording');
+  enableParseBtn();
+  if(document.getElementById('vlTranscript').value.trim())
+    setVlStatus('Recording stopped. Click ✨ Parse with AI to process.');
+  else
+    setVlStatus('');
+}
+
+function enableParseBtn(){
+  const has=document.getElementById('vlTranscript').value.trim().length>0;
+  document.getElementById('vlParseBtn').disabled=!has;
+}
+
+function vlClear(){
+  document.getElementById('vlTranscript').value='';
+  document.getElementById('vlResults').classList.remove('show');
+  document.getElementById('vlClarify').classList.remove('show');
+  document.getElementById('vlCommitBtn').disabled=true;
+  document.getElementById('vlParseBtn').disabled=true;
+  vlParsedItems=[];
+  setVlStatus('');
+}
+
+function setVlStatus(msg, spinning=false){
+  const el=document.getElementById('vlStatus');
+  el.innerHTML=spinning?`<span class="spinner"></span>${msg}`:msg;
+}
+
+// --- Build item catalogue for AI ---
+function buildItemCatalogue(){
+  const SEC_MAP={
+    costco:'Costco',ws:'Whole Sale',sobeys:'Sobeys',sysco:'Sysco',
+    chinese:'Chinese Market',korea:'Korea Mart',toronto:'Toronto 정육점',
+    fish:'Fish Market',bulk:'Bulk Barn',beer:'Beer',wine:'Wine',
+    whitewine:'White Wine',draft:'Draft',bargoods:'Bar Goods',
+    mcs:'MCS',sauce:'Sauce',extras:'Extras'
+  };
+  const items=[];
+  Object.keys(SEC_MAP).forEach(sec=>{
+    const rows=appData[sec]||[];
+    rows.forEach(r=>{
+      items.push({id:r.id, sec, name:r.name, store:SEC_MAP[sec]});
+    });
+  });
+  return items;
+}
+
+// --- Parse transcript with Claude API ---
+async function parseTranscript(){
+  const transcript=document.getElementById('vlTranscript').value.trim();
+  if(!transcript) return;
+
+  stopRec();
+  setVlStatus('Thinking…', true);
+  document.getElementById('vlParseBtn').disabled=true;
+  document.getElementById('vlResults').classList.remove('show');
+  document.getElementById('vlClarify').classList.remove('show');
+  vlParsedItems=[];
+
+  const catalogue=buildItemCatalogue();
+  const catalogueStr=catalogue.map(i=>`[${i.id}] "${i.name}" (${i.store})`).join('\n');
+
+  const systemPrompt=`You are a stock inventory parser for a Japanese restaurant called Osakahibachi. 
+Your job is to parse a logger's verbal transcript and match items to the inventory catalogue below.
+
+RULES:
+1. Match items fuzzily — "egg" = "Egg", "strip" = "Strip Loin", "tender" = "Tender Loin", "chicken" = "Chicken Breast", "brocoli/broccoli" = "Brocoli", etc.
+2. For stock quantity (how much is currently on hand): parse numbers + units. Convert to sensible strings: "6 plates" = "6판", "1 box" = "1박스", "half a box" = "0.5박스", "3 packs" = "3팩", "4 bags" = "4봉", bare numbers stay as numbers.
+3. For order quantity (how much to buy): ONLY fill orderQty if the logger says something like "we need to buy more X", "need to order X", "running low need X", "get more X". 
+4. If an item is ambiguous (e.g. "sauce" without specifying which), set ambiguous:true and do NOT guess the id — leave matchedId null.
+5. If the logger says something like "sauce, relish" or "sauce — relish" or "sauce we need more, relish", treat the word after as the clarification: match to "Relish (Diana sauce pickle)" in extras.
+6. Ignore filler words (alright, so, um, okay, let's see, etc.).
+7. Return ONLY valid JSON, no markdown, no explanation.
+
+CATALOGUE:
+${catalogueStr}
+
+OUTPUT FORMAT (JSON array):
+[
+  {
+    "matchedId": "cc32",
+    "name": "Egg",
+    "store": "Costco",
+    "sec": "costco",
+    "stock": "6판",
+    "orderQty": "",
+    "ambiguous": false,
+    "ambiguousOptions": []
+  },
+  {
+    "matchedId": null,
+    "name": "sauce",
+    "store": null,
+    "sec": null,
+    "stock": "",
+    "orderQty": "",
+    "ambiguous": true,
+    "ambiguousOptions": ["s1:샐러드 소스","s8:다이나소스","ex10:Relish (Diana sauce pickle)"]
+  }
+]`;
+
+  try{
+    const response=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:systemPrompt,
+        messages:[{role:'user',content:`Parse this transcript:\n"${transcript}"`}]
+      })
+    });
+    const data=await response.json();
+    const raw=data.content.map(b=>b.text||'').join('');
+    const clean=raw.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+    vlParsedItems=parsed;
+    renderVlResults(parsed);
+    setVlStatus(`✅ Found ${parsed.filter(p=>!p.ambiguous).length} item(s).`+(parsed.filter(p=>p.ambiguous).length>0?' ⚠️ '+parsed.filter(p=>p.ambiguous).length+' need clarification.':''));
+  }catch(err){
+    setVlStatus('❌ Parse error: '+err.message);
+    document.getElementById('vlParseBtn').disabled=false;
+  }
+}
+
+// --- Render results ---
+function renderVlResults(items){
+  const list=document.getElementById('vlResultsList');
+  list.innerHTML='';
+
+  const ambiguous=items.filter(i=>i.ambiguous);
+  const matched=items.filter(i=>!i.ambiguous&&i.matchedId);
+
+  // Clarify section
+  const clarify=document.getElementById('vlClarify');
+  const clarifyItems=document.getElementById('vlClarifyItems');
+  if(ambiguous.length>0){
+    clarifyItems.innerHTML=ambiguous.map((item,idx)=>`
+      <div class="vl-clarify-item">
+        <label>What did you mean by "<strong>${item.name}</strong>"?</label>
+        <select id="vlClarify_${idx}" onchange="vlResolveClarify(${idx}, this.value)">
+          <option value="">— select —</option>
+          ${item.ambiguousOptions.map(o=>{
+            const [id,name]=o.split(':');
+            return `<option value="${id}">${name}</option>`;
+          }).join('')}
+          <option value="SKIP">Skip / ignore</option>
+        </select>
+      </div>
+    `).join('');
+    clarify.classList.add('show');
+  } else {
+    clarify.classList.remove('show');
+  }
+
+  // Matched items list
+  matched.forEach((item,idx)=>{
+    const div=document.createElement('div');
+    div.className='vl-item'+(item.orderQty?' order-flag':'');
+    div.dataset.idx=idx;
+    div.innerHTML=`
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span class="vl-item-name">${item.name}</span>
+          <span class="vl-item-store">${item.store}</span>
+        </div>
+        <div class="vl-item-fields">
+          <div class="vl-field-group">
+            <div class="vl-field-label">현재고 (Stock)</div>
+            <input class="vl-field-input" value="${item.stock||''}" onchange="vlParsedItems[${idx}].stock=this.value" placeholder="e.g. 6판">
+          </div>
+          ${item.orderQty?`<div class="vl-field-group">
+            <div class="vl-field-label">주문수량 (Order)</div>
+            <input class="vl-field-input" value="${item.orderQty}" onchange="vlParsedItems[${idx}].orderQty=this.value" style="border-color:#5578a0">
+          </div>`:''}
+        </div>
+      </div>
+      <button class="vl-item-remove" onclick="vlRemoveItem(${idx})" title="Remove">✕</button>
+    `;
+    list.appendChild(div);
+  });
+
+  document.getElementById('vlResultsCount').textContent=`${matched.length} item${matched.length!==1?'s':''}`;
+  document.getElementById('vlResults').classList.add('show');
+  document.getElementById('vlCommitBtn').disabled=matched.length===0&&ambiguous.length===0;
+}
+
+function vlRemoveItem(idx){
+  vlParsedItems[idx]._removed=true;
+  renderVlResults(vlParsedItems.filter(i=>!i._removed));
+  vlParsedItems=vlParsedItems.filter(i=>!i._removed);
+}
+
+function vlResolveClarify(ambigIdx, selectedId){
+  const ambiguous=vlParsedItems.filter(i=>i.ambiguous);
+  const item=ambiguous[ambigIdx];
+  if(!item) return;
+  if(selectedId==='SKIP'){
+    item._removed=true;
+  } else if(selectedId){
+    // Find the real item in catalogue
+    const catalogue=buildItemCatalogue();
+    const match=catalogue.find(c=>c.id===selectedId);
+    if(match){
+      item.matchedId=match.id;
+      item.name=match.name;
+      item.store=match.store;
+      item.sec=match.sec;
+      item.ambiguous=false;
+    }
+  }
+  renderVlResults(vlParsedItems.filter(i=>!i._removed));
+}
+
+// --- Commit to Firebase ---
+function commitVoiceLog(){
+  const toSave=vlParsedItems.filter(i=>!i._removed&&!i.ambiguous&&i.matchedId);
+  if(toSave.length===0){setVlStatus('Nothing to save.');return;}
+
+  const affectedSecs=new Set();
+  toSave.forEach(item=>{
+    const sec=item.sec;
+    const row=(appData[sec]||[]).find(r=>r.id===item.matchedId);
+    if(row){
+      if(item.stock!==undefined&&item.stock!=='') row.stock=item.stock;
+      if(item.orderQty&&item.orderQty!=='') row.qty=item.orderQty;
+      affectedSecs.add(sec);
+    }
+  });
+
+  save();
+  affectedSecs.forEach(sec=>renderTbl(sec));
+  renderML();
+
+  setVlStatus(`✅ Saved ${toSave.length} item${toSave.length!==1?'s':''} to inventory.`);
+  document.getElementById('vlCommitBtn').disabled=true;
+
+  setTimeout(()=>closeVoiceLogger(), 1200);
+}
+
+// textarea input listener
+document.addEventListener('DOMContentLoaded',()=>{
+  const tx=document.getElementById('vlTranscript');
+  if(tx) tx.addEventListener('input',enableParseBtn);
+});
+
 init();
 </script>
+<!-- VOICE LOGGER -->
+<div class="vl-overlay hidden" id="vlOverlay">
+  <div class="vl-panel">
+    <div class="vl-header">
+      <h3>🎙️ Voice Stock Logger</h3>
+      <button class="vl-close" onclick="closeVoiceLogger()">✕</button>
+    </div>
+    <div class="vl-body">
+      <div class="vl-transcript-wrap">
+        <textarea class="vl-transcript" id="vlTranscript" placeholder="Tap the mic and start talking — or type directly here.&#10;&#10;e.g. &quot;egg 6 plates, butter 1 box, strip 3 boxes, tender 1, chicken 1.5 box, broccoli half a box, mushroom 4 packs — and we need to buy more sauce, relish&quot;"></textarea>
+        <span class="vl-live" id="vlLive">● LIVE</span>
+      </div>
+      <div class="vl-controls">
+        <button class="vl-rec-btn" id="vlRecBtn" onclick="toggleRec()">🎙️ Start Recording</button>
+        <button class="vl-parse-btn" id="vlParseBtn" onclick="parseTranscript()" disabled>✨ Parse with AI</button>
+        <button class="vl-clr-btn" onclick="vlClear()">Clear</button>
+      </div>
+      <div class="vl-status" id="vlStatus"></div>
+
+      <!-- CLARIFY ambiguous items -->
+      <div class="vl-clarify" id="vlClarify">
+        <h4>⚠️ Needs Clarification — which item did you mean?</h4>
+        <div id="vlClarifyItems"></div>
+      </div>
+
+      <!-- RESULTS PREVIEW -->
+      <div class="vl-results" id="vlResults">
+        <div class="vl-results-hdr">
+          Preview — confirm before saving
+          <span id="vlResultsCount"></span>
+        </div>
+        <div id="vlResultsList"></div>
+      </div>
+    </div>
+    <div class="vl-commit-bar">
+      <button class="vl-cancel-btn" onclick="closeVoiceLogger()">Cancel</button>
+      <button class="vl-commit-btn" id="vlCommitBtn" onclick="commitVoiceLog()" disabled>✅ Save to Inventory</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
