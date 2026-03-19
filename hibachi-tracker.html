@@ -2340,8 +2340,9 @@ function renderTimeSlots() {
       const _labelColor = isManuallyBlocked?'color:#c04040':slotFull?'color:#c04040':isSecondary?'color:var(--text3)':'';
       const _lockSpan   = isManuallyBlocked ? '<span style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);padding:0 6px">&#128274;</span>' : '';
       const _blockBtn   = isManager() ? '<button class="block-btn' + (isManuallyBlocked ? ' is-blocked' : '') + '" onclick="toggleBlockSlot(\'' + slot + '\')" title="' + (isManuallyBlocked ? 'Unblock slot' : 'Block slot') + '">&#128274;</button>' : '';
+      const _needForce  = slotFull || isChefBlocked || remaining <= 0 || !canAddAny;
       const _addBtn     = isManuallyBlocked ? ''
-                        : (slotFull || isChefBlocked)
+                        : _needForce
                           ? '<button class="time-add-btn" style="background:rgba(138,26,26,0.15);border-color:rgba(192,64,64,0.5);color:#e04040;font-size:0.6rem;width:auto;padding:0 7px;letter-spacing:0.03em;font-family:var(--mono);font-weight:700" onclick="openForceAddModal(\'' + slot + '\')" aria-label="Force Add">FORCE +</button>'
                           : '<button class="time-add-btn" onclick="openHibachiModal(\'' + slot + '\',null)" aria-label="Add">+</button>';
       head.innerHTML = '<div class="time-label" style="' + _labelColor + '">' + displayTime(slot) + '</div>'
