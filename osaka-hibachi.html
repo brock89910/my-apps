@@ -876,6 +876,61 @@ footer a:hover { color: rgba(245,240,232,0.7); }
 }
 
 /* ── MOBILE ── */
+/* ── MANAGER ITEM CONTROLS ── */
+.menu-item { position: relative; }
+.mgr-item-controls {
+  display: none;
+  align-items: center;
+  gap: 3px;
+  margin-left: 10px;
+  flex-shrink: 0;
+}
+.manager-active .menu-item .mgr-item-controls { display: flex; }
+.mgr-ic-btn {
+  width: 22px; height: 22px;
+  font-size: 0.7rem;
+  background: var(--paper2);
+  border: 1px solid var(--line);
+  color: var(--ink3);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  font-family: var(--mono);
+  padding: 0;
+  line-height: 1;
+}
+.mgr-ic-btn:hover { background: var(--paper3); color: var(--ink); border-color: var(--ink3); }
+.mgr-ic-del:hover { background: rgba(200,75,26,0.08); color: var(--ember); border-color: var(--ember); }
+
+/* ── ADD ITEM BUTTON (per grid) ── */
+.mgr-add-btn {
+  display: none;
+  grid-column: 1 / -1;
+  padding: 12px 20px;
+  background: transparent;
+  border: 1px dashed var(--gold);
+  color: var(--gold);
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.mgr-add-btn:hover { background: rgba(160,120,48,0.06); }
+.manager-active .mgr-add-btn { display: block; }
+
+/* ── ADD ITEM MODAL extras ── */
+.mgr-modal select.mgr-input {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a6a58'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 30px;
+}
+
 @media (max-width: 680px) {
   nav { padding: 0 16px; }
   .nav-links { display: none; }
@@ -1002,11 +1057,11 @@ footer a:hover { color: rgba(245,240,232,0.7); }
         <div class="menu-category-header">
           <div class="menu-category-title"><em>Soups</em></div>
         </div>
-        <div class="menu-items-grid">
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Miso Soup</div><div class="menu-item-desc">Tofu, wakame, green onion</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-miso">$4</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Clear Soup</div><div class="menu-item-desc">Light Japanese broth</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-clear">$4</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Seafood Soup</div><div class="menu-item-desc">Mixed seafood in seasoned broth</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-seafood-soup">$10</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Tofu Soup</div><div class="menu-item-desc">Soft tofu, mushrooms, miso</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-tofu-soup">$8</span></div></div>
+        <div class="menu-items-grid" id="grid-1">
+          <div class="menu-item" data-key="s-miso"><div class="menu-item-left"><div class="menu-item-name">Miso Soup</div><div class="menu-item-desc">Tofu, wakame, green onion</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-miso">$4</span></div></div>
+          <div class="menu-item" data-key="s-clear"><div class="menu-item-left"><div class="menu-item-name">Clear Soup</div><div class="menu-item-desc">Light Japanese broth</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-clear">$4</span></div></div>
+          <div class="menu-item" data-key="s-seafood-soup"><div class="menu-item-left"><div class="menu-item-name">Seafood Soup</div><div class="menu-item-desc">Mixed seafood in seasoned broth</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-seafood-soup">$10</span></div></div>
+          <div class="menu-item" data-key="s-tofu-soup"><div class="menu-item-left"><div class="menu-item-name">Tofu Soup</div><div class="menu-item-desc">Soft tofu, mushrooms, miso</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-tofu-soup">$8</span></div></div>
         </div>
       </div>
 
@@ -1014,11 +1069,11 @@ footer a:hover { color: rgba(245,240,232,0.7); }
         <div class="menu-category-header">
           <div class="menu-category-title"><em>Salads</em></div>
         </div>
-        <div class="menu-items-grid">
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">House Salad</div><div class="menu-item-desc">Mixed greens, ginger dressing</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-house-salad">$5</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Seaweed Salad</div><div class="menu-item-desc">Seasoned wakame, sesame</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-seaweed">$8</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Sunomono</div><div class="menu-item-desc">Cucumber salad, rice vinegar</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-sunomono">$8</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Spicy Tuna Salad</div><div class="menu-item-desc">Fresh tuna, cucumber, spicy mayo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-spicy-tuna-salad">$14</span></div></div>
+        <div class="menu-items-grid" id="grid-2">
+          <div class="menu-item" data-key="s-house-salad"><div class="menu-item-left"><div class="menu-item-name">House Salad</div><div class="menu-item-desc">Mixed greens, ginger dressing</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-house-salad">$5</span></div></div>
+          <div class="menu-item" data-key="s-seaweed"><div class="menu-item-left"><div class="menu-item-name">Seaweed Salad</div><div class="menu-item-desc">Seasoned wakame, sesame</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-seaweed">$8</span></div></div>
+          <div class="menu-item" data-key="s-sunomono"><div class="menu-item-left"><div class="menu-item-name">Sunomono</div><div class="menu-item-desc">Cucumber salad, rice vinegar</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-sunomono">$8</span></div></div>
+          <div class="menu-item" data-key="s-spicy-tuna-salad"><div class="menu-item-left"><div class="menu-item-name">Spicy Tuna Salad</div><div class="menu-item-desc">Fresh tuna, cucumber, spicy mayo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-spicy-tuna-salad">$14</span></div></div>
         </div>
       </div>
 
@@ -1026,17 +1081,17 @@ footer a:hover { color: rgba(245,240,232,0.7); }
         <div class="menu-category-header">
           <div class="menu-category-title"><em>Appetizers</em></div>
         </div>
-        <div class="menu-items-grid">
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Edamame</div><div class="menu-item-desc">Steamed salted soybeans</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-edamame">$6</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Gyoza (6 pcs)</div><div class="menu-item-desc">Pan-fried pork &amp; cabbage dumplings</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-gyoza">$10</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Agedashi Tofu</div><div class="menu-item-desc">Lightly fried tofu, dashi broth</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-agedashi">$9</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Osaka Spring Rolls (2 pcs)</div><div class="menu-item-desc">Crispy rolls, sweet chili sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-springrolls">$8</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Chicken Yakitori (4 pcs)</div><div class="menu-item-desc">Grilled skewers, tare glaze</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-yakitori">$12</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Shrimp Tempura (4 pcs)</div><div class="menu-item-desc">Crispy battered shrimp, tentsuyu</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-shrimp-tempura">$14</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Assorted Tempura</div><div class="menu-item-desc">Shrimp &amp; vegetables, dipping sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-assorted-tempura">$16</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Calamari</div><div class="menu-item-desc">Fried squid rings, lemon aioli</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-calamari">$14</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Sashimi Starter (6 pcs)</div><div class="menu-item-desc">Chef's selection of fresh fish</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-sashimi-starter">$18</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Tuna Tataki</div><div class="menu-item-desc">Seared tuna, ponzu, green onion</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-tataki">$18</span></div></div>
+        <div class="menu-items-grid" id="grid-3">
+          <div class="menu-item" data-key="s-edamame"><div class="menu-item-left"><div class="menu-item-name">Edamame</div><div class="menu-item-desc">Steamed salted soybeans</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-edamame">$6</span></div></div>
+          <div class="menu-item" data-key="s-gyoza"><div class="menu-item-left"><div class="menu-item-name">Gyoza (6 pcs)</div><div class="menu-item-desc">Pan-fried pork &amp; cabbage dumplings</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-gyoza">$10</span></div></div>
+          <div class="menu-item" data-key="s-agedashi"><div class="menu-item-left"><div class="menu-item-name">Agedashi Tofu</div><div class="menu-item-desc">Lightly fried tofu, dashi broth</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-agedashi">$9</span></div></div>
+          <div class="menu-item" data-key="s-springrolls"><div class="menu-item-left"><div class="menu-item-name">Osaka Spring Rolls (2 pcs)</div><div class="menu-item-desc">Crispy rolls, sweet chili sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-springrolls">$8</span></div></div>
+          <div class="menu-item" data-key="s-yakitori"><div class="menu-item-left"><div class="menu-item-name">Chicken Yakitori (4 pcs)</div><div class="menu-item-desc">Grilled skewers, tare glaze</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-yakitori">$12</span></div></div>
+          <div class="menu-item" data-key="s-shrimp-tempura"><div class="menu-item-left"><div class="menu-item-name">Shrimp Tempura (4 pcs)</div><div class="menu-item-desc">Crispy battered shrimp, tentsuyu</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-shrimp-tempura">$14</span></div></div>
+          <div class="menu-item" data-key="s-assorted-tempura"><div class="menu-item-left"><div class="menu-item-name">Assorted Tempura</div><div class="menu-item-desc">Shrimp &amp; vegetables, dipping sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-assorted-tempura">$16</span></div></div>
+          <div class="menu-item" data-key="s-calamari"><div class="menu-item-left"><div class="menu-item-name">Calamari</div><div class="menu-item-desc">Fried squid rings, lemon aioli</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-calamari">$14</span></div></div>
+          <div class="menu-item" data-key="s-sashimi-starter"><div class="menu-item-left"><div class="menu-item-name">Sashimi Starter (6 pcs)</div><div class="menu-item-desc">Chef's selection of fresh fish</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-sashimi-starter">$18</span></div></div>
+          <div class="menu-item" data-key="s-tataki"><div class="menu-item-left"><div class="menu-item-name">Tuna Tataki</div><div class="menu-item-desc">Seared tuna, ponzu, green onion</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="s-tataki">$18</span></div></div>
         </div>
       </div>
     </div><!-- /panel-starters -->
@@ -1049,15 +1104,15 @@ footer a:hover { color: rgba(245,240,232,0.7); }
           <div class="menu-category-title"><em>Nigiri &amp; Sashimi</em></div>
           <div class="menu-category-desc">2 pieces per order (nigiri) · 6 pieces per order (sashimi)</div>
         </div>
-        <div class="menu-items-grid">
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Tuna Nigiri</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ni-tuna">$7</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Salmon Nigiri</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ni-salmon">$7</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Shrimp Nigiri</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ni-shrimp">$7</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Scallop Nigiri</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ni-scallop">$8</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Tuna Sashimi (6 pcs)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sa-tuna">$17</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Salmon Sashimi (6 pcs)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sa-salmon">$16</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Sashimi Deluxe (15 pcs)</div><div class="menu-item-desc">Chef's selection</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sa-deluxe">$38</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Nigiri Combo (8 pcs)</div><div class="menu-item-desc">Assorted nigiri</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ni-combo">$24</span></div></div>
+        <div class="menu-items-grid" id="grid-4">
+          <div class="menu-item" data-key="ni-tuna"><div class="menu-item-left"><div class="menu-item-name">Tuna Nigiri</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ni-tuna">$7</span></div></div>
+          <div class="menu-item" data-key="ni-salmon"><div class="menu-item-left"><div class="menu-item-name">Salmon Nigiri</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ni-salmon">$7</span></div></div>
+          <div class="menu-item" data-key="ni-shrimp"><div class="menu-item-left"><div class="menu-item-name">Shrimp Nigiri</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ni-shrimp">$7</span></div></div>
+          <div class="menu-item" data-key="ni-scallop"><div class="menu-item-left"><div class="menu-item-name">Scallop Nigiri</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ni-scallop">$8</span></div></div>
+          <div class="menu-item" data-key="sa-tuna"><div class="menu-item-left"><div class="menu-item-name">Tuna Sashimi (6 pcs)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sa-tuna">$17</span></div></div>
+          <div class="menu-item" data-key="sa-salmon"><div class="menu-item-left"><div class="menu-item-name">Salmon Sashimi (6 pcs)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sa-salmon">$16</span></div></div>
+          <div class="menu-item" data-key="sa-deluxe"><div class="menu-item-left"><div class="menu-item-name">Sashimi Deluxe (15 pcs)</div><div class="menu-item-desc">Chef's selection</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sa-deluxe">$38</span></div></div>
+          <div class="menu-item" data-key="ni-combo"><div class="menu-item-left"><div class="menu-item-name">Nigiri Combo (8 pcs)</div><div class="menu-item-desc">Assorted nigiri</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ni-combo">$24</span></div></div>
         </div>
       </div>
 
@@ -1066,20 +1121,20 @@ footer a:hover { color: rgba(245,240,232,0.7); }
           <div class="menu-category-title"><em>Maki Rolls</em></div>
           <div class="menu-category-desc">8 pieces per roll</div>
         </div>
-        <div class="menu-items-grid">
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">California Maki</div><div class="menu-item-desc">Crab, avocado, cucumber</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-california">$12</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Spicy Tuna Maki</div><div class="menu-item-desc">Tuna, spicy mayo, cucumber</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-spicy-tuna">$14</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Salmon Avocado Maki</div><div class="menu-item-desc">Fresh salmon, avocado</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-salmon-avo">$14</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Rainbow Maki</div><div class="menu-item-desc">California base, assorted fish on top</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-rainbow">$17</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Volcano Maki</div><div class="menu-item-desc">Shrimp tempura, spicy tuna, volcano sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-volcano">$17</span><span class="menu-item-tag">Popular</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Dragon Roll</div><div class="menu-item-desc">Shrimp tempura, avocado, eel sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-dragon">$19</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Fire Maki (6 pcs)</div><div class="menu-item-desc">Spicy salmon, jalapeño, sriracha</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-fire">$16</span><span class="menu-item-tag">Spicy</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Osaka Hibachi Roll</div><div class="menu-item-desc">Signature house roll</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-osaka">$18</span><span class="menu-item-tag">Signature</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Monkey Bomb Roll</div><div class="menu-item-desc">Deep fried, banana, cream cheese</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-monkey">$21</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Lobster Tail Roll</div><div class="menu-item-desc">Lobster, mango, avocado</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-lobster">$24</span><span class="menu-item-tag">Premium</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Vegetable Roll</div><div class="menu-item-desc">Avocado, cucumber, pickled daikon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-veg">$11</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Sushi Combo A (25 pcs)</div><div class="menu-item-desc">Assorted nigiri &amp; rolls</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-combo-a">$38</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Sushi Combo B (35 pcs)</div><div class="menu-item-desc">Deluxe nigiri, sashimi &amp; rolls</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-combo-b">$52</span></div></div>
+        <div class="menu-items-grid" id="grid-5">
+          <div class="menu-item" data-key="mk-california"><div class="menu-item-left"><div class="menu-item-name">California Maki</div><div class="menu-item-desc">Crab, avocado, cucumber</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-california">$12</span></div></div>
+          <div class="menu-item" data-key="mk-spicy-tuna"><div class="menu-item-left"><div class="menu-item-name">Spicy Tuna Maki</div><div class="menu-item-desc">Tuna, spicy mayo, cucumber</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-spicy-tuna">$14</span></div></div>
+          <div class="menu-item" data-key="mk-salmon-avo"><div class="menu-item-left"><div class="menu-item-name">Salmon Avocado Maki</div><div class="menu-item-desc">Fresh salmon, avocado</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-salmon-avo">$14</span></div></div>
+          <div class="menu-item" data-key="mk-rainbow"><div class="menu-item-left"><div class="menu-item-name">Rainbow Maki</div><div class="menu-item-desc">California base, assorted fish on top</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-rainbow">$17</span></div></div>
+          <div class="menu-item" data-key="mk-volcano"><div class="menu-item-left"><div class="menu-item-name">Volcano Maki</div><div class="menu-item-desc">Shrimp tempura, spicy tuna, volcano sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-volcano">$17</span><span class="menu-item-tag">Popular</span></div></div>
+          <div class="menu-item" data-key="mk-dragon"><div class="menu-item-left"><div class="menu-item-name">Dragon Roll</div><div class="menu-item-desc">Shrimp tempura, avocado, eel sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-dragon">$19</span></div></div>
+          <div class="menu-item" data-key="mk-fire"><div class="menu-item-left"><div class="menu-item-name">Fire Maki (6 pcs)</div><div class="menu-item-desc">Spicy salmon, jalapeño, sriracha</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-fire">$16</span><span class="menu-item-tag">Spicy</span></div></div>
+          <div class="menu-item" data-key="mk-osaka"><div class="menu-item-left"><div class="menu-item-name">Osaka Hibachi Roll</div><div class="menu-item-desc">Signature house roll</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-osaka">$18</span><span class="menu-item-tag">Signature</span></div></div>
+          <div class="menu-item" data-key="mk-monkey"><div class="menu-item-left"><div class="menu-item-name">Monkey Bomb Roll</div><div class="menu-item-desc">Deep fried, banana, cream cheese</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-monkey">$21</span></div></div>
+          <div class="menu-item" data-key="mk-lobster"><div class="menu-item-left"><div class="menu-item-name">Lobster Tail Roll</div><div class="menu-item-desc">Lobster, mango, avocado</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-lobster">$24</span><span class="menu-item-tag">Premium</span></div></div>
+          <div class="menu-item" data-key="mk-veg"><div class="menu-item-left"><div class="menu-item-name">Vegetable Roll</div><div class="menu-item-desc">Avocado, cucumber, pickled daikon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-veg">$11</span></div></div>
+          <div class="menu-item" data-key="mk-combo-a"><div class="menu-item-left"><div class="menu-item-name">Sushi Combo A (25 pcs)</div><div class="menu-item-desc">Assorted nigiri &amp; rolls</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-combo-a">$38</span></div></div>
+          <div class="menu-item" data-key="mk-combo-b"><div class="menu-item-left"><div class="menu-item-name">Sushi Combo B (35 pcs)</div><div class="menu-item-desc">Deluxe nigiri, sashimi &amp; rolls</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="mk-combo-b">$52</span></div></div>
         </div>
       </div>
     </div><!-- /panel-sushi -->
@@ -1091,19 +1146,19 @@ footer a:hover { color: rgba(245,240,232,0.7); }
           <div class="menu-category-title">Hibachi <em>Dinner</em></div>
           <div class="menu-category-desc">Includes clear soup · house salad · hibachi vegetables · fried noodles · steamed rice</div>
         </div>
-        <div class="menu-items-grid">
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Chicken</div><div class="menu-item-desc">Tender chicken breast on the iron grill</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-chicken">$32</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Sirloin Steak</div><div class="menu-item-desc">AAA Canadian sirloin</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-steak">$42</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Salmon</div><div class="menu-item-desc">Atlantic salmon fillet</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-salmon">$38</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Shrimp</div><div class="menu-item-desc">Jumbo shrimp, garlic butter</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-shrimp">$38</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Scallops</div><div class="menu-item-desc">Atlantic sea scallops</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-scallops">$40</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Lobster Tail</div><div class="menu-item-desc">Cold water lobster tail</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-lobster">$58</span><span class="menu-item-tag">Premium</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Filet Mignon</div><div class="menu-item-desc">Tenderloin, premium cut</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-filet">$52</span><span class="menu-item-tag">Premium</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Steak &amp; Shrimp</div><div class="menu-item-desc">Sirloin + jumbo shrimp</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-steak-shrimp">$48</span><span class="menu-item-tag">Combo</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Steak &amp; Scallop</div><div class="menu-item-desc">Sirloin + sea scallops</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-steak-scallop">$52</span><span class="menu-item-tag">Combo</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Chicken &amp; Shrimp</div><div class="menu-item-desc">Chicken breast + jumbo shrimp</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-chick-shrimp">$44</span><span class="menu-item-tag">Combo</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Salmon &amp; Scallop</div><div class="menu-item-desc">Atlantic salmon + sea scallops</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-salm-scallop">$46</span><span class="menu-item-tag">Combo</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Vegetable Hibachi</div><div class="menu-item-desc">Seasonal vegetables, tofu</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-veg">$24</span></div></div>
+        <div class="menu-items-grid" id="grid-6">
+          <div class="menu-item" data-key="hib-chicken"><div class="menu-item-left"><div class="menu-item-name">Chicken</div><div class="menu-item-desc">Tender chicken breast on the iron grill</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-chicken">$32</span></div></div>
+          <div class="menu-item" data-key="hib-steak"><div class="menu-item-left"><div class="menu-item-name">Sirloin Steak</div><div class="menu-item-desc">AAA Canadian sirloin</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-steak">$42</span></div></div>
+          <div class="menu-item" data-key="hib-salmon"><div class="menu-item-left"><div class="menu-item-name">Salmon</div><div class="menu-item-desc">Atlantic salmon fillet</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-salmon">$38</span></div></div>
+          <div class="menu-item" data-key="hib-shrimp"><div class="menu-item-left"><div class="menu-item-name">Shrimp</div><div class="menu-item-desc">Jumbo shrimp, garlic butter</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-shrimp">$38</span></div></div>
+          <div class="menu-item" data-key="hib-scallops"><div class="menu-item-left"><div class="menu-item-name">Scallops</div><div class="menu-item-desc">Atlantic sea scallops</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-scallops">$40</span></div></div>
+          <div class="menu-item" data-key="hib-lobster"><div class="menu-item-left"><div class="menu-item-name">Lobster Tail</div><div class="menu-item-desc">Cold water lobster tail</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-lobster">$58</span><span class="menu-item-tag">Premium</span></div></div>
+          <div class="menu-item" data-key="hib-filet"><div class="menu-item-left"><div class="menu-item-name">Filet Mignon</div><div class="menu-item-desc">Tenderloin, premium cut</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-filet">$52</span><span class="menu-item-tag">Premium</span></div></div>
+          <div class="menu-item" data-key="hib-steak-shrimp"><div class="menu-item-left"><div class="menu-item-name">Steak &amp; Shrimp</div><div class="menu-item-desc">Sirloin + jumbo shrimp</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-steak-shrimp">$48</span><span class="menu-item-tag">Combo</span></div></div>
+          <div class="menu-item" data-key="hib-steak-scallop"><div class="menu-item-left"><div class="menu-item-name">Steak &amp; Scallop</div><div class="menu-item-desc">Sirloin + sea scallops</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-steak-scallop">$52</span><span class="menu-item-tag">Combo</span></div></div>
+          <div class="menu-item" data-key="hib-chick-shrimp"><div class="menu-item-left"><div class="menu-item-name">Chicken &amp; Shrimp</div><div class="menu-item-desc">Chicken breast + jumbo shrimp</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-chick-shrimp">$44</span><span class="menu-item-tag">Combo</span></div></div>
+          <div class="menu-item" data-key="hib-salm-scallop"><div class="menu-item-left"><div class="menu-item-name">Salmon &amp; Scallop</div><div class="menu-item-desc">Atlantic salmon + sea scallops</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-salm-scallop">$46</span><span class="menu-item-tag">Combo</span></div></div>
+          <div class="menu-item" data-key="hib-veg"><div class="menu-item-left"><div class="menu-item-name">Vegetable Hibachi</div><div class="menu-item-desc">Seasonal vegetables, tofu</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="hib-veg">$24</span></div></div>
           <div class="menu-note-row">All teppanyaki dinners cooked tableside on open iron grills. Gluten-free options available — ask your server. Minimum 2 guests recommended for full show experience.</div>
         </div>
       </div>
@@ -1116,17 +1171,17 @@ footer a:hover { color: rgba(245,240,232,0.7); }
           <div class="menu-category-title">Lunch <em>Specials</em></div>
           <div class="menu-category-desc">Available Mon–Fri · 12:00 PM – 3:00 PM</div>
         </div>
-        <div class="menu-items-grid">
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Bento Box — Chicken Teriyaki</div><div class="menu-item-desc">Rice, salad, miso soup, gyoza</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-bento-chicken">$18</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Bento Box — Salmon Teriyaki</div><div class="menu-item-desc">Rice, salad, miso soup, gyoza</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-bento-salmon">$20</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Bento Box — Beef Teriyaki</div><div class="menu-item-desc">Rice, salad, miso soup, gyoza</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-bento-beef">$22</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Lunch Hibachi — Chicken</div><div class="menu-item-desc">Smaller portion · soup, salad, rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-hib-chicken">$22</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Lunch Hibachi — Steak</div><div class="menu-item-desc">Smaller portion · soup, salad, rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-hib-steak">$28</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Lunch Hibachi — Salmon</div><div class="menu-item-desc">Smaller portion · soup, salad, rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-hib-salmon">$26</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Lunch Sushi Combo (15 pcs)</div><div class="menu-item-desc">Assorted maki &amp; nigiri</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-sushi">$22</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Ramen — Chicken</div><div class="menu-item-desc">Rich broth, noodles, soft egg, nori</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-ramen-chicken">$16</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Ramen — Seafood</div><div class="menu-item-desc">Shrimp, scallop, clam, noodles</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-ramen-seafood">$19</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Udon — Beef</div><div class="menu-item-desc">Thick noodles, beef, vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-udon-beef">$17</span></div></div>
+        <div class="menu-items-grid" id="grid-7">
+          <div class="menu-item" data-key="ln-bento-chicken"><div class="menu-item-left"><div class="menu-item-name">Bento Box — Chicken Teriyaki</div><div class="menu-item-desc">Rice, salad, miso soup, gyoza</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-bento-chicken">$18</span></div></div>
+          <div class="menu-item" data-key="ln-bento-salmon"><div class="menu-item-left"><div class="menu-item-name">Bento Box — Salmon Teriyaki</div><div class="menu-item-desc">Rice, salad, miso soup, gyoza</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-bento-salmon">$20</span></div></div>
+          <div class="menu-item" data-key="ln-bento-beef"><div class="menu-item-left"><div class="menu-item-name">Bento Box — Beef Teriyaki</div><div class="menu-item-desc">Rice, salad, miso soup, gyoza</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-bento-beef">$22</span></div></div>
+          <div class="menu-item" data-key="ln-hib-chicken"><div class="menu-item-left"><div class="menu-item-name">Lunch Hibachi — Chicken</div><div class="menu-item-desc">Smaller portion · soup, salad, rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-hib-chicken">$22</span></div></div>
+          <div class="menu-item" data-key="ln-hib-steak"><div class="menu-item-left"><div class="menu-item-name">Lunch Hibachi — Steak</div><div class="menu-item-desc">Smaller portion · soup, salad, rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-hib-steak">$28</span></div></div>
+          <div class="menu-item" data-key="ln-hib-salmon"><div class="menu-item-left"><div class="menu-item-name">Lunch Hibachi — Salmon</div><div class="menu-item-desc">Smaller portion · soup, salad, rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-hib-salmon">$26</span></div></div>
+          <div class="menu-item" data-key="ln-sushi"><div class="menu-item-left"><div class="menu-item-name">Lunch Sushi Combo (15 pcs)</div><div class="menu-item-desc">Assorted maki &amp; nigiri</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-sushi">$22</span></div></div>
+          <div class="menu-item" data-key="ln-ramen-chicken"><div class="menu-item-left"><div class="menu-item-name">Ramen — Chicken</div><div class="menu-item-desc">Rich broth, noodles, soft egg, nori</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-ramen-chicken">$16</span></div></div>
+          <div class="menu-item" data-key="ln-ramen-seafood"><div class="menu-item-left"><div class="menu-item-name">Ramen — Seafood</div><div class="menu-item-desc">Shrimp, scallop, clam, noodles</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-ramen-seafood">$19</span></div></div>
+          <div class="menu-item" data-key="ln-udon-beef"><div class="menu-item-left"><div class="menu-item-name">Udon — Beef</div><div class="menu-item-desc">Thick noodles, beef, vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ln-udon-beef">$17</span></div></div>
           <div class="menu-note-row">Lunch specials available Monday–Friday 12:00 PM – 3:00 PM only. Prices may differ on weekends.</div>
         </div>
       </div>
@@ -1139,15 +1194,15 @@ footer a:hover { color: rgba(245,240,232,0.7); }
         <div class="menu-category-header">
           <div class="menu-category-title">Japanese <em>Kitchen</em></div>
         </div>
-        <div class="menu-items-grid">
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Chicken Teriyaki</div><div class="menu-item-desc">Grilled chicken, teriyaki glaze, steamed rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="jk-chick-teri">$22</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Salmon Teriyaki</div><div class="menu-item-desc">Atlantic salmon, teriyaki, rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="jk-salm-teri">$26</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Beef Teriyaki</div><div class="menu-item-desc">Sliced beef, teriyaki glaze, rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="jk-beef-teri">$28</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Assorted Tempura</div><div class="menu-item-desc">Shrimp &amp; vegetable tempura, dipping sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="jk-tempura">$16</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Spicy Seafood Udon</div><div class="menu-item-desc">Thick noodles, mixed seafood, spicy broth</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="jk-udon">$20</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Yaki Udon</div><div class="menu-item-desc">Stir-fried udon, chicken or beef, vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="jk-yaki-udon">$19</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Katsu Curry</div><div class="menu-item-desc">Breaded cutlet, Japanese curry sauce, rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="jk-katsu">$22</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Yakisoba</div><div class="menu-item-desc">Stir-fried noodles, pork, cabbage</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="jk-yakisoba">$18</span></div></div>
+        <div class="menu-items-grid" id="grid-8">
+          <div class="menu-item" data-key="jk-chick-teri"><div class="menu-item-left"><div class="menu-item-name">Chicken Teriyaki</div><div class="menu-item-desc">Grilled chicken, teriyaki glaze, steamed rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="jk-chick-teri">$22</span></div></div>
+          <div class="menu-item" data-key="jk-salm-teri"><div class="menu-item-left"><div class="menu-item-name">Salmon Teriyaki</div><div class="menu-item-desc">Atlantic salmon, teriyaki, rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="jk-salm-teri">$26</span></div></div>
+          <div class="menu-item" data-key="jk-beef-teri"><div class="menu-item-left"><div class="menu-item-name">Beef Teriyaki</div><div class="menu-item-desc">Sliced beef, teriyaki glaze, rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="jk-beef-teri">$28</span></div></div>
+          <div class="menu-item" data-key="jk-tempura"><div class="menu-item-left"><div class="menu-item-name">Assorted Tempura</div><div class="menu-item-desc">Shrimp &amp; vegetable tempura, dipping sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="jk-tempura">$16</span></div></div>
+          <div class="menu-item" data-key="jk-udon"><div class="menu-item-left"><div class="menu-item-name">Spicy Seafood Udon</div><div class="menu-item-desc">Thick noodles, mixed seafood, spicy broth</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="jk-udon">$20</span></div></div>
+          <div class="menu-item" data-key="jk-yaki-udon"><div class="menu-item-left"><div class="menu-item-name">Yaki Udon</div><div class="menu-item-desc">Stir-fried udon, chicken or beef, vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="jk-yaki-udon">$19</span></div></div>
+          <div class="menu-item" data-key="jk-katsu"><div class="menu-item-left"><div class="menu-item-name">Katsu Curry</div><div class="menu-item-desc">Breaded cutlet, Japanese curry sauce, rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="jk-katsu">$22</span></div></div>
+          <div class="menu-item" data-key="jk-yakisoba"><div class="menu-item-left"><div class="menu-item-name">Yakisoba</div><div class="menu-item-desc">Stir-fried noodles, pork, cabbage</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="jk-yakisoba">$18</span></div></div>
         </div>
       </div>
 
@@ -1155,13 +1210,13 @@ footer a:hover { color: rgba(245,240,232,0.7); }
         <div class="menu-category-header">
           <div class="menu-category-title">Korean <em>Favourites</em></div>
         </div>
-        <div class="menu-items-grid">
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Bibimbap</div><div class="menu-item-desc">Mixed rice bowl, egg, gochujang</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ko-bibimbap">$18</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Korean Short Ribs (Galbi)</div><div class="menu-item-desc">Marinated beef short ribs, steamed rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ko-galbi">$26</span><span class="menu-item-tag">Popular</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Bulgogi</div><div class="menu-item-desc">Marinated beef, mushrooms, steamed rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ko-bulgogi">$24</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Japchae</div><div class="menu-item-desc">Glass noodles, beef, vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ko-japchae">$20</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Sundubu Jjigae</div><div class="menu-item-desc">Spicy soft tofu stew, seafood, egg</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ko-sundubu">$18</span><span class="menu-item-tag">Spicy</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Tteokbokki</div><div class="menu-item-desc">Rice cakes, fish cake, gochujang sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ko-tteok">$16</span><span class="menu-item-tag">Spicy</span></div></div>
+        <div class="menu-items-grid" id="grid-9">
+          <div class="menu-item" data-key="ko-bibimbap"><div class="menu-item-left"><div class="menu-item-name">Bibimbap</div><div class="menu-item-desc">Mixed rice bowl, egg, gochujang</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ko-bibimbap">$18</span></div></div>
+          <div class="menu-item" data-key="ko-galbi"><div class="menu-item-left"><div class="menu-item-name">Korean Short Ribs (Galbi)</div><div class="menu-item-desc">Marinated beef short ribs, steamed rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ko-galbi">$26</span><span class="menu-item-tag">Popular</span></div></div>
+          <div class="menu-item" data-key="ko-bulgogi"><div class="menu-item-left"><div class="menu-item-name">Bulgogi</div><div class="menu-item-desc">Marinated beef, mushrooms, steamed rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ko-bulgogi">$24</span></div></div>
+          <div class="menu-item" data-key="ko-japchae"><div class="menu-item-left"><div class="menu-item-name">Japchae</div><div class="menu-item-desc">Glass noodles, beef, vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ko-japchae">$20</span></div></div>
+          <div class="menu-item" data-key="ko-sundubu"><div class="menu-item-left"><div class="menu-item-name">Sundubu Jjigae</div><div class="menu-item-desc">Spicy soft tofu stew, seafood, egg</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ko-sundubu">$18</span><span class="menu-item-tag">Spicy</span></div></div>
+          <div class="menu-item" data-key="ko-tteok"><div class="menu-item-left"><div class="menu-item-name">Tteokbokki</div><div class="menu-item-desc">Rice cakes, fish cake, gochujang sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="ko-tteok">$16</span><span class="menu-item-tag">Spicy</span></div></div>
         </div>
       </div>
     </div><!-- /panel-kitchen -->
@@ -1173,23 +1228,23 @@ footer a:hover { color: rgba(245,240,232,0.7); }
           <div class="menu-category-title">Take Out <em>Specialties</em></div>
           <div class="menu-category-desc">Call ahead · (506) 853-8855 · Ready in 20–30 min</div>
         </div>
-        <div class="menu-items-grid">
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Chicken Fried Rice</div><div class="menu-item-desc">Wok-fried rice, egg, vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-cfr">$16</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Beef Fried Rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-bfr">$18</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Seafood Fried Rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-sfr">$20</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Vegetable Fried Rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-vfr">$14</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Chicken Chow Mein</div><div class="menu-item-desc">Stir-fried noodles, vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-ccm">$16</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Beef Chow Mein</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-bcm">$18</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Seafood Chow Mein</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-scm">$20</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Sweet &amp; Sour Chicken</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-ssc">$17</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Sweet &amp; Sour Pork</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-ssp">$17</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Beef with Broccoli</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-bwb">$19</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">General Tao Chicken</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-gtc">$17</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Kung Pao Chicken</div><div class="menu-item-desc">Peanuts, dried chili, hoisin sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-kpc">$17</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Lemon Chicken</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-lc">$17</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Mongolian Beef</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-mb">$20</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Chicken &amp; Cashew Nut</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-ccn">$17</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Steamed Rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-rice">$3</span></div></div>
+        <div class="menu-items-grid" id="grid-10">
+          <div class="menu-item" data-key="to-cfr"><div class="menu-item-left"><div class="menu-item-name">Chicken Fried Rice</div><div class="menu-item-desc">Wok-fried rice, egg, vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-cfr">$16</span></div></div>
+          <div class="menu-item" data-key="to-bfr"><div class="menu-item-left"><div class="menu-item-name">Beef Fried Rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-bfr">$18</span></div></div>
+          <div class="menu-item" data-key="to-sfr"><div class="menu-item-left"><div class="menu-item-name">Seafood Fried Rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-sfr">$20</span></div></div>
+          <div class="menu-item" data-key="to-vfr"><div class="menu-item-left"><div class="menu-item-name">Vegetable Fried Rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-vfr">$14</span></div></div>
+          <div class="menu-item" data-key="to-ccm"><div class="menu-item-left"><div class="menu-item-name">Chicken Chow Mein</div><div class="menu-item-desc">Stir-fried noodles, vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-ccm">$16</span></div></div>
+          <div class="menu-item" data-key="to-bcm"><div class="menu-item-left"><div class="menu-item-name">Beef Chow Mein</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-bcm">$18</span></div></div>
+          <div class="menu-item" data-key="to-scm"><div class="menu-item-left"><div class="menu-item-name">Seafood Chow Mein</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-scm">$20</span></div></div>
+          <div class="menu-item" data-key="to-ssc"><div class="menu-item-left"><div class="menu-item-name">Sweet &amp; Sour Chicken</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-ssc">$17</span></div></div>
+          <div class="menu-item" data-key="to-ssp"><div class="menu-item-left"><div class="menu-item-name">Sweet &amp; Sour Pork</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-ssp">$17</span></div></div>
+          <div class="menu-item" data-key="to-bwb"><div class="menu-item-left"><div class="menu-item-name">Beef with Broccoli</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-bwb">$19</span></div></div>
+          <div class="menu-item" data-key="to-gtc"><div class="menu-item-left"><div class="menu-item-name">General Tao Chicken</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-gtc">$17</span></div></div>
+          <div class="menu-item" data-key="to-kpc"><div class="menu-item-left"><div class="menu-item-name">Kung Pao Chicken</div><div class="menu-item-desc">Peanuts, dried chili, hoisin sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-kpc">$17</span></div></div>
+          <div class="menu-item" data-key="to-lc"><div class="menu-item-left"><div class="menu-item-name">Lemon Chicken</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-lc">$17</span></div></div>
+          <div class="menu-item" data-key="to-mb"><div class="menu-item-left"><div class="menu-item-name">Mongolian Beef</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-mb">$20</span></div></div>
+          <div class="menu-item" data-key="to-ccn"><div class="menu-item-left"><div class="menu-item-name">Chicken &amp; Cashew Nut</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-ccn">$17</span></div></div>
+          <div class="menu-item" data-key="to-rice"><div class="menu-item-left"><div class="menu-item-name">Steamed Rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="to-rice">$3</span></div></div>
           <div class="menu-note-row">Take out orders available during all business hours. Minimum order may apply for delivery. Please call ahead to ensure availability.</div>
         </div>
       </div>
@@ -1202,13 +1257,13 @@ footer a:hover { color: rgba(245,240,232,0.7); }
         <div class="menu-category-header">
           <div class="menu-category-title">Sake &amp; <em>Wine</em></div>
         </div>
-        <div class="menu-items-grid">
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">House Sake — Hot</div><div class="menu-item-desc">180ml carafe</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-sake-hot">$9</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">House Sake — Cold</div><div class="menu-item-desc">180ml carafe</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-sake-cold">$9</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Premium Sake</div><div class="menu-item-desc">300ml bottle, junmai daiginjo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-sake-prem">$18</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Plum Wine</div><div class="menu-item-desc">Sweet umeshu, rocks or neat</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-plum">$8</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">House White Wine</div><div class="menu-item-desc">Glass</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-white">$9</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">House Red Wine</div><div class="menu-item-desc">Glass</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-red">$9</span></div></div>
+        <div class="menu-items-grid" id="grid-11">
+          <div class="menu-item" data-key="bv-sake-hot"><div class="menu-item-left"><div class="menu-item-name">House Sake — Hot</div><div class="menu-item-desc">180ml carafe</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-sake-hot">$9</span></div></div>
+          <div class="menu-item" data-key="bv-sake-cold"><div class="menu-item-left"><div class="menu-item-name">House Sake — Cold</div><div class="menu-item-desc">180ml carafe</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-sake-cold">$9</span></div></div>
+          <div class="menu-item" data-key="bv-sake-prem"><div class="menu-item-left"><div class="menu-item-name">Premium Sake</div><div class="menu-item-desc">300ml bottle, junmai daiginjo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-sake-prem">$18</span></div></div>
+          <div class="menu-item" data-key="bv-plum"><div class="menu-item-left"><div class="menu-item-name">Plum Wine</div><div class="menu-item-desc">Sweet umeshu, rocks or neat</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-plum">$8</span></div></div>
+          <div class="menu-item" data-key="bv-white"><div class="menu-item-left"><div class="menu-item-name">House White Wine</div><div class="menu-item-desc">Glass</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-white">$9</span></div></div>
+          <div class="menu-item" data-key="bv-red"><div class="menu-item-left"><div class="menu-item-name">House Red Wine</div><div class="menu-item-desc">Glass</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-red">$9</span></div></div>
         </div>
       </div>
 
@@ -1216,14 +1271,14 @@ footer a:hover { color: rgba(245,240,232,0.7); }
         <div class="menu-category-header">
           <div class="menu-category-title">Beer &amp; <em>Cocktails</em></div>
         </div>
-        <div class="menu-items-grid">
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Sapporo Draft</div><div class="menu-item-desc">Japanese lager, pint</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-sapporo">$8</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Kirin Ichiban</div><div class="menu-item-desc">Bottle 500ml</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-kirin">$8</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Asahi</div><div class="menu-item-desc">Bottle 500ml</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-asahi">$8</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Domestic Beer</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-domestic">$7</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Lychee Martini</div><div class="menu-item-desc">Vodka, lychee liqueur, lime</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-lychee">$12</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Yuzu Sour</div><div class="menu-item-desc">Whisky, yuzu, honey, egg white</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-yuzu">$13</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Sake Mojito</div><div class="menu-item-desc">Sake, mint, lime, soda</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-sake-moji">$12</span></div></div>
+        <div class="menu-items-grid" id="grid-12">
+          <div class="menu-item" data-key="bv-sapporo"><div class="menu-item-left"><div class="menu-item-name">Sapporo Draft</div><div class="menu-item-desc">Japanese lager, pint</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-sapporo">$8</span></div></div>
+          <div class="menu-item" data-key="bv-kirin"><div class="menu-item-left"><div class="menu-item-name">Kirin Ichiban</div><div class="menu-item-desc">Bottle 500ml</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-kirin">$8</span></div></div>
+          <div class="menu-item" data-key="bv-asahi"><div class="menu-item-left"><div class="menu-item-name">Asahi</div><div class="menu-item-desc">Bottle 500ml</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-asahi">$8</span></div></div>
+          <div class="menu-item" data-key="bv-domestic"><div class="menu-item-left"><div class="menu-item-name">Domestic Beer</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-domestic">$7</span></div></div>
+          <div class="menu-item" data-key="bv-lychee"><div class="menu-item-left"><div class="menu-item-name">Lychee Martini</div><div class="menu-item-desc">Vodka, lychee liqueur, lime</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-lychee">$12</span></div></div>
+          <div class="menu-item" data-key="bv-yuzu"><div class="menu-item-left"><div class="menu-item-name">Yuzu Sour</div><div class="menu-item-desc">Whisky, yuzu, honey, egg white</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-yuzu">$13</span></div></div>
+          <div class="menu-item" data-key="bv-sake-moji"><div class="menu-item-left"><div class="menu-item-name">Sake Mojito</div><div class="menu-item-desc">Sake, mint, lime, soda</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-sake-moji">$12</span></div></div>
         </div>
       </div>
 
@@ -1231,12 +1286,12 @@ footer a:hover { color: rgba(245,240,232,0.7); }
         <div class="menu-category-header">
           <div class="menu-category-title">Non-Alcoholic &amp; <em>Hot</em></div>
         </div>
-        <div class="menu-items-grid">
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Green Tea</div><div class="menu-item-desc">Hot or iced</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-green-tea">$4</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Barley Tea</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-barley">$4</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Ramune Soda</div><div class="menu-item-desc">Original, strawberry, or melon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-ramune">$5</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Soft Drink</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-soft">$3</span></div></div>
-          <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Juice</div><div class="menu-item-desc">Orange, apple, cranberry</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-juice">$4</span></div></div>
+        <div class="menu-items-grid" id="grid-13">
+          <div class="menu-item" data-key="bv-green-tea"><div class="menu-item-left"><div class="menu-item-name">Green Tea</div><div class="menu-item-desc">Hot or iced</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-green-tea">$4</span></div></div>
+          <div class="menu-item" data-key="bv-barley"><div class="menu-item-left"><div class="menu-item-name">Barley Tea</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-barley">$4</span></div></div>
+          <div class="menu-item" data-key="bv-ramune"><div class="menu-item-left"><div class="menu-item-name">Ramune Soda</div><div class="menu-item-desc">Original, strawberry, or melon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-ramune">$5</span></div></div>
+          <div class="menu-item" data-key="bv-soft"><div class="menu-item-left"><div class="menu-item-name">Soft Drink</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-soft">$3</span></div></div>
+          <div class="menu-item" data-key="bv-juice"><div class="menu-item-left"><div class="menu-item-name">Juice</div><div class="menu-item-desc">Orange, apple, cranberry</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="bv-juice">$4</span></div></div>
         </div>
       </div>
     </div><!-- /panel-beverages -->
@@ -1437,7 +1492,7 @@ footer a:hover { color: rgba(245,240,232,0.7); }
 <div class="mgr-overlay" id="mgrOverlay" onclick="closeMgrOverlayIfOutside(event)">
   <div class="mgr-modal">
     <h3>Manager Access</h3>
-    <p>Enter the manager password to edit menu prices. Changes are saved locally and persist across sessions.</p>
+    <p>Enter the manager password to edit menu prices, add or remove items, and reorder.</p>
     <input class="mgr-input" id="mgrPwd" type="password" placeholder="Password" autocomplete="off"
       onkeydown="if(event.key==='Enter')submitManagerPwd()">
     <div class="mgr-err" id="mgrErr"></div>
@@ -1448,39 +1503,142 @@ footer a:hover { color: rgba(245,240,232,0.7); }
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<!-- ADD ITEM MODAL -->
+<div class="mgr-overlay" id="addItemOverlay" onclick="closeAddItemOverlayIfOutside(event)">
+  <div class="mgr-modal" style="max-width:460px">
+    <h3 id="addItemTitle">Add Menu Item</h3>
+    <p id="addItemSubtitle">New item will appear at the bottom of this section.</p>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
+      <div>
+        <label style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:5px">Item Name *</label>
+        <input class="mgr-input" id="aiName" type="text" placeholder="e.g. Dragon Roll" style="margin-bottom:0">
+      </div>
+      <div>
+        <label style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:5px">Description</label>
+        <input class="mgr-input" id="aiDesc" type="text" placeholder="e.g. Shrimp tempura, avocado, eel sauce" style="margin-bottom:0">
+      </div>
+      <div>
+        <label style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:5px">Price *</label>
+        <input class="mgr-input" id="aiPrice" type="text" placeholder="e.g. $18" style="margin-bottom:0"
+          onkeydown="if(event.key==='Enter')submitAddItem()">
+      </div>
+      <div>
+        <label style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);display:block;margin-bottom:5px">Tag (optional)</label>
+        <select class="mgr-input" id="aiTag" style="margin-bottom:0;cursor:pointer">
+          <option value="">— None —</option>
+          <option value="Popular">Popular</option>
+          <option value="Signature">Signature</option>
+          <option value="Premium">Premium</option>
+          <option value="Spicy">Spicy</option>
+          <option value="Combo">Combo</option>
+          <option value="New">New</option>
+        </select>
+      </div>
+    </div>
+    <div class="mgr-err" id="aiErr"></div>
+    <div class="mgr-actions">
+      <button class="mgr-btn-cancel" onclick="closeAddItemModal()">Cancel</button>
+      <button class="mgr-btn" onclick="submitAddItem()">Add Item</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  OSAKA HIBACHI — Menu Manager
+// ══════════════════════════════════════════════
+
 // ── HIGHLIGHT TODAY ──
 (function() {
   const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const today = days[new Date().getDay()];
-  const rows = document.querySelectorAll('#hoursTable tr');
-  rows.forEach(row => {
-    if (row.cells[0] && row.cells[0].textContent.trim() === today) {
-      row.classList.add('today');
-    }
+  document.querySelectorAll('#hoursTable tr').forEach(row => {
+    if (row.cells[0] && row.cells[0].textContent.trim() === today) row.classList.add('today');
   });
 })();
 
-// ── PRICE STORAGE ──
+// ── STORAGE KEYS ──
+const STORAGE_PRICES   = 'osakaPrices';
+const STORAGE_ITEMS    = 'osakaMenuItems';    // {gridId: [{name,desc,price,tag,key}, ...]}
+const STORAGE_DELETED  = 'osakaMenuDeleted';  // {key: true}
+const STORAGE_ORDER    = 'osakaMenuOrder';    // {gridId: [key, key, ...]}
+
+// ── LOAD SAVED STATE ──
+function getSavedPrices()   { try { return JSON.parse(localStorage.getItem(STORAGE_PRICES)  || '{}'); } catch(e){ return {}; } }
+function getSavedItems()    { try { return JSON.parse(localStorage.getItem(STORAGE_ITEMS)   || '{}'); } catch(e){ return {}; } }
+function getSavedDeleted()  { try { return JSON.parse(localStorage.getItem(STORAGE_DELETED) || '{}'); } catch(e){ return {}; } }
+function getSavedOrder()    { try { return JSON.parse(localStorage.getItem(STORAGE_ORDER)   || '{}'); } catch(e){ return {}; } }
+
+function saveData(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){} }
+
+// ── APPLY SAVED PRICES ──
 function loadPrices() {
-  try {
-    const stored = JSON.parse(localStorage.getItem('osakaPrices') || '{}');
-    document.querySelectorAll('.menu-item-price, .pricing-item-price').forEach(el => {
-      const key = el.dataset.key;
-      if (key && stored[key]) el.textContent = stored[key];
+  const stored = getSavedPrices();
+  document.querySelectorAll('.menu-item-price').forEach(el => {
+    if (el.dataset.key && stored[el.dataset.key]) el.textContent = stored[el.dataset.key];
+  });
+}
+
+// ── APPLY SAVED DELETIONS ──
+function loadDeletions() {
+  const deleted = getSavedDeleted();
+  document.querySelectorAll('.menu-item[data-key]').forEach(el => {
+    if (deleted[el.dataset.key]) el.remove();
+  });
+}
+
+// ── APPLY SAVED ORDER ──
+function loadOrder() {
+  const orders = getSavedOrder();
+  Object.entries(orders).forEach(([gridId, keyOrder]) => {
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+    keyOrder.forEach(key => {
+      const el = grid.querySelector(`.menu-item[data-key="${key}"]`);
+      if (el) grid.appendChild(el); // move to end in order
     });
-  } catch(e) {}
+  });
 }
 
-function savePrice(key, value) {
-  try {
-    const stored = JSON.parse(localStorage.getItem('osakaPrices') || '{}');
-    stored[key] = value;
-    localStorage.setItem('osakaPrices', JSON.stringify(stored));
-  } catch(e) {}
+// ── APPLY SAVED NEW ITEMS ──
+function loadNewItems() {
+  const saved = getSavedItems();
+  Object.entries(saved).forEach(([gridId, items]) => {
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+    items.forEach(item => {
+      if (!grid.querySelector(`.menu-item[data-key="${item.key}"]`)) {
+        grid.appendChild(buildItemEl(item, gridId));
+      }
+    });
+  });
 }
 
+function buildItemEl(item, gridId) {
+  const div = document.createElement('div');
+  div.className = 'menu-item';
+  div.dataset.key = item.key;
+  div.innerHTML = `
+    <div class="menu-item-left">
+      <div class="menu-item-name">${escHtml(item.name)}</div>
+      ${item.desc ? `<div class="menu-item-desc">${escHtml(item.desc)}</div>` : ''}
+    </div>
+    <div class="menu-item-right">
+      <span class="menu-item-price" data-key="${item.key}">${escHtml(item.price)}</span>
+      ${item.tag ? `<span class="menu-item-tag">${escHtml(item.tag)}</span>` : ''}
+    </div>`;
+  return div;
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// Run on load
 loadPrices();
+loadDeletions();
+loadOrder();
+loadNewItems();
 
 // ── MENU TAB SWITCHING ──
 function switchMenuTab(panelId, btn) {
@@ -1488,11 +1646,10 @@ function switchMenuTab(panelId, btn) {
   document.querySelectorAll('.menu-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('panel-' + panelId).classList.add('active');
   btn.classList.add('active');
-  // Re-apply manager mode to newly visible prices
-  if (managerUnlocked) enableManagerMode();
+  if (managerUnlocked) applyManagerToPanel(document.getElementById('panel-' + panelId));
 }
 
-// ── MANAGER PASSWORD (SHA-256, never stored plain) ──
+// ── MANAGER PASSWORD ──
 const MGR_HASH = '25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117';
 let managerUnlocked = false;
 
@@ -1502,23 +1659,15 @@ async function hashStr(str) {
 }
 
 function openManagerModal() {
-  if (managerUnlocked) {
-    lockManager();
-    return;
-  }
+  if (managerUnlocked) { lockManager(); return; }
   document.getElementById('mgrOverlay').classList.add('open');
   document.getElementById('mgrErr').textContent = '';
   document.getElementById('mgrPwd').value = '';
   setTimeout(() => document.getElementById('mgrPwd').focus(), 80);
 }
 
-function closeManagerModal() {
-  document.getElementById('mgrOverlay').classList.remove('open');
-}
-
-function closeMgrOverlayIfOutside(e) {
-  if (e.target === document.getElementById('mgrOverlay')) closeManagerModal();
-}
+function closeManagerModal() { document.getElementById('mgrOverlay').classList.remove('open'); }
+function closeMgrOverlayIfOutside(e) { if (e.target === document.getElementById('mgrOverlay')) closeManagerModal(); }
 
 async function submitManagerPwd() {
   const pwd = document.getElementById('mgrPwd').value;
@@ -1534,41 +1683,70 @@ async function submitManagerPwd() {
   enableManagerMode();
 }
 
+// ── ENABLE MANAGER MODE ──
 function enableManagerMode() {
   document.getElementById('pricingGrid').classList.add('manager-active');
   document.getElementById('managerBadge').style.display = 'inline';
   document.getElementById('managerGateBtn').textContent = '🔓 Lock Prices';
-  document.querySelectorAll('.menu-item-price, .pricing-item-price').forEach(el => {
+  document.querySelectorAll('.menu-panel').forEach(panel => applyManagerToPanel(panel));
+}
+
+function applyManagerToPanel(panel) {
+  // Price editing
+  panel.querySelectorAll('.menu-item-price').forEach(el => {
     el.title = 'Click to edit price';
-    el.onclick = () => startEditPrice(el);
+    el.onclick = (e) => { e.stopPropagation(); startEditPrice(el); };
+  });
+  // Item controls
+  panel.querySelectorAll('.menu-item').forEach(el => applyItemControls(el));
+  // Add buttons per grid
+  panel.querySelectorAll('.menu-items-grid').forEach(grid => {
+    if (!grid.querySelector('.mgr-add-btn')) {
+      const btn = document.createElement('button');
+      btn.className = 'mgr-add-btn';
+      btn.textContent = '+ Add Item';
+      btn.onclick = () => openAddItemModal(grid.id);
+      grid.appendChild(btn);
+    }
   });
 }
 
+function applyItemControls(itemEl) {
+  if (itemEl.querySelector('.mgr-item-controls')) return;
+  const ctrl = document.createElement('div');
+  ctrl.className = 'mgr-item-controls';
+  ctrl.innerHTML = `
+    <button class="mgr-ic-btn mgr-ic-up" title="Move up" onclick="moveItem(this,'up')">↑</button>
+    <button class="mgr-ic-btn mgr-ic-dn" title="Move down" onclick="moveItem(this,'down')">↓</button>
+    <button class="mgr-ic-btn mgr-ic-del" title="Delete item" onclick="deleteItem(this)">✕</button>`;
+  itemEl.appendChild(ctrl);
+}
+
+// ── LOCK MANAGER ──
 function lockManager() {
   managerUnlocked = false;
   document.getElementById('pricingGrid').classList.remove('manager-active');
   document.getElementById('managerBadge').style.display = 'none';
   document.getElementById('managerGateBtn').textContent = '🔒 Manage Prices';
-  document.querySelectorAll('.menu-item-price, .pricing-item-price').forEach(el => {
-    el.onclick = null;
-    el.title = '';
+  // Remove all manager controls
+  document.querySelectorAll('.mgr-item-controls').forEach(e => e.remove());
+  document.querySelectorAll('.mgr-add-btn').forEach(e => e.remove());
+  document.querySelectorAll('.menu-item-price').forEach(el => {
+    el.onclick = null; el.title = '';
     if (el.classList.contains('editing')) cancelEditPrice(el);
   });
 }
 
+// ── PRICE EDITING ──
 function startEditPrice(el) {
   if (el.classList.contains('editing')) return;
-  const current = el.textContent.trim();
   el.classList.add('editing');
   el.contentEditable = 'true';
   el.focus();
-
-  // Select all text
   const range = document.createRange();
   range.selectNodeContents(el);
   window.getSelection().removeAllRanges();
   window.getSelection().addRange(range);
-
   el.onblur = () => commitEditPrice(el);
   el.onkeydown = (e) => {
     if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
@@ -1578,8 +1756,140 @@ function startEditPrice(el) {
 
 function commitEditPrice(el) {
   const raw = el.textContent.trim();
-  // Normalize: ensure $ prefix, strip extra chars
   const num = raw.replace(/[^0-9.]/g, '');
-  const formatted = num ? '$' + parseFloat(num).toFixed(0) : el.dataset.original || el.textContent;
+  const formatted = num ? '$' + parseFloat(num).toFixed(2).replace(/\.00$/, '') : (el.dataset.original || el.textContent);
   el.textContent = formatted;
-  el.classList.remove('editin
+  el.classList.remove('editing');
+  el.contentEditable = 'false';
+  el.onblur = null; el.onkeydown = null;
+  if (el.dataset.key) {
+    const prices = getSavedPrices();
+    prices[el.dataset.key] = formatted;
+    saveData(STORAGE_PRICES, prices);
+  }
+  // Re-bind click if still in manager mode
+  if (managerUnlocked) { el.onclick = (e) => { e.stopPropagation(); startEditPrice(el); }; }
+}
+
+function cancelEditPrice(el) {
+  el.classList.remove('editing');
+  el.contentEditable = 'false';
+  el.onblur = null; el.onkeydown = null;
+  loadPrices(); // restore saved value
+}
+
+// ── DELETE ITEM ──
+function deleteItem(btn) {
+  const item = btn.closest('.menu-item');
+  if (!item) return;
+  const key = item.dataset.key;
+  if (!confirm('Remove "' + (item.querySelector('.menu-item-name')?.textContent || 'this item') + '" from the menu?')) return;
+  if (key) {
+    const deleted = getSavedDeleted();
+    deleted[key] = true;
+    saveData(STORAGE_DELETED, deleted);
+    // Also remove from saved new items if it was added
+    const saved = getSavedItems();
+    Object.keys(saved).forEach(gridId => {
+      saved[gridId] = saved[gridId].filter(i => i.key !== key);
+    });
+    saveData(STORAGE_ITEMS, saved);
+  }
+  item.remove();
+}
+
+// ── MOVE ITEM (reorder) ──
+function moveItem(btn, dir) {
+  const item = btn.closest('.menu-item');
+  const grid = item?.parentElement;
+  if (!item || !grid) return;
+  if (dir === 'up') {
+    let prev = item.previousElementSibling;
+    while (prev && (prev.classList.contains('menu-note-row') || prev.classList.contains('mgr-add-btn'))) prev = prev.previousElementSibling;
+    if (prev && prev.classList.contains('menu-item')) grid.insertBefore(item, prev);
+  } else {
+    let next = item.nextElementSibling;
+    while (next && (next.classList.contains('menu-note-row') || next.classList.contains('mgr-add-btn'))) next = next.nextElementSibling;
+    if (next && next.classList.contains('menu-item')) grid.insertBefore(next, item);
+  }
+  // Save order
+  saveGridOrder(grid);
+}
+
+function saveGridOrder(grid) {
+  const orders = getSavedOrder();
+  const keys = Array.from(grid.querySelectorAll('.menu-item[data-key]')).map(el => el.dataset.key);
+  orders[grid.id] = keys;
+  saveData(STORAGE_ORDER, orders);
+}
+
+// ── ADD ITEM MODAL ──
+let _addTargetGridId = null;
+
+function openAddItemModal(gridId) {
+  _addTargetGridId = gridId;
+  // Find the category title for the subtitle
+  const grid = document.getElementById(gridId);
+  const catTitle = grid?.closest('.menu-category')?.querySelector('.menu-category-title')?.textContent || '';
+  document.getElementById('addItemSubtitle').textContent = catTitle ? 'Adding to: ' + catTitle : 'New item will appear at the bottom of this section.';
+  document.getElementById('aiName').value = '';
+  document.getElementById('aiDesc').value = '';
+  document.getElementById('aiPrice').value = '';
+  document.getElementById('aiTag').value = '';
+  document.getElementById('aiErr').textContent = '';
+  document.getElementById('addItemOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('aiName').focus(), 80);
+}
+
+function closeAddItemModal() {
+  document.getElementById('addItemOverlay').classList.remove('open');
+  _addTargetGridId = null;
+}
+
+function closeAddItemOverlayIfOutside(e) {
+  if (e.target === document.getElementById('addItemOverlay')) closeAddItemModal();
+}
+
+function submitAddItem() {
+  const name  = document.getElementById('aiName').value.trim();
+  const desc  = document.getElementById('aiDesc').value.trim();
+  const price = document.getElementById('aiPrice').value.trim();
+  const tag   = document.getElementById('aiTag').value;
+  const errEl = document.getElementById('aiErr');
+
+  if (!name) { errEl.textContent = 'Item name is required.'; return; }
+  if (!price) { errEl.textContent = 'Price is required.'; return; }
+  const num = price.replace(/[^0-9.]/g, '');
+  if (!num) { errEl.textContent = 'Enter a valid price (e.g. $14).'; return; }
+
+  const formatted = '$' + parseFloat(num).toFixed(2).replace(/\.00$/, '');
+  const key = 'custom-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+  const item = { name, desc, price: formatted, tag, key };
+
+  // Save to localStorage
+  const saved = getSavedItems();
+  if (!saved[_addTargetGridId]) saved[_addTargetGridId] = [];
+  saved[_addTargetGridId].push(item);
+  saveData(STORAGE_ITEMS, saved);
+
+  // Also save price
+  const prices = getSavedPrices();
+  prices[key] = formatted;
+  saveData(STORAGE_PRICES, prices);
+
+  // Add to DOM
+  const grid = document.getElementById(_addTargetGridId);
+  const el = buildItemEl(item, _addTargetGridId);
+  // Insert before the add button
+  const addBtn = grid.querySelector('.mgr-add-btn');
+  grid.insertBefore(el, addBtn || null);
+  applyItemControls(el);
+  // Bind price click
+  const priceEl = el.querySelector('.menu-item-price');
+  if (priceEl) priceEl.onclick = (e) => { e.stopPropagation(); startEditPrice(priceEl); };
+
+  closeAddItemModal();
+}
+</script>
+</body>
+</html>
