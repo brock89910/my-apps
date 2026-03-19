@@ -2342,7 +2342,7 @@ function renderTimeSlots() {
         +capWidget
         +'<div class="time-chef-info">'+chefs+' chef'+(chefs!==1?'s':'')+' · '+allRecs.length+' grp'+slotLabel+fullTag+'</div>'
         +(isManuallyBlocked?'<span style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);padding:0 6px">🔒</span>':'')
-        +(isManager()?'<button class="block-btn'+(isManuallyBlocked?' is-blocked':'')+' block-btn" onclick="toggleBlockSlot(''+slot+'')" title="'+(isManuallyBlocked?'Unblock slot':'Block slot')+'">🔒</button>':'')
+        +(isManager()?`<button class="block-btn${isManuallyBlocked?' is-blocked':''}" onclick="toggleBlockSlot('${slot}')" title="${isManuallyBlocked?'Unblock slot':'Block slot'}">🔒</button>`:'')
         +(isManuallyBlocked?''
           : (slotFull || isChefBlocked)
             ? `<button class="time-add-btn" style="background:rgba(138,26,26,0.15);border-color:rgba(192,64,64,0.5);color:#e04040;font-size:0.6rem;width:auto;padding:0 7px;letter-spacing:0.03em;font-family:var(--mono);font-weight:700" onclick="openForceAddModal('${slot}')" aria-label="Force Add">FORCE +</button>`
