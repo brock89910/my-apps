@@ -3104,7 +3104,7 @@ async function srSave() {
   if (!window._db||!window._ref||!window._push) return _srErr('Firebase not ready. Please wait and try again.');
   try {
     await window._push(window._ref(window._db,`reservations/${key}`),data);
-    const grillStr=freshAssign.isDouble?'Grills '+freshAssign.grill+'+'+freshAssign.grill2:'Grill '+freshAssign.grill;
+    const grillStr=finalAssign.isDouble?'Grills '+finalAssign.grill+'+'+finalAssign.grill2:'Grill '+finalAssign.grill;
     await logAudit('create',_sr.name+' · '+_sr.guests+'p · '+displayTime(_sr.slot)+' · '+grillStr,initials);
     closeModal();
   } catch(e) { _srErr('Error saving: '+e.message); }
