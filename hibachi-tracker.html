@@ -673,6 +673,20 @@ body::before {
   padding-left: 5px;
 }
 
+/* ── INLINE DELETE BUTTON ── */
+.res-delete-btn {
+  width: 22px; height: 22px; border-radius: 4px;
+  background: transparent;
+  border: 1px solid rgba(192,64,64,0.3);
+  color: rgba(192,64,64,0.55); font-size: 0.72rem; cursor: pointer;
+  display: flex; align-items:center; justify-content:center;
+  transition: all 0.15s; flex-shrink: 0;
+  font-family: var(--sans); line-height: 1;
+  margin-left: 2px;
+}
+.res-delete-btn:hover  { background: rgba(192,64,64,0.12); border-color: #c04040; color: #e04040; }
+.res-delete-btn:active { background: rgba(192,64,64,0.22); }
+
 /* ── CONFIRMED RESERVATION ── */
 .res-row.is-confirmed { border-left-color: var(--green); }
 .confirm-btn {
@@ -2199,18 +2213,27 @@ function printDailySheet() {
   html+='<h2>Hibachi</h2>';
   if (hibachi.length) {
     html+='<table><thead><tr><th style="width:60px">Time</th><th style="width:30px">#</th><th>Name</th><th>Phone</th><th>Grill</th><th>Note</th></tr></thead><tbody>';
+    let lastSlot='';
     hibachi.forEach(r=>{
       const nb=r.noteType==='allergy'?'<span class="badge allergy">ALLERGY</span>':r.noteType==='restriction'?'<span class="badge restriction">RESTRICTION</span>':'';
       const nd=(r.noteType==='allergy'||r.noteType==='restriction')&&r.noteText?'<div class="note">'+escHtml(r.noteText)+'</div>':'';
       const gs=r.grill2?'G'+r.grill+'+G'+r.grill2:'G'+(r.grill||'?');
-      html+='<tr><td class="slot">'+(r.slot?displayTime(r.slot):'?')+'</td><td>'+(r.guests||'?')+'</td><td>'+escHtml(r.name||'Guest')+nb+nd+'</td><td>'+escHtml(r.phone||'')+'</td><td>'+gs+'</td><td>'+((r.noteType&&r.noteType!=='allergy'&&r.noteType!=='restriction')?escHtml(r.noteType+(r.noteText?': '+r.noteText:'')):'')+'</td></tr>';
+      const slotDisplay=r.slot||'?';
+      const timeCell=slotDisplay!==lastSlot?'<td class="slot">'+(r.slot?displayTime(r.slot):'?')+'</td>':'<td></td>';
+      lastSlot=slotDisplay;
+      html+='<tr>'+timeCell+'<td>'+(r.guests||'?')+'</td><td>'+escHtml(r.name||'Guest')+nb+nd+'</td><td>'+escHtml(r.phone||'')+'</td><td>'+gs+'</td><td>'+((r.noteType&&r.noteType!=='allergy'&&r.noteType!=='restriction')?escHtml(r.noteType+(r.noteText?': '+r.noteText:'')):'')+'</td></tr>';
     });
     html+='</tbody></table><div class="total">Total: '+hibachi.length+' group'+(hibachi.length!==1?'s':'')+' · '+hibachi.reduce((s,r)=>s+(r.guests||0),0)+' guests</div>';
   } else { html+='<div style="color:#888;font-size:11px;padding:6px">No hibachi reservations.</div>'; }
   html+='<h2>Dining Room</h2>';
   if (dining.length) {
     html+='<table><thead><tr><th style="width:60px">Time</th><th style="width:30px">#</th><th>Name</th><th>Phone</th><th>Notes</th></tr></thead><tbody>';
-    dining.forEach(r=>{ html+='<tr><td class="slot">'+(r.time?displayTime(r.time):'—')+'</td><td>'+(r.guests||'?')+'</td><td>'+escHtml(r.name||'Guest')+'</td><td>'+escHtml(r.phone||'')+'</td><td>'+escHtml(r.notes||'')+'</td></tr>'; });
+    let lastDiningTime='';
+    dining.forEach(r=>{
+      const timeCell=r.time!==lastDiningTime?'<td class="slot">'+(r.time?displayTime(r.time):'—')+'</td>':'<td></td>';
+      lastDiningTime=r.time||'';
+      html+='<tr>'+timeCell+'<td>'+(r.guests||'?')+'</td><td>'+escHtml(r.name||'Guest')+'</td><td>'+escHtml(r.phone||'')+'</td><td>'+escHtml(r.notes||'')+'</td></tr>';
+    });
     html+='</tbody></table><div class="total">Total: '+dining.length+' group'+(dining.length!==1?'s':'')+' · '+dining.reduce((s,r)=>s+(r.guests||0),0)+' guests</div>';
   } else { html+='<div style="color:#888;font-size:11px;padding:6px">No dining reservations.</div>'; }
   html+='<div style="margin-top:22px;font-size:10px;color:#aaa;border-top:1px solid #eee;padding-top:7px">Generated '+new Date().toLocaleString('en-CA')+' · Osaka Hibachi</div></body></html>';
@@ -2396,6 +2419,7 @@ function renderTimeSlots() {
             +(isSoon?'<span class="soon-badge">SEAT NOW</span>':'')
             +(r.phone?'<span style="font-size:0.6rem">'+escHtml(r.phone)+'</span>':'')
             +(r.initials?'<span class="res-row-badge">'+escHtml(r.initials)+'</span>':'')
+            +'<button class="res-delete-btn" title="Delete reservation" onclick="event.stopPropagation();quickDeleteRes(\''+key+'\',\''+r.id+'\',\''+escHtml(r.name||'Guest')+'\')">✕</button>'
             +'</div>';
           row.onclick=()=>openHibachiModal(slot,r.id);
           listDiv.appendChild(row);
@@ -3094,6 +3118,35 @@ function confirmDelete(dk,id) {
     +'<input class="form-input" id="delInitials" type="text" maxlength="4" placeholder="Initials" style="flex:1;padding:8px 10px">'
     +'<button onclick="deleteRes(\''+dk+'\',\''+id+'\')" style="padding:8px 14px;background:#c04040;color:#fff;border:none;border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:600;cursor:pointer">DELETE</button>'
     +'</div></div>';
+}
+
+/* ── QUICK DELETE — inline delete button on reservation row ── */
+function quickDeleteRes(dk, id, name) {
+  document.getElementById('modalTitle').textContent = 'Delete Reservation';
+  document.getElementById('modalBody').innerHTML =
+    '<div style="font-family:var(--mono);font-size:0.78rem;color:var(--text2);line-height:1.7;margin-bottom:16px">'
+    + 'Delete <strong style="color:var(--text)">' + escHtml(name) + '</strong>? This cannot be undone.'
+    + '</div>'
+    + '<div class="form-row"><label class="form-label">Your Initials *</label>'
+    + '<input class="form-input" id="quickDelInitials" type="text" maxlength="4" placeholder="JS" autocomplete="off"'
+    + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();quickDeleteConfirm(\''+dk+'\',\''+id+'\')}">'
+    + '</div>'
+    + '<div id="quickDelErr" style="font-family:var(--mono);font-size:0.67rem;color:#c04040;min-height:14px;margin-bottom:8px"></div>'
+    + '<button style="width:100%;padding:12px;background:#c04040;color:#fff;font-family:var(--mono);font-size:0.78rem;font-weight:700;letter-spacing:0.05em;border:none;border-radius:var(--r);cursor:pointer" onclick="quickDeleteConfirm(\''+dk+'\',\''+id+'\')">✕ Delete</button>';
+  showModal();
+  setTimeout(() => document.getElementById('quickDelInitials')?.focus(), 80);
+}
+
+async function quickDeleteConfirm(dk, id) {
+  const initials = sanitizeInitials(document.getElementById('quickDelInitials')?.value || '');
+  const errEl = document.getElementById('quickDelErr');
+  if (!initials) { if(errEl) errEl.textContent = 'Initials required.'; return; }
+  const r = (reservations[dk] || {})[id];
+  try {
+    await logAudit('delete', (r?.name||'?') + ' · ' + (r?.guests||'?') + 'p · ' + displayTime(r?.slot||'00:00'), initials);
+    await safeWrite(window._ref(window._db, `reservations/${dk}/${id}`), null, 'remove');
+    closeModal();
+  } catch(e) { if(errEl) errEl.textContent = 'Error: ' + e.message; }
 }
 
 function showLargeGroupPwdField() {
