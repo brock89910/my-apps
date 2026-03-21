@@ -657,8 +657,15 @@ body::before {
 
 /* ── OVERRIDE & LARGE GROUP ── */
 .res-row.is-override    { border-left-color: #c04040; background: rgba(192,64,64,0.05); }
-.res-row.is-large-group { border-left-color: var(--amber); background: rgba(200,150,42,0.05); }
-.res-row.is-override.is-large-group { border-left-color: #c04040; background: rgba(192,64,64,0.07); }
+.res-row.is-large-group {
+  border-left: 4px solid #333;
+  background: #efefef;
+  border-color: #bbb;
+}
+.res-row.is-large-group .res-row-name { color: #111 !important; font-weight: 800; }
+.res-row.is-large-group .res-row-meta { color: #333 !important; }
+.res-row.is-large-group .res-row-badge { background: #ddd; color: #111; border-color: #aaa; }
+.res-row.is-override.is-large-group { border-left-color: #c04040; background: #efefef; }
 
 /* ── FULL SLOT — name cell diagonal stripe ── */
 .slot-full .res-row-name {
@@ -2209,7 +2216,7 @@ function printDailySheet() {
   const dining=allDining.slice().sort((a,b)=>(a.time||'').localeCompare(b.time||''));
   const dateStr=currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
   let html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Daily Sheet — '+dateStr+'</title><style>body{font-family:"DM Mono",monospace;font-size:12px;color:#111;background:#fff;padding:24px;max-width:720px;margin:0 auto}h1{font-family:Georgia,serif;font-size:18px;font-weight:600;margin:0 0 4px}h2{font-family:Georgia,serif;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#888;margin:20px 0 8px;border-bottom:1px solid #ddd;padding-bottom:4px}table{width:100%;border-collapse:collapse;margin-bottom:8px}th{text-align:left;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#666;padding:4px 8px;border-bottom:2px solid #111}td{padding:5px 8px;border-bottom:1px solid #eee;vertical-align:top}.slot{font-weight:700;white-space:nowrap}.badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:2px;margin-left:4px}.allergy{background:#fee;color:#c00;border:1px solid #faa}.restriction{background:#fff8e1;color:#a60;border:1px solid #fcc}.note{font-size:10px;color:#444;font-style:italic}.total{font-size:11px;font-weight:700;margin-top:12px;padding:6px 8px;background:#f5f5f5;border:1px solid #ddd}.divider-col{border-left:1px solid #bbb}.large-hl{background:#ddeeff;font-weight:700}@media print{body{padding:12px}}</style></head><body>';
-  html+='<h1>Osaka Hibachi — Daily Sheet</h1><div style="font-size:11px;color:#555;margin-bottom:16px">'+dateStr+'</div>';
+  html+='<div style="font-family:Georgia,serif;font-size:22px;font-weight:700;margin:0 0 14px">'+dateStr+'</div>';
   html+='<h2>Hibachi</h2>';
   if (hibachi.length) {
     // Group by slot, sort each slot's reservations by guests descending, then flatten
@@ -2422,7 +2429,7 @@ function renderTimeSlots() {
           if (isLargeGroup) row.classList.add('is-large-group');
           if (isConfirmed) row.classList.add('is-confirmed');
           row.innerHTML='<button class="confirm-btn'+(isConfirmed?' confirmed':'')+'" title="'+(isConfirmed?'Confirmed by '+escHtml(r.confirmedBy||'?'):'Confirm reservation')+'" onclick="event.stopPropagation();openConfirmModal(\''+key+'\',\''+r.id+'\')">'+(isConfirmed?'✓':'○')+'</button>'
-            +'<div class="res-row-name"><span style="color:'+(isLargeGroup?'#5aa0e0':'var(--gold)')+';font-weight:700;margin-right:6px">'+(r.guests||'')+'p</span><span style="'+(isLargeGroup?'color:#5aa0e0;font-weight:600':'')+'">'+escHtml(displayName)+'</span>'
+            +'<div class="res-row-name"><span style="color:'+(isLargeGroup?'inherit':'var(--gold)')+';font-weight:700;margin-right:6px">'+(r.guests||'')+'p</span><span>'+escHtml(displayName)+'</span>'
             +(r.isDouble?' <span style="font-size:0.58rem;color:var(--amber)">×2</span>':'')
             +(isLargeGroup?' <span class="large-group-badge">⚡</span>':'')
             // override/changed badges hidden from staff view
