@@ -1511,10 +1511,11 @@ function renderCalGrid() {
     const thisKey = `${calViewYear}-${String(calViewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isSel=thisKey===selKey, isToday=thisKey===todayKey, isInWeek=weekKeys.has(thisKey);
     const cacheEntry=weekDataCache[thisKey];
+    const isAlert=!isSel&&(cacheEntry?.hasLargeGroup15||cacheEntry?.hasManyDining);
     const cell = document.createElement('div');
     cell.style.cssText='display:flex;flex-direction:column;align-items:center;gap:1px;';
     const btn = document.createElement('button');
-    btn.style.cssText=`width:100%;padding:5px 2px 3px;border-radius:5px;border:none;cursor:pointer;font-family:var(--mono);font-size:0.72rem;font-weight:${isSel?'700':'400'};background:${isSel?'var(--gold)':isToday?'rgba(196,158,84,0.14)':isInWeek?'rgba(196,158,84,0.05)':'transparent'};color:${isSel?'var(--bg)':isToday?'var(--gold)':'var(--text)'};border:1px solid ${isSel?'var(--gold)':isToday?'rgba(196,158,84,0.3)':isInWeek?'rgba(196,158,84,0.12)':'transparent'};`;
+    btn.style.cssText=`width:100%;padding:5px 2px 3px;border-radius:5px;border:none;cursor:pointer;font-family:var(--mono);font-size:0.72rem;font-weight:${isSel||isAlert?'700':'400'};background:${isSel?'var(--gold)':isAlert?'#f0f0f0':isToday?'rgba(196,158,84,0.14)':isInWeek?'rgba(196,158,84,0.05)':'transparent'};color:${isSel?'var(--bg)':isAlert?'#111':isToday?'var(--gold)':'var(--text)'};border:1px solid ${isSel?'var(--gold)':isAlert?'#999':isToday?'rgba(196,158,84,0.3)':isInWeek?'rgba(196,158,84,0.12)':'transparent'};`;
     btn.textContent=d;
     btn.onclick=()=>pickDate(thisKey);
     cell.appendChild(btn);
@@ -2117,17 +2118,23 @@ async function loadWeekData() {
     const dk = dateKey(d);
     if (weekDataCache[dk]!==undefined) return;
     try {
-      const snap=await window._get(window._ref(window._db,`reservations/${dk}`));
-      const data=snap.val()||{};
-      const vals=Object.values(data);
+      const [snapRes, snapDining] = await Promise.all([
+        window._get(window._ref(window._db,`reservations/${dk}`)),
+        window._get(window._ref(window._db,`dining/${dk}`))
+      ]);
+      const data=snapRes.val()||{};
+      const vals=Object.values(data).filter(r=>r&&r.slot);
+      const diningVals=Object.values(snapDining.val()||{});
       weekDataCache[dk]={
         guests:vals.reduce((s,r)=>s+(r.guests||0),0),
         bookings:vals.length,
         hasOverride:vals.some(r=>r.managerOverride||r.overrideBooked),
-        hasLargeGroup:vals.some(r=>(r.guests||0)>=DOUBLE_GRILL_MIN_GUESTS)
+        hasLargeGroup:vals.some(r=>(r.guests||0)>=DOUBLE_GRILL_MIN_GUESTS),
+        hasLargeGroup15:vals.some(r=>(r.guests||0)>=15),
+        hasManyDining:diningVals.length>=4
       };
     } catch(e) {
-      weekDataCache[dk]={guests:0,bookings:0,hasOverride:false,hasLargeGroup:false};
+      weekDataCache[dk]={guests:0,bookings:0,hasOverride:false,hasLargeGroup:false,hasLargeGroup15:false,hasManyDining:false};
     }
   });
   await Promise.all(promises);
@@ -2161,20 +2168,24 @@ function renderWeekStrip() {
 
   items.forEach(({d,dk,label,guests,bookings})=>{
     const isSel=dk===selKey, isToday=dk===todayKey, hasBkg=bookings>0;
+    const cache=weekDataCache[dk]||{};
+    const isAlert=!isSel&&(cache.hasLargeGroup15||cache.hasManyDining);
+    const na=cache.hasOverride||cache.hasLargeGroup;
     const cell=document.createElement('button');
-    cell.style.cssText=`display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 10px;border-radius:8px;border:1px solid;cursor:pointer;min-width:48px;background:${isSel?'var(--gold)':isToday?'rgba(210,175,100,0.14)':'transparent'};border-color:${isSel?'var(--gold)':isToday?'rgba(210,175,100,0.4)':'var(--border)'};transition:all 0.15s;`;
+    cell.style.cssText=`display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 10px;border-radius:8px;border:1px solid;cursor:pointer;min-width:48px;background:${isSel?'var(--gold)':isAlert?'#f0f0f0':isToday?'rgba(210,175,100,0.14)':'transparent'};border-color:${isSel?'var(--gold)':isAlert?'#999':isToday?'rgba(210,175,100,0.4)':'var(--border)'};transition:all 0.15s;`;
     const dl=document.createElement('div');
-    dl.style.cssText=`font-family:var(--mono);font-size:0.65rem;font-weight:700;letter-spacing:0.06em;color:${isSel?'var(--bg)':isToday?'var(--gold)':'var(--text2)'}`;
+    dl.style.cssText=`font-family:var(--mono);font-size:0.65rem;font-weight:700;letter-spacing:0.06em;color:${isSel?'var(--bg)':isAlert?'#111':isToday?'var(--gold)':'var(--text2)'}`;
     dl.textContent=label;
     const dd=document.createElement('div');
-    dd.style.cssText=`font-family:var(--serif);font-size:1.1rem;font-weight:${isSel||isToday?'700':'500'};color:${isSel?'var(--bg)':isToday?'var(--gold)':'var(--text)'}`;
+    dd.style.cssText=`font-family:var(--serif);font-size:1.1rem;font-weight:${isSel||isToday||isAlert?'700':'500'};color:${isSel?'var(--bg)':isAlert?'#111':isToday?'var(--gold)':'var(--text)'}`;
     dd.textContent=d.getDate();
     const gl=document.createElement('div');
-    const na=weekDataCache[dk]&&(weekDataCache[dk].hasOverride||weekDataCache[dk].hasLargeGroup);
-    gl.style.cssText='font-family:var(--mono);font-size:0.72rem;font-weight:700;margin-top:2px;color:'+(isSel?'rgba(17,16,16,0.85)':'var(--gold-light)');
+    gl.style.cssText='font-family:var(--mono);font-size:0.72rem;font-weight:700;margin-top:2px;color:'+(isSel?'rgba(17,16,16,0.85)':isAlert?'#111':'var(--gold-light)');
     if (hasBkg && (isManager() || isToday || isSel)) {
       // Manager: always show tally. Staff: only today + selected day
       gl.innerHTML=guests+'p'+(na?'<span style="color:#e04040"> !</span>':'');
+    } else if (isAlert && hasBkg) {
+      gl.textContent=guests+'p';
     } else {
       gl.textContent='';
     }
