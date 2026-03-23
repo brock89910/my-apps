@@ -44,30 +44,30 @@
 
 <style>
 /* ══════════════════════════════════════════════
-   LUXURY DARK — OSAKA HIBACHI
-   Palette: Deep charcoal · Champagne gold · Cream
+   CLEAN WHITE — OSAKA HIBACHI
+   Palette: Pure white · Warm gold · Slate text
    Type: Cormorant Garamond (display) · DM Sans (body) · DM Mono (data)
    ══════════════════════════════════════════════ */
 :root {
-  --bg:        #0e0d0c;
-  --bg2:       #1e1c1a;
-  --bg3:       #252220;
-  --panel:     #1a1918;
-  --lift:      #302c28;
-  --border:    rgba(210,175,100,0.28);
-  --border2:   rgba(210,175,100,0.15);
-  --gold:      #d4a843;
-  --gold2:     #b8922e;
-  --gold3:     rgba(196,158,84,0.12);
-  --gold-light:#f5e4b0;
-  --text:      #faf4e8;
-  --text2:     #d8c8a8;
-  --text3:     #a89880;
-  --green:     #72d080;
-  --red:       #e04040;
-  --red-deep:  #8a1a1a;
-  --amber:     #e0a830;
-  --blue:      #5a90c8;
+  --bg:        #ffffff;
+  --bg2:       #f7f6f4;
+  --bg3:       #f0ede8;
+  --panel:     #faf9f7;
+  --lift:      #ede9e3;
+  --border:    rgba(180,150,90,0.22);
+  --border2:   rgba(180,150,90,0.12);
+  --gold:      #b8892a;
+  --gold2:     #9e7420;
+  --gold3:     rgba(184,137,42,0.10);
+  --gold-light:#7a5a10;
+  --text:      #1a1714;
+  --text2:     #5a5040;
+  --text3:     #9a8870;
+  --green:     #2a8a3a;
+  --red:       #cc2828;
+  --red-deep:  #7a1010;
+  --amber:     #b87820;
+  --blue:      #2a68a8;
   --r:         6px;
   --serif:     'Cormorant Garamond', Georgia, serif;
   --sans:      'DM Sans', system-ui, sans-serif;
@@ -94,7 +94,7 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 0;
-  opacity: 0.4;
+  opacity: 0.15;
 }
 
 /* ── HEADER ── */
@@ -216,8 +216,8 @@ body::before {
 
 /* Full: strong red signal */
 .time-block.slot-full {
-  border-left: 4px solid #e04040;
-  background: rgba(140,20,20,0.14);
+  border-left: 4px solid #cc2828;
+  background: rgba(200,40,40,0.05);
 }
 
 /* Nearly full: removed — no longer used */
@@ -230,7 +230,7 @@ body::before {
 }
 
 .slot-full .time-header {
-  background: rgba(130,20,20,0.3);
+  background: rgba(200,40,40,0.06);
 }
 
 /* ── NOTE BADGES ── */
@@ -243,12 +243,12 @@ body::before {
   letter-spacing: 0.04em;
 }
 .note-badge.allergy {
-  background: rgba(192,64,64,0.15); color: #d06060;
-  border: 1px solid rgba(192,64,64,0.35);
+  background: rgba(180,40,40,0.08); color: #aa2020;
+  border: 1px solid rgba(180,40,40,0.28);
 }
 .note-badge.restriction {
-  background: rgba(200,150,42,0.12); color: var(--amber);
-  border: 1px solid rgba(200,150,42,0.3);
+  background: rgba(184,137,42,0.09); color: var(--amber);
+  border: 1px solid rgba(184,137,42,0.22);
 }
 .note-badge[title]:hover::after {
   content: attr(title);
@@ -297,7 +297,7 @@ body::before {
   font-family: var(--sans);
 }
 
-.time-add-btn:active { background: rgba(196,158,84,0.22); }
+.time-add-btn:active { background: rgba(184,137,42,0.15); }
 
 /* ── RESERVATION LIST ── */
 .slot-res-list {
@@ -318,15 +318,15 @@ body::before {
 
 /* Full slot — all reservation rows turn red */
 .slot-full .res-row {
-  border-left-color: #e04040;
-  background: rgba(140,20,20,0.18);
-  border-color: rgba(200,60,60,0.35);
+  border-left-color: #cc2828;
+  background: rgba(200,40,40,0.05);
+  border-color: rgba(180,60,60,0.25);
 }
 .slot-full .res-row-name {
-  color: #ff8080;
+  color: #aa2020;
 }
 .slot-full .res-row-meta {
-  color: #d06060;
+  color: #bb4040;
 }
 
 .res-row-name {
@@ -374,9 +374,9 @@ body::before {
   margin-right: 6px; display: inline-block;
 }
 
-.h-action.create { background: rgba(109,184,126,0.12); color: #6db87e; }
-.h-action.edit   { background: rgba(196,158,84,0.12);  color: var(--gold); }
-.h-action.delete { background: rgba(192,64,64,0.1);    color: #c04040; }
+.h-action.create { background: rgba(42,138,58,0.10); color: #1e7a30; }
+.h-action.edit   { background: rgba(184,137,42,0.10); color: var(--gold); }
+.h-action.delete { background: rgba(180,40,40,0.08);  color: #aa2020; }
 
 .history-entry .h-who  { color: var(--gold2); font-weight: 600; }
 .history-entry .h-detail { color: var(--text2); }
@@ -385,7 +385,7 @@ body::before {
 /* ── MODAL ── */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 500;
-  background: rgba(10,8,6,0.7);
+  background: rgba(20,16,12,0.35);
   backdrop-filter: blur(6px);
   display: flex; align-items: flex-end;
   animation: fadeIn 0.2s ease;
@@ -450,7 +450,7 @@ body::before {
 }
 
 .form-input:focus, .form-select:focus, .form-textarea:focus {
-  border-color: rgba(196,158,84,0.5);
+  border-color: rgba(184,137,42,0.5);
   background: var(--lift);
 }
 
@@ -476,14 +476,14 @@ body::before {
 
 .btn-danger {
   width: 100%; padding: 10px;
-  background: rgba(192,64,64,0.08); color: #c04040;
+  background: rgba(180,40,40,0.06); color: #aa2020;
   font-family: var(--mono); font-size: 0.72rem; font-weight: 500;
   letter-spacing: 0.06em; text-transform: uppercase;
-  border: 1px solid rgba(192,64,64,0.25); border-radius: var(--r);
+  border: 1px solid rgba(180,40,40,0.20); border-radius: var(--r);
   cursor: pointer; margin-top: 7px; transition: all 0.15s;
 }
 
-.btn-danger:active { background: rgba(192,64,64,0.18); }
+.btn-danger:active { background: rgba(180,40,40,0.12); }
 
 .btn-outline {
   display: inline-flex; align-items: center; justify-content: center;
@@ -511,16 +511,16 @@ body::before {
   padding: 2px 9px; border-radius: 3px;
 }
 
-.grill-assign-badge.g1 { background: rgba(109,184,126,0.12); color: #6db87e;  border: 1px solid rgba(109,184,126,0.3); }
-.grill-assign-badge.g2 { background: rgba(90,144,200,0.12);  color: #5a90c8;  border: 1px solid rgba(90,144,200,0.3); }
-.grill-assign-badge.g3 { background: rgba(196,158,84,0.12);  color: var(--gold); border: 1px solid rgba(196,158,84,0.3); }
-.grill-assign-badge.g4 { background: rgba(160,96,200,0.12);  color: #a060c8;  border: 1px solid rgba(160,96,200,0.3); }
-.grill-assign-badge.double { background: rgba(196,158,84,0.12); color: var(--gold); border: 1px solid rgba(196,158,84,0.3); }
+.grill-assign-badge.g1 { background: rgba(42,138,58,0.10);  color: #1e7a30;  border: 1px solid rgba(42,138,58,0.25); }
+.grill-assign-badge.g2 { background: rgba(42,104,168,0.10); color: #2a68a8;  border: 1px solid rgba(42,104,168,0.25); }
+.grill-assign-badge.g3 { background: rgba(184,137,42,0.10); color: var(--gold); border: 1px solid rgba(184,137,42,0.25); }
+.grill-assign-badge.g4 { background: rgba(130,60,180,0.10); color: #7a3aaa;  border: 1px solid rgba(130,60,180,0.25); }
+.grill-assign-badge.double { background: rgba(184,137,42,0.10); color: var(--gold); border: 1px solid rgba(184,137,42,0.25); }
 
 /* ── WARNING BANNER ── */
 .warn-banner {
-  background: rgba(200,150,42,0.08);
-  border: 1px solid rgba(200,150,42,0.3);
+  background: rgba(184,137,42,0.07);
+  border: 1px solid rgba(184,137,42,0.22);
   border-radius: 5px; padding: 7px 11px; margin-bottom: 10px;
   font-family: var(--mono); font-size: 0.67rem;
   color: var(--amber); letter-spacing: 0.02em;
@@ -528,11 +528,11 @@ body::before {
 }
 
 .err-banner {
-  background: rgba(192,64,64,0.08);
-  border: 1px solid rgba(192,64,64,0.3);
+  background: rgba(180,40,40,0.06);
+  border: 1px solid rgba(180,40,40,0.22);
   border-radius: 5px; padding: 7px 11px; margin-bottom: 10px;
   font-family: var(--mono); font-size: 0.67rem;
-  color: #c04040; letter-spacing: 0.02em;
+  color: #aa2020; letter-spacing: 0.02em;
 }
 
 /* ── EMPTY STATE ── */
@@ -552,7 +552,7 @@ body::before {
   transition: border-color 0.15s;
 }
 
-.dining-card:active { border-color: rgba(196,158,84,0.7); }
+.dining-card:active { border-color: rgba(184,137,42,0.60); }
 
 .dining-name {
   font-family: var(--sans); font-size: 0.95rem; font-weight: 600; color: var(--text);
@@ -574,7 +574,7 @@ body::before {
   background: var(--gold); color: var(--bg);
   font-size: 1.4rem; font-weight: 600;
   border: none; cursor: pointer;
-  box-shadow: 0 4px 24px rgba(196,158,84,0.3), 0 1px 6px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 24px rgba(184,137,42,0.22), 0 1px 6px rgba(0,0,0,0.12);
   display: flex; align-items:center; justify-content:center;
   transition: all 0.15s; font-family: var(--sans);
 }
@@ -583,28 +583,28 @@ body::before {
 
 /* ── SEATED SOON ── */
 .res-row.seated-soon {
-  border-left-color: #6db87e;
-  background: rgba(109,184,126,0.07);
+  border-left-color: #1e7a30;
+  background: rgba(42,138,58,0.07);
   animation: soonPulse 2.5s ease-in-out infinite;
 }
 
 @keyframes soonPulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(109,184,126,0.0); }
-  50%      { box-shadow: 0 0 0 3px rgba(109,184,126,0.15); }
+  0%,100% { box-shadow: 0 0 0 0 rgba(42,138,58,0.0); }
+  50%      { box-shadow: 0 0 0 3px rgba(42,138,58,0.10); }
 }
 
 .soon-badge {
   font-family: var(--mono); font-size: 0.58rem; font-weight: 500;
   padding: 1px 6px; border-radius: 10px;
-  background: rgba(109,184,126,0.12); color: #6db87e;
-  border: 1px solid rgba(109,184,126,0.3);
+  background: rgba(42,138,58,0.08); color: #1e7a30;
+  border: 1px solid rgba(42,138,58,0.22);
   animation: soonPulse 2.5s ease-in-out infinite;
   white-space: nowrap;
 }
 
 /* ── SLOT CAP WIDGET ── */
 .cap-bar-wrap {
-  height: 2px; background: var(--bg); border-radius: 2px; margin-top: 2px;
+  height: 2px; background: var(--border2); border-radius: 2px; margin-top: 2px;
 }
 .cap-bar {
   height: 100%; border-radius: 2px; transition: width 0.3s;
@@ -612,14 +612,14 @@ body::before {
 
 /* ── MANUALLY BLOCKED SLOTS ── */
 .time-block.slot-blocked {
-  border-left: 3px solid rgba(192,64,64,0.6);
+  border-left: 3px solid rgba(180,40,40,0.5);
   background: repeating-linear-gradient(
     45deg, transparent, transparent 6px,
-    rgba(192,64,64,0.03) 6px, rgba(192,64,64,0.03) 12px
+    rgba(180,40,40,0.025) 6px, rgba(180,40,40,0.025) 12px
   );
 }
-.slot-blocked .time-header { background: rgba(100,15,15,0.15); }
-.slot-blocked .time-label  { color: #c04040 !important; }
+.slot-blocked .time-header { background: rgba(180,40,40,0.04); }
+.slot-blocked .time-label  { color: #aa2020 !important; }
 
 .block-btn {
   margin-left: 6px; width: 26px; height: 26px; border-radius: 5px;
@@ -628,8 +628,8 @@ body::before {
   display: flex; align-items: center; justify-content: center;
   transition: all 0.15s; flex-shrink: 0;
 }
-.block-btn:hover      { border-color: rgba(192,64,64,0.5); color: #c04040; background: rgba(192,64,64,0.08); }
-.block-btn.is-blocked { border-color: #c04040; color: #c04040; background: rgba(192,64,64,0.12); }
+.block-btn:hover      { border-color: rgba(180,40,40,0.5); color: #aa2020; background: rgba(180,40,40,0.07); }
+.block-btn.is-blocked { border-color: #aa2020; color: #aa2020; background: rgba(180,40,40,0.10); }
 
 /* ── SLOT CAP ── */
 .slot-cap {
@@ -642,10 +642,10 @@ body::before {
   padding: 2px 6px; border-radius: 3px;
   cursor: pointer; transition: all 0.15s;
 }
-.slot-cap-label.plenty { color: var(--green);  background: rgba(109,184,126,0.1); border: 1px solid rgba(109,184,126,0.25); }
-.slot-cap-label.low    { color: #e05050;        background: rgba(192,64,64,0.12);  border: 1px solid rgba(192,64,64,0.35); }
-.slot-cap-label.none   { color: #b02020;        background: rgba(138,26,26,0.18);  border: 1px solid rgba(138,26,26,0.45); font-weight:700; }
-.slot-cap-label.custom { color: var(--blue);    background: rgba(90,144,200,0.1);  border: 1px solid rgba(90,144,200,0.25); }
+.slot-cap-label.plenty { color: var(--green);  background: rgba(42,138,58,0.08);  border: 1px solid rgba(42,138,58,0.22); }
+.slot-cap-label.low    { color: #aa2020;        background: rgba(180,40,40,0.07);  border: 1px solid rgba(180,40,40,0.25); }
+.slot-cap-label.none   { color: #7a1010;        background: rgba(180,40,40,0.10);  border: 1px solid rgba(180,40,40,0.35); font-weight:700; }
+.slot-cap-label.custom { color: var(--blue);    background: rgba(42,104,168,0.08); border: 1px solid rgba(42,104,168,0.22); }
 .slot-cap-input {
   width: 44px; padding: 2px 5px;
   background: var(--bg3); border: 1px solid var(--border);
@@ -653,26 +653,26 @@ body::before {
   color: var(--text); outline: none; text-align: center;
   display: none;
 }
-.slot-cap-input:focus { border-color: rgba(196,158,84,0.5); display: block; }
+.slot-cap-input:focus { border-color: rgba(184,137,42,0.5); display: block; }
 
 /* ── OVERRIDE & LARGE GROUP ── */
-.res-row.is-override    { border-left-color: #c04040; background: rgba(192,64,64,0.05); }
+.res-row.is-override    { border-left-color: #cc2828; background: rgba(200,40,40,0.04); }
 .res-row.is-large-group {
-  border-left: 4px solid #333;
-  background: #efefef;
-  border-color: #bbb;
+  border-left: 4px solid #1e3a8a;
+  background: #1e3a8a;
+  border-color: #1e3a8a;
 }
-.res-row.is-large-group .res-row-name { color: #111 !important; font-weight: 800; }
-.res-row.is-large-group .res-row-meta { color: #333 !important; }
-.res-row.is-large-group .res-row-badge { background: #ddd; color: #111; border-color: #aaa; }
-.res-row.is-override.is-large-group { border-left-color: #c04040; background: #efefef; }
+.res-row.is-large-group .res-row-name { color: #ffffff !important; font-weight: 800; }
+.res-row.is-large-group .res-row-meta { color: #c7d7ff !important; }
+.res-row.is-large-group .res-row-badge { background: rgba(255,255,255,0.15); color: #ffffff; border-color: rgba(255,255,255,0.3); }
+.res-row.is-override.is-large-group { border-left-color: #cc2828; background: #1e3a8a; }
 
 /* ── FULL SLOT — name cell diagonal stripe ── */
 .slot-full .res-row-name {
   background: repeating-linear-gradient(
     -45deg,
-    rgba(180,30,30,0.13) 0px,
-    rgba(180,30,30,0.13) 4px,
+    rgba(180,30,30,0.06) 0px,
+    rgba(180,30,30,0.06) 4px,
     transparent 4px,
     transparent 10px
   );
@@ -684,29 +684,29 @@ body::before {
 .res-delete-btn {
   width: 22px; height: 22px; border-radius: 4px;
   background: transparent;
-  border: 1px solid rgba(192,64,64,0.3);
+  border: 1px solid rgba(180,40,40,0.22);
   color: rgba(192,64,64,0.55); font-size: 0.72rem; cursor: pointer;
   display: flex; align-items:center; justify-content:center;
   transition: all 0.15s; flex-shrink: 0;
   font-family: var(--sans); line-height: 1;
   margin-left: 2px;
 }
-.res-delete-btn:hover  { background: rgba(192,64,64,0.12); border-color: #c04040; color: #e04040; }
-.res-delete-btn:active { background: rgba(192,64,64,0.22); }
+.res-delete-btn:hover  { background: rgba(180,40,40,0.08); border-color: #aa2020; color: #cc2828; }
+.res-delete-btn:active { background: rgba(180,40,40,0.15); }
 
 /* ── CONFIRMED RESERVATION ── */
 .res-row.is-confirmed { border-left-color: var(--green); }
 .confirm-btn {
   width: 26px; height: 26px; border-radius: 50%;
   background: transparent;
-  border: 1.5px solid rgba(109,184,126,0.35);
+  border: 1.5px solid rgba(42,138,58,0.25);
   color: var(--text3); font-size: 0.85rem; cursor: pointer;
   display: flex; align-items:center; justify-content:center;
   transition: all 0.18s; flex-shrink: 0;
   font-family: var(--sans);
 }
 .confirm-btn.confirmed {
-  background: rgba(109,184,126,0.14);
+  background: rgba(42,138,58,0.09);
   border-color: var(--green);
   color: var(--green);
 }
@@ -779,8 +779,8 @@ body::before {
 /* ── REMOVE CHEF BANNER ── */
 .chef-removed-banner {
   margin: 0 14px 0; padding: 7px 12px;
-  background: rgba(200,150,42,0.07);
-  border: 1px solid rgba(200,150,42,0.3);
+  background: rgba(184,137,42,0.07);
+  border: 1px solid rgba(184,137,42,0.22);
   border-radius: var(--r);
   font-family: var(--mono); font-size: 0.7rem;
   color: var(--amber); display: flex; align-items: center;
@@ -795,18 +795,18 @@ body::before {
   padding: 5px 11px; border-radius: var(--r);
   font-family: var(--mono); font-size: 0.62rem; font-weight: 500;
   letter-spacing: 0.05em; cursor: pointer;
-  background: rgba(200,150,42,0.1);
-  border: 1px solid rgba(200,150,42,0.3);
+  background: rgba(184,137,42,0.08);
+  border: 1px solid rgba(184,137,42,0.22);
   color: var(--amber); transition: all 0.15s;
   white-space: nowrap;
 }
-.chef-remove-btn:active { background: rgba(200,150,42,0.2); }
+.chef-remove-btn:active { background: rgba(184,137,42,0.15); }
 
 .override-badge {
   font-family: var(--mono); font-size: 0.68rem; font-weight: 600;
   padding: 1px 5px; border-radius: 2px;
-  background: rgba(192,64,64,0.12); color: #c04040;
-  border: 1px solid rgba(192,64,64,0.35);
+  background: rgba(180,40,40,0.08); color: #aa2020;
+  border: 1px solid rgba(180,40,40,0.25);
   white-space: nowrap;
 }
 .large-group-badge { font-family: var(--mono); font-size: 0.6rem; white-space: nowrap; }
@@ -830,7 +830,7 @@ body::before {
   position: absolute;
   width: 320px; height: 320px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(196,158,84,0.06) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(184,137,42,0.08) 0%, transparent 70%);
   top: 50%; left: 50%;
   transform: translate(-50%, -70%);
   pointer-events: none;
@@ -890,11 +890,11 @@ body::before {
   -webkit-appearance: none;
 }
 
-.login-input:focus { border-color: rgba(196,158,84,0.5); }
+.login-input:focus { border-color: rgba(184,137,42,0.5); }
 
 .login-err {
   font-family: var(--mono); font-size: 0.62rem;
-  color: #c04040; min-height: 14px;
+  color: #aa2020; min-height: 14px;
   margin-bottom: 8px; letter-spacing: 0.04em;
 }
 
@@ -939,18 +939,18 @@ body::before {
 }
 #modeIndicator.staff {
   display: inline-flex; align-items: center; gap: 4px;
-  color: var(--green); background: rgba(109,184,126,0.1);
-  border: 1px solid rgba(109,184,126,0.25);
+  color: var(--green); background: rgba(42,138,58,0.08);
+  border: 1px solid rgba(42,138,58,0.22);
 }
 #modeIndicator.guest {
   display: inline-flex; align-items: center; gap: 4px;
-  color: var(--blue); background: rgba(90,144,200,0.1);
-  border: 1px solid rgba(90,144,200,0.25);
+  color: var(--blue); background: rgba(42,104,168,0.08);
+  border: 1px solid rgba(42,104,168,0.22);
 }
 #modeIndicator.manager {
   display: inline-flex; align-items: center; gap: 4px;
-  color: var(--gold-light); background: rgba(196,158,84,0.12);
-  border: 1px solid rgba(196,158,84,0.35);
+  color: #7a5a10; background: rgba(184,137,42,0.10);
+  border: 1px solid rgba(184,137,42,0.30);
 }
 
 /* ── GUEST MODE ── */
@@ -969,7 +969,7 @@ body.staff-mode .real-name { display: inline; }
 #exportTable th { color: var(--gold) !important; }
 
 /* ── FULL SLOT row strikethrough tint ── */
-.time-block.slot-full .time-label { color: #c04040 !important; }
+.time-block.slot-full .time-label { color: #aa2020 !important; }
 .time-block.slot-full .time-add-btn { display: none; }
 
 /* ── section divider ── */
@@ -1201,7 +1201,7 @@ body.staff-mode .real-name { display: inline; }
             placeholder="Enter password…"
             style="margin-bottom:9px;letter-spacing:0.1em"
             onkeydown="if(event.key==='Enter')unlockExport()">
-          <div id="exportLockErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:9px"></div>
+          <div id="exportLockErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#aa2020;margin-bottom:9px"></div>
           <button class="btn-gold" onclick="unlockExport()">Unlock Export</button>
         </div>
         <div style="text-align:center;margin-top:12px">
@@ -1515,7 +1515,7 @@ function renderCalGrid() {
     const cell = document.createElement('div');
     cell.style.cssText='display:flex;flex-direction:column;align-items:center;gap:1px;';
     const btn = document.createElement('button');
-    btn.style.cssText=`width:100%;padding:5px 2px 3px;border-radius:5px;border:none;cursor:pointer;font-family:var(--mono);font-size:0.72rem;font-weight:${isSel||isAlert?'700':'400'};background:${isSel?'var(--gold)':isAlert?'#f0f0f0':isToday?'rgba(196,158,84,0.14)':isInWeek?'rgba(196,158,84,0.05)':'transparent'};color:${isSel?'var(--bg)':isAlert?'#111':isToday?'var(--gold)':'var(--text)'};border:1px solid ${isSel?'var(--gold)':isAlert?'#999':isToday?'rgba(196,158,84,0.3)':isInWeek?'rgba(196,158,84,0.12)':'transparent'};`;
+    btn.style.cssText=`width:100%;padding:5px 2px 3px;border-radius:5px;border:none;cursor:pointer;font-family:var(--mono);font-size:0.72rem;font-weight:${isSel||isAlert?'700':'400'};background:${isSel?'var(--gold)':isAlert?'#f0f0f0':isToday?'rgba(184,137,42,0.10)':isInWeek?'rgba(184,137,42,0.05)':'transparent'};color:${isSel?'var(--bg)':isAlert?'#111':isToday?'var(--gold)':'var(--text)'};border:1px solid ${isSel?'var(--gold)':isAlert?'#999':isToday?'rgba(184,137,42,0.22)':isInWeek?'rgba(184,137,42,0.09)':'transparent'};`;
     btn.textContent=d;
     btn.onclick=()=>pickDate(thisKey);
     cell.appendChild(btn);
@@ -1703,7 +1703,7 @@ async function promptRemoveChef() {
     + '<input class="form-input" id="chefRemoveInitials" type="text" maxlength="4" placeholder="JS" autocomplete="off"'
     + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();confirmRemoveChef()}">'
     + '</div>'
-    + '<div id="chefRemoveErr" style="font-family:var(--mono);font-size:0.67rem;color:#c04040;min-height:14px;margin-bottom:8px"></div>'
+    + '<div id="chefRemoveErr" style="font-family:var(--mono);font-size:0.67rem;color:#aa2020;min-height:14px;margin-bottom:8px"></div>'
     + '<button class="btn-gold" onclick="confirmRemoveChef()">Remove Chef for Today</button>';
   showModal();
   setTimeout(() => document.getElementById('chefRemovePwd')?.focus(), 80);
@@ -1746,7 +1746,7 @@ async function restoreChefForDay() {
     + '<input class="form-input" id="chefRestoreInitials" type="text" maxlength="4" placeholder="JS" autocomplete="off"'
     + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();confirmRestoreChef()}">'
     + '</div>'
-    + '<div id="chefRestoreErr" style="font-family:var(--mono);font-size:0.67rem;color:#c04040;min-height:14px;margin-bottom:8px"></div>'
+    + '<div id="chefRestoreErr" style="font-family:var(--mono);font-size:0.67rem;color:#aa2020;min-height:14px;margin-bottom:8px"></div>'
     + '<button class="btn-gold" onclick="confirmRestoreChef()">Restore Chef</button>';
   showModal();
   setTimeout(() => document.getElementById('chefRestorePwd')?.focus(), 80);
@@ -1798,7 +1798,7 @@ function openConfirmModal(dk, resId) {
     + '<input class="form-input" id="confirmInitials" type="text" maxlength="4" placeholder="JS" autocomplete="off"'
     + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();saveConfirm(\''+dk+'\',\''+resId+'\')}">'
     + '</div>'
-    + '<div id="confirmErr" style="font-family:var(--mono);font-size:0.67rem;color:#c04040;min-height:14px;margin-bottom:8px"></div>'
+    + '<div id="confirmErr" style="font-family:var(--mono);font-size:0.67rem;color:#aa2020;min-height:14px;margin-bottom:8px"></div>'
     + '<button class="btn-gold" style="width:100%;padding:14px;margin-top:4px" onclick="saveConfirm(\''+dk+'\',\''+resId+'\')">✓ Confirm</button>';
   showModal();
   setTimeout(() => document.getElementById('confirmInitials')?.focus(), 80);
@@ -2172,7 +2172,7 @@ function renderWeekStrip() {
     const isAlert=!isSel&&(cache.hasLargeGroup15||cache.hasManyDining);
     const na=cache.hasOverride||cache.hasLargeGroup;
     const cell=document.createElement('button');
-    cell.style.cssText=`display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 10px;border-radius:8px;border:1px solid;cursor:pointer;min-width:48px;background:${isSel?'var(--gold)':isAlert?'#f0f0f0':isToday?'rgba(210,175,100,0.14)':'transparent'};border-color:${isSel?'var(--gold)':isAlert?'#999':isToday?'rgba(210,175,100,0.4)':'var(--border)'};transition:all 0.15s;`;
+    cell.style.cssText=`display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 10px;border-radius:8px;border:1px solid;cursor:pointer;min-width:48px;background:${isSel?'var(--gold)':isAlert?'#f0f0f0':isToday?'rgba(184,137,42,0.10)':'transparent'};border-color:${isSel?'var(--gold)':isAlert?'#999':isToday?'rgba(184,137,42,0.30)':'var(--border)'};transition:all 0.15s;`;
     const dl=document.createElement('div');
     dl.style.cssText=`font-family:var(--mono);font-size:0.65rem;font-weight:700;letter-spacing:0.06em;color:${isSel?'var(--bg)':isAlert?'#111':isToday?'var(--gold)':'var(--text2)'}`;
     dl.textContent=label;
@@ -2180,10 +2180,10 @@ function renderWeekStrip() {
     dd.style.cssText=`font-family:var(--serif);font-size:1.1rem;font-weight:${isSel||isToday||isAlert?'700':'500'};color:${isSel?'var(--bg)':isAlert?'#111':isToday?'var(--gold)':'var(--text)'}`;
     dd.textContent=d.getDate();
     const gl=document.createElement('div');
-    gl.style.cssText='font-family:var(--mono);font-size:0.72rem;font-weight:700;margin-top:2px;color:'+(isSel?'rgba(17,16,16,0.85)':isAlert?'#111':'var(--gold-light)');
+    gl.style.cssText='font-family:var(--mono);font-size:0.72rem;font-weight:700;margin-top:2px;color:'+(isSel?'rgba(255,255,255,0.85)':isAlert?'#111':'var(--gold-light)');
     if (hasBkg && (isManager() || isToday || isSel)) {
       // Manager: always show tally. Staff: only today + selected day
-      gl.innerHTML=guests+'p'+(na?'<span style="color:#e04040"> !</span>':'');
+      gl.innerHTML=guests+'p'+(na?'<span style="color:#cc2828"> !</span>':'');
     } else if (isAlert && hasBkg) {
       gl.textContent=guests+'p';
     } else {
@@ -2205,7 +2205,7 @@ function renderWeekStrip() {
   const rcb=document.createElement('button');
   rcb.style.cssText='flex-shrink:0;margin:5px 4px 5px 0;padding:5px 10px;border-radius:5px;font-family:var(--mono);font-size:0.6rem;font-weight:500;cursor:pointer;white-space:nowrap;letter-spacing:0.04em;align-self:center;'
     +(chefRemoved
-      ?'background:rgba(200,150,42,0.12);border:1px solid rgba(200,150,42,0.4);color:var(--amber);'
+      ?'background:rgba(184,137,42,0.09);border:1px solid rgba(184,137,42,0.30);color:var(--amber);'
       :'background:var(--bg3);border:1px solid var(--border);color:var(--text2);');
   rcb.textContent=chefRemoved?'Chef Off ✓':'Remove Chef';
   rcb.title=chefRemoved?'1 chef removed today — click to restore':'Remove latest chef for today only';
@@ -2369,7 +2369,7 @@ function renderTimeSlots() {
     const blockInfo=blockedSlots[key]?.[slot.replace(':','_')];
     // FULL tag — deep red, no "nearly full"
     const fullTag=isManuallyBlocked
-      ? '<span style="font-family:var(--mono);font-size:0.56rem;font-weight:600;color:#b02020;background:rgba(100,10,10,0.2);border:1px solid rgba(138,26,26,0.5);padding:1px 7px;border-radius:3px;margin-left:7px">BLOCKED'+(blockInfo?.by?' · '+blockInfo.by:'')+'</span>'
+      ? '<span style="font-family:var(--mono);font-size:0.56rem;font-weight:600;color:#aa2020;background:rgba(180,40,40,0.08);border:1px solid rgba(180,40,40,0.25);padding:1px 7px;border-radius:3px;margin-left:7px">BLOCKED'+(blockInfo?.by?' · '+blockInfo.by:'')+'</span>'
       : slotFull
       ? '<span style="font-family:var(--mono);font-size:0.56rem;font-weight:700;color:#e03030;background:rgba(120,20,20,0.2);border:1px solid rgba(160,30,30,0.55);padding:1px 7px;border-radius:3px;margin-left:7px;letter-spacing:0.04em">FULL</span>'
       : '';
@@ -2391,9 +2391,9 @@ function renderTimeSlots() {
 
     const isGuest=appMode==='guest';
     if (isGuest) {
-      head.innerHTML='<div class="time-label" style="'+(slotFull||isManuallyBlocked?'color:#c04040':'')+'">'+displayTime(slot)+'</div>'+capWidget;
+      head.innerHTML='<div class="time-label" style="'+(slotFull||isManuallyBlocked?'color:#aa2020':'')+'">'+displayTime(slot)+'</div>'+capWidget;
     } else {
-      const _labelColor = isManuallyBlocked?'color:#c04040':slotFull?'color:#c04040':isSecondary?'color:var(--text3)':'';
+      const _labelColor = isManuallyBlocked?'color:#aa2020':slotFull?'color:#aa2020':isSecondary?'color:var(--text3)':'';
       const _lockSpan   = isManuallyBlocked ? '<span style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);padding:0 6px">&#128274;</span>' : '';
       const _blockBtn   = isManager() ? '<button class="block-btn' + (isManuallyBlocked ? ' is-blocked' : '') + '" onclick="toggleBlockSlot(\'' + slot + '\')" title="' + (isManuallyBlocked ? 'Unblock slot' : 'Block slot') + '">&#128274;</button>' : '';
       // All 4 grills occupied at this slot (physically no more grills to open)
@@ -2402,7 +2402,7 @@ function renderTimeSlots() {
       const _needForce        = slotFull || isChefBlocked || remaining <= 0 || !canAddAny || _allGrillsFull;
       const _addBtn     = isManuallyBlocked ? ''
                         : _needForce
-                          ? '<button class="force-add-btn" style="background:rgba(138,26,26,0.15);border-color:1px solid rgba(192,64,64,0.5);color:#e04040;font-size:0.6rem;width:auto;padding:0 7px;letter-spacing:0.03em;font-family:var(--mono);font-weight:700;border:1px solid rgba(192,64,64,0.5);border-radius:5px;cursor:pointer;height:28px" onclick="openForceAddModal(\'' + slot + '\')" aria-label="Force Add">FORCE +</button>'
+                          ? '<button class="force-add-btn" style="background:rgba(180,40,40,0.08);border-color:1px solid rgba(180,40,40,0.40);color:#cc2828;font-size:0.6rem;width:auto;padding:0 7px;letter-spacing:0.03em;font-family:var(--mono);font-weight:700;border:1px solid rgba(180,40,40,0.40);border-radius:5px;cursor:pointer;height:28px" onclick="openForceAddModal(\'' + slot + '\')" aria-label="Force Add">FORCE +</button>'
                           : '<button class="time-add-btn" onclick="openHibachiModal(\'' + slot + '\',null)" aria-label="Add">+</button>';
       head.innerHTML = '<div class="time-label" style="' + _labelColor + '">' + displayTime(slot) + '</div>'
         + capWidget
@@ -2417,7 +2417,7 @@ function renderTimeSlots() {
     listDiv.className='slot-res-list';
     if (!allRecs.length) {
       const em=document.createElement('div'); em.className='slot-empty';
-      if (isManuallyBlocked) { em.style.color='#c04040'; em.textContent='Slot blocked'; }
+      if (isManuallyBlocked) { em.style.color='#aa2020'; em.textContent='Slot blocked'; }
       else if (preferHourly) {
         if (halfHourBiased&&!isHalfHourSlot(slot)) em.textContent='Prefer :30 slots today';
         else if (!halfHourBiased&&isHalfHourSlot(slot)) em.textContent='Off-peak';
@@ -2444,7 +2444,7 @@ function renderTimeSlots() {
             +(r.isDouble?' <span style="font-size:0.58rem;color:var(--amber)">×2</span>':'')
             +(isLargeGroup?' <span class="large-group-badge">⚡</span>':'')
             // override/changed badges hidden from staff view
-            +(r.holdUntil?' <span style="font-size:0.56rem;color:var(--amber);font-weight:600;background:rgba(200,150,42,0.12);border:1px solid rgba(200,150,42,0.3);padding:1px 5px;border-radius:2px">HOLD</span>':'')
+            +(r.holdUntil?' <span style="font-size:0.56rem;color:var(--amber);font-weight:600;background:rgba(184,137,42,0.09);border:1px solid rgba(184,137,42,0.22);padding:1px 5px;border-radius:2px">HOLD</span>':'')
             +(r.noteType==='allergy'?' <span class="note-badge allergy" title="'+escHtml(r.noteText||r.notes||'')+'">ALLERGY</span>':'')
             +(r.noteType==='restriction'?' <span class="note-badge restriction" title="'+escHtml(r.noteText||r.notes||'')+'">REST.</span>':'')
             +'</div>'
@@ -2506,7 +2506,7 @@ function openEditAuthModal(slot, editId) {
     +'<input class="form-input" id="editAuthInitials" type="text" maxlength="4" placeholder="JS" autocomplete="off"'
     +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();submitEditAuth(\''+slot+'\',\''+editId+'\')}">'
     +'</div>';
-  const errDiv='<div id="editAuthErr" style="font-family:var(--mono);font-size:0.67rem;color:#c04040;min-height:14px;margin-bottom:8px"></div>';
+  const errDiv='<div id="editAuthErr" style="font-family:var(--mono);font-size:0.67rem;color:#aa2020;min-height:14px;margin-bottom:8px"></div>';
   const submitBtn='<button class="btn-gold" style="width:100%;padding:14px" onclick="submitEditAuth(\''+slot+'\',\''+editId+'\')">Edit Reservation</button>';
   if (isManager()) {
     // Manager: initials only
@@ -2577,7 +2577,7 @@ function _openHibachiModalInner(slot, editId) {
     } else if (existing && existing.holdUntil && !existing.card) {
       // Hold reservation with no card — show card fields directly, no password needed
       cardSectionHtml='<div id="cardSection" style="margin-bottom:12px">'
-        +'<div style="background:rgba(200,150,42,0.06);border:1px solid rgba(200,150,42,0.3);border-radius:var(--r);padding:10px 13px;margin-bottom:9px;font-family:var(--mono);font-size:0.65rem;color:var(--amber);line-height:1.5">&#9203; Hold — no card on file. Enter card details below to confirm this reservation.</div>'
+        +'<div style="background:rgba(184,137,42,0.06);border:1px solid rgba(184,137,42,0.22);border-radius:var(--r);padding:10px 13px;margin-bottom:9px;font-family:var(--mono);font-size:0.65rem;color:var(--amber);line-height:1.5">&#9203; Hold — no card on file. Enter card details below to confirm this reservation.</div>'
         +'<div class="card-row" style="margin:0">'
         +'<div class="form-row" style="margin:0"><label class="form-label">Card Number</label>'
         +'<input class="form-input" id="fCard" type="text" maxlength="19" placeholder="•••• •••• •••• ••••" value="" oninput="fmtCard(this)"></div>'
@@ -2594,16 +2594,16 @@ function _openHibachiModalInner(slot, editId) {
         +'<div style="display:flex;gap:7px;align-items:center">'
         +'<input class="form-input" id="cardUnlockPwd" type="password" placeholder="Password to reveal" style="flex:1" onkeydown="if(event.key===\'Enter\'){event.preventDefault();unlockCardDetails(\''+editId+'\')}">'
         +'<button onclick="unlockCardDetails(\''+editId+'\')" style="padding:9px 14px;background:var(--gold3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:500;color:var(--gold);cursor:pointer;white-space:nowrap">Unlock</button>'
-        +'</div><div id="cardUnlockErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040"></div>'
+        +'</div><div id="cardUnlockErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#aa2020"></div>'
         +'</div></div>';
     }
   }
 
   const isHoldRes = (existing && existing.holdUntil && !existing.card);
   const holdBanner = isHoldRes
-    ? '<div style="margin-top:9px;padding:9px 12px;background:rgba(200,150,42,0.08);border:1px solid rgba(200,150,42,0.35);border-radius:var(--r);font-family:var(--mono);font-size:0.7rem;color:var(--amber)">&#9203; HOLD &mdash; expires <strong>'+existing.holdUntil+'</strong>. Card fields are unlocked above &mdash; fill in card details and save to confirm this reservation.</div>'
+    ? '<div style="margin-top:9px;padding:9px 12px;background:rgba(184,137,42,0.07);border:1px solid rgba(184,137,42,0.25);border-radius:var(--r);font-family:var(--mono);font-size:0.7rem;color:var(--amber)">&#9203; HOLD &mdash; expires <strong>'+existing.holdUntil+'</strong>. Card fields are unlocked above &mdash; fill in card details and save to confirm this reservation.</div>'
     : (existing && existing.holdUntil)
-    ? '<div style="margin-top:9px;padding:9px 12px;background:rgba(109,184,126,0.07);border:1px solid rgba(109,184,126,0.35);border-radius:var(--r);font-family:var(--mono);font-size:0.7rem;color:var(--green)">&#10003; HOLD &mdash; card on file. Save to confirm.</div>'
+    ? '<div style="margin-top:9px;padding:9px 12px;background:rgba(42,138,58,0.07);border:1px solid rgba(42,138,58,0.25);border-radius:var(--r);font-family:var(--mono);font-size:0.7rem;color:var(--green)">&#10003; HOLD &mdash; card on file. Save to confirm.</div>'
     : '';
 
   const deleteBtn=editId?'<button class="btn-danger" onclick="confirmDelete(\''+key+'\',\''+editId+'\')">✕ Delete Reservation</button>':'';
@@ -2637,7 +2637,7 @@ function _openHibachiModalInner(slot, editId) {
     +'<option value="other"'+(existing&&existing.noteType==='other'?' selected':'')+'>Other</option>'
     +'</select>'
     +'<input class="form-input" id="fNoteText" type="text" placeholder="Max 10 words…" maxlength="80" value="'+escHtml(existing?existing.noteText||'':'')+'" oninput="checkNoteWordLimit()"></div>'
-    +'<div id="noteWordErr" style="font-family:var(--mono);font-size:0.6rem;color:#c04040;margin-top:3px;display:none">Max 10 words</div></div>'
+    +'<div id="noteWordErr" style="font-family:var(--mono);font-size:0.6rem;color:#aa2020;margin-top:3px;display:none">Max 10 words</div></div>'
     +'<div id="formErr"></div>'
     +'<button class="btn-gold" onclick="saveHibachi(\''+key+'\',\''+(editId||'')+'\')">'+saveLbl+'</button>'
     +holdBanner+deleteBtn;
@@ -2720,7 +2720,7 @@ function _srStep1() {
     +' oninput="checkLargeGroupPwd()"'
     +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srNext1()}">'
     +'</div>'
-    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:8px"></div>'
+    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#aa2020;margin-bottom:8px"></div>'
     + _srContinueBtn('Continue','srNext1');
   showModal();
   setTimeout(()=>document.getElementById('srGuests')?.focus(),80);
@@ -2770,7 +2770,7 @@ function _srShowOverride(g) {
   block.id='srOverrideBlock';
   block.innerHTML=
     '<div style="background:rgba(138,26,26,0.08);border:1px solid rgba(138,26,26,0.35);border-radius:var(--r);padding:13px;margin-top:10px">'
-    +'<div style="font-family:var(--serif);font-size:0.95rem;font-weight:600;color:#e04040;margin-bottom:6px">No availability at '+displayTime(_sr.slot)+'</div>'
+    +'<div style="font-family:var(--serif);font-size:0.95rem;font-weight:600;color:#cc2828;margin-bottom:6px">No availability at '+displayTime(_sr.slot)+'</div>'
     +'<div style="font-family:var(--mono);font-size:0.65rem;color:var(--text3);margin-bottom:12px;line-height:1.6">All grills or chefs are occupied. Enter the override password to force-book anyway.</div>'
     +'<div style="display:flex;gap:7px;margin-bottom:8px">'
     +'<select id="srOverridePair" style="flex:1;padding:9px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--mono);font-size:0.78rem;color:var(--text);outline:none">'
@@ -2780,8 +2780,8 @@ function _srShowOverride(g) {
     +'<input class="form-input" id="srOverridePwd" type="password" placeholder="Override password" autocomplete="off"'
     +' style="margin-bottom:8px;letter-spacing:0.15em"'
     +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srApplyOverride('+g+')}">'
-    +'<div id="srOverrideErr" style="display:none;font-family:var(--mono);font-size:0.65rem;color:#c04040;margin-bottom:8px"></div>'
-    +'<button onclick="srApplyOverride('+g+')" style="width:100%;padding:11px;background:rgba(138,26,26,0.1);border:1px solid rgba(138,26,26,0.4);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:600;color:#e04040;cursor:pointer">Force Book</button>'
+    +'<div id="srOverrideErr" style="display:none;font-family:var(--mono);font-size:0.65rem;color:#aa2020;margin-bottom:8px"></div>'
+    +'<button onclick="srApplyOverride('+g+')" style="width:100%;padding:11px;background:rgba(180,40,40,0.07);border:1px solid rgba(180,40,40,0.25);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:600;color:#cc2828;cursor:pointer">Force Book</button>'
     +'</div>';
   const guestsInput=document.getElementById('srGuests');
   if (guestsInput) guestsInput.closest('.form-row').after(block);
@@ -2817,15 +2817,15 @@ function openForceAddModal(slot) {
   document.getElementById('modalTitle').textContent = 'Force Add — ' + displayTime(slot);
   document.getElementById('modalBody').innerHTML =
     '<div style="background:rgba(138,26,26,0.08);border:1px solid rgba(138,26,26,0.35);border-radius:var(--r);padding:12px 13px;margin-bottom:14px">'
-    +'<div style="font-family:var(--mono);font-size:0.62rem;font-weight:700;color:#e04040;letter-spacing:0.06em;margin-bottom:3px">⚠ SLOT IS FULL</div>'
+    +'<div style="font-family:var(--mono);font-size:0.62rem;font-weight:700;color:#cc2828;letter-spacing:0.06em;margin-bottom:3px">⚠ SLOT IS FULL</div>'
     +'<div style="font-family:var(--mono);font-size:0.65rem;color:var(--text3);line-height:1.6">This time slot has no available grills or capacity. Force-adding will override the limit and add a reservation anyway.</div>'
     +'</div>'
     +'<div class="form-row"><label class="form-label">Override Password *</label>'
     +'<input class="form-input" id="forceAddPwd" type="password" placeholder="Enter password" autocomplete="off" style="letter-spacing:0.18em"'
     +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();submitForceAdd(\''+slot+'\')}">'
     +'</div>'
-    +'<div id="forceAddErr" style="font-family:var(--mono);font-size:0.67rem;color:#c04040;min-height:14px;margin-bottom:8px"></div>'
-    +'<button class="btn-gold" style="background:#c04040" onclick="submitForceAdd(\''+slot+'\')">Unlock Force Add</button>';
+    +'<div id="forceAddErr" style="font-family:var(--mono);font-size:0.67rem;color:#aa2020;min-height:14px;margin-bottom:8px"></div>'
+    +'<button class="btn-gold" style="background:#aa2020" onclick="submitForceAdd(\''+slot+'\')">Unlock Force Add</button>';
   showModal();
   setTimeout(() => document.getElementById('forceAddPwd')?.focus(), 80);
 }
@@ -2855,7 +2855,7 @@ async function submitForceAdd(slot) {
 function _srStep1Force() {
   document.getElementById('modalTitle').textContent = 'Force Add Reservation';
   document.getElementById('modalBody').innerHTML =
-    '<div style="background:rgba(138,26,26,0.08);border:1px solid rgba(138,26,26,0.35);border-radius:var(--r);padding:7px 12px;margin-bottom:14px;font-family:var(--mono);font-size:0.62rem;color:#e04040;letter-spacing:0.04em">⚠ OVERRIDE ACTIVE — ignoring grill cap</div>'
+    '<div style="background:rgba(138,26,26,0.08);border:1px solid rgba(138,26,26,0.35);border-radius:var(--r);padding:7px 12px;margin-bottom:14px;font-family:var(--mono);font-size:0.62rem;color:#cc2828;letter-spacing:0.04em">⚠ OVERRIDE ACTIVE — ignoring grill cap</div>'
     + _srHeader()
     + _srProgress(1)
     +'<div class="form-row"><label class="form-label" style="font-size:0.85rem;margin-bottom:8px">How many guests?</label>'
@@ -2863,7 +2863,7 @@ function _srStep1Force() {
     +' style="font-size:1.4rem;text-align:center;padding:14px;letter-spacing:0.1em"'
     +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srNext1Force()}">'
     +'</div>'
-    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:8px"></div>'
+    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#aa2020;margin-bottom:8px"></div>'
     + _srContinueBtn('Continue','srNext1Force');
   showModal();
   setTimeout(() => document.getElementById('srGuests')?.focus(), 80);
@@ -2897,7 +2897,7 @@ function _srStep2() {
     +' style="font-size:1.1rem;padding:13px"'
     +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srNext2()}">'
     +'</div>'
-    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:8px"></div>'
+    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#aa2020;margin-bottom:8px"></div>'
     +'<div style="display:flex;gap:8px">'
     +'<button class="btn-outline" style="flex:0 0 80px;padding:12px" onclick="_srStep1()">← Back</button>'
     + _srContinueBtn('Continue','srNext2')
@@ -2929,7 +2929,7 @@ function _srStep3() {
     +' oninput="fmtPhone(this)"'
     +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srNext3()}">'
     +'</div>'
-    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:8px"></div>'
+    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#aa2020;margin-bottom:8px"></div>'
     +'<div style="display:flex;gap:8px">'
     +'<button class="btn-outline" style="flex:0 0 80px;padding:12px" onclick="_srStep2()">← Back</button>'
     + _srContinueBtn('Continue','srNext3')
@@ -2964,7 +2964,7 @@ function _srStep4() {
     +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srNext4()}">'
     +'</div>'
     +'<div style="font-family:var(--mono);font-size:0.62rem;color:var(--text3);margin-bottom:12px">Required for groups of '+_sr.guests+'.</div>'
-    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:8px"></div>'
+    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#aa2020;margin-bottom:8px"></div>'
     +'<div style="display:flex;gap:8px">'
     +'<button class="btn-outline" style="flex:0 0 80px;padding:12px" onclick="_srStep3()">← Back</button>'
     + _srContinueBtn('Continue','srNext4')
@@ -3002,7 +3002,7 @@ function _srStep5() {
     +' oninput="fmtExpiry(this)"'
     +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srNext5()}">'
     +'</div>'
-    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:8px"></div>'
+    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#aa2020;margin-bottom:8px"></div>'
     +'<div style="display:flex;gap:8px">'
     +'<button class="btn-outline" style="flex:0 0 80px;padding:12px" onclick="_srStep4()">← Back</button>'
     + _srContinueBtn('Continue','srNext5')
@@ -3037,7 +3037,7 @@ function _srStep6() {
     +' oninput="this.value=this.value.toUpperCase()"'
     +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srNext6()}">'
     +'</div>'
-    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:8px"></div>'
+    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#aa2020;margin-bottom:8px"></div>'
     +'<div style="display:flex;gap:8px">'
     +'<button class="btn-outline" style="flex:0 0 80px;padding:12px" onclick="'
     +(_sr.needCard&&!_sr.isHold?'_srStep5':'_srStep3')+'()">← Back</button>'
@@ -3078,9 +3078,9 @@ function _srStep7() {
     +'<input class="form-input" id="srNoteText" type="text" placeholder="Describe in max 10 words…" maxlength="80"'
     +' oninput="checkNoteWordLimit_sr()"'
     +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srSave()}">'
-    +'<div id="noteWordErr" style="font-family:var(--mono);font-size:0.6rem;color:#c04040;margin-top:3px;display:none">Max 10 words</div>'
+    +'<div id="noteWordErr" style="font-family:var(--mono);font-size:0.6rem;color:#aa2020;margin-top:3px;display:none">Max 10 words</div>'
     +'</div>'
-    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040;margin-bottom:8px"></div>'
+    +'<div id="srErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#aa2020;margin-bottom:8px"></div>'
     +'<div style="display:flex;gap:8px">'
     +'<button class="btn-outline" style="flex:0 0 80px;padding:12px" onclick="_srStep6()">← Back</button>'
     +'<button class="btn-gold" style="flex:1;padding:14px" onclick="srSave()">✓ Confirm Reservation</button>'
@@ -3149,7 +3149,7 @@ function confirmDelete(dk,id) {
   err.innerHTML='<div class="warn-banner" style="flex-direction:column;gap:7px"><div>Confirm deletion — enter your initials to proceed:</div>'
     +'<div style="display:flex;gap:7px;align-items:center">'
     +'<input class="form-input" id="delInitials" type="text" maxlength="4" placeholder="Initials" style="flex:1;padding:8px 10px">'
-    +'<button onclick="deleteRes(\''+dk+'\',\''+id+'\')" style="padding:8px 14px;background:#c04040;color:#fff;border:none;border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:600;cursor:pointer">DELETE</button>'
+    +'<button onclick="deleteRes(\''+dk+'\',\''+id+'\')" style="padding:8px 14px;background:#aa2020;color:#fff;border:none;border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:600;cursor:pointer">DELETE</button>'
     +'</div></div>';
 }
 
@@ -3164,8 +3164,8 @@ function quickDeleteRes(dk, id, name) {
     + '<input class="form-input" id="quickDelInitials" type="text" maxlength="4" placeholder="JS" autocomplete="off"'
     + ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();quickDeleteConfirm(\''+dk+'\',\''+id+'\')}">'
     + '</div>'
-    + '<div id="quickDelErr" style="font-family:var(--mono);font-size:0.67rem;color:#c04040;min-height:14px;margin-bottom:8px"></div>'
-    + '<button style="width:100%;padding:12px;background:#c04040;color:#fff;font-family:var(--mono);font-size:0.78rem;font-weight:700;letter-spacing:0.05em;border:none;border-radius:var(--r);cursor:pointer" onclick="quickDeleteConfirm(\''+dk+'\',\''+id+'\')">✕ Delete</button>';
+    + '<div id="quickDelErr" style="font-family:var(--mono);font-size:0.67rem;color:#aa2020;min-height:14px;margin-bottom:8px"></div>'
+    + '<button style="width:100%;padding:12px;background:#aa2020;color:#fff;font-family:var(--mono);font-size:0.78rem;font-weight:700;letter-spacing:0.05em;border:none;border-radius:var(--r);cursor:pointer" onclick="quickDeleteConfirm(\''+dk+'\',\''+id+'\')">✕ Delete</button>';
   showModal();
   setTimeout(() => document.getElementById('quickDelInitials')?.focus(), 80);
 }
@@ -3203,21 +3203,21 @@ function showHoldWarning(dk,editId) {
   if (document.getElementById('holdWarningBlock')) return;
   const err=document.getElementById('formErr'); err.innerHTML='';
   const div=document.createElement('div'); div.id='holdWarningBlock';
-  div.innerHTML='<div style="background:rgba(200,150,42,0.07);border:1px solid rgba(200,150,42,0.35);border-radius:var(--r);padding:13px;margin-bottom:11px">'
+  div.innerHTML='<div style="background:rgba(184,137,42,0.07);border:1px solid rgba(184,137,42,0.25);border-radius:var(--r);padding:13px;margin-bottom:11px">'
     +'<div style="font-family:var(--serif);font-size:1rem;font-weight:600;color:var(--gold);margin-bottom:7px">Card Info Missing</div>'
     +'<div style="font-family:var(--mono);font-size:0.67rem;color:var(--text2);line-height:1.6;margin-bottom:11px">Card details required. Choose an option:</div>'
     +'<div style="display:flex;flex-direction:column;gap:9px">'
     +'<button onclick="document.getElementById(\'holdWarningBlock\').remove();document.getElementById(\'cardSection\').style.display=\'\';document.getElementById(\'fCard\')?.focus()" style="padding:8px 14px;background:var(--gold3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:500;color:var(--gold);cursor:pointer;text-align:left">Enter Card Info (recommended)</button>'
     +'<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">'
     +'<select id="fHoldDays" class="form-select" style="flex:0 0 100px;padding:7px 9px"><option value="1">Hold 1 day</option><option value="2">Hold 2 days</option></select>'
-    +'<button onclick="saveHibachi(\''+dk+'\',\''+(editId||'')+'\')" style="flex:1;padding:8px 14px;background:rgba(200,150,42,0.1);border:1px solid rgba(200,150,42,0.3);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:500;color:var(--amber);cursor:pointer;white-space:nowrap">Place Hold (auto-expire)</button>'
+    +'<button onclick="saveHibachi(\''+dk+'\',\''+(editId||'')+'\')" style="flex:1;padding:8px 14px;background:rgba(184,137,42,0.08);border:1px solid rgba(184,137,42,0.22);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:500;color:var(--amber);cursor:pointer;white-space:nowrap">Place Hold (auto-expire)</button>'
     +'</div>'
     +'<div style="border-top:1px solid var(--border2);padding-top:9px">'
     +'<div style="font-family:var(--mono);font-size:0.62rem;color:var(--text3);margin-bottom:5px">Manager override — skip card requirement:</div>'
     +'<div style="display:flex;gap:7px;align-items:center">'
     +'<input type="password" id="noCardOverridePwd" placeholder="Manager password" style="flex:1;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--sans);font-size:0.85rem;color:var(--text);outline:none" onkeydown="if(event.key===\'Enter\'){event.preventDefault();applyNoCardOverride(\''+dk+'\',\''+(editId||'')+'\');}">'
-    +'<button onclick="applyNoCardOverride(\''+dk+'\',\''+(editId||'')+'\')" style="padding:7px 12px;background:rgba(192,64,64,0.1);border:1px solid rgba(192,64,64,0.3);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:500;color:#c04040;cursor:pointer;white-space:nowrap">Override</button>'
-    +'</div><div id="noCardOverrideErr" style="display:none;font-family:var(--mono);font-size:0.65rem;color:#c04040;margin-top:5px"></div>'
+    +'<button onclick="applyNoCardOverride(\''+dk+'\',\''+(editId||'')+'\')" style="padding:7px 12px;background:rgba(180,40,40,0.07);border:1px solid rgba(180,40,40,0.22);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:500;color:#aa2020;cursor:pointer;white-space:nowrap">Override</button>'
+    +'</div><div id="noCardOverrideErr" style="display:none;font-family:var(--mono);font-size:0.65rem;color:#aa2020;margin-top:5px"></div>'
     +'</div></div></div>';
   err.parentNode.insertBefore(div,err);
   div.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -3252,13 +3252,13 @@ function showCardOnFilePrompt(dk,editId) {
   if (document.getElementById('cardOnFilePrompt')) return;
   const err=document.getElementById('formErr'); err.innerHTML='';
   const div=document.createElement('div'); div.id='cardOnFilePrompt';
-  div.innerHTML='<div style="background:rgba(90,144,200,0.07);border:1px solid rgba(90,144,200,0.3);border-radius:var(--r);padding:13px;margin-bottom:11px">'
+  div.innerHTML='<div style="background:rgba(90,144,200,0.07);border:1px solid rgba(42,104,168,0.22);border-radius:var(--r);padding:13px;margin-bottom:11px">'
     +'<div style="font-family:var(--serif);font-size:1rem;font-weight:600;color:var(--blue);margin-bottom:7px">Card on File</div>'
     +'<div style="font-family:var(--mono);font-size:0.67rem;color:var(--text2);line-height:1.6;margin-bottom:11px">Enter manager password to confirm card is still valid, then save.</div>'
     +'<div style="display:flex;gap:7px;align-items:center">'
     +'<input type="password" id="cardOnFilePwd" placeholder="Manager password" style="flex:1;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--sans);font-size:0.85rem;color:var(--text);outline:none" onkeydown="if(event.key===\'Enter\'){event.preventDefault();verifyCardOnFile(\''+dk+'\',\''+editId+'\');}">'
-    +'<button onclick="verifyCardOnFile(\''+dk+'\',\''+editId+'\')" style="padding:8px 14px;background:rgba(90,144,200,0.1);border:1px solid rgba(90,144,200,0.3);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:500;color:var(--blue);cursor:pointer;white-space:nowrap">Verify & Save</button>'
-    +'</div><div id="cardOnFileErr" style="display:none;font-family:var(--mono);font-size:0.65rem;color:#c04040;margin-top:5px"></div></div>';
+    +'<button onclick="verifyCardOnFile(\''+dk+'\',\''+editId+'\')" style="padding:8px 14px;background:rgba(42,104,168,0.08);border:1px solid rgba(42,104,168,0.22);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:500;color:var(--blue);cursor:pointer;white-space:nowrap">Verify & Save</button>'
+    +'</div><div id="cardOnFileErr" style="display:none;font-family:var(--mono);font-size:0.65rem;color:#aa2020;margin-top:5px"></div></div>';
   err.parentNode.insertBefore(div,err);
   document.getElementById('cardOnFilePwd')?.focus();
   div.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -3424,8 +3424,8 @@ async function saveHibachi(dk,editId) {
       +'<div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">'
       +'<input type="password" id="overridePwd" placeholder="Manager password" style="flex:1;min-width:130px;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--sans);font-size:0.85rem;color:var(--text);outline:none">'
       +'<select id="overridePair" style="padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--mono);font-size:0.78rem;color:var(--text);outline:none"><option value="1,2">Grills 1+2</option><option value="3,4">Grills 3+4</option></select>'
-      +'<button onclick="saveHibachiOverride(\''+dk+'\',\''+(editId||'')+'\')" style="padding:8px 14px;background:rgba(138,26,26,0.1);border:1px solid rgba(138,26,26,0.3);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:600;color:#8a1a1a;cursor:pointer;white-space:nowrap">Force Book</button>'
-      +'</div><div id="overrideErr" style="display:none;font-size:0.65rem;color:#c04040;font-family:var(--mono)"></div></div>';
+      +'<button onclick="saveHibachiOverride(\''+dk+'\',\''+(editId||'')+'\')" style="padding:8px 14px;background:rgba(180,40,40,0.07);border:1px solid rgba(138,26,26,0.3);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:600;color:#8a1a1a;cursor:pointer;white-space:nowrap">Force Book</button>'
+      +'</div><div id="overrideErr" style="display:none;font-size:0.65rem;color:#aa2020;font-family:var(--mono)"></div></div>';
     return;
   }
 
@@ -3440,7 +3440,7 @@ async function saveHibachi(dk,editId) {
     err.innerHTML='<div class="warn-banner" style="flex-direction:column;gap:9px">'
       +'<div>⚠ Timing may be tight — previous group on this grill seated within 2 hours.</div>'
       +'<div style="display:flex;gap:9px;flex-wrap:wrap">'
-      +'<button onclick="confirmTightTiming(\''+dk+'\',\''+(editId||'')+'\')" style="padding:7px 16px;background:rgba(200,150,42,0.12);border:1px solid rgba(200,150,42,0.35);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:500;color:var(--amber);cursor:pointer">Book Anyway</button>'
+      +'<button onclick="confirmTightTiming(\''+dk+'\',\''+(editId||'')+'\')" style="padding:7px 16px;background:rgba(184,137,42,0.09);border:1px solid rgba(184,137,42,0.25);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:500;color:var(--amber);cursor:pointer">Book Anyway</button>'
       +'<button onclick="document.getElementById(\'formErr\').innerHTML=\'\'" style="padding:7px 16px;background:transparent;border:1px solid var(--border);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;color:var(--text2);cursor:pointer">Cancel</button>'
       +'</div></div>';
     return;
@@ -3790,7 +3790,7 @@ async function runImport() {
   let msg='✓ Imported '+imported+' reservation'+(imported!==1?'s':'')+'.';
   if (skipped) msg+=' '+skipped+' row'+(skipped!==1?'s':'')+' skipped.';
   if (errors.length) msg+='\n'+errors.slice(0,5).join('\n')+(errors.length>5?'\n…and '+(errors.length-5)+' more':'');
-  status.style.color=imported?'var(--green)':'#c04040';
+  status.style.color=imported?'var(--green)':'#aa2020';
   status.textContent=msg;
   if (imported) document.getElementById('importTsv').value='';
 }
@@ -3902,7 +3902,7 @@ function updateLockoutUI() {
     pin.placeholder = 'Device locked';
     if (btn) btn.disabled = true;
     err.textContent = '⚠ Too many attempts — locked for ' + mins + ' min' + (mins !== 1 ? 's' : '');
-    err.style.color = '#e04040';
+    err.style.color = '#cc2828';
     // Tick every 30s to update the countdown
     setTimeout(updateLockoutUI, 30000);
   } else if (getLockState().lockedUntil && Date.now() >= getLockState().lockedUntil) {
@@ -3978,7 +3978,7 @@ async function submitPin() {
   if (isLockedOut()) {
     updateLockoutUI();
   } else {
-    err.style.color = '#e04040';
+    err.style.color = '#cc2828';
     err.textContent = remaining > 0
       ? '✕ Incorrect password — ' + remaining + ' attempt' + (remaining !== 1 ? 's' : '') + ' left'
       : '✕ Incorrect password';
