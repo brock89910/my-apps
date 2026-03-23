@@ -230,10 +230,11 @@ body::before {
 }
 
 .slot-full .time-header {
-  background: rgba(130,20,20,0.3);
-  border-bottom-color: var(--border);
+  background: #ffffff;
+  border-bottom-color: rgba(0,0,0,0.12);
 }
-.slot-full .time-header .time-chef-info { color: var(--text2); }
+.slot-full .time-header .time-chef-info { color: #111 !important; font-weight: 700; }
+.slot-full .time-header .time-label { color: #111 !important; }
 
 /* ── NOTE BADGES ── */
 .note-badge {
@@ -964,7 +965,7 @@ body.staff-mode .real-name { display: inline; }
 #exportTable th { color: var(--gold) !important; }
 
 /* ── FULL SLOT row standout ── */
-.time-block.slot-full .time-label { color: #c04040 !important; }
+.time-block.slot-full .time-label { color: #111111 !important; }
 .time-block.slot-full .time-add-btn { display: none; }
 
 /* ── section divider ── */
@@ -2386,9 +2387,9 @@ function renderTimeSlots() {
 
     const isGuest=appMode==='guest';
     if (isGuest) {
-      head.innerHTML='<div class="time-label" style="'+(slotFull||isManuallyBlocked?'color:#c04040':'')+'">'+displayTime(slot)+'</div>'+capWidget;
+      head.innerHTML='<div class="time-label" style="'+(slotFull||isManuallyBlocked?'color:#111111':'')+'">'+displayTime(slot)+'</div>'+capWidget;
     } else {
-      const _labelColor = isManuallyBlocked?'color:#c04040':slotFull?'color:#c04040':isSecondary?'color:var(--text3)':'';
+      const _labelColor = isManuallyBlocked?'color:#c04040':slotFull?'color:#111111':isSecondary?'color:var(--text3)':'';
       const _lockSpan   = isManuallyBlocked ? '<span style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);padding:0 6px">&#128274;</span>' : '';
       const _blockBtn   = isManager() ? '<button class="block-btn' + (isManuallyBlocked ? ' is-blocked' : '') + '" onclick="toggleBlockSlot(\'' + slot + '\')" title="' + (isManuallyBlocked ? 'Unblock slot' : 'Block slot') + '">&#128274;</button>' : '';
       // All 4 grills occupied at this slot (physically no more grills to open)
