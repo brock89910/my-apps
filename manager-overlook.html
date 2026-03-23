@@ -134,40 +134,6 @@ tr:hover td{background:rgba(232,160,32,.03)}
 .fc-busy{background:rgba(232,160,32,.06);border-color:rgba(232,160,32,.2)}.fc-busy .fcs{color:var(--amber)}
 .fc-very-busy{background:rgba(208,72,40,.07);border-color:rgba(208,72,40,.25)}.fc-very-busy .fcs{color:#e87858}
 .off-badge{position:absolute;top:3px;right:3px;background:rgba(74,138,74,.2);color:var(--green-l);border-radius:2px;font-family:var(--font-mono);font-size:.55rem;padding:1px 4px;letter-spacing:.06em}
-/* COUNTER WEEKLY */
-.ct-week-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-.day-tabs{display:flex;gap:2px;flex-wrap:wrap}
-.day-tab{padding:6px 12px;cursor:pointer;font-family:var(--font-mono);font-size:.68rem;font-weight:500;color:var(--text2);transition:all .12s;border:1px solid var(--border);border-radius:var(--r);text-transform:uppercase;letter-spacing:.06em}
-.day-tab:hover{background:var(--s2);color:var(--text)}
-.day-tab.on{background:var(--amber);color:#0a0908;border-color:var(--amber)}
-.day-tab.has-data{border-color:rgba(232,160,32,.3);color:var(--amber)}
-.ct-day-pane{display:none}.ct-day-pane.on{display:block}
-.ct-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
-.ct-section h4{font-family:var(--font-head);font-size:.95rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber);margin-bottom:12px}
-.ct-pools{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
-.ct-pool{background:var(--s3);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center}
-.ct-pool .pl{font-family:var(--font-mono);font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
-.ct-pool .pv{font-family:var(--font-head);font-size:1.6rem;font-weight:800;color:var(--amber);margin-top:4px}
-.ct-pool .ps{font-family:var(--font-mono);font-size:.62rem;color:var(--text2);margin-top:2px}
-/* WEEKLY SUMMARY TABLE */
-.week-summary{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:4px}
-.week-summary th{font-family:var(--font-mono);font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;padding:7px 10px;border-bottom:1px solid var(--border);font-weight:500;text-align:left}
-.week-summary td{padding:8px 10px;border-bottom:1px solid rgba(42,41,37,.4);font-size:.78rem}
-.week-summary tr:last-child td{border-bottom:none;font-weight:700;color:var(--amber);font-family:var(--font-mono)}
-.week-summary .hib{color:#e87858;font-family:var(--font-mono);font-size:.74rem}
-/* SVC STAFF */
-.svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-top:12px}
-.svc-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:11px;transition:border-color .12s}
-.svc-card .sname{font-family:var(--font-head);font-size:.95rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
-.svc-card .srole{font-family:var(--font-mono);font-size:.6rem;color:var(--text3);margin-bottom:6px;text-transform:uppercase}
-.svc-card .samt{font-family:var(--font-head);font-size:1.15rem;font-weight:700;color:var(--amber);margin-top:5px}
-.svc-card .swt{font-family:var(--font-mono);font-size:.62rem;color:var(--text2);margin-top:2px}
-.break-row{display:flex;align-items:center;gap:6px;margin-top:5px}
-.break-row .fg{flex:1}
-.break-add{background:none;border:1px dashed var(--border);color:var(--text3);border-radius:var(--r);padding:3px 8px;font-size:.65rem;cursor:pointer;font-family:var(--font-mono);transition:all .12s;margin-top:5px;width:100%;text-align:center}
-.break-add:hover{border-color:var(--amber);color:var(--amber)}
-.break-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.7rem;padding:0;flex-shrink:0;margin-top:14px}
-.break-del:hover{color:var(--red)}
 /* CLEANING */
 .cls-title{font-family:var(--font-head);font-size:1rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--amber);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
 .cls-title::before{content:'//';font-family:var(--font-mono);font-size:.7rem;color:var(--text3)}
@@ -177,47 +143,6 @@ tr:hover td{background:rgba(232,160,32,.03)}
 .ci label{font-size:.81rem;cursor:pointer;flex:1;line-height:1.45}
 .ci label.done{text-decoration:line-through;color:var(--text3)}
 .ca{font-family:var(--font-mono);font-size:.58rem;color:var(--text3);background:var(--s3);padding:2px 6px;border-radius:2px;flex-shrink:0;margin-top:2px;text-transform:uppercase;letter-spacing:.07em;border:1px solid var(--border)}
-/* PAYROLL */
-.ptot{background:var(--amber-g);border:1px solid rgba(232,160,32,.2);border-radius:var(--r);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.ptot span{font-family:var(--font-mono);font-size:.65rem;color:var(--text2);text-transform:uppercase;letter-spacing:.08em}
-.ptot strong{font-family:var(--font-head);font-size:1.7rem;font-weight:800;color:var(--amber)}
-/* PAYROLL — fire entry mode */
-.pay-entry-wrap{display:flex;flex-direction:column;gap:0}
-.pay-entry-row{display:flex;align-items:center;gap:0;border-bottom:1px solid var(--border);transition:background .1s;position:relative}
-.pay-entry-row:last-child{border-bottom:none}
-.pay-entry-row.active-row{background:rgba(232,160,32,.06);}
-.pay-entry-row.active-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--amber)}
-.pay-entry-row .per-name{font-family:var(--font-head);font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:12px 14px;min-width:140px;flex-shrink:0}
-.pay-entry-row .per-role{min-width:90px;padding:0 10px;flex-shrink:0}
-.pay-entry-row .per-wage{font-family:var(--font-mono);font-size:.72rem;color:var(--text3);padding:0 10px;min-width:90px;flex-shrink:0}
-.pay-entry-row .per-input-wrap{flex:1;padding:8px 10px}
-.pay-entry-row .per-input-wrap label{font-family:var(--font-mono);font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;display:block;margin-bottom:3px}
-.pay-entry-row .per-input{background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);border-radius:0;padding:4px 6px;font-size:1.1rem;font-family:var(--font-head);font-weight:700;outline:none;width:100%;transition:border-color .12s}
-.pay-entry-row.active-row .per-input{border-bottom-color:var(--amber)}
-.pay-entry-row .per-input:focus{border-bottom-color:var(--amber)}
-.pay-entry-row .per-total{font-family:var(--font-head);font-size:1.15rem;font-weight:700;color:var(--amber);padding:0 16px;min-width:100px;text-align:right;flex-shrink:0}
-.pay-entry-row .per-drag{cursor:grab;color:var(--text3);font-size:.95rem;padding:12px 8px;user-select:none;flex-shrink:0}
-.pay-entry-row .per-drag:hover{color:var(--amber)}
-.pay-entry-row .per-drag:active{cursor:grabbing}
-.pay-entry-row.dragging{opacity:.35;border:1px dashed var(--amber)}
-.pay-entry-row.drag-over{background:var(--amber-g);border-top:2px solid var(--amber)}
-
-/* Copy-paste just amounts */
-.copy-amounts{background:var(–bg);border:1px solid var(–border);border-radius:var(–r);padding:10px 12px;font-family:var(–font-mono);font-size:.88rem;color:var(–amber);white-space:pre;margin-top:10px;cursor:pointer;transition:border-color .12s;user-select:all;overflow-x:auto;line-height:2}
-.copy-amounts:hover{border-color:var(–amber)}
-
-.copy-out{background:var(–bg);border:1px solid var(–border);border-radius:var(–r);padding:10px 12px;font-family:var(–font-mono);font-size:.74rem;color:var(–text);white-space:pre;margin-top:10px;cursor:pointer;transition:border-color .12s;user-select:all;overflow-x:auto;line-height:1.7}
-.copy-out:hover{border-color:var(–amber)}
-.pay-quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
-.pay-card{background:var(–bg2);border:1px solid var(–border);border-radius:var(–r);padding:11px;display:flex;flex-direction:column;gap:6px;cursor:default;transition:border-color .12s}
-.pay-card.dragging{opacity:.35;border-color:var(–amber)}
-.pay-card.drag-over{border-color:var(–amber);background:var(–amber-g)}
-.pay-card .pcname{font-family:var(–font-head);font-size:.95rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
-.pay-card .pcrole{font-family:var(–font-mono);font-size:.6rem;color:var(–text3);text-transform:uppercase}
-.pay-card .pctot{font-family:var(–font-head);font-size:1.1rem;font-weight:700;color:var(–amber)}
-.drag-handle{cursor:grab;color:var(–text3);font-size:.95rem;padding:2px 4px;user-select:none;line-height:1}
-.drag-handle:active{cursor:grabbing}
-.drag-handle:hover{color:var(–amber)}
 /* PRINT / STEP */
 .print-reminder{background:rgba(208,72,40,.06);border:1px solid rgba(208,72,40,.2);border-radius:var(–r);padding:9px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
 .print-reminder span{font-size:.79rem;color:#e87858}
@@ -264,9 +189,7 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div class="nav-sec">Modules</div>
 <div class="ni" onclick="go('bills',this)"><span class="ico">▤</span><span class="lbl">Bill Tracking</span><span class="dot"></span></div>
 <div class="ni" onclick="go('schedule',this)"><span class="ico">▦</span><span class="lbl">Scheduling</span><span class="dot"></span></div>
-<div class="ni" onclick="go('counter',this)"><span class="ico">◉</span><span class="lbl">Counter</span><span class="dot"></span></div>
 <div class="ni" onclick="go('cleaning',this)"><span class="ico">✓</span><span class="lbl">Cleaning</span><span class="dot"></span></div>
-<div class="ni" onclick="go('payroll',this)"><span class="ico">$</span><span class="lbl">Payroll</span><span class="dot"></span></div>
 </nav>
 <div class="sidebar-foot"><div><span class="status-dot"></span>Firebase Connected</div><div id="sb-date"></div></div>
 </aside>
@@ -280,7 +203,7 @@ tr:hover td{background:rgba(232,160,32,.03)}
   <div class="sc"><div class="lb">Due This Week</div><div class="vl" id="d-due">—</div><div class="sb">Within 7 days</div></div>
   <div class="sc"><div class="lb">Today's Staff</div><div class="vl" id="d-staff">—</div><div class="sb">Scheduled today</div></div>
   <div class="sc"><div class="lb">On Roster</div><div class="vl" id="d-roster">—</div><div class="sb">Total staff</div></div>
-  <div class="sc"><div class="lb">Pay Records</div><div class="vl" id="d-pay">—</div><div class="sb">Entries logged</div></div>
+
 </div>
 <div class="pn" id="print-remind-pn" style="display:none"><div class="pnh"><h3>🖨 Print Reminders</h3></div><div id="print-remind-list"></div></div>
 <div class="pn"><div class="pnh"><h3>Upcoming Bills</h3></div><div class="tw"><table><thead><tr><th>Vendor</th><th>Amount</th><th>Due</th><th>Type</th><th>Category</th></tr></thead><tbody id="d-bills"></tbody></table></div></div>
@@ -292,13 +215,13 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div class="topbar"><div class="topbar-left"><div class="bc">OVERLOOK / BILLS</div><h2>Bill Tracking</h2></div></div>
 <div class="aib"><h4>// AI Bill Extraction Prompt</h4><p>Photo any bill → attach to Claude or ChatGPT → paste this prompt:</p>
 <div class="aip">Extract from this bill and return ONLY valid JSON:
-{"vendor":"name","amount":0.00,"due_date":"YYYY-MM-DD","category":"Food & Beverage / Utilities / Rent / Equipment / Maintenance / Insurance / Payroll / Marketing / Cleaning / Other","pay_type":"autopay or manual","notes":"invoice # or key detail"}</div></div>
+{"vendor":"name","amount":0.00,"due_date":"YYYY-MM-DD","category":"Food & Beverage / Utilities / Rent / Equipment / Maintenance / Insurance / Marketing / Cleaning / Other","pay_type":"autopay or manual","notes":"invoice # or key detail"}</div></div>
 <div class="pn"><div class="pnh"><h3>Add New Bill</h3></div>
 <div class="g2">
 <div class="fg"><label>Vendor</label><input id="b-vendor" placeholder="e.g. Sysco Foods"></div>
 <div class="fg"><label>Amount ($)</label><input id="b-amount" type="number" placeholder="0.00" step="0.01"></div>
 <div class="fg"><label>Due Date</label><input id="b-due" type="date"></div>
-<div class="fg"><label>Category</label><select id="b-cat"><option>Food & Beverage</option><option>Utilities</option><option>Rent</option><option>Equipment</option><option>Maintenance</option><option>Insurance</option><option>Payroll</option><option>Marketing</option><option>Cleaning</option><option>Other</option></select></div>
+<div class="fg"><label>Category</label><select id="b-cat"><option>Food & Beverage</option><option>Utilities</option><option>Rent</option><option>Equipment</option><option>Maintenance</option><option>Insurance</option><option>Marketing</option><option>Cleaning</option><option>Other</option></select></div>
 <div class="fg"><label>Pay Type</label><select id="b-paytype" onchange="toggleReceiptNote()"><option value="manual">Manual Pay</option><option value="autopay">Autopay (print receipt)</option></select></div>
 <div class="fg"><label>Refresh Frequency</label><select id="b-freq"><option value="once">One-time</option><option value="weekly">Weekly</option><option value="biweekly">Bi-weekly</option><option value="monthly">Monthly</option></select></div>
 <div class="fg"><label>Status</label><select id="b-paid"><option value="Unpaid">Unpaid</option><option value="Paid">Paid</option></select></div>
@@ -342,29 +265,6 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div class="pn" id="sch-prompt-pn" style="display:none"><div class="pnh"><h3>AI Schedule Prompt</h3><button class="btn bo bs" onclick="copyEl('sch-prompt-txt')">Copy</button></div><div class="aip" id="sch-prompt-txt"></div></div>
 </div>
 
-<!-- COUNTER -->
-
-<div class="pg" id="pg-counter">
-<div class="topbar"><div class="topbar-left"><div class="bc">OVERLOOK / COUNTER</div><h2>Counter</h2></div>
-<div style="display:flex;align-items:center;gap:8px">
-<span style="font-family:var(--font-mono);font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">WEEK OF</span>
-<input type="date" id="ct-weekdate" class="iline" onchange="onCtWeekChange()">
-<span class="week-lbl" id="ct-week-label" style="font-size:.85rem"></span>
-</div></div>
-<div class="day-tabs" id="ct-day-tabs"></div>
-<div id="ct-day-panes"></div>
-<div class="pn" style="margin-top:4px">
-<div class="pnh"><h3>Weekly Summary</h3><button class="btn bg bs" onclick="saveWeekCounter()">Save Week</button></div>
-<div class="tw"><table class="week-summary" id="ct-week-table">
-<thead><tr><th>Day</th><th>TPN Total</th><th>DIN Total</th><th>Svc Pool</th><th>TPN Kit</th><th>DIN Kit</th><th>HIB Guests</th></tr></thead>
-<tbody id="ct-week-tbody"></tbody>
-</table></div>
-</div>
-<div class="pn"><div class="pnh"><h3>Saved Records</h3></div>
-<div class="tw"><table><thead><tr><th>Week</th><th>Day</th><th>TPN</th><th>DIN</th><th>Svc Pool</th><th>HIB</th><th></th></tr></thead><tbody id="ct-tbody"></tbody></table></div>
-</div>
-</div>
-
 <!-- CLEANING -->
 
 <div class="pg" id="pg-cleaning">
@@ -380,59 +280,6 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div class="tw"><table><thead><tr><th>Date</th><th>Staff</th><th>Done</th><th>Total</th><th>Score</th></tr></thead><tbody id="cl-log"></tbody></table></div></div>
 </div>
 
-<!-- PAYROLL -->
-
-<div class="pg" id="pg-payroll">
-<div class="topbar"><div class="topbar-left"><div class="bc">OVERLOOK / PAYROLL</div><h2>Payroll</h2></div></div>
-<div class="aib"><h4>// AI Timesheet Extraction Prompt</h4>
-<div class="aip">Extract timesheet data. Return ONLY a JSON array:
-[{"name":"Full Name","role":"role","hours":38.5}]
-Hours = decimal. Include every staff member listed.</div></div>
-<div class="pn"><div class="pnh"><h3>Staff & Wages</h3><button class="btn bg bs" onclick="openModal('wage-modal')">＋ Add Staff</button></div>
-<div class="tw"><table><thead><tr><th>Order</th><th>Name</th><th>Role</th><th>Type</th><th>Wage</th><th></th></tr></thead><tbody id="wage-tbody"></tbody></table></div></div>
-
-<!-- FIRE ENTRY PAYROLL PANEL -->
-
-<div class="pn">
-  <div class="pnh">
-    <h3>Enter Pay Period</h3>
-    <div style="display:flex;align-items:center;gap:7px">
-      <span style="font-family:var(--font-mono);font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Period ending:</span>
-      <input type="date" id="pay-period" class="iline">
-    </div>
-  </div>
-  <p style="font-family:var(--font-mono);font-size:.65rem;color:var(--text3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.07em">↵ Enter or Tab — jumps to next · Drag ⠿ to reorder</p>
-  <div class="pn" style="padding:0;overflow:hidden">
-    <div class="pay-entry-wrap" id="pay-entry-rows"></div>
-  </div>
-  <button class="btn bg" style="margin-top:12px" onclick="calcAndSavePayroll()">Calculate & Save</button>
-</div>
-
-<div class="pn" id="pay-results-pn" style="display:none">
-<div class="pnh"><h3>Results</h3>
-  <div style="display:flex;gap:6px;flex-wrap:wrap">
-    <button class="btn bo bs" onclick="copyAmountsOnly()">Copy Amounts</button>
-    <button class="btn bo bs" onclick="copyPayTable()">Copy Full Table</button>
-  </div>
-</div>
-<div class="ptot"><span>Total Payroll</span><strong id="pay-grand">$0.00</strong></div>
-<div class="tw"><table><thead><tr><th>Name</th><th>Role</th><th>Type</th><th>Qty</th><th>Wage</th><th>Total</th></tr></thead><tbody id="pay-tbody"></tbody></table></div>
-
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
-  <div>
-    <div style="font-family:var(--font-mono);font-size:.62rem;color:var(--amber);margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em">// Amounts only — tap to select</div>
-    <div class="copy-amounts" id="pay-amounts-text" onclick="selectAmountsText()"></div>
-  </div>
-  <div>
-    <div style="font-family:var(--font-mono);font-size:.62rem;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em">// Full table — tap to select</div>
-    <div class="copy-out" id="pay-copy-text" onclick="selectCopyText()"></div>
-  </div>
-</div>
-</div>
-
-<div class="pn"><div class="pnh"><h3>Pay History</h3></div>
-<div class="tw"><table><thead><tr><th>Period</th><th>Name</th><th>Type</th><th>Qty</th><th>Wage</th><th>Total</th><th></th></tr></thead><tbody id="pay-hist-tbody"></tbody></table></div></div>
-</div>
 </main>
 
 <!-- MODALS -->
@@ -455,29 +302,6 @@ Hours = decimal. Include every staff member listed.</div></div>
 <div class="mf"><button class="btn bo" onclick="closeModal('restrict-modal')">Cancel</button><button class="btn bg" onclick="addRestriction()">Add</button></div>
 </div></div>
 
-<div class="mb" id="wage-modal"><div class="mo">
-<h3>Add Staff Member</h3>
-<div class="g2">
-<div class="fg"><label>Full Name</label><input id="wm-name" placeholder="Name"></div>
-<div class="fg"><label>Role</label><select id="wm-role"><option>Service</option><option>Cook</option></select></div>
-<div class="fg"><label>Pay Type</label><select id="wm-type"><option value="hourly">Hourly (bi-weekly hours)</option><option value="daily">Daily (days worked)</option></select></div>
-<div class="fg"><label>Wage ($/hr or $/day)</label><input id="wm-wage" type="number" placeholder="0.00" step="0.01"></div>
-</div>
-<div class="mf"><button class="btn bo" onclick="closeModal('wage-modal')">Cancel</button><button class="btn bg" onclick="addWageStaff()">Save</button></div>
-</div></div>
-
-<div class="mb" id="edit-wage-modal"><div class="mo">
-<h3>Edit Staff</h3>
-<input type="hidden" id="ew-id">
-<div class="g2">
-<div class="fg"><label>Full Name</label><input id="ew-name"></div>
-<div class="fg"><label>Role</label><select id="ew-role"><option>Service</option><option>Cook</option></select></div>
-<div class="fg"><label>Pay Type</label><select id="ew-type"><option value="hourly">Hourly</option><option value="daily">Daily</option></select></div>
-<div class="fg"><label>Wage</label><input id="ew-wage" type="number" step="0.01"></div>
-</div>
-<div class="mf"><button class="btn bo" onclick="closeModal('edit-wage-modal')">Cancel</button><button class="btn bg" onclick="saveEditStaff()">Save Changes</button></div>
-</div></div>
-
 <div class="mb" id="sheet-modal"><div class="mo mo-wide">
 <h3>Schedule Sheet</h3>
 <p style="font-family:var(--font-mono);font-size:.65rem;color:var(--text3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.07em">Matches your Google Sheets format. Copy → paste into A1.</p>
@@ -490,12 +314,9 @@ Hours = decimal. Include every staff member listed.</div></div>
 <script>
 ['go','openModal','closeModal','addBill','renderBills','togglePaid','delBill',
 'openShiftModal','confirmAddShift','delShift','addRestriction','delRestriction',
-'buildSchPrompt','delCounter','resetChecks','saveChecklist','saveWeekCounter',
-'addWageStaff','delWageStaff','editWageStaff','saveEditStaff','calcAndSavePayroll',
-'copyPayTable','selectCopyText','delPayHist','onWeekChange','onCtWeekChange','copyEl',
+'buildSchPrompt','resetChecks','saveChecklist','onWeekChange','copyEl',
 'toggleReceiptNote','markPrintDone','switchSchTab','loadReservations','openSheetModal',
-'copySheetData','liveCalcPay','payCardKeydown','addBreak','removeBreak','recalcDay',
-'copyAmountsOnly','selectAmountsText'
+'copySheetData'
 ].forEach(function(fn){if(!window[fn])window[fn]=function(){};});
 </script>
 
@@ -509,7 +330,7 @@ const db=getFirestore(appMgr);
 const appRes=initializeApp({apiKey:"AIzaSyCMXA2a4RUUNuzmTz1QxdJbIciICojLjA8",authDomain:"restaurant599-b5595.firebaseapp.com",databaseURL:"https://restaurant599-b5595-default-rtdb.firebaseio.com",projectId:"restaurant599-b5595",storageBucket:"restaurant599-b5595.firebasestorage.app",messagingSenderId:"141750935511",appId:"1:141750935511:web:8ad37806a7d9a70a8e7592"},'reservations');
 const resDb=getDatabase(appRes);
 
-const S={bills:[],shifts:[],counterRecords:[],payrollStaff:[],payrollHistory:[],cleanLogs:[],restrictions:[],reservations:{}};
+const S={bills:[],shifts:[],cleanLogs:[],restrictions:[],reservations:{}};
 const DAYS_SHORT=['MON','TUE','WED','THU','FRI','SAT','SUN'];
 
 const fsAdd=async(col,data)=>{const r=await addDoc(collection(db,col),{...data,_ts:Date.now()});return r.id;};
@@ -519,10 +340,9 @@ const fsGet=async col=>(await getDocs(collection(db,col))).docs.map(d=>({id:d.id
 
 async function boot(){
   try{
-    [S.bills,S.shifts,S.counterRecords,S.payrollStaff,S.payrollHistory,S.cleanLogs,S.restrictions]=await Promise.all([
-      fsGet('bills'),fsGet('shifts'),fsGet('counterRecords'),fsGet('payrollStaff'),fsGet('payrollHistory'),fsGet('cleanLogs'),fsGet('restrictions')
+    [S.bills,S.shifts,S.cleanLogs,S.restrictions]=await Promise.all([
+      fsGet('bills'),fsGet('shifts'),fsGet('cleanLogs'),fsGet('restrictions')
     ]);
-    S.payrollStaff.sort((a,b)=>(a.order||0)-(b.order||0));
   }catch(e){showToast('Firebase error');console.error(e);}
   const now=new Date();
   document.getElementById('d-date').textContent=now.toLocaleDateString('en-CA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -530,14 +350,12 @@ async function boot(){
   document.getElementById('cl-date').valueAsDate=now;
   const mon=getMonday(now);
   document.getElementById('sch-weekdate').valueAsDate=mon;
-  document.getElementById('ct-weekdate').valueAsDate=mon;
   setWeekLabel('sch-weekdate','sch-week-label');
-  setWeekLabel('ct-weekdate','ct-week-label');
-  buildCleaning();buildCtWeek();renderAll();loadReservations();
+  buildCleaning();renderAll();loadReservations();
 }
 boot();
 
-function renderAll(){renderDash();renderBills();renderSchedule();renderCleanLog();renderWageStaff();buildPayEntryRows();renderPayHist();renderRestrictions();renderCounterHistory();}
+function renderAll(){renderDash();renderBills();renderSchedule();renderCleanLog();renderRestrictions();}
 
 window.go=function(id,el){
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
@@ -564,7 +382,6 @@ function setWeekLabel(inputId,labelId){
   document.getElementById(labelId).textContent=d.toLocaleDateString('en-CA',{month:'short',day:'numeric'})+' – '+e.toLocaleDateString('en-CA',{month:'short',day:'numeric'});
 }
 window.onWeekChange=function(){setWeekLabel('sch-weekdate','sch-week-label');renderSchedule();renderRestrictions();renderForecast();};
-window.onCtWeekChange=function(){setWeekLabel('ct-weekdate','ct-week-label');buildCtWeek();};
 window.toggleReceiptNote=function(){document.getElementById('b-receipt-note').style.display=document.getElementById('b-paytype').value==='autopay'?'block':'none';};
 function nextDueDate(due,freq){
   if(!due||freq==='once')return due;
@@ -597,11 +414,9 @@ window.loadReservations=async function(){
     document.getElementById('res-sync-status').textContent=Object.keys(byDate).length+' days synced';
   }catch(e){document.getElementById('res-sync-status').textContent='Sync failed';console.error('Res sync error:',e);}
   renderForecast();
-  updateCtHibachi();
 };
 
 function getWeekKey(){return document.getElementById('sch-weekdate').value||'default';}
-function getCtWeekKey(){return document.getElementById('ct-weekdate').value||'default';}
 function getWeekDates(inputId){
   const v=document.getElementById(inputId||'sch-weekdate').value;if(!v)return[];
   const mon=new Date(v+'T12:00:00');
@@ -662,212 +477,7 @@ function countTodayStaff(dateStr){
   return names.size;
 }
 
-// ── COUNTER — WEEKLY ──
-function buildCtWeek(){
-  const dates=getWeekDates('ct-weekdate');
-  if(!dates.length)return;
-  const svcStaff=S.payrollStaff.filter(s=>s.role==='Service');
-  const tabsEl=document.getElementById('ct-day-tabs');
-  const panesEl=document.getElementById('ct-day-panes');
-  tabsEl.innerHTML=DAYS_SHORT.map((d,i)=>`<div class="day-tab${i===0?' on':''}" id="ct-tab-${i}" onclick="switchCtDay(${i},this)">${d}<br><span style="font-size:.6rem;color:inherit">${dates[i].slice(5)}</span></div>`).join('');
-  panesEl.innerHTML=dates.map((date,i)=>`
-    <div class="ct-day-pane${i===0?' on':''}" id="ct-pane-${i}">
-      <div class="ct-section"><h4>TPN — ${DAYS_SHORT[i]} ${date.slice(5)}</h4>
-        <div class="g2">
-          <div class="fg"><label>TPN Credit (CRD)</label><input type="number" id="ct-${i}-tpn-crd" placeholder="0.00" step="0.01" oninput="recalcDay(${i})"></div>
-          <div class="fg"><label>TPN Cash (CSH)</label><input type="number" id="ct-${i}-tpn-csh" placeholder="0.00" step="0.01" oninput="recalcDay(${i})"></div>
-        </div>
-      </div>
-      <div class="ct-section"><h4>DIN — ${DAYS_SHORT[i]} ${date.slice(5)}</h4>
-        <div class="g2">
-          <div class="fg"><label>DIN Credit (CRD)</label><input type="number" id="ct-${i}-din-crd" placeholder="0.00" step="0.01" oninput="recalcDay(${i})"></div>
-          <div class="fg"><label>DIN Cash (CSH)</label><input type="number" id="ct-${i}-din-csh" placeholder="0.00" step="0.01" oninput="recalcDay(${i})"></div>
-        </div>
-      </div>
-      <div class="ct-section">
-        <h4>Stream Pools — ${DAYS_SHORT[i]}</h4>
-        <div class="ct-pools">
-          <div class="ct-pool"><div class="pl">TPN Kitchen (30%)</div><div class="pv" id="ct-${i}-tpn-kit">$0.00</div><div class="ps" id="ct-${i}-tpn-lbl">TPN: $0.00</div></div>
-          <div class="ct-pool"><div class="pl">DIN Kitchen (30%)</div><div class="pv" id="ct-${i}-din-kit">$0.00</div><div class="ps" id="ct-${i}-din-lbl">DIN: $0.00</div></div>
-          <div class="ct-pool"><div class="pl">Service Pool (70%)</div><div class="pv" id="ct-${i}-svc-pool">$0.00</div><div class="ps">Split by weighted hrs</div></div>
-        </div>
-        <div style="margin-top:10px;font-family:var(--font-mono);font-size:.62rem;color:var(--text3)">
-          HIB Guests: <span style="color:#e87858;font-weight:600" id="ct-${i}-hib">—</span>
-        </div>
-      </div>
-      <div class="ct-section">
-        <h4>Service Staff — ${DAYS_SHORT[i]}</h4>
-        <p style="font-family:var(--font-mono);font-size:.63rem;color:var(--text3);margin-bottom:10px">Enter shifts. Add a break row if they left and came back. 11:00–16:00 = ×0.3 · 16:01–23:45 = ×0.7</p>
-        <div class="svc-grid" id="ct-${i}-staff"></div>
-      </div>
-    </div>`).join('');
-
-  dates.forEach((_,i)=>buildDaySvcStaff(i,svcStaff));
-  updateCtHibachi();
-  recalcAll();
-}
-
-window.switchCtDay=function(i,el){
-  document.querySelectorAll('.day-tab').forEach(t=>t.classList.remove('on'));
-  document.querySelectorAll('.ct-day-pane').forEach(p=>p.classList.remove('on'));
-  el.classList.add('on');
-  document.getElementById('ct-pane-'+i).classList.add('on');
-};
-
-function buildDaySvcStaff(dayIdx,svcStaff){
-  const c=document.getElementById('ct-'+dayIdx+'-staff');
-  if(!c)return;
-  if(!svcStaff.length){c.innerHTML='<p style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">Add Service staff in Payroll first.</p>';return;}
-  c.innerHTML=svcStaff.map(s=>`
-    <div class="svc-card" id="ct-${dayIdx}-card-${s.id}">
-      <div class="sname">${s.name}</div>
-      <div class="srole">Service</div>
-      <div id="ct-${dayIdx}-shifts-${s.id}">
-        <div class="break-row">
-          <div class="fg"><label>Start</label><input type="time" class="shift-start" data-day="${dayIdx}" data-staff="${s.id}" value="11:00" oninput="recalcDay(${dayIdx})"></div>
-          <div class="fg"><label>End</label><input type="time" class="shift-end" data-day="${dayIdx}" data-staff="${s.id}" value="22:00" oninput="recalcDay(${dayIdx})"></div>
-        </div>
-      </div>
-      <button class="break-add" onclick="addBreak(${dayIdx},'${s.id}')">+ Add break segment</button>
-      <div class="swt" id="ct-${dayIdx}-wt-${s.id}">—</div>
-      <div class="samt" id="ct-${dayIdx}-amt-${s.id}">$0.00</div>
-    </div>`).join('');
-}
-
-window.addBreak=function(dayIdx,staffId){
-  const container=document.getElementById(`ct-${dayIdx}-shifts-${staffId}`);
-  const row=document.createElement('div');row.className='break-row';
-  row.innerHTML=`
-    <div class="fg"><label>Start</label><input type="time" class="shift-start" data-day="${dayIdx}" data-staff="${staffId}" value="18:00" oninput="recalcDay(${dayIdx})"></div>
-    <div class="fg"><label>End</label><input type="time" class="shift-end" data-day="${dayIdx}" data-staff="${staffId}" value="22:00" oninput="recalcDay(${dayIdx})"></div>
-    <button class="break-del" onclick="removeBreak(this,${dayIdx})">✕</button>`;
-  container.appendChild(row);
-};
-window.removeBreak=function(btn,dayIdx){btn.closest('.break-row').remove();recalcDay(dayIdx);};
-
-function calcWeightedMins(start,end){
-  function toM(t){if(!t)return 0;const[h,m]=t.split(':').map(Number);return h*60+m;}
-  const s=toM(start),e=toM(end);if(e<=s)return 0;
-  const L_END=16*60,D_START=16*60+1,D_END=23*60+45;
-  const lunch=Math.max(0,Math.min(e,L_END)-Math.max(s,9*60));
-  const din=Math.max(0,Math.min(e,D_END)-Math.max(s,D_START));
-  return(lunch*0.3+din*0.7)/60;
-}
-
-window.recalcDay=function(dayIdx){
-  const tpnCrd=+document.getElementById(`ct-${dayIdx}-tpn-crd`)?.value||0;
-  const tpnCsh=+document.getElementById(`ct-${dayIdx}-tpn-csh`)?.value||0;
-  const dinCrd=+document.getElementById(`ct-${dayIdx}-din-crd`)?.value||0;
-  const dinCsh=+document.getElementById(`ct-${dayIdx}-din-csh`)?.value||0;
-  const tpnTotal=tpnCrd+tpnCsh,dinTotal=dinCrd+dinCsh;
-  const tpnKit=tpnTotal*0.3,dinKit=dinTotal*0.3;
-  const svcPool=(tpnTotal+dinTotal)*0.7;
-  const setEl=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  setEl(`ct-${dayIdx}-tpn-kit`,fmt(tpnKit));
-  setEl(`ct-${dayIdx}-din-kit`,fmt(dinKit));
-  setEl(`ct-${dayIdx}-svc-pool`,fmt(svcPool));
-  setEl(`ct-${dayIdx}-tpn-lbl`,`TPN: ${fmt(tpnTotal)}`);
-  setEl(`ct-${dayIdx}-din-lbl`,`DIN: ${fmt(dinTotal)}`);
-  const svcStaff=S.payrollStaff.filter(s=>s.role==='Service');
-  let totalW=0;
-  const weights=svcStaff.map(s=>{
-    const starts=[...document.querySelectorAll(`.shift-start[data-day="${dayIdx}"][data-staff="${s.id}"]`)];
-    const ends=[...document.querySelectorAll(`.shift-end[data-day="${dayIdx}"][data-staff="${s.id}"]`)];
-    let w=0;
-    starts.forEach((st,i)=>{w+=calcWeightedMins(st.value,ends[i]?.value);});
-    totalW+=w;return{id:s.id,w};
-  });
-  weights.forEach(({id,w})=>{
-    const amt=totalW>0?svcPool*(w/totalW):0;
-    setEl(`ct-${dayIdx}-amt-${id}`,fmt(amt));
-    setEl(`ct-${dayIdx}-wt-${id}`,`${w.toFixed(2)} weighted hrs`);
-  });
-  updateWeeklySummary();
-  const tab=document.getElementById('ct-tab-'+dayIdx);
-  if(tab){const tpnTotal2=tpnCrd+tpnCsh,dinTotal2=dinCrd+dinCsh;(tpnTotal2||dinTotal2)?tab.classList.add('has-data'):tab.classList.remove('has-data');}
-};
-
-function recalcAll(){for(let i=0;i<7;i++)recalcDay(i);}
-
-function updateCtHibachi(){
-  const dates=getWeekDates('ct-weekdate');
-  dates.forEach((date,i)=>{
-    const el=document.getElementById(`ct-${i}-hib`);
-    if(!el)return;
-    const data=S.reservations[date];
-    el.textContent=data?`${data.guests} guests (${data.grills} grills)`:'No data — sync reservations';
-  });
-}
-
-function updateWeeklySummary(){
-  const dates=getWeekDates('ct-weekdate');
-  const tbody=document.getElementById('ct-week-tbody');
-  let grandTpn=0,grandDin=0,grandSvc=0,grandTKit=0,grandDKit=0;
-  const rows=dates.map((date,i)=>{
-    const tpnCrd=+document.getElementById(`ct-${i}-tpn-crd`)?.value||0;
-    const tpnCsh=+document.getElementById(`ct-${i}-tpn-csh`)?.value||0;
-    const dinCrd=+document.getElementById(`ct-${i}-din-crd`)?.value||0;
-    const dinCsh=+document.getElementById(`ct-${i}-din-csh`)?.value||0;
-    const tT=tpnCrd+tpnCsh,dT=dinCrd+dinCsh;
-    const tK=tT*0.3,dK=dT*0.3,sP=(tT+dT)*0.7;
-    grandTpn+=tT;grandDin+=dT;grandSvc+=sP;grandTKit+=tK;grandDKit+=dK;
-    const hib=S.reservations[date];
-    const hibStr=hib?`<span class="hib">${hib.guests}g</span>`:'—';
-    return`<tr>
-      <td style="font-family:var(--font-mono);font-size:.73rem">${DAYS_SHORT[i]} ${date.slice(5)}</td>
-      <td style="color:var(--amber)">${fmt(tT)}</td>
-      <td style="color:var(--amber)">${fmt(dT)}</td>
-      <td style="color:var(--green-l)">${fmt(sP)}</td>
-      <td>${fmt(tK)}</td><td>${fmt(dK)}</td>
-      <td>${hibStr}</td>
-    </tr>`;
-  });
-  rows.push(`<tr style="border-top:1px solid var(--border)">
-    <td>WEEK TOTAL</td>
-    <td>${fmt(grandTpn)}</td><td>${fmt(grandDin)}</td>
-    <td>${fmt(grandSvc)}</td><td>${fmt(grandTKit)}</td><td>${fmt(grandDKit)}</td>
-    <td>—</td>
-  </tr>`);
-  tbody.innerHTML=rows.join('');
-}
-
-window.saveWeekCounter=async function(){
-  const dates=getWeekDates('ct-weekdate');
-  const wk=getCtWeekKey();
-  let saved=0;
-  for(let i=0;i<7;i++){
-    const tpnCrd=+document.getElementById(`ct-${i}-tpn-crd`)?.value||0;
-    const tpnCsh=+document.getElementById(`ct-${i}-tpn-csh`)?.value||0;
-    const dinCrd=+document.getElementById(`ct-${i}-din-crd`)?.value||0;
-    const dinCsh=+document.getElementById(`ct-${i}-din-csh`)?.value||0;
-    if(!tpnCrd&&!tpnCsh&&!dinCrd&&!dinCsh)continue;
-    const tT=tpnCrd+tpnCsh,dT=dinCrd+dinCsh;
-    const hib=S.reservations[dates[i]];
-    const rec={week:wk,date:dates[i],day:DAYS_SHORT[i],tpnTotal:tT,dinTotal:dT,
-      tpnKit:tT*0.3,dinKit:dT*0.3,svcPool:(tT+dT)*0.7,
-      hibGuests:hib?.guests||0,hibGrills:hib?.grills||0};
-    rec.id=await fsAdd('counterRecords',rec);
-    S.counterRecords.push(rec);saved++;
-  }
-  if(!saved){showToast('No data entered to save');return;}
-  renderCounterHistory();showToast(`${saved} day(s) saved ✓`);
-};
-
-function renderCounterHistory(){
-  const sorted=[...S.counterRecords].sort((a,b)=>new Date(b.date)-new Date(a.date));
-  document.getElementById('ct-tbody').innerHTML=sorted.length?sorted.map(t=>`<tr>
-    <td style="font-family:var(--font-mono);font-size:.72rem">${t.week}</td>
-    <td style="font-family:var(--font-mono);font-size:.72rem">${t.day}</td>
-    <td style="color:var(--amber)">${fmt(t.tpnTotal)}</td>
-    <td style="color:var(--amber)">${fmt(t.dinTotal)}</td>
-    <td style="color:var(--green-l)">${fmt(t.svcPool)}</td>
-    <td style="color:#e87858;font-family:var(--font-mono)">${t.hibGuests||0}g</td>
-    <td><button class="btn br bs" onclick="delCounter('${t.id}')">✕</button></td>
-  </tr>`).join(''):`<tr><td colspan="7" class="emp">// No records yet</td></tr>`;
-}
-window.delCounter=async function(id){await fsDel('counterRecords',id);S.counterRecords=S.counterRecords.filter(t=>t.id!==id);renderCounterHistory();};
-
-// ── DASHBOARD ──
+// ── CLEANING ──
 function renderDash(){
   const now=new Date(),w=new Date();w.setDate(now.getDate()+7);
   document.getElementById('d-due').textContent=S.bills.filter(b=>b.paid==='Unpaid'&&new Date(b.due+'T12:00:00')<=w).length;
@@ -884,9 +494,7 @@ function renderDash(){
     todayStaffCount=new Set(todayShifts.map(s=>s.name)).size;
   }
   document.getElementById('d-staff').textContent=todayStaffCount||'—';
-  document.getElementById('d-roster').textContent=S.payrollStaff.length;
-  // Pay records count (number of individual entries, not dollar amount)
-  document.getElementById('d-pay').textContent=S.payrollHistory.length;
+  document.getElementById('d-roster').textContent=S.shifts.length?new Set(S.shifts.map(s=>s.name)).size:'—';
 
   const pn=document.getElementById('print-remind-pn');
   const pr=S.bills.filter(b=>b.paid==='Paid'&&b.needsPrint===true);
@@ -1018,7 +626,7 @@ window.buildSchPrompt=function(){
   const forecastLines=dates.map((d,i)=>{const res=S.reservations[d]||{bookings:0,guests:0,grills:0};return`  ${DAYS_SHORT[i]} (${d}): ${res.bookings} bookings, ${res.guests} guests, ${res.grills} grills`;}).join('\n');
   const allSec=['SUSHI','KITCHEN','SERVING'];
   const currentSched=allSec.map(sec=>{const row=DAYS_SHORT.map((_,i)=>{const cs=ws.filter(s=>s.section===sec&&s.dayIdx===i);return cs.length?cs.map(s=>s.time?`${s.name} ${s.time}`:s.name).join(', '):'—';});return`${sec}: ${row.join(' | ')}`;}).join('\n');
-  const roster=S.payrollStaff.map(s=>`- ${s.name} (${s.role})`).join('\n')||'[No staff set up]';
+  const roster=S.shifts.length?[...new Set(S.shifts.map(s=>s.name))].map(n=>`- ${n}`).join('\n'):'[No staff scheduled]';
   const p=`Create a weekly staff schedule for the week of ${wLabel||wk}.\n\nSTAFF ROSTER:\n${roster}\n\nCLOCK-IN FORMAT:\n- Opening = earliest shift. Half or 1/2 = starts mid-day.\n- Format: Name + time (e.g. "Kim 11", "Yang 1/2")\n\nCURRENT SCHEDULE:\n${currentSched}\n\nRESERVATION FORECAST (Hibachi):\n${forecastLines}\n\nRESTRICTIONS:\n${restrictions}\n\nSuggest changes based on restrictions. Consider day off on quiet days. Format as SUSHI / KITCHEN / SERVING rows, MON–SUN columns.`;
   document.getElementById('sch-prompt-txt').textContent=p;document.getElementById('sch-prompt-pn').style.display='block';showToast('Prompt ready ✓');
 };
@@ -1054,173 +662,6 @@ function renderCleanLog(){
   document.getElementById('cl-log').innerHTML=sorted.length?sorted.map(l=>{const col=l.pct>=80?'var(--green-l)':l.pct>=50?'var(--amber)':'var(--red)';return`<tr><td>${l.date}</td><td>${l.staff}</td><td>${l.done}</td><td>${l.total}</td><td style="color:${col};font-weight:600;font-family:var(--font-mono)">${l.pct}%</td></tr>`;}).join(''):`<tr><td colspan="5" class="emp">// No logs yet</td></tr>`;
 }
 
-// ── PAYROLL — FIRE ENTRY ROWS ──
-let payDragSrc=null;
-
-function buildPayEntryRows(){
-  const c=document.getElementById('pay-entry-rows');
-  if(!S.payrollStaff.length){c.innerHTML='<p style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3);padding:16px">Add staff above first.</p>';return;}
-  c.innerHTML=S.payrollStaff.map((s,idx)=>`
-    <div class="pay-entry-row" draggable="true" data-id="${s.id}" id="per-row-${s.id}">
-      <div class="per-drag" title="Drag to reorder">⠿</div>
-      <div class="per-name">${s.name}</div>
-      <div class="per-role"><span class="badge ${s.role==='Service'?'bservice':'bcook'}" style="font-size:.58rem">${s.role}</span></div>
-      <div class="per-wage">${s.type==='hourly'?fmt(s.wage)+'/hr':fmt(s.wage)+'/day'}</div>
-      <div class="per-input-wrap">
-        <label>${s.type==='hourly'?'Hrs (bi-weekly)':'Days worked'}</label>
-        <input type="number" class="per-input" id="per-${s.id}" placeholder="0"
-          step="${s.type==='hourly'?'0.5':'1'}"
-          data-wage="${s.wage}"
-          data-staffid="${s.id}"
-          oninput="liveCalcPayRow('${s.id}','${s.wage}')"
-          onkeydown="payRowKeydown(event,'${s.id}')"
-          onfocus="setActiveRow('${s.id}')">
-      </div>
-      <div class="per-total" id="per-tot-${s.id}">—</div>
-    </div>`).join('');
-
-  // Focus first input
-  const first=c.querySelector('.per-input');
-  if(first)setTimeout(()=>first.focus(),80);
-
-  // Drag to reorder
-  c.querySelectorAll('.pay-entry-row').forEach(row=>{
-    row.addEventListener('dragstart',e=>{payDragSrc=row;row.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
-    row.addEventListener('dragend',()=>{row.classList.remove('dragging');document.querySelectorAll('.pay-entry-row').forEach(r=>r.classList.remove('drag-over'));});
-    row.addEventListener('dragover',e=>{e.preventDefault();if(row!==payDragSrc)row.classList.add('drag-over');});
-    row.addEventListener('dragleave',()=>row.classList.remove('drag-over'));
-    row.addEventListener('drop',async e=>{
-      e.preventDefault();row.classList.remove('drag-over');
-      if(!payDragSrc||payDragSrc===row)return;
-      const fi=S.payrollStaff.findIndex(s=>s.id===payDragSrc.dataset.id);
-      const ti=S.payrollStaff.findIndex(s=>s.id===row.dataset.id);
-      const[moved]=S.payrollStaff.splice(fi,1);S.payrollStaff.splice(ti,0,moved);
-      S.payrollStaff.forEach((s,i)=>{s.order=i;fsUp('payrollStaff',s.id,{order:i});});
-      buildPayEntryRows();renderWageStaff();showToast('Order saved ✓');
-    });
-  });
-}
-
-window.setActiveRow=function(staffId){
-  document.querySelectorAll('.pay-entry-row').forEach(r=>r.classList.remove('active-row'));
-  const row=document.getElementById('per-row-'+staffId);
-  if(row)row.classList.add('active-row');
-};
-
-window.liveCalcPayRow=function(id,wage){
-  const qty=+document.getElementById('per-'+id)?.value||0;
-  const el=document.getElementById('per-tot-'+id);
-  if(el)el.textContent=qty?fmt(qty*(+wage||0)):'—';
-};
-
-window.payRowKeydown=function(e,currentId){
-  if(e.key==='Enter'||e.key==='Tab'){
-    e.preventDefault();
-    const inputs=[...document.querySelectorAll('.pay-entry-row .per-input')];
-    const idx=inputs.findIndex(i=>i.dataset.staffid===currentId);
-    const next=inputs[idx+1];
-    if(next){next.focus();next.select();}
-    else document.getElementById('pay-period').focus();
-  }
-};
-
-window.calcAndSavePayroll=async function(){
-  const period=document.getElementById('pay-period').value;if(!period){showToast('Select a period date');return;}
-  const entries=[];
-  for(const s of S.payrollStaff){
-    const qty=+document.getElementById('per-'+s.id)?.value||0;if(qty===0)continue;
-    const total=(qty*(+s.wage||0)).toFixed(2);
-    const rec={period,name:s.name,role:s.role,type:s.type,qty,wage:s.wage,total};
-    rec.id=await fsAdd('payrollHistory',rec);S.payrollHistory.push(rec);entries.push(rec);
-  }
-  if(!entries.length){showToast('No quantities entered');return;}
-  renderPayResults(entries);renderPayHist();renderDash();showToast('Payroll saved ✓');
-};
-
-function renderPayResults(entries){
-  const grand=entries.reduce((a,e)=>a+(+e.total||0),0);
-  document.getElementById('pay-grand').textContent=fmt(grand);
-  document.getElementById('pay-tbody').innerHTML=entries.map(e=>`<tr>
-    <td><strong>${e.name}</strong></td>
-    <td><span class="badge ${e.role==='Service'?'bservice':'bcook'}">${e.role}</span></td>
-    <td style="font-family:var(--font-mono);font-size:.72rem;color:var(--text2)">${e.type==='hourly'?'Hourly':'Daily'}</td>
-    <td style="font-family:var(--font-mono);font-size:.72rem">${e.qty} ${e.type==='hourly'?'hrs':'days'}</td>
-    <td style="font-family:var(--font-mono);font-size:.72rem">${e.type==='hourly'?fmt(e.wage)+'/hr':fmt(e.wage)+'/day'}</td>
-    <td style="color:var(--amber);font-weight:600;font-family:var(--font-mono)">${fmt(e.total)}</td>
-  </tr>`).join('');
-
-  // Amounts-only block: just the dollar value, one per line, stacked
-  const amountsLines=entries.map(e=>fmtN(e.total)).join('\n');
-  document.getElementById('pay-amounts-text').textContent=amountsLines;
-
-  // Full table block
-  const lines=['Name\tRole\tType\tQty\tWage\tTotal'];
-  entries.forEach(e=>lines.push(`${e.name}\t${e.role}\t${e.type==='hourly'?'Hourly':'Daily'}\t${e.qty}\t${fmtN(e.wage)}\t${fmtN(e.total)}`));
-  lines.push(`\t\t\t\tTOTAL\t${fmtN(grand)}`);
-  document.getElementById('pay-copy-text').textContent=lines.join('\n');
-  document.getElementById('pay-results-pn').style.display='block';
-}
-
-window.copyAmountsOnly=function(){
-  const txt=document.getElementById('pay-amounts-text').textContent;
-  navigator.clipboard.writeText(txt);showToast('Amounts copied ✓');
-};
-window.selectAmountsText=function(){
-  const el=document.getElementById('pay-amounts-text');
-  const r=document.createRange();r.selectNodeContents(el);
-  const s=window.getSelection();s.removeAllRanges();s.addRange(r);
-};
-window.copyPayTable=function(){navigator.clipboard.writeText(document.getElementById('pay-copy-text').textContent);showToast('Copied ✓');};
-window.selectCopyText=function(){const el=document.getElementById('pay-copy-text');const r=document.createRange();r.selectNodeContents(el);const s=window.getSelection();s.removeAllRanges();s.addRange(r);};
-
-function renderPayHist(){
-  const sorted=[...S.payrollHistory].sort((a,b)=>new Date(b.period)-new Date(a.period));
-  document.getElementById('pay-hist-tbody').innerHTML=sorted.length?sorted.map(p=>`<tr>
-    <td style="font-family:var(--font-mono);font-size:.72rem">${p.period}</td>
-    <td><strong>${p.name}</strong></td>
-    <td style="font-family:var(--font-mono);font-size:.72rem;color:var(--text2)">${p.type==='hourly'?'Hourly':'Daily'}</td>
-    <td style="font-family:var(--font-mono);font-size:.72rem">${p.qty} ${p.type==='hourly'?'hrs':'days'}</td>
-    <td style="font-family:var(--font-mono);font-size:.72rem">${p.type==='hourly'?fmt(p.wage)+'/hr':fmt(p.wage)+'/day'}</td>
-    <td style="color:var(--amber);font-weight:600;font-family:var(--font-mono)">${fmt(p.total)}</td>
-    <td><button class="btn br bs" onclick="delPayHist('${p.id}')">✕</button></td>
-  </tr>`).join(''):`<tr><td colspan="7" class="emp">// No history yet</td></tr>`;
-}
-window.delPayHist=async function(id){if(!confirm('Delete?'))return;await fsDel('payrollHistory',id);S.payrollHistory=S.payrollHistory.filter(p=>p.id!==id);renderPayHist();renderDash();};
-
-// ── WAGE STAFF TABLE (separate from payroll entry) ──
-function renderWageStaff(){
-  document.getElementById('wage-tbody').innerHTML=S.payrollStaff.length?S.payrollStaff.map((s,i)=>`<tr>
-    <td style="font-family:var(--font-mono);font-size:.7rem;color:var(--text3)">${i+1}</td>
-    <td><strong>${s.name}</strong></td>
-    <td><span class="badge ${s.role==='Service'?'bservice':'bcook'}">${s.role}</span></td>
-    <td style="font-family:var(--font-mono);font-size:.72rem;color:var(--text2)">${s.type==='hourly'?'Hourly':'Daily'}</td>
-    <td style="font-family:var(--font-mono);font-size:.74rem">${s.type==='hourly'?fmt(s.wage)+'/hr':fmt(s.wage)+'/day'}</td>
-    <td style="display:flex;gap:4px"><button class="btn bo bs" onclick="editWageStaff('${s.id}')">Edit</button><button class="btn br bs" onclick="delWageStaff('${s.id}')">✕</button></td>
-  </tr>`).join(''):`<tr><td colspan="6" class="emp">// No staff yet</td></tr>`;
-}
-
-window.addWageStaff=async function(){
-  const name=document.getElementById('wm-name').value.trim();if(!name){showToast('Enter a name');return;}
-  const s={name,role:document.getElementById('wm-role').value,type:document.getElementById('wm-type').value,wage:document.getElementById('wm-wage').value,order:S.payrollStaff.length};
-  s.id=await fsAdd('payrollStaff',s);S.payrollStaff.push(s);
-  closeModal('wage-modal');renderWageStaff();buildPayEntryRows();buildCtWeek();renderDash();showToast('Staff added ✓');
-};
-window.editWageStaff=function(id){
-  const s=S.payrollStaff.find(x=>x.id===id);if(!s)return;
-  document.getElementById('ew-id').value=id;document.getElementById('ew-name').value=s.name;
-  document.getElementById('ew-role').value=s.role;document.getElementById('ew-type').value=s.type;document.getElementById('ew-wage').value=s.wage;
-  openModal('edit-wage-modal');
-};
-window.saveEditStaff=async function(){
-  const id=document.getElementById('ew-id').value;
-  const updates={name:document.getElementById('ew-name').value.trim(),role:document.getElementById('ew-role').value,type:document.getElementById('ew-type').value,wage:document.getElementById('ew-wage').value};
-  await fsUp('payrollStaff',id,updates);const s=S.payrollStaff.find(x=>x.id===id);if(s)Object.assign(s,updates);
-  closeModal('edit-wage-modal');renderWageStaff();buildPayEntryRows();buildCtWeek();showToast('Updated ✓');
-};
-window.delWageStaff=async function(id){
-  if(!confirm('Remove?'))return;await fsDel('payrollStaff',id);S.payrollStaff=S.payrollStaff.filter(s=>s.id!==id);
-  renderWageStaff();buildPayEntryRows();buildCtWeek();renderDash();
-};
 </script>
 
 </body>
