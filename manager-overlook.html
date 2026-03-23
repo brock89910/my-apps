@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -15,6 +14,11 @@
 --text:#f0ead6;--text2:#a09880;--text3:#5a5648;
 --red:#d04828;--red-d:rgba(208,72,40,0.15);--green:#4a8a4a;--green-l:#6ab86a;
 --blue:#3a7ab8;
+/* Role colors */
+--teppan:#e06020;--teppan-d:rgba(224,96,32,0.15);--teppan-g:rgba(224,96,32,0.08);
+--sushi:#3a9ab8;--sushi-d:rgba(58,154,184,0.15);--sushi-g:rgba(58,154,184,0.08);
+--kitchen:#c8a020;--kitchen-d:rgba(200,160,32,0.15);--kitchen-g:rgba(200,160,32,0.08);
+--service:#8a5ab8;--service-d:rgba(138,90,184,0.15);--service-g:rgba(138,90,184,0.08);
 --font-head:'Barlow Condensed',sans-serif;--font-body:'Barlow',sans-serif;--font-mono:'JetBrains Mono',monospace;
 --r:4px;
 }
@@ -55,6 +59,9 @@ main{flex:1;padding:28px 30px;overflow-y:auto}
 .sc .lb{font-family:var(--font-mono);font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
 .sc .vl{font-family:var(--font-head);font-size:2rem;font-weight:800;color:var(--amber);margin-top:4px;letter-spacing:.02em;line-height:1}
 .sc .sb{font-size:.71rem;color:var(--text3);margin-top:3px}
+.sc .vl-split{display:flex;gap:8px;align-items:baseline;margin-top:4px}
+.sc .vl-split .vpart{font-family:var(--font-head);font-size:1.5rem;font-weight:800;line-height:1}
+.sc .vl-split .vlabel{font-family:var(--font-mono);font-size:.55rem;color:var(--text3);text-transform:uppercase}
 .pn{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px;position:relative}
 .pn::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--amber-d),transparent)}
 .pnh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:8px;flex-wrap:wrap}
@@ -93,6 +100,11 @@ tr:hover td{background:rgba(232,160,32,.03)}
 .aib h4{font-family:var(--font-mono);font-size:.68rem;color:var(--amber);margin-bottom:6px;letter-spacing:.08em;text-transform:uppercase}
 .aib p{font-size:.78rem;color:var(--text2);line-height:1.6}
 .aip{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-top:10px;font-family:var(--font-mono);font-size:.72rem;color:var(--text2);line-height:1.75;white-space:pre-wrap;word-break:break-word}
+/* ROLE BADGES */
+.role-teppan{background:var(--teppan-d);color:var(--teppan);border:1px solid rgba(224,96,32,.3)}
+.role-sushi{background:var(--sushi-d);color:var(--sushi);border:1px solid rgba(58,154,184,.3)}
+.role-kitchen{background:var(--kitchen-d);color:var(--kitchen);border:1px solid rgba(200,160,32,.3)}
+.role-service{background:var(--service-d);color:var(--service);border:1px solid rgba(138,90,184,.3)}
 /* SCHEDULE */
 .sch-tabs{display:flex;gap:0;margin-bottom:14px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;width:fit-content}
 .sch-tab{padding:8px 22px;cursor:pointer;font-family:var(--font-head);font-size:.88rem;font-weight:700;color:var(--text2);transition:all .12s;user-select:none;text-transform:uppercase;letter-spacing:.07em;border-right:1px solid var(--border)}
@@ -105,10 +117,23 @@ tr:hover td{background:rgba(232,160,32,.03)}
 .sg th{background:var(--s3);font-family:var(--font-head);font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:9px 8px;border:1px solid var(--border);text-align:center;color:var(--amber)}
 .sg th.corner{background:var(--bg2)}
 .sg td{border:1px solid var(--border);padding:6px 5px;vertical-align:top;min-width:80px;background:var(--surface)}
-.sg td.sc2{background:var(--s3);font-family:var(--font-head);font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;text-align:center;color:var(--amber);padding:8px 6px;white-space:nowrap;width:70px}
+.sg td.sc2{background:var(--s3);font-family:var(--font-head);font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;text-align:center;padding:8px 6px;white-space:nowrap;width:70px}
+.sg td.sc2.sec-teppan{color:var(--teppan)}
+.sg td.sc2.sec-sushi{color:var(--sushi)}
+.sg td.sc2.sec-kitchen{color:var(--kitchen)}
+.sg td.sc2.sec-serving{color:var(--service)}
 .sg td.dn{background:var(--bg2);font-family:var(--font-mono);font-size:.68rem;color:var(--text3);text-align:center;padding:4px;border:1px solid var(--border)}
-.sg-chip{background:var(--amber-g);border:1px solid rgba(232,160,32,.15);border-radius:2px;padding:4px 5px;margin-bottom:3px;font-size:.72rem;display:flex;justify-content:space-between;align-items:center;gap:3px}
-.sg-chip .cn{color:var(--amber);font-weight:600}
+/* Role-colored chips */
+.sg-chip{border-radius:2px;padding:4px 5px;margin-bottom:3px;font-size:.72rem;display:flex;justify-content:space-between;align-items:center;gap:3px}
+.sg-chip.chip-teppan{background:var(--teppan-g);border:1px solid rgba(224,96,32,.2)}
+.sg-chip.chip-sushi{background:var(--sushi-g);border:1px solid rgba(58,154,184,.2)}
+.sg-chip.chip-kitchen{background:var(--kitchen-g);border:1px solid rgba(200,160,32,.2)}
+.sg-chip.chip-serving{background:var(--service-g);border:1px solid rgba(138,90,184,.2)}
+.sg-chip .cn{font-weight:600}
+.sg-chip.chip-teppan .cn{color:var(--teppan)}
+.sg-chip.chip-sushi .cn{color:var(--sushi)}
+.sg-chip.chip-kitchen .cn{color:var(--kitchen)}
+.sg-chip.chip-serving .cn{color:var(--service)}
 .sg-chip .ct{color:var(--text2);font-family:var(--font-mono);font-size:.65rem}
 .sg-chip .cx{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.65rem;padding:0;flex-shrink:0}
 .sg-chip .cx:hover{color:var(--red)}
@@ -120,19 +145,24 @@ tr:hover td{background:rgba(232,160,32,.03)}
 .rlist{display:flex;flex-wrap:wrap;gap:5px}
 .rtag{display:inline-flex;align-items:center;gap:4px;background:rgba(208,72,40,.1);border:1px solid rgba(208,72,40,.2);color:#e87858;border-radius:2px;padding:3px 8px;font-family:var(--font-mono);font-size:.68rem}
 .rtag button{background:none;border:none;color:#e87858;cursor:pointer;font-size:.65rem;padding:0}
-/* FORECAST — rolling 8 days */
+/* REQUEST-OFF TAGS */
+.off-req-tag{display:inline-flex;align-items:center;gap:4px;background:rgba(138,90,184,.1);border:1px solid rgba(138,90,184,.25);color:var(--service);border-radius:2px;padding:3px 8px;font-family:var(--font-mono);font-size:.68rem;flex-wrap:wrap}
+.off-req-tag button{background:none;border:none;color:var(--service);cursor:pointer;font-size:.65rem;padding:0}
+/* FORECAST */
 .forecast-bar{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin-bottom:14px}
 .fc-day{border-radius:var(--r);padding:9px 6px;text-align:center;border:1px solid var(--border);position:relative}
 .fc-day.fc-today{border-color:var(--amber);box-shadow:0 0 0 1px rgba(232,160,32,.25)}
 .fc-today-badge{position:absolute;top:3px;left:3px;background:var(--amber);color:#0a0908;border-radius:2px;font-family:var(--font-mono);font-size:.5rem;padding:1px 4px;letter-spacing:.06em;font-weight:700}
 .fc-day .fcd{font-family:var(--font-mono);font-size:.6rem;color:var(--text3);letter-spacing:.08em;text-transform:uppercase}
 .fc-day .fcn{font-size:.78rem;font-weight:500;margin:2px 0;font-family:var(--font-mono)}
-.fc-day .fcs{font-family:var(--font-mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em}
+.fc-day .fcs{font-family:var(--font-mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.06em;margin-top:1px}
 .fc-day .fcc{font-size:.6rem;color:var(--text2);margin-top:2px;font-family:var(--font-mono);line-height:1.6}
-.fc-quiet{background:rgba(74,138,74,.06);border-color:rgba(74,138,74,.2)}.fc-quiet .fcs{color:var(--green-l)}
-.fc-normal{background:var(--s2)}.fc-normal .fcs{color:var(--text2)}
+/* Business level colors */
+.fc-silent{background:rgba(42,41,37,.3)}.fc-silent .fcs{color:var(--text3)}
+.fc-slow{background:rgba(74,138,74,.06);border-color:rgba(74,138,74,.2)}.fc-slow .fcs{color:var(--green-l)}
+.fc-regular{background:var(--s2)}.fc-regular .fcs{color:var(--text2)}
 .fc-busy{background:rgba(232,160,32,.06);border-color:rgba(232,160,32,.2)}.fc-busy .fcs{color:var(--amber)}
-.fc-very-busy{background:rgba(208,72,40,.07);border-color:rgba(208,72,40,.25)}.fc-very-busy .fcs{color:#e87858}
+.fc-unusual{background:rgba(208,72,40,.07);border-color:rgba(208,72,40,.25)}.fc-unusual .fcs{color:#e87858}
 .off-badge{position:absolute;top:3px;right:3px;background:rgba(74,138,74,.2);color:var(--green-l);border-radius:2px;font-family:var(--font-mono);font-size:.55rem;padding:1px 4px;letter-spacing:.06em}
 /* CLEANING */
 .cls-title{font-family:var(--font-head);font-size:1rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--amber);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
@@ -143,42 +173,73 @@ tr:hover td{background:rgba(232,160,32,.03)}
 .ci label{font-size:.81rem;cursor:pointer;flex:1;line-height:1.45}
 .ci label.done{text-decoration:line-through;color:var(--text3)}
 .ca{font-family:var(--font-mono);font-size:.58rem;color:var(--text3);background:var(--s3);padding:2px 6px;border-radius:2px;flex-shrink:0;margin-top:2px;text-transform:uppercase;letter-spacing:.07em;border:1px solid var(--border)}
-/* PRINT / STEP */
-.print-reminder{background:rgba(208,72,40,.06);border:1px solid rgba(208,72,40,.2);border-radius:var(–r);padding:9px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
+/* PRINT/STEP */
+.print-reminder{background:rgba(208,72,40,.06);border:1px solid rgba(208,72,40,.2);border-radius:var(--r);padding:9px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
 .print-reminder span{font-size:.79rem;color:#e87858}
-.print-reminder .prn{font-weight:600;color:var(–text)}
-.step{display:flex;gap:12px;padding:11px;background:var(–bg2);border:1px solid var(–border);border-radius:var(–r);margin-bottom:7px}
-.step .num{font-family:var(–font-head);color:var(–amber);font-weight:800;font-size:1.1rem;width:20px;flex-shrink:0;line-height:1}
+.print-reminder .prn{font-weight:600;color:var(--text)}
+.step{display:flex;gap:12px;padding:11px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:7px}
+.step .num{font-family:var(--font-head);color:var(--amber);font-weight:800;font-size:1.1rem;width:20px;flex-shrink:0;line-height:1}
 .step .stit{font-size:.82rem;font-weight:600}
-.step .sdesc{font-size:.77rem;color:var(–text2);margin-top:2px;line-height:1.5}
+.step .sdesc{font-size:.77rem;color:var(--text2);margin-top:2px;line-height:1.5}
 /* SHEET */
-.sheet-preview{background:var(–bg);border:1px solid var(–border);border-radius:var(–r);overflow:auto;margin-top:12px}
-.sheet-table{border-collapse:collapse;font-family:var(–font-body);font-size:.79rem;width:100%}
+.sheet-preview{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);overflow:auto;margin-top:12px}
+.sheet-table{border-collapse:collapse;font-family:var(--font-body);font-size:.79rem;width:100%}
 .sheet-table th,.sheet-table td{border:1px solid #2a2925;padding:6px 12px;white-space:nowrap}
-.sheet-table th{background:#161412;font-family:var(–font-head);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(–amber);text-align:center}
-.sheet-table td{background:#111010;color:var(–text);text-align:center}
-.sheet-table td.section-lbl{background:#1a1916;color:var(–amber);font-family:var(–font-head);font-weight:800;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;min-width:80px}
-.sheet-table td.week-hdr{background:#161412;color:var(–amber);font-family:var(–font-head);font-weight:800;text-align:center;font-size:.92rem;text-transform:uppercase;letter-spacing:.06em}
-.sheet-table td.date-num{background:#141310;color:var(–text3);font-family:var(–font-mono);font-size:.68rem}
-.sheet-table td.day-name{background:#141310;color:var(–amber);font-family:var(–font-head);font-weight:800;font-size:.75rem;text-transform:uppercase}
-.sheet-table td.staff-cell{color:var(–text);font-size:.79rem;min-width:90px}
-.sheet-table td.empty-cell{color:var(–text3);min-width:90px}
+.sheet-table th{background:#161412;font-family:var(--font-head);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--amber);text-align:center}
+.sheet-table td{background:#111010;color:var(--text);text-align:center}
+.sheet-table td.section-lbl{background:#1a1916;font-family:var(--font-head);font-weight:800;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;min-width:80px}
+.sheet-table td.section-lbl.sec-teppan{color:var(--teppan)}
+.sheet-table td.section-lbl.sec-sushi{color:var(--sushi)}
+.sheet-table td.section-lbl.sec-kitchen{color:var(--kitchen)}
+.sheet-table td.section-lbl.sec-serving{color:var(--service)}
+.sheet-table td.week-hdr{background:#161412;color:var(--amber);font-family:var(--font-head);font-weight:800;text-align:center;font-size:.92rem;text-transform:uppercase;letter-spacing:.06em}
+.sheet-table td.date-num{background:#141310;color:var(--text3);font-family:var(--font-mono);font-size:.68rem}
+.sheet-table td.day-name{background:#141310;color:var(--amber);font-family:var(--font-head);font-weight:800;font-size:.75rem;text-transform:uppercase}
+.sheet-table td.staff-cell{color:var(--text);font-size:.79rem;min-width:90px}
+.sheet-table td.empty-cell{color:var(--text3);min-width:90px}
 /* MODAL */
 .mb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(4px);z-index:300;align-items:center;justify-content:center}
 .mb.open{display:flex}
-.mo{background:var(–surface);border:1px solid var(–border2);border-top:2px solid var(–amber);border-radius:var(–r);padding:24px;width:90%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.6)}
-.mo h3{font-family:var(–font-head);font-size:1.4rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-bottom:16px}
+.mo{background:var(--surface);border:1px solid var(--border2);border-top:2px solid var(--amber);border-radius:var(--r);padding:24px;width:90%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.mo h3{font-family:var(--font-head);font-size:1.4rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-bottom:16px}
 .mf{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 .mo-wide{max-width:960px;width:96vw}
-.toast{position:fixed;bottom:20px;right:20px;background:var(–surface);border:1px solid var(–amber);color:var(–text);padding:9px 16px;border-radius:var(–r);font-family:var(–font-mono);font-size:.72rem;letter-spacing:.04em;z-index:999;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--amber);color:var(--text);padding:9px 16px;border-radius:var(--r);font-family:var(--font-mono);font-size:.72rem;letter-spacing:.04em;z-index:999;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;box-shadow:0 8px 32px rgba(0,0,0,.4)}
 .toast.show{opacity:1;transform:translateY(0)}
-.iline{background:var(–s2);border:1px solid var(–border);color:var(–text);border-radius:var(–r);padding:5px 9px;font-size:.78rem;font-family:var(–font-body);outline:none}
-.iline:focus{border-color:var(–amber)}
-.info-note{font-size:.76rem;color:#7ab4cc;background:rgba(61,114,143,.08);border:1px solid rgba(61,114,143,.2);border-left:2px solid #7ab4cc;border-radius:var(–r);padding:8px 12px;margin-bottom:12px}
-#res-sync-status{font-family:var(–font-mono);font-size:.62rem;color:var(–text3)}
-@media(max-width:680px){body{flex-direction:column}aside{width:100%;min-height:auto;position:relative}main{padding:14px}.ct-pools{grid-template-columns:1fr}.forecast-bar{grid-template-columns:repeat(4,1fr)}}
+.iline{background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:5px 9px;font-size:.78rem;font-family:var(--font-body);outline:none}
+.iline:focus{border-color:var(--amber)}
+.info-note{font-size:.76rem;color:#7ab4cc;background:rgba(61,114,143,.08);border:1px solid rgba(61,114,143,.2);border-left:2px solid #7ab4cc;border-radius:var(--r);padding:8px 12px;margin-bottom:12px}
+#res-sync-status{font-family:var(--font-mono);font-size:.62rem;color:var(--text3)}
+/* EMPLOYEE PROFILES */
+.emp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:14px}
+.emp-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;position:relative;transition:border-color .15s}
+.emp-card:hover{border-color:var(--border2)}
+.emp-card .ec-name{font-family:var(--font-head);font-size:1.15rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.emp-card .ec-role{font-family:var(--font-mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.emp-card .ec-info{font-size:.76rem;color:var(--text2);line-height:1.6}
+.emp-card .ec-info span{color:var(--text3);font-size:.68rem}
+.emp-card .ec-actions{display:flex;gap:5px;margin-top:10px}
+.emp-card .ec-del{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:.75rem;padding:2px 5px;border-radius:2px;transition:all .1s}
+.emp-card .ec-del:hover{color:var(--red);background:var(--red-d)}
+.emp-card-teppan{border-left:2px solid var(--teppan)}
+.emp-card-sushi{border-left:2px solid var(--sushi)}
+.emp-card-kitchen{border-left:2px solid var(--kitchen)}
+.emp-card-service{border-left:2px solid var(--service)}
+/* ROLE LEGEND */
+.role-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.role-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:12px;font-family:var(--font-mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.06em}
+.role-pill .rdot{width:6px;height:6px;border-radius:50%}
+/* TIME RANGE TOGGLE */
+.time-toggle{display:flex;align-items:center;gap:8px;margin-top:8px}
+.time-toggle label{font-family:var(--font-mono);font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.toggle-sw{position:relative;width:34px;height:18px;display:inline-block;flex-shrink:0}
+.toggle-sw input{opacity:0;width:0;height:0}
+.toggle-sw .sl{position:absolute;cursor:pointer;inset:0;background:var(--s3);border:1px solid var(--border);border-radius:9px;transition:.2s}
+.toggle-sw .sl:before{content:'';position:absolute;height:12px;width:12px;left:2px;top:2px;background:var(--text3);border-radius:50%;transition:.2s}
+.toggle-sw input:checked+.sl{background:var(--amber-d);border-color:var(--amber)}
+.toggle-sw input:checked+.sl:before{transform:translateX(16px);background:var(--amber)}
+@media(max-width:680px){body{flex-direction:column}aside{width:100%;min-height:auto;position:relative}main{padding:14px}.forecast-bar{grid-template-columns:repeat(4,1fr)}}
 </style>
-
 </head>
 <body>
 <aside>
@@ -189,6 +250,7 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div class="nav-sec">Modules</div>
 <div class="ni" onclick="go('bills',this)"><span class="ico">▤</span><span class="lbl">Bill Tracking</span><span class="dot"></span></div>
 <div class="ni" onclick="go('schedule',this)"><span class="ico">▦</span><span class="lbl">Scheduling</span><span class="dot"></span></div>
+<div class="ni" onclick="go('employees',this)"><span class="ico">◉</span><span class="lbl">Employees</span><span class="dot"></span></div>
 <div class="ni" onclick="go('cleaning',this)"><span class="ico">✓</span><span class="lbl">Cleaning</span><span class="dot"></span></div>
 </nav>
 <div class="sidebar-foot"><div><span class="status-dot"></span>Firebase Connected</div><div id="sb-date"></div></div>
@@ -199,18 +261,23 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div class="pg on" id="pg-dashboard">
 <div class="topbar"><div class="topbar-left"><div class="bc">OVERLOOK / DASHBOARD</div><h2>Overview</h2></div><div class="topbar-right" id="d-date"></div></div>
 <div class="stats">
-  <!-- REMOVED: Unpaid Bills stat -->
   <div class="sc"><div class="lb">Due This Week</div><div class="vl" id="d-due">—</div><div class="sb">Within 7 days</div></div>
-  <div class="sc"><div class="lb">Today's Staff</div><div class="vl" id="d-staff">—</div><div class="sb">Scheduled today</div></div>
-  <div class="sc"><div class="lb">On Roster</div><div class="vl" id="d-roster">—</div><div class="sb">Total staff</div></div>
-
+  <div class="sc">
+    <div class="lb">Today's Staff</div>
+    <div class="vl-split" id="d-staff-split">
+      <div><div class="vpart" id="d-cooks" style="color:var(--kitchen)">—</div><div class="vlabel">Kitchen</div></div>
+      <div style="color:var(--text3);font-family:var(--font-mono);font-size:1rem;align-self:center">/</div>
+      <div><div class="vpart" id="d-service" style="color:var(--service)">—</div><div class="vlabel">Service</div></div>
+    </div>
+    <div class="sb">Scheduled today</div>
+  </div>
+  <div class="sc"><div class="lb">On Roster</div><div class="vl" id="d-roster">—</div><div class="sb">Total employees</div></div>
 </div>
 <div class="pn" id="print-remind-pn" style="display:none"><div class="pnh"><h3>🖨 Print Reminders</h3></div><div id="print-remind-list"></div></div>
 <div class="pn"><div class="pnh"><h3>Upcoming Bills</h3></div><div class="tw"><table><thead><tr><th>Vendor</th><th>Amount</th><th>Due</th><th>Type</th><th>Category</th></tr></thead><tbody id="d-bills"></tbody></table></div></div>
 </div>
 
 <!-- BILLS -->
-
 <div class="pg" id="pg-bills">
 <div class="topbar"><div class="topbar-left"><div class="bc">OVERLOOK / BILLS</div><h2>Bill Tracking</h2></div></div>
 <div class="aib"><h4>// AI Bill Extraction Prompt</h4><p>Photo any bill → attach to Claude or ChatGPT → paste this prompt:</p>
@@ -244,10 +311,21 @@ tr:hover td{background:rgba(232,160,32,.03)}
 </div></div>
 
 <!-- SCHEDULE -->
-
 <div class="pg" id="pg-schedule">
 <div class="topbar"><div class="topbar-left"><div class="bc">OVERLOOK / SCHEDULE</div><h2>Scheduling</h2></div>
-<div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn bo bs" onclick="openModal('restrict-modal')">+ Restriction</button><button class="btn bg bs" onclick="openSheetModal()">📄 Sheet</button><button class="btn bo bs" onclick="buildSchPrompt()">AI Prompt</button></div></div>
+<div style="display:flex;gap:7px;flex-wrap:wrap">
+  <button class="btn bo bs" onclick="openModal('restrict-modal')">+ Restriction</button>
+  <button class="btn bo bs" onclick="openModal('reqoff-modal')">✕ Request Off</button>
+  <button class="btn bg bs" onclick="openSheetModal()">📄 Sheet</button>
+  <button class="btn bo bs" onclick="buildSchPrompt()">AI Prompt</button>
+</div></div>
+<!-- Role Legend -->
+<div class="role-legend">
+  <div class="role-pill" style="background:var(--teppan-d);color:var(--teppan);border:1px solid rgba(224,96,32,.25)"><div class="rdot" style="background:var(--teppan)"></div>Teppan</div>
+  <div class="role-pill" style="background:var(--sushi-d);color:var(--sushi);border:1px solid rgba(58,154,184,.25)"><div class="rdot" style="background:var(--sushi)"></div>Sushi</div>
+  <div class="role-pill" style="background:var(--kitchen-d);color:var(--kitchen);border:1px solid rgba(200,160,32,.25)"><div class="rdot" style="background:var(--kitchen)"></div>Kitchen</div>
+  <div class="role-pill" style="background:var(--service-d);color:var(--service);border:1px solid rgba(138,90,184,.25)"><div class="rdot" style="background:var(--service)"></div>Service</div>
+</div>
 <div class="pn">
 <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px">
 <span style="font-family:var(--font-mono);font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">WEEK OF</span>
@@ -255,18 +333,36 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <span class="week-lbl" id="sch-week-label"></span>
 <div style="margin-left:auto;display:flex;align-items:center;gap:8px"><span id="res-sync-status"></span><button class="btn bo bs" onclick="loadReservations()" style="font-size:.65rem;padding:3px 8px">↻ Sync</button></div>
 </div>
-<!-- Rolling 8-day forecast: today + next 7 -->
 <div class="forecast-bar" id="forecast-bar"></div>
 <div class="rbox"><h4>// This week's restrictions & notes</h4><div class="rlist" id="restrict-list"><span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">None</span></div></div>
+<div class="rbox" id="reqoff-display-box"><h4>// Time-off requests</h4><div class="rlist" id="reqoff-list"><span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">None</span></div></div>
 </div>
-<div class="sch-tabs"><div class="sch-tab on" onclick="switchSchTab('kitchen',this)">🍳 Kitchen + Sushi</div><div class="sch-tab" onclick="switchSchTab('serving',this)">🍽 Serving</div></div>
+<div class="sch-tabs">
+  <div class="sch-tab on" onclick="switchSchTab('kitchen',this)">🍳 Kitchen + Sushi</div>
+  <div class="sch-tab" onclick="switchSchTab('serving',this)">🍽 Serving</div>
+</div>
 <div class="sch-tab-pane on" id="sch-pane-kitchen"><div class="pn" style="padding:10px"><div class="sg-wrap"><table class="sg" id="sg-kitchen"></table></div></div></div>
 <div class="sch-tab-pane" id="sch-pane-serving"><div class="pn" style="padding:10px"><div class="sg-wrap"><table class="sg" id="sg-serving"></table></div></div></div>
 <div class="pn" id="sch-prompt-pn" style="display:none"><div class="pnh"><h3>AI Schedule Prompt</h3><button class="btn bo bs" onclick="copyEl('sch-prompt-txt')">Copy</button></div><div class="aip" id="sch-prompt-txt"></div></div>
 </div>
 
-<!-- CLEANING -->
+<!-- EMPLOYEES -->
+<div class="pg" id="pg-employees">
+<div class="topbar"><div class="topbar-left"><div class="bc">OVERLOOK / EMPLOYEES</div><h2>Employees</h2></div>
+<button class="btn bg" onclick="openModal('emp-modal')">＋ Add Employee</button></div>
+<div class="role-legend">
+  <div class="role-pill" style="background:var(--teppan-d);color:var(--teppan);border:1px solid rgba(224,96,32,.25)"><div class="rdot" style="background:var(--teppan)"></div>Teppan</div>
+  <div class="role-pill" style="background:var(--sushi-d);color:var(--sushi);border:1px solid rgba(58,154,184,.25)"><div class="rdot" style="background:var(--sushi)"></div>Sushi</div>
+  <div class="role-pill" style="background:var(--kitchen-d);color:var(--kitchen);border:1px solid rgba(200,160,32,.25)"><div class="rdot" style="background:var(--kitchen)"></div>Kitchen</div>
+  <div class="role-pill" style="background:var(--service-d);color:var(--service);border:1px solid rgba(138,90,184,.25)"><div class="rdot" style="background:var(--service)"></div>Service</div>
+</div>
+<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+  <select id="emp-role-filter" onchange="renderEmployees()" class="iline"><option value="all">All Roles</option><option value="TEPPAN">Teppan</option><option value="SUSHI">Sushi</option><option value="KITCHEN">Kitchen</option><option value="SERVICE">Service</option></select>
+</div>
+<div class="emp-grid" id="emp-grid"><div class="emp">// No employees yet</div></div>
+</div>
 
+<!-- CLEANING -->
 <div class="pg" id="pg-cleaning">
 <div class="topbar"><div class="topbar-left"><div class="bc">OVERLOOK / CLEANING</div><h2>Cleaning</h2></div></div>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
@@ -279,16 +375,14 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div class="pn" style="margin-top:14px"><div class="pnh"><h3>Log History</h3></div>
 <div class="tw"><table><thead><tr><th>Date</th><th>Staff</th><th>Done</th><th>Total</th><th>Score</th></tr></thead><tbody id="cl-log"></tbody></table></div></div>
 </div>
-
 </main>
 
 <!-- MODALS -->
-
 <div class="mb" id="shift-modal"><div class="mo">
 <h3>Add to Schedule</h3>
 <p style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.07em" id="shift-cell-label"></p>
 <div style="display:grid;gap:10px">
-<div class="fg"><label>Staff Name</label><input id="sh-name" placeholder="e.g. Kim"></div>
+<div class="fg"><label>Staff Name</label><input id="sh-name" placeholder="e.g. Kim" list="emp-name-list"><datalist id="emp-name-list"></datalist></div>
 <div class="fg"><label>Clock-in Time</label><select id="sh-time"><option value="">— Name only —</option><option value="11">11 (11am)</option><option value="11-2">11-2 (11am–2pm)</option><option value="12">12</option><option value="1/2">1/2 (half)</option><option value="Half">Half</option><option value="custom">Custom...</option></select></div>
 <div class="fg" id="sh-custom-wrap" style="display:none"><label>Custom time</label><input id="sh-custom" placeholder="e.g. 4, 5.30, 6-close"></div>
 </div>
@@ -302,11 +396,75 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div class="mf"><button class="btn bo" onclick="closeModal('restrict-modal')">Cancel</button><button class="btn bg" onclick="addRestriction()">Add</button></div>
 </div></div>
 
+<!-- REQUEST OFF MODAL -->
+<div class="mb" id="reqoff-modal"><div class="mo">
+<h3>Request Time Off</h3>
+<div style="display:grid;gap:12px">
+  <div class="fg"><label>Employee Name</label><input id="ro-name" placeholder="e.g. Kim" list="emp-name-list2"><datalist id="emp-name-list2"></datalist></div>
+  <div class="fg"><label>Request Type</label>
+    <select id="ro-type" onchange="updateReqOffUI()">
+      <option value="single">Single Day</option>
+      <option value="range">Date Range</option>
+    </select>
+  </div>
+  <div id="ro-single-wrap">
+    <div class="fg"><label>Date</label><input type="date" id="ro-date"></div>
+  </div>
+  <div id="ro-range-wrap" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="fg"><label>From</label><input type="date" id="ro-from"></div>
+      <div class="fg"><label>To</label><input type="date" id="ro-to"></div>
+    </div>
+  </div>
+  <div>
+    <div class="time-toggle">
+      <label class="toggle-sw"><input type="checkbox" id="ro-time-toggle" onchange="updateReqOffTimeUI()"><span class="sl"></span></label>
+      <label style="cursor:pointer" onclick="document.getElementById('ro-time-toggle').click()">Specific time range (partial day)</label>
+    </div>
+    <div id="ro-time-wrap" style="display:none;margin-top:10px;display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="fg"><label>Unavailable From</label><input type="time" id="ro-time-from"></div>
+        <div class="fg"><label>Unavailable Until</label><input type="time" id="ro-time-to"></div>
+      </div>
+    </div>
+  </div>
+  <div class="fg"><label>Notes (optional)</label><input id="ro-notes" placeholder="Reason / details..."></div>
+</div>
+<div class="mf"><button class="btn bo" onclick="closeModal('reqoff-modal')">Cancel</button><button class="btn bg" onclick="confirmReqOff()">Submit</button></div>
+</div></div>
+
+<!-- SHEET MODAL — TWO SHEETS -->
 <div class="mb" id="sheet-modal"><div class="mo mo-wide">
 <h3>Schedule Sheet</h3>
-<p style="font-family:var(--font-mono);font-size:.65rem;color:var(--text3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.07em">Matches your Google Sheets format. Copy → paste into A1.</p>
-<div style="display:flex;gap:8px;margin-bottom:12px"><button class="btn bg" onclick="copySheetData()">Copy for Google Sheets</button><button class="btn bo" onclick="closeModal('sheet-modal')">Close</button></div>
-<div class="sheet-preview" id="sheet-preview-wrap"></div>
+<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+  <button class="btn bg" onclick="copySheetData('kitchen')">Copy Kitchen+Sushi</button>
+  <button class="btn bg" onclick="copySheetData('serving')" style="background:var(--service);color:#fff">Copy Serving</button>
+  <button class="btn bo" onclick="closeModal('sheet-modal')">Close</button>
+</div>
+<div style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">🍳 Kitchen + Sushi</div>
+<div class="sheet-preview" id="sheet-preview-kitchen"></div>
+<div style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3);margin-top:14px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">🍽 Serving</div>
+<div class="sheet-preview" id="sheet-preview-serving"></div>
+</div></div>
+
+<!-- EMPLOYEE MODAL -->
+<div class="mb" id="emp-modal"><div class="mo">
+<h3 id="emp-modal-title">Add Employee</h3>
+<input type="hidden" id="emp-edit-id">
+<div style="display:grid;gap:10px">
+  <div class="fg"><label>Full Name</label><input id="emp-name" placeholder="e.g. Kim Lee"></div>
+  <div class="fg"><label>Role</label>
+    <select id="emp-role">
+      <option value="TEPPAN">Teppan</option>
+      <option value="SUSHI">Sushi</option>
+      <option value="KITCHEN">Kitchen</option>
+      <option value="SERVICE">Service</option>
+    </select>
+  </div>
+  <div class="fg"><label>Phone (optional)</label><input id="emp-phone" placeholder="e.g. 506-555-0100" type="tel"></div>
+  <div class="fg"><label>Notes (optional)</label><input id="emp-notes" placeholder="e.g. Part-time, Fridays only..."></div>
+</div>
+<div class="mf"><button class="btn bo" onclick="closeModal('emp-modal')">Cancel</button><button class="btn bg" onclick="confirmEmployee()">Save</button></div>
 </div></div>
 
 <div class="toast" id="toast"></div>
@@ -316,7 +474,8 @@ tr:hover td{background:rgba(232,160,32,.03)}
 'openShiftModal','confirmAddShift','delShift','addRestriction','delRestriction',
 'buildSchPrompt','resetChecks','saveChecklist','onWeekChange','copyEl',
 'toggleReceiptNote','markPrintDone','switchSchTab','loadReservations','openSheetModal',
-'copySheetData'
+'copySheetData','updateReqOffUI','updateReqOffTimeUI','confirmReqOff','delReqOff',
+'renderEmployees','confirmEmployee','delEmployee','editEmployee'
 ].forEach(function(fn){if(!window[fn])window[fn]=function(){};});
 </script>
 
@@ -330,18 +489,50 @@ const db=getFirestore(appMgr);
 const appRes=initializeApp({apiKey:"AIzaSyCMXA2a4RUUNuzmTz1QxdJbIciICojLjA8",authDomain:"restaurant599-b5595.firebaseapp.com",databaseURL:"https://restaurant599-b5595-default-rtdb.firebaseio.com",projectId:"restaurant599-b5595",storageBucket:"restaurant599-b5595.firebasestorage.app",messagingSenderId:"141750935511",appId:"1:141750935511:web:8ad37806a7d9a70a8e7592"},'reservations');
 const resDb=getDatabase(appRes);
 
-const S={bills:[],shifts:[],cleanLogs:[],restrictions:[],reservations:{}};
+const S={bills:[],shifts:[],cleanLogs:[],restrictions:[],reservations:{},reqOffs:[],employees:[]};
 const DAYS_SHORT=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+
+// Sections that count as "kitchen/cook"
+const COOK_SECTIONS=['SUSHI','KITCHEN','TEPPAN'];
+const SERVICE_SECTIONS=['SERVING'];
 
 const fsAdd=async(col,data)=>{const r=await addDoc(collection(db,col),{...data,_ts:Date.now()});return r.id;};
 const fsDel=async(col,id)=>deleteDoc(doc(db,col,id));
 const fsUp=async(col,id,d)=>updateDoc(doc(db,col,id),d);
 const fsGet=async col=>(await getDocs(collection(db,col))).docs.map(d=>({id:d.id,...d.data()}));
 
+// Role → chip CSS class
+function chipClass(section){
+  const s=(section||'').toUpperCase();
+  if(s==='TEPPAN')return 'chip-teppan';
+  if(s==='SUSHI')return 'chip-sushi';
+  if(s==='KITCHEN')return 'chip-kitchen';
+  if(s==='SERVING'||s==='SERVICE')return 'chip-serving';
+  return 'chip-kitchen';
+}
+// Role → section header class
+function secClass(section){
+  const s=(section||'').toUpperCase();
+  if(s==='TEPPAN')return 'sec-teppan';
+  if(s==='SUSHI')return 'sec-sushi';
+  if(s==='KITCHEN')return 'sec-kitchen';
+  if(s==='SERVING'||s==='SERVICE')return 'sec-serving';
+  return '';
+}
+function roleColor(role){
+  const r=(role||'').toUpperCase();
+  if(r==='TEPPAN')return 'var(--teppan)';
+  if(r==='SUSHI')return 'var(--sushi)';
+  if(r==='KITCHEN')return 'var(--kitchen)';
+  if(r==='SERVICE')return 'var(--service)';
+  return 'var(--text2)';
+}
+
 async function boot(){
   try{
-    [S.bills,S.shifts,S.cleanLogs,S.restrictions]=await Promise.all([
-      fsGet('bills'),fsGet('shifts'),fsGet('cleanLogs'),fsGet('restrictions')
+    [S.bills,S.shifts,S.cleanLogs,S.restrictions,S.reqOffs,S.employees]=await Promise.all([
+      fsGet('bills'),fsGet('shifts'),fsGet('cleanLogs'),fsGet('restrictions'),
+      fsGet('reqOffs').catch(()=>[]),fsGet('employees').catch(()=>[])
     ]);
   }catch(e){showToast('Firebase error');console.error(e);}
   const now=new Date();
@@ -355,7 +546,7 @@ async function boot(){
 }
 boot();
 
-function renderAll(){renderDash();renderBills();renderSchedule();renderCleanLog();renderRestrictions();}
+function renderAll(){renderDash();renderBills();renderSchedule();renderCleanLog();renderRestrictions();renderReqOffs();renderEmployees();updateEmpDatalist();}
 
 window.go=function(id,el){
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
@@ -369,7 +560,6 @@ window.switchSchTab=function(tab,el){
 };
 
 const fmt=n=>'$'+parseFloat(n||0).toFixed(2);
-const fmtN=n=>parseFloat(n||0).toFixed(2);
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2700);}
 window.openModal=id=>document.getElementById(id).classList.add('open');
 window.closeModal=id=>document.getElementById(id).classList.remove('open');
@@ -381,7 +571,11 @@ function setWeekLabel(inputId,labelId){
   const d=new Date(v+'T12:00:00'),e=new Date(d);e.setDate(e.getDate()+6);
   document.getElementById(labelId).textContent=d.toLocaleDateString('en-CA',{month:'short',day:'numeric'})+' – '+e.toLocaleDateString('en-CA',{month:'short',day:'numeric'});
 }
-window.onWeekChange=function(){setWeekLabel('sch-weekdate','sch-week-label');renderSchedule();renderRestrictions();renderForecast();};
+window.onWeekChange=function(){
+  setWeekLabel('sch-weekdate','sch-week-label');
+  renderScheduleWithCopy();
+  renderRestrictions();renderReqOffs();renderForecast();
+};
 window.toggleReceiptNote=function(){document.getElementById('b-receipt-note').style.display=document.getElementById('b-paytype').value==='autopay'?'block':'none';};
 function nextDueDate(due,freq){
   if(!due||freq==='once')return due;
@@ -390,6 +584,46 @@ function nextDueDate(due,freq){
   if(freq==='biweekly')d.setDate(d.getDate()+14);
   if(freq==='monthly')d.setMonth(d.getMonth()+1);
   return d.toISOString().slice(0,10);
+}
+
+// ── WEEK COPY LOGIC ──
+// Returns the previous week key (Monday date string) for a given week key
+function prevWeekKey(wk){
+  if(!wk||wk==='default')return null;
+  try{
+    const d=new Date(wk+'T12:00:00');
+    d.setDate(d.getDate()-7);
+    return d.toISOString().slice(0,10);
+  }catch(e){return null;}
+}
+
+// Copy previous week shifts into current week if current week is empty
+async function copyFromPrevWeek(wk){
+  const prev=prevWeekKey(wk);
+  if(!prev)return;
+  const prevShifts=S.shifts.filter(s=>s.week===prev);
+  // If previous week has no data, don't copy (avoid infinite-chain issue)
+  if(!prevShifts.length)return;
+  const curShifts=S.shifts.filter(s=>s.week===wk);
+  if(curShifts.length)return; // already has data
+  // Copy each shift from prev week into current week
+  const promises=prevShifts.map(async s=>{
+    const ns={week:wk,section:s.section,dayIdx:s.dayIdx,name:s.name,time:s.time||''};
+    ns.id=await fsAdd('shifts',ns);
+    S.shifts.push(ns);
+  });
+  await Promise.all(promises);
+}
+
+async function renderScheduleWithCopy(){
+  const wk=getWeekKey();
+  if(wk&&wk!=='default'){
+    const cur=S.shifts.filter(s=>s.week===wk);
+    if(!cur.length){
+      await copyFromPrevWeek(wk);
+    }
+  }
+  renderSchedule();
 }
 
 // ── RESERVATIONS ──
@@ -423,34 +657,41 @@ function getWeekDates(inputId){
   return Array.from({length:7},(_,i)=>{const d=new Date(mon);d.setDate(d.getDate()+i);return d.toISOString().slice(0,10);});
 }
 
-// Rolling 8-day forecast: today + next 7 days, labeled with "TODAY" badge
+// Business level labels based on guest count + day of week
+function getBizLevel(guests,dateStr){
+  let dow=0;
+  try{dow=new Date(dateStr+'T12:00:00').getDay();}catch(e){}
+  const isFriSat=(dow===5||dow===6);
+  if(!guests||guests===0)return{cls:'fc-silent',label:'Silent'};
+  if(isFriSat){
+    if(guests>=115)return{cls:'fc-unusual',label:'Unusual Busy'};
+    if(guests>=95)return{cls:'fc-busy',label:'Busy'};
+    if(guests>=75)return{cls:'fc-regular',label:'Regular'};
+    if(guests>=50)return{cls:'fc-slow',label:'Slow'};
+    return{cls:'fc-silent',label:'Silent'};
+  }else{
+    if(guests>=33)return{cls:'fc-unusual',label:'Unusual Busy'};
+    if(guests>=27)return{cls:'fc-busy',label:'Busy'};
+    if(guests>=13)return{cls:'fc-regular',label:'Regular'};
+    if(guests>=1)return{cls:'fc-slow',label:'Slow'};
+    return{cls:'fc-silent',label:'Silent'};
+  }
+}
+
 function renderForecast(){
   const bar=document.getElementById('forecast-bar');
+  if(!bar)return;
   const todayDate=new Date();
   todayDate.setHours(0,0,0,0);
   const rollingDates=Array.from({length:8},(_,i)=>{
     const d=new Date(todayDate);d.setDate(d.getDate()+i);return d.toISOString().slice(0,10);
   });
 
-  const allGuests=Object.values(S.reservations).map(r=>r.guests);
-  const maxG=Math.max(...allGuests,1);
-
-  // Get current week restrictions
-  const wk=getWeekKey();
-
   bar.innerHTML=rollingDates.map((date,i)=>{
     const data=S.reservations[date]||{bookings:0,guests:0,grills:0};
-    const score=data.guests/maxG;
-    let cls='fc-normal',label='Normal';
-    if(!data.bookings){cls='fc-quiet';label='Quiet';}
-    else if(score>0.8){cls='fc-very-busy';label='Packed';}
-    else if(score>0.5){cls='fc-busy';label='Busy';}
-    else if(score<0.25){cls='fc-quiet';label='Light';}
-
+    const{cls,label}=getBizLevel(data.guests,date);
     const isToday=i===0;
     const dayName=new Date(date+'T12:00:00').toLocaleDateString('en-CA',{weekday:'short'}).toUpperCase();
-
-    // Count today's scheduled staff
     const todayShifts=i===0?countTodayStaff(date):null;
 
     return`<div class="fc-day ${cls}${isToday?' fc-today':''}">
@@ -464,37 +705,41 @@ function renderForecast(){
   }).join('');
 }
 
-// Count staff scheduled on a given date from shifts
 function countTodayStaff(dateStr){
   const wk=getWeekKey();
-  // find which dayIdx this date corresponds to in the current schedule week
   const weekDates=getWeekDates('sch-weekdate');
   const idx=weekDates.indexOf(dateStr);
   if(idx<0)return null;
   const todayShifts=S.shifts.filter(s=>s.week===wk&&s.dayIdx===idx);
-  // deduplicate by name
   const names=new Set(todayShifts.map(s=>s.name));
   return names.size;
 }
 
-// ── CLEANING ──
+// ── DASHBOARD ──
 function renderDash(){
   const now=new Date(),w=new Date();w.setDate(now.getDate()+7);
   document.getElementById('d-due').textContent=S.bills.filter(b=>b.paid==='Unpaid'&&new Date(b.due+'T12:00:00')<=w).length;
 
-  // Today's scheduled staff count
+  // Today's staff split: kitchen vs service
   const todayStr=now.toISOString().slice(0,10);
   const mon=getMonday(now);
   const monStr=mon.toISOString().slice(0,10);
   const weekDates=Array.from({length:7},(_,i)=>{const d=new Date(mon);d.setDate(d.getDate()+i);return d.toISOString().slice(0,10);});
   const todayIdx=weekDates.indexOf(todayStr);
-  let todayStaffCount=0;
+  let cooksCount=0,serviceCount=0;
   if(todayIdx>=0){
     const todayShifts=S.shifts.filter(s=>s.week===monStr&&s.dayIdx===todayIdx);
-    todayStaffCount=new Set(todayShifts.map(s=>s.name)).size;
+    // Deduplicate per section type
+    const cookNames=new Set(todayShifts.filter(s=>COOK_SECTIONS.includes((s.section||'').toUpperCase())).map(s=>s.name));
+    const svcNames=new Set(todayShifts.filter(s=>SERVICE_SECTIONS.includes((s.section||'').toUpperCase())).map(s=>s.name));
+    cooksCount=cookNames.size;serviceCount=svcNames.size;
   }
-  document.getElementById('d-staff').textContent=todayStaffCount||'—';
-  document.getElementById('d-roster').textContent=S.shifts.length?new Set(S.shifts.map(s=>s.name)).size:'—';
+  document.getElementById('d-cooks').textContent=cooksCount||'—';
+  document.getElementById('d-service').textContent=serviceCount||'—';
+
+  // Roster count from employees collection, fallback to unique shift names
+  const rosterCount=S.employees.length||new Set(S.shifts.map(s=>s.name)).size;
+  document.getElementById('d-roster').textContent=rosterCount||'—';
 
   const pn=document.getElementById('print-remind-pn');
   const pr=S.bills.filter(b=>b.paid==='Paid'&&b.needsPrint===true);
@@ -556,11 +801,15 @@ function buildScheduleGrid(tableId,sections){
   DAYS_SHORT.forEach(d=>html+=`<th>${d}</th>`);
   html+='</tr></thead><tbody>';
   sections.forEach(sec=>{
-    html+=`<tr><td class="sc2">${sec}</td>`;
+    const cc=secClass(sec);
+    html+=`<tr><td class="sc2 ${cc}">${sec}</td>`;
     DAYS_SHORT.forEach((_,di)=>{
       const cs=ws.filter(s=>s.section===sec&&s.dayIdx===di);
       html+=`<td onclick="openShiftModal('${sec}',${di})">`;
-      cs.forEach(sh=>{html+=`<div class="sg-chip"><span class="cn">${sh.name}</span>${sh.time?`<span class="ct">${sh.time}</span>`:''}<button class="cx" onclick="event.stopPropagation();delShift('${sh.id}')">✕</button></div>`;});
+      cs.forEach(sh=>{
+        const cc2=chipClass(sec);
+        html+=`<div class="sg-chip ${cc2}"><span class="cn">${sh.name}</span>${sh.time?`<span class="ct">${sh.time}</span>`:''}<button class="cx" onclick="event.stopPropagation();delShift('${sh.id}')">✕</button></div>`;
+      });
       html+=`<div class="sg-add">+</div></td>`;
     });
     html+='</tr>';
@@ -568,7 +817,23 @@ function buildScheduleGrid(tableId,sections){
   html+='</tbody>';
   document.getElementById(tableId).innerHTML=html;
 }
-function renderSchedule(){buildScheduleGrid('sg-kitchen',['SUSHI','KITCHEN']);buildScheduleGrid('sg-serving',['SERVING']);}
+function renderSchedule(){
+  buildScheduleGrid('sg-kitchen',['TEPPAN','SUSHI','KITCHEN']);
+  buildScheduleGrid('sg-serving',['SERVING']);
+}
+function renderScheduleWithCopy(){
+  // Called from onWeekChange — async wrapper
+  (async()=>{
+    const wk=getWeekKey();
+    if(wk&&wk!=='default'){
+      const cur=S.shifts.filter(s=>s.week===wk);
+      if(!cur.length){
+        await copyFromPrevWeek(wk);
+      }
+    }
+    renderSchedule();
+  })();
+}
 window.openShiftModal=function(section,dayIdx){
   pendingCell={section,dayIdx};
   document.getElementById('shift-cell-label').textContent=`${section} — ${DAYS_SHORT[dayIdx]}`;
@@ -580,7 +845,7 @@ window.openShiftModal=function(section,dayIdx){
 window.confirmAddShift=async function(){
   const name=document.getElementById('sh-name').value.trim();if(!name){showToast('Enter a name');return;}
   let time=document.getElementById('sh-time').value;if(time==='custom')time=document.getElementById('sh-custom').value.trim();
-  const sh={week:getWeekKey(),section:pendingCell.section,dayIdx:pendingCell.dayIdx,name,time};
+  const sh={week:getWeekKey(),section:pendingCell.section,dayIdx:pendingCell.dayIdx,name,time:time||''};
   sh.id=await fsAdd('shifts',sh);S.shifts.push(sh);closeModal('shift-modal');renderSchedule();showToast('Added ✓');
 };
 window.delShift=async function(id){await fsDel('shifts',id);S.shifts=S.shifts.filter(s=>s.id!==id);renderSchedule();};
@@ -594,41 +859,193 @@ function renderRestrictions(){
   document.getElementById('restrict-list').innerHTML=list.length?list.map(r=>`<div class="rtag">${r.text}<button onclick="delRestriction('${r.id}')">✕</button></div>`).join(''):`<span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">None</span>`;
 }
 window.delRestriction=async function(id){await fsDel('restrictions',id);S.restrictions=S.restrictions.filter(r=>r.id!==id);renderRestrictions();renderForecast();};
-window.openSheetModal=function(){buildSheetPreview();openModal('sheet-modal');};
-function buildSheetPreview(){
+
+// ── REQUEST OFF ──
+window.updateReqOffUI=function(){
+  const t=document.getElementById('ro-type').value;
+  document.getElementById('ro-single-wrap').style.display=t==='single'?'':'none';
+  document.getElementById('ro-range-wrap').style.display=t==='range'?'':'none';
+};
+window.updateReqOffTimeUI=function(){
+  const on=document.getElementById('ro-time-toggle').checked;
+  document.getElementById('ro-time-wrap').style.display=on?'block':'none';
+};
+window.confirmReqOff=async function(){
+  const name=document.getElementById('ro-name').value.trim();
+  const type=document.getElementById('ro-type').value;
+  if(!name){showToast('Enter employee name');return;}
+  let dateFrom='',dateTo='';
+  if(type==='single'){
+    dateFrom=document.getElementById('ro-date').value;
+    dateTo=dateFrom;
+    if(!dateFrom){showToast('Select a date');return;}
+  }else{
+    dateFrom=document.getElementById('ro-from').value;
+    dateTo=document.getElementById('ro-to').value;
+    if(!dateFrom||!dateTo){showToast('Select date range');return;}
+    if(dateTo<dateFrom){showToast('End date before start');return;}
+  }
+  const timeOn=document.getElementById('ro-time-toggle').checked;
+  const timeFrom=timeOn?document.getElementById('ro-time-from').value:'';
+  const timeTo=timeOn?document.getElementById('ro-time-to').value:'';
+  const notes=document.getElementById('ro-notes').value.trim();
+  const rec={name,dateFrom,dateTo,timeFrom,timeTo,notes,type};
+  rec.id=await fsAdd('reqOffs',rec);
+  S.reqOffs.push(rec);
+  closeModal('reqoff-modal');
+  // Clear fields
+  ['ro-name','ro-date','ro-from','ro-to','ro-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('ro-time-toggle').checked=false;
+  document.getElementById('ro-time-wrap').style.display='none';
+  renderReqOffs();showToast('Time-off request saved ✓');
+};
+function renderReqOffs(){
+  const wk=getWeekKey();
+  if(!wk||wk==='default'){document.getElementById('reqoff-list').innerHTML=`<span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">None</span>`;return;}
+  // Get all dates in the current week
+  const weekDates=getWeekDates('sch-weekdate');
+  const wkStart=weekDates[0],wkEnd=weekDates[6];
+  // Filter req offs that overlap this week
+  const list=S.reqOffs.filter(r=>{
+    if(!r.dateFrom)return false;
+    const from=r.dateFrom,to=r.dateTo||r.dateFrom;
+    // Overlap: from <= wkEnd && to >= wkStart
+    return from<=wkEnd&&to>=wkStart;
+  });
+  const el=document.getElementById('reqoff-list');
+  if(!list.length){el.innerHTML=`<span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">None</span>`;return;}
+  el.innerHTML=list.map(r=>{
+    const dateLabel=r.dateFrom===r.dateTo?r.dateFrom:`${r.dateFrom} → ${r.dateTo}`;
+    const timeLabel=(r.timeFrom&&r.timeTo)?` <span style="color:var(--text3)">${r.timeFrom}–${r.timeTo}</span>`:'';
+    const notesLabel=r.notes?` <span style="color:var(--text3)">— ${r.notes}</span>`:'';
+    return`<div class="off-req-tag"><strong>${r.name}</strong> ${dateLabel}${timeLabel}${notesLabel}<button onclick="delReqOff('${r.id}')">✕</button></div>`;
+  }).join('');
+}
+window.delReqOff=async function(id){
+  await fsDel('reqOffs',id);
+  S.reqOffs=S.reqOffs.filter(r=>r.id!==id);
+  renderReqOffs();showToast('Removed ✓');
+};
+
+// ── SHEET GEN ──
+window.openSheetModal=function(){buildSheetPreviews();openModal('sheet-modal');};
+function buildSheetPreview(containerId,sections){
   const wk=getWeekKey(),ws=S.shifts.filter(s=>s.week===wk);
   const v=document.getElementById('sch-weekdate').value,mon=v?new Date(v+'T12:00:00'):new Date();
   const wLabel=document.getElementById('sch-week-label').textContent;
-  const allSec=['SUSHI','KITCHEN','SERVING'];
-  const maxRows={};allSec.forEach(sec=>{let max=0;for(let di=0;di<7;di++){const cnt=ws.filter(s=>s.section===sec&&s.dayIdx===di).length;if(cnt>max)max=cnt;}maxRows[sec]=Math.max(max,1);});
+  const maxRows={};sections.forEach(sec=>{let max=0;for(let di=0;di<7;di++){const cnt=ws.filter(s=>s.section===sec&&s.dayIdx===di).length;if(cnt>max)max=cnt;}maxRows[sec]=Math.max(max,1);});
   let html=`<table class="sheet-table"><tr><td class="week-hdr" colspan="9">${wLabel}</td></tr><tr><td class="date-num"></td>`;
   for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(d.getDate()+i);html+=`<td class="date-num">${d.getDate()}</td>`;}
   html+=`</tr><tr><td class="day-name"></td>`;DAYS_SHORT.forEach(d=>html+=`<td class="day-name">${d}</td>`);html+='</tr>';
-  allSec.forEach(sec=>{for(let row=0;row<maxRows[sec];row++){html+=`<tr>${row===0?`<td class="section-lbl">${sec}</td>`:'<td></td>'}`;for(let di=0;di<7;di++){const cs=ws.filter(s=>s.section===sec&&s.dayIdx===di),sh=cs[row];html+=sh?`<td class="staff-cell">${sh.time?`${sh.name} ${sh.time}`:sh.name}</td>`:`<td class="empty-cell"></td>`;}html+='</tr>';}});
-  html+='</table>';document.getElementById('sheet-preview-wrap').innerHTML=html;
+  sections.forEach(sec=>{
+    const sc2=secClass(sec);
+    for(let row=0;row<maxRows[sec];row++){html+=`<tr>${row===0?`<td class="section-lbl ${sc2}">${sec}</td>`:'<td></td>'}`;for(let di=0;di<7;di++){const cs=ws.filter(s=>s.section===sec&&s.dayIdx===di),sh=cs[row];html+=sh?`<td class="staff-cell">${sh.time?`${sh.name} ${sh.time}`:sh.name}</td>`:`<td class="empty-cell"></td>`;}html+='</tr>';}
+  });
+  html+='</table>';document.getElementById(containerId).innerHTML=html;
 }
-window.copySheetData=function(){
+function buildSheetPreviews(){
+  buildSheetPreview('sheet-preview-kitchen',['TEPPAN','SUSHI','KITCHEN']);
+  buildSheetPreview('sheet-preview-serving',['SERVING']);
+}
+window.copySheetData=function(which){
+  const sections=which==='serving'?['SERVING']:['TEPPAN','SUSHI','KITCHEN'];
   const wk=getWeekKey(),ws=S.shifts.filter(s=>s.week===wk);
   const v=document.getElementById('sch-weekdate').value,mon=v?new Date(v+'T12:00:00'):new Date();
   const wLabel=document.getElementById('sch-week-label').textContent;
-  const allSec=['SUSHI','KITCHEN','SERVING'];
-  const maxRows={};allSec.forEach(sec=>{let max=0;for(let di=0;di<7;di++){const cnt=ws.filter(s=>s.section===sec&&s.dayIdx===di).length;if(cnt>max)max=cnt;}maxRows[sec]=Math.max(max,1);});
+  const maxRows={};sections.forEach(sec=>{let max=0;for(let di=0;di<7;di++){const cnt=ws.filter(s=>s.section===sec&&s.dayIdx===di).length;if(cnt>max)max=cnt;}maxRows[sec]=Math.max(max,1);});
   const rows=[[wLabel,'','','','','','','']];
   const dr=[''];for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(d.getDate()+i);dr.push(String(d.getDate()));}
   rows.push(dr);rows.push(['','MON','TUE','WED','THU','FRI','SAT','SUN']);
-  allSec.forEach(sec=>{for(let row=0;row<maxRows[sec];row++){const r=[row===0?sec:''];for(let di=0;di<7;di++){const cs=ws.filter(s=>s.section===sec&&s.dayIdx===di),sh=cs[row];r.push(sh?(sh.time?`${sh.name} ${sh.time}`:sh.name):'');}rows.push(r);}});
-  navigator.clipboard.writeText(rows.map(r=>r.join('\t')).join('\n'));showToast('Copied — paste into Google Sheets ✓');
+  sections.forEach(sec=>{for(let row=0;row<maxRows[sec];row++){const r=[row===0?sec:''];for(let di=0;di<7;di++){const cs=ws.filter(s=>s.section===sec&&s.dayIdx===di),sh=cs[row];r.push(sh?(sh.time?`${sh.name} ${sh.time}`:sh.name):'');}rows.push(r);}});
+  navigator.clipboard.writeText(rows.map(r=>r.join('\t')).join('\n'));
+  showToast(`${which==='serving'?'Serving':'Kitchen+Sushi'} copied — paste into Google Sheets ✓`);
 };
 window.buildSchPrompt=function(){
   const wk=getWeekKey(),wLabel=document.getElementById('sch-week-label').textContent,ws=S.shifts.filter(s=>s.week===wk);
   const restrictions=S.restrictions.filter(r=>r.week===wk).map(r=>`- ${r.text}`).join('\n')||'None';
   const dates=getWeekDates('sch-weekdate');
   const forecastLines=dates.map((d,i)=>{const res=S.reservations[d]||{bookings:0,guests:0,grills:0};return`  ${DAYS_SHORT[i]} (${d}): ${res.bookings} bookings, ${res.guests} guests, ${res.grills} grills`;}).join('\n');
-  const allSec=['SUSHI','KITCHEN','SERVING'];
+  const allSec=['TEPPAN','SUSHI','KITCHEN','SERVING'];
   const currentSched=allSec.map(sec=>{const row=DAYS_SHORT.map((_,i)=>{const cs=ws.filter(s=>s.section===sec&&s.dayIdx===i);return cs.length?cs.map(s=>s.time?`${s.name} ${s.time}`:s.name).join(', '):'—';});return`${sec}: ${row.join(' | ')}`;}).join('\n');
-  const roster=S.shifts.length?[...new Set(S.shifts.map(s=>s.name))].map(n=>`- ${n}`).join('\n'):'[No staff scheduled]';
-  const p=`Create a weekly staff schedule for the week of ${wLabel||wk}.\n\nSTAFF ROSTER:\n${roster}\n\nCLOCK-IN FORMAT:\n- Opening = earliest shift. Half or 1/2 = starts mid-day.\n- Format: Name + time (e.g. "Kim 11", "Yang 1/2")\n\nCURRENT SCHEDULE:\n${currentSched}\n\nRESERVATION FORECAST (Hibachi):\n${forecastLines}\n\nRESTRICTIONS:\n${restrictions}\n\nSuggest changes based on restrictions. Consider day off on quiet days. Format as SUSHI / KITCHEN / SERVING rows, MON–SUN columns.`;
+  const roster=S.employees.length?S.employees.map(e=>`- ${e.name} (${e.role})`).join('\n'):(S.shifts.length?[...new Set(S.shifts.map(s=>s.name))].map(n=>`- ${n}`).join('\n'):'[No staff scheduled]');
+  const offRequests=S.reqOffs.length?S.reqOffs.map(r=>{const t=r.timeFrom?` (${r.timeFrom}–${r.timeTo})`:'';return`- ${r.name}: ${r.dateFrom}${r.dateTo!==r.dateFrom?' → '+r.dateTo:''}${t}`;}).join('\n'):'None';
+  const p=`Create a weekly staff schedule for the week of ${wLabel||wk}.\n\nSTAFF ROSTER:\n${roster}\n\nROLES: TEPPAN, SUSHI, KITCHEN, SERVING\n\nCLOCK-IN FORMAT:\n- Opening = earliest shift. Half or 1/2 = starts mid-day.\n- Format: Name + time (e.g. "Kim 11", "Yang 1/2")\n\nCURRENT SCHEDULE:\n${currentSched}\n\nRESERVATION FORECAST (Hibachi):\n${forecastLines}\n\nRESTRICTIONS:\n${restrictions}\n\nTIME-OFF REQUESTS:\n${offRequests}\n\nSuggest changes based on restrictions and time-off requests. Consider day off on quiet days. Format as TEPPAN / SUSHI / KITCHEN / SERVING rows, MON–SUN columns.`;
   document.getElementById('sch-prompt-txt').textContent=p;document.getElementById('sch-prompt-pn').style.display='block';showToast('Prompt ready ✓');
+};
+
+// ── EMPLOYEES ──
+function updateEmpDatalist(){
+  const names=S.employees.length?S.employees.map(e=>e.name):[...new Set(S.shifts.map(s=>s.name))];
+  const opts=names.map(n=>`<option value="${n}">`).join('');
+  const dl1=document.getElementById('emp-name-list');
+  const dl2=document.getElementById('emp-name-list2');
+  if(dl1)dl1.innerHTML=opts;
+  if(dl2)dl2.innerHTML=opts;
+}
+window.renderEmployees=function(){
+  const filter=document.getElementById('emp-role-filter')?.value||'all';
+  let list=filter==='all'?[...S.employees]:S.employees.filter(e=>e.role===filter);
+  list.sort((a,b)=>a.name.localeCompare(b.name));
+  const grid=document.getElementById('emp-grid');
+  if(!list.length){grid.innerHTML=`<div class="emp">// No employees</div>`;return;}
+  grid.innerHTML=list.map(e=>{
+    const roleKey=(e.role||'').toLowerCase();
+    const cardClass=`emp-card-${roleKey}`;
+    const rc=roleColor(e.role);
+    return`<div class="emp-card ${cardClass}">
+      <button class="ec-del" onclick="delEmployee('${e.id}')">✕</button>
+      <div class="ec-name" style="color:${rc}">${e.name}</div>
+      <div class="ec-role"><span class="badge role-${roleKey}">${e.role||'—'}</span></div>
+      <div class="ec-info">
+        ${e.phone?`<div><span>Phone</span><br>${e.phone}</div>`:''}
+        ${e.notes?`<div><span>Notes</span><br>${e.notes}</div>`:''}
+      </div>
+      <div class="ec-actions">
+        <button class="btn bo bs" onclick="editEmployee('${e.id}')">Edit</button>
+      </div>
+    </div>`;
+  }).join('');
+};
+window.confirmEmployee=async function(){
+  const name=document.getElementById('emp-name').value.trim();
+  const role=document.getElementById('emp-role').value;
+  if(!name){showToast('Enter employee name');return;}
+  const phone=document.getElementById('emp-phone').value.trim();
+  const notes=document.getElementById('emp-notes').value.trim();
+  const editId=document.getElementById('emp-edit-id').value;
+  if(editId){
+    // Update existing
+    const rec={name,role,phone,notes};
+    await fsUp('employees',editId,rec);
+    const idx=S.employees.findIndex(e=>e.id===editId);
+    if(idx>=0)S.employees[idx]={...S.employees[idx],...rec};
+    showToast('Updated ✓');
+  }else{
+    const rec={name,role,phone,notes};
+    rec.id=await fsAdd('employees',rec);
+    S.employees.push(rec);
+    showToast('Employee added ✓');
+  }
+  closeModal('emp-modal');
+  ['emp-name','emp-phone','emp-notes','emp-edit-id'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('emp-modal-title').textContent='Add Employee';
+  renderEmployees();updateEmpDatalist();renderDash();
+};
+window.editEmployee=function(id){
+  const e=S.employees.find(x=>x.id===id);if(!e)return;
+  document.getElementById('emp-edit-id').value=id;
+  document.getElementById('emp-name').value=e.name||'';
+  document.getElementById('emp-role').value=e.role||'TEPPAN';
+  document.getElementById('emp-phone').value=e.phone||'';
+  document.getElementById('emp-notes').value=e.notes||'';
+  document.getElementById('emp-modal-title').textContent='Edit Employee';
+  openModal('emp-modal');
+};
+window.delEmployee=async function(id){
+  if(!confirm('Remove employee?'))return;
+  await fsDel('employees',id);
+  S.employees=S.employees.filter(e=>e.id!==id);
+  renderEmployees();updateEmpDatalist();renderDash();showToast('Removed ✓');
 };
 
 // ── CLEANING ──
@@ -661,8 +1078,6 @@ function renderCleanLog(){
   const sorted=[...S.cleanLogs].sort((a,b)=>new Date(b.date)-new Date(a.date));
   document.getElementById('cl-log').innerHTML=sorted.length?sorted.map(l=>{const col=l.pct>=80?'var(--green-l)':l.pct>=50?'var(--amber)':'var(--red)';return`<tr><td>${l.date}</td><td>${l.staff}</td><td>${l.done}</td><td>${l.total}</td><td style="color:${col};font-weight:600;font-family:var(--font-mono)">${l.pct}%</td></tr>`;}).join(''):`<tr><td colspan="5" class="emp">// No logs yet</td></tr>`;
 }
-
 </script>
-
 </body>
 </html>
