@@ -217,7 +217,7 @@ body::before {
 /* Full: white standout signal */
 .time-block.slot-full {
   border-left: 4px solid #ffffff;
-  background: rgba(255,255,255,0.07);
+  background: #ffffff;
 }
 
 /* Nearly full: removed — no longer used */
@@ -230,8 +230,10 @@ body::before {
 }
 
 .slot-full .time-header {
-  background: rgba(255,255,255,0.10);
+  background: #f0ede8;
+  border-bottom-color: rgba(0,0,0,0.10);
 }
+.slot-full .time-header .time-chef-info { color: #5a5040; }
 
 /* ── NOTE BADGES ── */
 .note-badge {
@@ -318,15 +320,15 @@ body::before {
 
 /* Full slot — all reservation rows turn white */
 .slot-full .res-row {
-  border-left-color: #ffffff;
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.18);
+  border-left-color: #1a1714;
+  background: #ffffff;
+  border-color: rgba(0,0,0,0.12);
 }
 .slot-full .res-row-name {
-  color: #ffffff;
+  color: #1a1714;
 }
 .slot-full .res-row-meta {
-  color: rgba(255,255,255,0.75);
+  color: #5a5040;
 }
 
 .res-row-name {
@@ -667,15 +669,8 @@ body::before {
 .res-row.is-large-group .res-row-badge { background: rgba(255,255,255,0.15); color: #ffffff; border-color: rgba(255,255,255,0.3); }
 .res-row.is-override.is-large-group { border-left-color: #e04040; background: #1e3a8a; }
 
-/* ── FULL SLOT — name cell diagonal stripe ── */
+/* ── FULL SLOT — name cell ── */
 .slot-full .res-row-name {
-  background: repeating-linear-gradient(
-    -45deg,
-    rgba(255,255,255,0.05) 0px,
-    rgba(255,255,255,0.05) 4px,
-    transparent 4px,
-    transparent 10px
-  );
   border-radius: 3px;
   padding-left: 5px;
 }
@@ -969,7 +964,7 @@ body.staff-mode .real-name { display: inline; }
 #exportTable th { color: var(--gold) !important; }
 
 /* ── FULL SLOT row standout ── */
-.time-block.slot-full .time-label { color: #ffffff !important; }
+.time-block.slot-full .time-label { color: #1a1714 !important; }
 .time-block.slot-full .time-add-btn { display: none; }
 
 /* ── section divider ── */
@@ -2391,9 +2386,9 @@ function renderTimeSlots() {
 
     const isGuest=appMode==='guest';
     if (isGuest) {
-      head.innerHTML='<div class="time-label" style="'+(slotFull||isManuallyBlocked?'color:#ffffff':'')+'">'+displayTime(slot)+'</div>'+capWidget;
+      head.innerHTML='<div class="time-label" style="'+(slotFull||isManuallyBlocked?'color:#1a1714':'')+'">'+displayTime(slot)+'</div>'+capWidget;
     } else {
-      const _labelColor = isManuallyBlocked?'color:#c04040':slotFull?'color:#ffffff':isSecondary?'color:var(--text3)':'';
+      const _labelColor = isManuallyBlocked?'color:#c04040':slotFull?'color:#1a1714':isSecondary?'color:var(--text3)':'';
       const _lockSpan   = isManuallyBlocked ? '<span style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);padding:0 6px">&#128274;</span>' : '';
       const _blockBtn   = isManager() ? '<button class="block-btn' + (isManuallyBlocked ? ' is-blocked' : '') + '" onclick="toggleBlockSlot(\'' + slot + '\')" title="' + (isManuallyBlocked ? 'Unblock slot' : 'Block slot') + '">&#128274;</button>' : '';
       // All 4 grills occupied at this slot (physically no more grills to open)
