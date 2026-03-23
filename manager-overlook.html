@@ -815,6 +815,114 @@ async function boot(){
     S.reqOffs=results[4];S.employees=results[5];S.clTasks=results[6];
     S.vendors=results[7];S.priceItems=results[8];
   }catch(e){showToast('Firebase error');console.error(e);}
+
+  // Seed checklist tasks if none exist
+  if(!S.clTasks.length){
+    const seedTasks=[
+      {title:'Beer Keg, Wine Box',desc:'Beer & Wine — Inventory Weekly. Due: Monday',importance:'medium',flag:'action',status:'notstarted'},
+      {title:'Beer & Wine',desc:'Inventory Weekly. Due: 3/3/2026',importance:'medium',flag:'active',status:'notstarted'},
+      {title:'Juice',desc:'Inventory Weekly',importance:'medium',flag:'action',status:'notstarted'},
+      {title:'Receipt Sending',desc:'Bills — Quarterly. Due: 6/5/2026',importance:'medium',flag:'action',status:'notstarted'},
+      {title:'Sorting Emails',desc:'Email — Daily',importance:'medium',flag:'active',status:'notstarted'},
+      {title:'Call Lindsay Squires',desc:'Email',importance:'medium',flag:'active',status:'notstarted'},
+      {title:'WAIT Melanie number confirm jun26',desc:'Reservations',importance:'medium',flag:'active',status:'waiting'},
+      {title:'Schedule Pre-planning',desc:'Admin — Weekly. Due: Monday',importance:'medium',flag:'action',status:'notstarted'},
+      {title:'Schedule check',desc:'Admin. Due: Thursday',importance:'medium',flag:'active',status:'notstarted'},
+      {title:'Schedule Upload',desc:'Admin. Due: Friday',importance:'medium',flag:'action',status:'notstarted'},
+      {title:'599 Mail',desc:'Admin. Due: Monday',importance:'medium',flag:'action',status:'notstarted'},
+      {title:'498 Mail',desc:'Admin',importance:'low',flag:'later',status:'notstarted'},
+      {title:'45 Mail',desc:'Admin',importance:'low',flag:'later',status:'notstarted'},
+      {title:'Tips',desc:'Admin',importance:'medium',flag:'action',status:'notstarted'},
+      {title:'Paycheck',desc:'Admin',importance:'medium',flag:'action',status:'notstarted'},
+      {title:'Recycle',desc:'Outside. Due: Tuesday',importance:'medium',flag:'action',status:'notstarted'},
+      {title:'Electrician kitchen',desc:'Admin',importance:'low',flag:'later',status:'notstarted'},
+      {title:'Under table glow LED',desc:'Admin',importance:'low',flag:'later',status:'notstarted'},
+      {title:'Clover machine',desc:'Admin',importance:'medium',flag:'active',status:'notstarted'},
+      {title:'New Sign',desc:'Admin',importance:'low',flag:'later',status:'notstarted'},
+      {title:'Downing metal',desc:'Bills',importance:'low',flag:'later',status:'notstarted'},
+    ];
+    for(let i=0;i<seedTasks.length;i++){
+      const rec={...seedTasks[i],order:i};
+      rec.id=await fsAdd('clTasks',rec);S.clTasks.push(rec);
+    }
+  }
+
+  // Seed vendors if none exist
+  const SEED_VENDORS=[
+    {name:'Costco',contact:'',notes:'Membership required. Bulk/wholesale retail.'},
+    {name:'Wholesale Club',contact:'',notes:'Bulk foodservice items.'},
+    {name:"Sobey's",contact:'',notes:'Local grocery chain.'},
+    {name:'Sysco',contact:'',notes:'Primary foodservice distributor. Delivery scheduled.'},
+    {name:'DaiLam',contact:'',notes:'Asian grocery supplier.'},
+    {name:'SuperStore',contact:'',notes:'Large format grocery.'},
+    {name:'Dollarama',contact:'',notes:'Cleaning supplies, disposables.'},
+    {name:"Kim's",contact:'',notes:'Asian specialty grocery.'},
+    {name:'Moncton Fish Market',contact:'',notes:'Fresh & frozen seafood supplier.'},
+    {name:'True North NS',contact:'',notes:'Nova Scotia seafood supplier.'},
+    {name:'BulkBarn',contact:'',notes:'Dry goods, spices, bulk items.'},
+    {name:'Walmart',contact:'',notes:'General supplies.'},
+    {name:'MCS',contact:'',notes:''},
+    {name:'NB Liquor',contact:'',notes:'Beer, wine, spirits.'},
+    {name:'FirstLight',contact:'',notes:''},
+  ];
+  if(!S.vendors.length){
+    for(const v of SEED_VENDORS){
+      const rec={...v};rec.id=await fsAdd('vendors',rec);S.vendors.push(rec);
+    }
+  }
+
+  // Seed price items from known data (scallop pricing from screenshot + common restaurant items)
+  if(!S.priceItems.length&&S.vendors.length){
+    const vMap={};S.vendors.forEach(v=>{vMap[v.name.toLowerCase().replace(/[^a-z0-9]/g,'')]=v.id;});
+    const getV=name=>vMap[name.toLowerCase().replace(/[^a-z0-9]/g,'')]||'';
+    const seedItems=[
+      // Scallops — from screenshot
+      {itemName:'Scallops (Olivia)',vendorId:getV('Costco'),price:29.99,weight:680,unit:'g',type:'20/40',notes:'Retail baseline — calculated $20/100g'},
+      {itemName:'Atlantic Scallops',vendorId:getV('Sysco'),price:414.52,weight:10,unit:'lb',type:'10/20',notes:'Premium large — $41.45/lb calculated'},
+      {itemName:'Atlantic Scallops',vendorId:getV('Sysco'),price:368.84,weight:10,unit:'lb',type:'20/30',notes:'Mid-large — $36.88/lb calculated'},
+      {itemName:'Atlantic Scallops',vendorId:getV('Sysco'),price:79.29,weight:10,unit:'lb',type:'80/120',notes:'Too small — not usable. $7.93/lb'},
+      {itemName:'Atlantic Scallops',vendorId:getV('Sysco'),price:1057.34,weight:30,unit:'lb',type:'10/20',notes:'Bulk — better pricing. $35.24/lb'},
+      {itemName:'Peru Scallops',vendorId:getV('Sysco'),price:576.20,weight:30,unit:'lb',type:'20/30',notes:'Best value — $19.21/lb calculated'},
+      {itemName:'IQF Scallops',vendorId:getV('True North NS'),price:45.50,weight:1,unit:'lb',type:'10/20',notes:'Overpriced — $45.50/lb'},
+      {itemName:'IQF Scallops',vendorId:getV('True North NS'),price:42.25,weight:1,unit:'lb',type:'20/30',notes:'Overpriced — $42.25/lb'},
+      {itemName:'Patagonian Med Scallops',vendorId:getV('True North NS'),price:20.99,weight:454,unit:'g',type:'10/20',notes:'Not whole scallop — $21/100g'},
+      {itemName:'Sea Scallops',vendorId:getV('Moncton Fish Market'),price:329.90,weight:10,unit:'lb',type:'10/20',notes:'Best premium — $32.99/lb'},
+      {itemName:'Sea Scallops',vendorId:getV('Moncton Fish Market'),price:299.90,weight:10,unit:'lb',type:'20/30',notes:'Mid tier — $29.99/lb'},
+      {itemName:'Sea Scallops',vendorId:getV('Moncton Fish Market'),price:285.00,weight:10,unit:'lb',type:'30/40',notes:'Lower size — $28.50/lb'},
+      // Common restaurant items — approximate estimates
+      {itemName:'Salmon (Atlantic)',vendorId:getV('Sysco'),price:189.00,weight:10,unit:'lb',type:'Fillet, skin-on',notes:'Approx. market price'},
+      {itemName:'Salmon (Atlantic)',vendorId:getV('Moncton Fish Market'),price:16.99,weight:1,unit:'lb',type:'Fresh fillet',notes:'Fresh — market price'},
+      {itemName:'Tuna (Yellowfin)',vendorId:getV('Sysco'),price:22.00,weight:1,unit:'lb',type:'Sashimi grade',notes:'Approx.'},
+      {itemName:'Shrimp (21/25)',vendorId:getV('Costco'),price:32.99,weight:2,unit:'kg',type:'Frozen, peeled',notes:'Frozen IQF — Costco approx.'},
+      {itemName:'Shrimp (21/25)',vendorId:getV('Sysco'),price:145.00,weight:10,unit:'lb',type:'Frozen EZ peel',notes:'Case price approx.'},
+      {itemName:'Chicken Breast',vendorId:getV('Sysco'),price:89.00,weight:20,unit:'lb',type:'Boneless skinless',notes:'Case approx.'},
+      {itemName:'Chicken Breast',vendorId:getV('Costco'),price:39.99,weight:6,unit:'kg',type:'Boneless skinless',notes:'Costco bulk approx.'},
+      {itemName:'Beef Tenderloin',vendorId:getV('Sysco'),price:280.00,weight:10,unit:'lb',type:'Whole trimmed',notes:'AAA approx.'},
+      {itemName:'NY Strip Steak',vendorId:getV('Sysco'),price:210.00,weight:10,unit:'lb',type:'AAA',notes:'Approx. case price'},
+      {itemName:'Lobster Tail',vendorId:getV('Moncton Fish Market'),price:28.00,weight:1,unit:'unit',type:'4-5 oz',notes:'Each approx.'},
+      {itemName:'Soy Sauce',vendorId:getV('Sysco'),price:38.00,weight:5,unit:'L',type:'Kikkoman',notes:'4x1.25L case approx.'},
+      {itemName:'Soy Sauce',vendorId:getV('DaiLam'),price:8.99,weight:1,unit:'L',type:'Dark/Lite',notes:'Per bottle approx.'},
+      {itemName:'Sesame Oil',vendorId:getV('Sysco'),price:24.00,weight:2,unit:'L',type:'Pure',notes:'Approx.'},
+      {itemName:'Mirin',vendorId:getV('DaiLam'),price:12.99,weight:1,unit:'L',type:'',notes:'Per bottle approx.'},
+      {itemName:'Rice (Sushi)',vendorId:getV('Costco'),price:32.99,weight:9,unit:'kg',type:'Short grain',notes:'Costco 9kg bag approx.'},
+      {itemName:'Rice (Sushi)',vendorId:getV('Sysco'),price:65.00,weight:25,unit:'kg',type:'Short grain',notes:'25kg bag approx.'},
+      {itemName:'Vegetable Oil',vendorId:getV('Costco'),price:24.99,weight:16,unit:'L',type:'Canola',notes:'Large jug approx.'},
+      {itemName:'Butter',vendorId:getV('Costco'),price:29.99,weight:2,unit:'kg',type:'Unsalted',notes:'Approx.'},
+      {itemName:'Eggs',vendorId:getV('Costco'),price:14.99,weight:60,unit:'unit',type:'Large',notes:'60-count flat approx.'},
+      {itemName:'Garlic (minced)',vendorId:getV('Sysco'),price:16.00,weight:3,unit:'kg',type:'Jarred',notes:'Case approx.'},
+      {itemName:'Beer (Domestic Keg)',vendorId:getV('NB Liquor'),price:260.00,weight:50,unit:'L',type:'Keg 50L',notes:'Approx. NB Liquor keg price'},
+      {itemName:'House Wine (White)',vendorId:getV('NB Liquor'),price:18.99,weight:1,unit:'unit',type:'750mL bottle',notes:'Per bottle approx.'},
+      {itemName:'House Wine (Red)',vendorId:getV('NB Liquor'),price:18.99,weight:1,unit:'unit',type:'750mL bottle',notes:'Per bottle approx.'},
+      {itemName:'Sake',vendorId:getV('NB Liquor'),price:22.00,weight:1,unit:'unit',type:'720mL',notes:'Per bottle approx.'},
+      {itemName:'Paper Bags (To-go)',vendorId:getV('Sysco'),price:45.00,weight:250,unit:'unit',type:'Medium',notes:'Case of 250 approx.'},
+      {itemName:'Disposable Chopsticks',vendorId:getV('Sysco'),price:22.00,weight:100,unit:'unit',type:'Wrapped',notes:'Pack of 100 approx.'},
+    ];
+    for(const item of seedItems){
+      if(!item.vendorId)continue;
+      const rec={...item};rec.id=await fsAdd('priceItems',rec);S.priceItems.push(rec);
+    }
+  }
+
   const now=new Date();
   document.getElementById('d-date').textContent=now.toLocaleDateString('en-CA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   document.getElementById('sb-date').textContent=now.toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});
@@ -1038,6 +1146,12 @@ window.delBill=async function(id){if(!confirm('Delete?'))return;await fsDel('bil
 
 // ── SCHEDULE ──
 let pendingCell=null;
+function shiftSortKey(time){
+  const t=(time||'').trim().toLowerCase();
+  if(!t)return 0; // name only = first
+  if(t==='half'||t==='1/2')return 1; // half = second
+  return 2; // everything else = last
+}
 function buildScheduleGrid(tableId,sections){
   const wk=getWeekKey(),ws=S.shifts.filter(s=>s.week===wk);
   const v=document.getElementById('sch-weekdate').value,mon=v?new Date(v+'T12:00:00'):new Date();
@@ -1050,7 +1164,7 @@ function buildScheduleGrid(tableId,sections){
     const cc=secClass(sec);
     html+=`<tr><td class="sc2 ${cc}">${sec}</td>`;
     DAYS_SHORT.forEach((_,di)=>{
-      const cs=ws.filter(s=>s.section===sec&&s.dayIdx===di);
+      const cs=ws.filter(s=>s.section===sec&&s.dayIdx===di).sort((a,b)=>shiftSortKey(a.time)-shiftSortKey(b.time));
       html+=`<td onclick="window.handleCellClick('${sec}',${di})">`;
       cs.forEach(sh=>{
         const cc2=chipClass(sec);
@@ -1064,7 +1178,7 @@ function buildScheduleGrid(tableId,sections){
   document.getElementById(tableId).innerHTML=html;
 }
 function renderSchedule(){
-  buildScheduleGrid('sg-kitchen',['TEPPAN','SUSHI','KITCHEN']);
+  buildScheduleGrid('sg-kitchen',['SUSHI','KITCHEN','TEPPAN']);
   buildScheduleGrid('sg-serving',['SERVING']);
   renderStaffQuickPanel();
 }
@@ -1225,31 +1339,126 @@ window.delReqOff=async function(id){await fsDel('reqOffs',id);S.reqOffs=S.reqOff
 
 // ── SHEET GEN ──
 window.openSheetModal=function(){buildSheetPreviews();openModal('sheet-modal');};
+// Serving time order: 11, 12, 11-2, [empty row], 5, 5:30, 6
+const SERVING_AM_TIMES=['11','12','11-2','11-2 (11am–2pm)'];
+const SERVING_PM_TIMES=['5','5:30','6'];
+function servingTimeOrder(time){
+  const t=(time||'').trim();
+  if(t==='11')return 0;
+  if(t==='12')return 1;
+  if(t==='11-2'||t.startsWith('11-2'))return 2;
+  if(t==='5')return 4;
+  if(t==='5:30'||t==='5.30')return 5;
+  if(t==='6')return 6;
+  // fallback: name-only goes first, others go to end
+  if(!t)return 0;
+  return 7;
+}
+function isPmServing(time){
+  const t=(time||'').trim();
+  return t==='5'||t==='5:30'||t==='5.30'||t==='6';
+}
+function isAmServing(time){
+  const t=(time||'').trim();
+  return !t||t==='11'||t==='12'||t==='11-2'||t.startsWith('11-2');
+}
 function buildSheetPreview(containerId,sections){
   const wk=getWeekKey(),ws=S.shifts.filter(s=>s.week===wk);
   const v=document.getElementById('sch-weekdate').value,mon=v?new Date(v+'T12:00:00'):new Date();
   const wLabel=document.getElementById('sch-week-label').textContent;
-  const maxRows={};sections.forEach(sec=>{let max=0;for(let di=0;di<7;di++){const cnt=ws.filter(s=>s.section===sec&&s.dayIdx===di).length;if(cnt>max)max=cnt;}maxRows[sec]=Math.max(max,1);});
+  const isServing=sections.length===1&&sections[0]==='SERVING';
   let html=`<table class="sheet-table"><tr><td class="week-hdr" colspan="9">${wLabel}</td></tr><tr><td class="date-num"></td>`;
   for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(d.getDate()+i);html+=`<td class="date-num">${d.getDate()}</td>`;}
   html+=`</tr><tr><td class="day-name"></td>`;DAYS_SHORT.forEach(d=>html+=`<td class="day-name">${d}</td>`);html+='</tr>';
-  sections.forEach(sec=>{
-    const sc2=secClass(sec);
-    for(let row=0;row<maxRows[sec];row++){html+=`<tr>${row===0?`<td class="section-lbl ${sc2}">${sec}</td>`:'<td></td>'}`;for(let di=0;di<7;di++){const cs=ws.filter(s=>s.section===sec&&s.dayIdx===di),sh=cs[row];html+=sh?`<td class="staff-cell">${sh.time?`${sh.name} ${sh.time}`:sh.name}</td>`:`<td class="empty-cell"></td>`;}html+='</tr>';}
-  });
+  if(isServing){
+    // Build rows sorted by serving time order, with empty row between AM and PM
+    const allShifts=ws.filter(s=>s.section==='SERVING');
+    // Collect all unique (name,time) combos per day, sorted
+    // Find max rows needed for AM and PM per day
+    let maxAM=1,maxPM=1;
+    for(let di=0;di<7;di++){
+      const dayShifts=allShifts.filter(s=>s.dayIdx===di).sort((a,b)=>servingTimeOrder(a.time)-servingTimeOrder(b.time));
+      const am=dayShifts.filter(s=>!isPmServing(s.time));
+      const pm=dayShifts.filter(s=>isPmServing(s.time));
+      if(am.length>maxAM)maxAM=am.length;
+      if(pm.length>maxPM)maxPM=pm.length;
+    }
+    // AM rows
+    for(let row=0;row<maxAM;row++){
+      html+=`<tr>${row===0?`<td class="section-lbl sec-serving">SERVING</td>`:'<td></td>'}`;
+      for(let di=0;di<7;di++){
+        const dayShifts=allShifts.filter(s=>s.dayIdx===di&&!isPmServing(s.time)).sort((a,b)=>servingTimeOrder(a.time)-servingTimeOrder(b.time));
+        const sh=dayShifts[row];
+        html+=sh?`<td class="staff-cell">${sh.time?`${sh.name} ${sh.time}`:sh.name}</td>`:`<td class="empty-cell"></td>`;
+      }
+      html+='</tr>';
+    }
+    // Empty spacer row
+    html+=`<tr><td colspan="8" style="background:var(--bg2);height:8px;border:1px solid var(--border)"></td></tr>`;
+    // PM rows
+    for(let row=0;row<maxPM;row++){
+      html+=`<tr><td></td>`;
+      for(let di=0;di<7;di++){
+        const dayShifts=allShifts.filter(s=>s.dayIdx===di&&isPmServing(s.time)).sort((a,b)=>servingTimeOrder(a.time)-servingTimeOrder(b.time));
+        const sh=dayShifts[row];
+        html+=sh?`<td class="staff-cell">${sh.time?`${sh.name} ${sh.time}`:sh.name}</td>`:`<td class="empty-cell"></td>`;
+      }
+      html+='</tr>';
+    }
+  }else{
+    const maxRows={};sections.forEach(sec=>{let max=0;for(let di=0;di<7;di++){const cnt=ws.filter(s=>s.section===sec&&s.dayIdx===di).length;if(cnt>max)max=cnt;}maxRows[sec]=Math.max(max,1);});
+    sections.forEach(sec=>{
+      const sc2=secClass(sec);
+      for(let row=0;row<maxRows[sec];row++){
+        html+=`<tr>${row===0?`<td class="section-lbl ${sc2}">${sec}</td>`:'<td></td>'}`;
+        for(let di=0;di<7;di++){
+          const cs=ws.filter(s=>s.section===sec&&s.dayIdx===di).sort((a,b)=>shiftSortKey(a.time)-shiftSortKey(b.time));
+          const sh=cs[row];
+          html+=sh?`<td class="staff-cell">${sh.time?`${sh.name} ${sh.time}`:sh.name}</td>`:`<td class="empty-cell"></td>`;
+        }
+        html+='</tr>';
+      }
+    });
+  }
   html+='</table>';document.getElementById(containerId).innerHTML=html;
 }
-function buildSheetPreviews(){buildSheetPreview('sheet-preview-kitchen',['TEPPAN','SUSHI','KITCHEN']);buildSheetPreview('sheet-preview-serving',['SERVING']);}
+function buildSheetPreviews(){buildSheetPreview('sheet-preview-kitchen',['SUSHI','KITCHEN','TEPPAN']);buildSheetPreview('sheet-preview-serving',['SERVING']);}
 window.copySheetData=function(which){
-  const sections=which==='serving'?['SERVING']:['TEPPAN','SUSHI','KITCHEN'];
+  const sections=which==='serving'?['SERVING']:['SUSHI','KITCHEN','TEPPAN'];
   const wk=getWeekKey(),ws=S.shifts.filter(s=>s.week===wk);
   const v=document.getElementById('sch-weekdate').value,mon=v?new Date(v+'T12:00:00'):new Date();
   const wLabel=document.getElementById('sch-week-label').textContent;
-  const maxRows={};sections.forEach(sec=>{let max=0;for(let di=0;di<7;di++){const cnt=ws.filter(s=>s.section===sec&&s.dayIdx===di).length;if(cnt>max)max=cnt;}maxRows[sec]=Math.max(max,1);});
   const rows=[[wLabel,'','','','','','','']];
   const dr=[''];for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(d.getDate()+i);dr.push(String(d.getDate()));}
   rows.push(dr);rows.push(['','MON','TUE','WED','THU','FRI','SAT','SUN']);
-  sections.forEach(sec=>{for(let row=0;row<maxRows[sec];row++){const r=[row===0?sec:''];for(let di=0;di<7;di++){const cs=ws.filter(s=>s.section===sec&&s.dayIdx===di),sh=cs[row];r.push(sh?(sh.time?`${sh.name} ${sh.time}`:sh.name):'');}rows.push(r);}});
+  if(which==='serving'){
+    const allShifts=ws.filter(s=>s.section==='SERVING');
+    let maxAM=1,maxPM=1;
+    for(let di=0;di<7;di++){
+      const am=allShifts.filter(s=>s.dayIdx===di&&!isPmServing(s.time));
+      const pm=allShifts.filter(s=>s.dayIdx===di&&isPmServing(s.time));
+      if(am.length>maxAM)maxAM=am.length;
+      if(pm.length>maxPM)maxPM=pm.length;
+    }
+    for(let row=0;row<maxAM;row++){
+      const r=[row===0?'SERVING':''];
+      for(let di=0;di<7;di++){
+        const dayShifts=allShifts.filter(s=>s.dayIdx===di&&!isPmServing(s.time)).sort((a,b)=>servingTimeOrder(a.time)-servingTimeOrder(b.time));
+        const sh=dayShifts[row];r.push(sh?(sh.time?`${sh.name} ${sh.time}`:sh.name):'');
+      }rows.push(r);
+    }
+    rows.push(['','','','','','','','']); // empty row
+    for(let row=0;row<maxPM;row++){
+      const r=[''];
+      for(let di=0;di<7;di++){
+        const dayShifts=allShifts.filter(s=>s.dayIdx===di&&isPmServing(s.time)).sort((a,b)=>servingTimeOrder(a.time)-servingTimeOrder(b.time));
+        const sh=dayShifts[row];r.push(sh?(sh.time?`${sh.name} ${sh.time}`:sh.name):'');
+      }rows.push(r);
+    }
+  }else{
+    const maxRows={};sections.forEach(sec=>{let max=0;for(let di=0;di<7;di++){const cnt=ws.filter(s=>s.section===sec&&s.dayIdx===di).length;if(cnt>max)max=cnt;}maxRows[sec]=Math.max(max,1);});
+    sections.forEach(sec=>{for(let row=0;row<maxRows[sec];row++){const r=[row===0?sec:''];for(let di=0;di<7;di++){const cs=ws.filter(s=>s.section===sec&&s.dayIdx===di).sort((a,b)=>shiftSortKey(a.time)-shiftSortKey(b.time)),sh=cs[row];r.push(sh?(sh.time?`${sh.name} ${sh.time}`:sh.name):'');}rows.push(r);}});
+  }
   navigator.clipboard.writeText(rows.map(r=>r.join('\t')).join('\n'));
   showToast(`${which==='serving'?'Serving':'Kitchen+Sushi'} copied — paste into Google Sheets ✓`);
 };
@@ -1258,7 +1467,7 @@ window.buildSchPrompt=function(){
   const restrictions=S.restrictions.filter(r=>r.week===wk).map(r=>`- ${r.text}`).join('\n')||'None';
   const dates=getWeekDates('sch-weekdate');
   const forecastLines=dates.map((d,i)=>{const res=S.reservations[d]||{bookings:0,guests:0,grills:0};return`  ${DAYS_SHORT[i]} (${d}): ${res.bookings} bookings, ${res.guests} guests, ${res.grills} grills`;}).join('\n');
-  const allSec=['TEPPAN','SUSHI','KITCHEN','SERVING'];
+  const allSec=['SUSHI','KITCHEN','TEPPAN','SERVING'];
   const currentSched=allSec.map(sec=>{const row=DAYS_SHORT.map((_,i)=>{const cs=ws.filter(s=>s.section===sec&&s.dayIdx===i);return cs.length?cs.map(s=>s.time?`${s.name} ${s.time}`:s.name).join(', '):'—';});return`${sec}: ${row.join(' | ')}`;}).join('\n');
   const roster=S.employees.length?S.employees.map(e=>`- ${e.name} (${getEmpRoles(e).join('/')})`).join('\n'):(S.shifts.length?[...new Set(S.shifts.map(s=>s.name))].map(n=>`- ${n}`).join('\n'):'[No staff scheduled]');
   const offRequests=S.reqOffs.length?S.reqOffs.map(r=>{const t=r.timeFrom?` (${r.timeFrom}–${r.timeTo})`:'';return`- ${r.name}: ${r.dateFrom}${r.dateTo!==r.dateFrom?' → '+r.dateTo:''}${t}`;}).join('\n'):'None';
