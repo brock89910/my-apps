@@ -216,7 +216,7 @@ body::before {
 
 /* Full: white standout signal */
 .time-block.slot-full {
-  border-left: 4px solid #ffffff;
+  border-left: 4px solid #1a1714;
   background: #ffffff;
 }
 
@@ -318,17 +318,17 @@ body::before {
 
 .res-row:active { opacity: 0.75; }
 
-/* Full slot — all reservation rows turn white */
+/* Full slot — reservation rows stay dark */
 .slot-full .res-row {
-  border-left-color: #1a1714;
-  background: #ffffff;
-  border-color: rgba(0,0,0,0.12);
+  border-left-color: var(--gold);
+  background: var(--bg3);
+  border-color: var(--border);
 }
 .slot-full .res-row-name {
-  color: #1a1714;
+  color: var(--text);
 }
 .slot-full .res-row-meta {
-  color: #5a5040;
+  color: var(--text2);
 }
 
 .res-row-name {
