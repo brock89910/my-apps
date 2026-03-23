@@ -421,7 +421,7 @@ tr:hover td{background:rgba(232,160,32,.03)}
       <label class="toggle-sw"><input type="checkbox" id="ro-time-toggle" onchange="updateReqOffTimeUI()"><span class="sl"></span></label>
       <label style="cursor:pointer" onclick="document.getElementById('ro-time-toggle').click()">Specific time range (partial day)</label>
     </div>
-    <div id="ro-time-wrap" style="display:none;margin-top:10px;display:none">
+    <div id="ro-time-wrap" style="display:none;margin-top:10px">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <div class="fg"><label>Unavailable From</label><input type="time" id="ro-time-from"></div>
         <div class="fg"><label>Unavailable Until</label><input type="time" id="ro-time-to"></div>
@@ -820,19 +820,6 @@ function buildScheduleGrid(tableId,sections){
 function renderSchedule(){
   buildScheduleGrid('sg-kitchen',['TEPPAN','SUSHI','KITCHEN']);
   buildScheduleGrid('sg-serving',['SERVING']);
-}
-function renderScheduleWithCopy(){
-  // Called from onWeekChange — async wrapper
-  (async()=>{
-    const wk=getWeekKey();
-    if(wk&&wk!=='default'){
-      const cur=S.shifts.filter(s=>s.week===wk);
-      if(!cur.length){
-        await copyFromPrevWeek(wk);
-      }
-    }
-    renderSchedule();
-  })();
 }
 window.openShiftModal=function(section,dayIdx){
   pendingCell={section,dayIdx};
