@@ -2799,7 +2799,7 @@ function _srShowOverride(g) {
 async function srApplyOverride(g) {
   const pwd=document.getElementById('srOverridePwd')?.value||'';
   const oeEl=document.getElementById('srOverrideErr');
-  const ok=await checkPassword(pwd,PWD_HASH_CARD);
+  const ok=await checkPassword(pwd,PWD_HASH_LARGE);
   if (!ok){
     if(oeEl){oeEl.textContent='✕ Incorrect password.';oeEl.style.display='block';}
     document.getElementById('srOverridePwd').value='';
@@ -2840,7 +2840,7 @@ function openForceAddModal(slot) {
 async function submitForceAdd(slot) {
   const pwd = document.getElementById('forceAddPwd')?.value || '';
   const errEl = document.getElementById('forceAddErr');
-  const ok = await checkPassword(pwd, PWD_HASH_EDIT); // 0709
+  const ok = await checkPassword(pwd, PWD_HASH_LARGE); // 2599
   if (!ok) {
     if (errEl) { errEl.textContent = '✕ Incorrect password.'; }
     document.getElementById('forceAddPwd').value = '';
@@ -3484,7 +3484,7 @@ async function saveHibachiOverride(dk,editId) {
   const oeEl=document.getElementById('overrideErr');
   if (!isManager()) {
     const pwd=document.getElementById('overridePwd')?.value||'';
-    const ok=await checkPassword(pwd,PWD_HASH_CARD);
+    const ok=await checkPassword(pwd,PWD_HASH_LARGE);
     if (!ok) { if(oeEl){oeEl.textContent='✕ Incorrect password';oeEl.style.display='block';} return; }
   }
   if (oeEl) oeEl.style.display='none';
