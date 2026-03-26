@@ -1266,7 +1266,7 @@ let unlockedCardIds = new Set();
 
 /* ── PASSWORDS (SHA-256) ── */
 const PWD_HASH_CARD   = '25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117'; // 2017040334 — view card details
-const PWD_HASH_LARGE  = '53d6668b995a4117d05d7799f6563672f4659d05f9f9fd45f961164de256b5d0'; // large group override
+const PWD_HASH_LARGE  = '533099ac357e5586238f6be92e706eacb5dea6559fa61b979069c39c5efe8cee'; // 2599 — large group override
 const PWD_HASH_EXPORT = '25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117'; // 2017040334 — export tab
 const PWD_HASH_CHEF   = '25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117'; // 2017040334 — chef removal
 const PWD_HASH_EDIT   = '53d6668b995a4117d05d7799f6563672f4659d05f9f9fd45f961164de256b5d0'; // 0709 — edit existing reservation
@@ -1357,6 +1357,14 @@ async function wipeCardsForDate(dk) {
 /* ── MIDNIGHT CARD WIPE — polling approach (fires reliably even if tab was open overnight) ── */
 let _lastWipeDate = '';
 function startMidnightWipePoller() {
+  // On startup: immediately wipe cards for today and all past 30 days (catches any missed wipes)
+  (async () => {
+    for (let i = 0; i <= 30; i++) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      await wipeCardsForDate(dateKey(d));
+    }
+  })();
+
   setInterval(async () => {
     const now = new Date();
     const h = now.getHours(), m = now.getMinutes();
@@ -2222,7 +2230,7 @@ function printDailySheet() {
   const hibachi=allRes.slice().sort((a,b)=>(a.slot||'').localeCompare(b.slot||''));
   const dining=allDining.slice().sort((a,b)=>(a.time||'').localeCompare(b.time||''));
   const dateStr=currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-  let html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Daily Sheet — '+dateStr+'</title><style>body{font-family:"DM Mono",monospace;font-size:12px;color:#111;background:#fff;padding:24px;max-width:720px;margin:0 auto}h1{font-family:Georgia,serif;font-size:18px;font-weight:600;margin:0 0 4px}h2{font-family:Georgia,serif;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#888;margin:20px 0 8px;border-bottom:1px solid #ddd;padding-bottom:4px}table{width:100%;border-collapse:collapse;margin-bottom:8px}th{text-align:left;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#666;padding:4px 8px;border-bottom:2px solid #111}td{padding:5px 8px;border-bottom:1px solid #eee;vertical-align:top}.slot{font-weight:700;white-space:nowrap}.badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:2px;margin-left:4px}.allergy{background:#fee;color:#c00;border:1px solid #faa}.restriction{background:#fff8e1;color:#a60;border:1px solid #fcc}.note{font-size:10px;color:#444;font-style:italic}.total{font-size:11px;font-weight:700;margin-top:12px;padding:6px 8px;background:#f5f5f5;border:1px solid #ddd}.divider-col{border-left:1px solid #bbb}.large-hl{background:#ddeeff;font-weight:700}@media print{body{padding:12px}}</style></head><body>';
+  let html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Daily Sheet — '+dateStr+'</title><style>body{font-family:"DM Mono",monospace;font-size:15px;color:#111;background:#fff;padding:28px;max-width:780px;margin:0 auto}h1{font-family:Georgia,serif;font-size:22px;font-weight:700;margin:0 0 6px}h2{font-family:Georgia,serif;font-size:14px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#666;margin:26px 0 10px;border-bottom:2px solid #ccc;padding-bottom:5px}table{width:100%;border-collapse:collapse;margin-bottom:10px}th{text-align:left;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#555;padding:7px 10px;border-bottom:2px solid #111}td{padding:8px 10px;border-bottom:1px solid #ddd;vertical-align:top;font-size:14px}.slot{font-weight:700;white-space:nowrap;font-size:15px}.badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:3px;margin-left:5px}.allergy{background:#fee;color:#c00;border:1px solid #faa}.restriction{background:#fff8e1;color:#a60;border:1px solid #fcc}.note{font-size:12px;color:#444;font-style:italic;margin-top:2px}.total{font-size:13px;font-weight:700;margin-top:14px;padding:8px 10px;background:#f5f5f5;border:1px solid #ddd}.divider-col{border-left:1px solid #bbb}.large-hl{background:#ddeeff;font-weight:700}@media print{body{padding:14px}}</style></head><body>';
   html+='<div style="font-family:Georgia,serif;font-size:22px;font-weight:700;margin:0 0 14px">'+dateStr+'</div>';
   html+='<h2>Hibachi</h2>';
   if (hibachi.length) {
@@ -2581,16 +2589,19 @@ function _openHibachiModalInner(slot, editId) {
         +'<input class="form-input" id="fExpiry" type="text" maxlength="5" placeholder="MM/YY" value="" oninput="fmtExpiry(this)"></div>'
         +'</div></div>';
     } else {
-      const cardStatus=(existing&&existing.card)?'Card on file — enter password to view or edit':'No card on file';
+      const cardStatus=(existing&&existing.card)?'Card on file':'No card on file';
       cardSectionHtml='<div id="cardSection" style="margin-bottom:12px"><label class="form-label">Card Details</label>'
         +'<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:9px">'
         +'<div style="display:flex;align-items:center;gap:9px">'
-        +'<span style="font-size:1.1rem">🔒</span>'
-        +'<span style="font-family:var(--mono);font-size:0.72rem;color:var(--text2)">'+cardStatus+'</span></div>'
-        +'<div style="display:flex;gap:7px;align-items:center">'
-        +'<input class="form-input" id="cardUnlockPwd" type="password" placeholder="Password to reveal" style="flex:1" onkeydown="if(event.key===\'Enter\'){event.preventDefault();unlockCardDetails(\''+editId+'\')}">'
-        +'<button onclick="unlockCardDetails(\''+editId+'\')" style="padding:9px 14px;background:var(--gold3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:500;color:var(--gold);cursor:pointer;white-space:nowrap">Unlock</button>'
-        +'</div><div id="cardUnlockErr" style="display:none;font-family:var(--mono);font-size:0.67rem;color:#c04040"></div>'
+        +'<span style="font-size:1.1rem">&#128274;</span>'
+        +'<span style="font-family:var(--mono);font-size:0.72rem;color:var(--text2)">'+cardStatus+' — existing card details are hidden for privacy</span></div>'
+        +'<div class="card-row" style="margin:6px 0 0">'
+        +'<div class="form-row" style="margin:0"><label class="form-label">Enter / Replace Card Number</label>'
+        +'<input class="form-input" id="fCard" type="text" maxlength="19" placeholder="•••• •••• •••• ••••" value="" oninput="fmtCard(this)"></div>'
+        +'<div class="form-row" style="margin:0"><label class="form-label">Expiry</label>'
+        +'<input class="form-input" id="fExpiry" type="text" maxlength="5" placeholder="MM/YY" value="" oninput="fmtExpiry(this)"></div>'
+        +'</div>'
+        +'<div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);line-height:1.5">Leave blank to keep existing card on file. Fill in only if replacing or adding a new card.</div>'
         +'</div></div>';
     }
   }
@@ -3384,9 +3395,9 @@ async function saveHibachi(dk,editId) {
       if (editId) {
         const oldR=(reservations[dk]||{})[editId];
         const cardOnFile=!!(oldR&&oldR.card);
-        const cardVerified=!!document.getElementById('cardOnFileVerified');
-        if (cardOnFile&&!cardVerified) { showCardOnFilePrompt(dk,editId); return; }
-        if (!cardOnFile&&!cardVerified) { const hd=parseInt(document.getElementById('fHoldDays')?.value||'0'); if (!hd) { showHoldWarning(dk,editId); return; } }
+        // If card is blank on edit and there's already a card on file, silently keep the existing card — no prompt needed
+        if (cardOnFile) { /* existing card will be preserved in saveHibachi via oldR.card fallback */ }
+        else if (!cardOnFile) { const hd=parseInt(document.getElementById('fHoldDays')?.value||'0'); if (!hd) { showHoldWarning(dk,editId); return; } }
       } else {
         const holdDays=parseInt(document.getElementById('fHoldDays')?.value||'0');
         if (!holdDays) { showHoldWarning(dk,editId); return; }
