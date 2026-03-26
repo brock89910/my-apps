@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>OVERLOOK — TODAY</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS — matches existing Overlook theme
+═══════════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0a0908;--bg2:#0f0e0c;--surface:#141310;--s2:#1a1916;--s3:#201f1c;
+  --border:#2a2925;--border2:#353330;
+  --amber:#e8a020;--amber2:#f5b93a;--amber-d:rgba(232,160,32,0.12);--amber-g:rgba(232,160,32,0.06);
+  --text:#f0ead6;--text2:#a09880;--text3:#5a5648;
+  --red:#d04828;--red-d:rgba(208,72,40,0.18);--red-b:rgba(208,72,40,0.35);
+  --green:#4a8a4a;--green-l:#6ab86a;--green-d:rgba(74,138,74,0.15);
+  --blue:#3a7ab8;--blue-d:rgba(58,122,184,0.15);--blue-l:#7ab4cc;
+  --teppan:#e06020;--sushi:#3a9ab8;--kitchen:#c8a020;--service:#8a5ab8;
+  --font-head:'Barlow Condensed',sans-serif;
+  --font-body:'Barlow',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --r:6px;--r2:10px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+
+/* scanlines overlay */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px)}
+
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);
+  min-height:100vh;min-height:100dvh;padding-bottom:calc(100px + var(--safe-bottom));overflow-x:hidden}
+
+/* ═══════════════════════════════════════════════
+   TOP BAR
+═══════════════════════════════════════════════ */
+.topbar{
+  position:sticky;top:0;z-index:200;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:12px 16px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.topbar-brand{display:flex;align-items:baseline;gap:8px}
+.topbar-brand h1{font-family:var(--font-head);font-size:1.6rem;font-weight:900;letter-spacing:.03em;text-transform:uppercase;line-height:1}
+.topbar-brand h1 span{color:var(--amber)}
+.topbar-brand .day-badge{
+  font-family:var(--font-mono);font-size:.62rem;color:var(--amber);
+  background:var(--amber-d);border:1px solid rgba(232,160,32,.2);
+  border-radius:var(--r);padding:3px 8px;letter-spacing:.08em;text-transform:uppercase;
+}
+.topbar-time{font-family:var(--font-mono);font-size:.72rem;color:var(--text2);text-align:right;line-height:1.5}
+.status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green-l);
+  box-shadow:0 0 6px var(--green-l);animation:pulse 2s infinite;margin-right:4px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ═══════════════════════════════════════════════
+   MAIN LAYOUT
+═══════════════════════════════════════════════ */
+main{padding:14px 14px 0;max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+
+/* ═══════════════════════════════════════════════
+   SECTION LABEL
+═══════════════════════════════════════════════ */
+.sec-label{
+  font-family:var(--font-mono);font-size:.58rem;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.14em;
+  display:flex;align-items:center;gap:6px;margin-bottom:6px;
+}
+.sec-label::before{content:'//';color:var(--amber);opacity:.5}
+
+/* ═══════════════════════════════════════════════
+   PANEL BASE
+═══════════════════════════════════════════════ */
+.panel{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r2);overflow:hidden;
+  position:relative;
+}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,var(--amber-d),transparent)}
+
+/* ═══════════════════════════════════════════════
+   TODAY HERO — schedule snapshot + reservations
+═══════════════════════════════════════════════ */
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hero-stat{
+  background:var(--s2);border:1px solid var(--border);border-radius:var(--r);
+  padding:14px 14px 10px;text-align:center;cursor:pointer;transition:border-color .15s;
+}
+.hero-stat:hover,.hero-stat:active{border-color:var(--amber)}
+.hero-stat .hs-num{
+  font-family:var(--font-head);font-size:3rem;font-weight:900;
+  color:var(--amber);line-height:1;letter-spacing:.02em;
+}
+.hero-stat .hs-label{font-family:var(--font-mono);font-size:.58rem;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.1em;margin-top:4px}
+.hero-stat .hs-sub{font-size:.73rem;color:var(--text2);margin-top:2px}
+
+/* Staff row list inside schedule panel */
+.staff-today{display:flex;flex-direction:column;gap:0}
+.staff-row{
+  display:flex;align-items:center;gap:10px;padding:9px 14px;
+  border-bottom:1px solid rgba(42,41,37,.5);
+}
+.staff-row:last-child{border-bottom:none}
+.staff-row .sr-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.staff-row .sr-name{font-size:.85rem;font-weight:600;flex:1}
+.staff-row .sr-role{font-family:var(--font-mono);font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em}
+.staff-row .sr-time{font-family:var(--font-mono);font-size:.65rem;color:var(--text2)}
+.staff-none{padding:16px;text-align:center;font-family:var(--font-mono);font-size:.7rem;color:var(--text3);letter-spacing:.05em}
+
+/* ═══════════════════════════════════════════════
+   ALERTS — attention needed
+═══════════════════════════════════════════════ */
+.alerts-list{display:flex;flex-direction:column;gap:0}
+.alert-item{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 14px;border-bottom:1px solid rgba(42,41,37,.5);
+  cursor:pointer;transition:background .12s;position:relative;
+  user-select:none;
+}
+.alert-item:last-child{border-bottom:none}
+.alert-item:active{background:var(--s2)}
+.alert-item .ai-icon{
+  width:34px;height:34px;border-radius:var(--r);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:1rem;
+}
+.alert-item .ai-body{flex:1;min-width:0}
+.alert-item .ai-title{font-size:.82rem;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alert-item .ai-sub{font-size:.72rem;color:var(--text2);margin-top:1px}
+.alert-item .ai-arrow{color:var(--text3);font-size:.75rem;flex-shrink:0}
+.alert-item .ai-badge{
+  font-family:var(--font-mono);font-size:.55rem;padding:2px 7px;border-radius:3px;
+  text-transform:uppercase;letter-spacing:.07em;flex-shrink:0;
+}
+
+/* severity colors */
+.sev-critical .ai-icon{background:var(--red-d);color:#e87858}
+.sev-critical .ai-badge{background:var(--red-d);color:#e87858;border:1px solid var(--red-b)}
+.sev-critical .ai-title{color:var(--text)}
+.sev-warn .ai-icon{background:var(--amber-d);color:var(--amber)}
+.sev-warn .ai-badge{background:var(--amber-d);color:var(--amber);border:1px solid rgba(232,160,32,.3)}
+.sev-info .ai-icon{background:var(--blue-d);color:var(--blue-l)}
+.sev-info .ai-badge{background:var(--blue-d);color:var(--blue-l);border:1px solid rgba(58,122,184,.3)}
+
+.no-alerts{
+  padding:20px;text-align:center;
+  font-family:var(--font-mono);font-size:.72rem;color:var(--green-l);letter-spacing:.05em;
+}
+.no-alerts::before{content:'✓ ';opacity:.7}
+
+/* ═══════════════════════════════════════════════
+   CLEANING PROGRESS BAR
+═══════════════════════════════════════════════ */
+.clean-bar-wrap{padding:14px}
+.clean-bar-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.clean-bar-top .cb-label{font-family:var(--font-mono);font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.09em}
+.clean-bar-top .cb-pct{font-family:var(--font-head);font-size:1.5rem;font-weight:800;color:var(--amber)}
+.clean-bar{background:var(--s3);border-radius:2px;height:6px;overflow:hidden}
+.clean-bar-fill{height:100%;border-radius:2px;background:var(--amber);transition:width .6s ease}
+.clean-bar-fill.full{background:var(--green-l)}
+.clean-bar-detail{font-family:var(--font-mono);font-size:.62rem;color:var(--text3);margin-top:6px}
+
+/* ═══════════════════════════════════════════════
+   QUICK ACTIONS ROW
+═══════════════════════════════════════════════ */
+.qa-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.qa-btn{
+  background:var(--s2);border:1px solid var(--border);border-radius:var(--r);
+  padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  cursor:pointer;transition:all .12s;font-family:var(--font-body);
+  color:var(--text2);text-align:center;
+}
+.qa-btn:hover,.qa-btn:active{background:var(--s3);border-color:var(--amber);color:var(--amber)}
+.qa-btn .qa-icon{font-size:1.4rem;line-height:1}
+.qa-btn .qa-label{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;line-height:1.2}
+
+/* ═══════════════════════════════════════════════
+   INCIDENTS LIST
+═══════════════════════════════════════════════ */
+.inc-list{display:flex;flex-direction:column;gap:0}
+.inc-item{
+  padding:12px 14px;border-bottom:1px solid rgba(42,41,37,.5);
+  display:flex;align-items:flex-start;gap:10px;
+}
+.inc-item:last-child{border-bottom:none}
+.inc-item .ii-cat{
+  font-family:var(--font-mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;
+  padding:2px 7px;border-radius:3px;flex-shrink:0;margin-top:2px;
+}
+.cat-equipment{background:rgba(232,160,32,.12);color:var(--amber);border:1px solid rgba(232,160,32,.25)}
+.cat-customer{background:rgba(58,122,184,.12);color:var(--blue-l);border:1px solid rgba(58,122,184,.25)}
+.cat-health{background:rgba(208,72,40,.12);color:#e87858;border:1px solid rgba(208,72,40,.25)}
+.cat-staff{background:rgba(138,90,184,.12);color:#c09cd8;border:1px solid rgba(138,90,184,.25)}
+.cat-other{background:var(--s3);color:var(--text2);border:1px solid var(--border)}
+.inc-item .ii-body{flex:1;min-width:0}
+.inc-item .ii-desc{font-size:.82rem;line-height:1.4}
+.inc-item .ii-meta{font-family:var(--font-mono);font-size:.6rem;color:var(--text3);margin-top:3px}
+.inc-item .ii-resolve{
+  background:none;border:1px solid var(--border);border-radius:3px;
+  color:var(--text3);cursor:pointer;font-size:.7rem;padding:4px 8px;
+  font-family:var(--font-mono);flex-shrink:0;transition:all .12s;
+}
+.inc-item .ii-resolve:hover,.inc-item .ii-resolve:active{border-color:var(--green-l);color:var(--green-l)}
+.inc-resolved .ii-desc{color:var(--text3);text-decoration:line-through}
+.inc-empty{padding:16px;text-align:center;font-family:var(--font-mono);font-size:.7rem;color:var(--text3)}
+
+/* ═══════════════════════════════════════════════
+   STAFF NOTES
+═══════════════════════════════════════════════ */
+.notes-emp-list{display:flex;flex-direction:column;gap:0}
+.notes-emp-btn{
+  display:flex;align-items:center;gap:10px;padding:12px 14px;
+  border-bottom:1px solid rgba(42,41,37,.5);cursor:pointer;
+  transition:background .12s;
+}
+.notes-emp-btn:last-child{border-bottom:none}
+.notes-emp-btn:active{background:var(--s2)}
+.notes-emp-btn .neb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.notes-emp-btn .neb-name{font-size:.85rem;font-weight:600;flex:1}
+.notes-emp-btn .neb-count{font-family:var(--font-mono);font-size:.6rem;color:var(--text3)}
+.notes-emp-btn .neb-arrow{color:var(--text3);font-size:.7rem}
+
+.note-list{display:flex;flex-direction:column;gap:0}
+.note-item{padding:11px 14px;border-bottom:1px solid rgba(42,41,37,.5);display:flex;gap:10px;align-items:flex-start}
+.note-item:last-child{border-bottom:none}
+.note-item .ni-date{font-family:var(--font-mono);font-size:.6rem;color:var(--amber);flex-shrink:0;padding-top:2px;min-width:60px}
+.note-item .ni-text{font-size:.8rem;line-height:1.5;flex:1;color:var(--text2)}
+.note-item .ni-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.75rem;padding:2px 4px;flex-shrink:0}
+.note-item .ni-del:hover{color:var(--red)}
+
+/* ═══════════════════════════════════════════════
+   WASTE LOG
+═══════════════════════════════════════════════ */
+.waste-list{display:flex;flex-direction:column;gap:0}
+.waste-item{
+  padding:11px 14px;border-bottom:1px solid rgba(42,41,37,.5);
+  display:flex;align-items:center;gap:10px;
+}
+.waste-item:last-child{border-bottom:none}
+.waste-item .wi-item{font-size:.82rem;font-weight:600;flex:1}
+.waste-item .wi-reason{font-family:var(--font-mono);font-size:.6rem;color:var(--text3);text-transform:uppercase}
+.waste-item .wi-cost{font-family:var(--font-head);font-size:.95rem;font-weight:700;color:#e87858}
+.waste-item .wi-time{font-family:var(--font-mono);font-size:.58rem;color:var(--text3)}
+.waste-item .wi-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.7rem;padding:2px 5px}
+.waste-item .wi-del:hover{color:var(--red)}
+.waste-empty{padding:14px;text-align:center;font-family:var(--font-mono);font-size:.7rem;color:var(--text3)}
+.waste-summary{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 14px;background:var(--s3);
+  border-top:1px solid var(--border);
+  font-family:var(--font-mono);font-size:.65rem;
+}
+.waste-summary .ws-label{color:var(--text3)}
+.waste-summary .ws-total{color:#e87858;font-size:.8rem;font-weight:500}
+
+/* ═══════════════════════════════════════════════
+   MODALS
+═══════════════════════════════════════════════ */
+.modal-backdrop{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(4px);
+  z-index:500;align-items:flex-end;justify-content:center;
+}
+.modal-backdrop.open{display:flex}
+.modal{
+  background:var(--surface);border:1px solid var(--border2);
+  border-top:2px solid var(--amber);
+  border-radius:var(--r2) var(--r2) 0 0;
+  padding:20px 18px calc(20px + var(--safe-bottom));
+  width:100%;max-width:540px;max-height:92dvh;overflow-y:auto;
+  box-shadow:0 -24px 80px rgba(0,0,0,.6);
+  animation:slideUp .22s ease;
+}
+@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal h3{
+  font-family:var(--font-head);font-size:1.4rem;font-weight:900;
+  text-transform:uppercase;letter-spacing:.04em;margin-bottom:16px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal h3 .m-close{
+  background:none;border:none;color:var(--text3);cursor:pointer;
+  font-size:1.2rem;padding:4px;line-height:1;
+}
+.modal h3 .m-close:hover{color:var(--text)}
+
+/* Form fields in modals */
+.mf{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.mf label{font-family:var(--font-mono);font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:4px}
+.mf input,.mf select,.mf textarea{
+  background:var(--s2);border:1px solid var(--border);color:var(--text);
+  border-radius:var(--r);padding:12px;font-size:.88rem;font-family:var(--font-body);
+  outline:none;transition:border-color .12s;width:100%;
+}
+.mf input:focus,.mf select:focus,.mf textarea:focus{border-color:var(--amber);background:var(--s3)}
+.mf select option{background:var(--s2)}
+.mf textarea{resize:vertical;min-height:80px;line-height:1.5}
+
+/* Big primary button */
+.btn-primary{
+  width:100%;padding:15px;background:var(--amber);color:#0a0908;
+  border:none;border-radius:var(--r);font-family:var(--font-head);
+  font-size:1.1rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;
+  cursor:pointer;transition:background .12s;
+}
+.btn-primary:hover{background:var(--amber2)}
+.btn-primary:active{transform:scale(.98)}
+
+.btn-secondary{
+  width:100%;padding:12px;background:transparent;color:var(--text2);
+  border:1px solid var(--border);border-radius:var(--r);font-family:var(--font-body);
+  font-size:.85rem;font-weight:600;cursor:pointer;transition:all .12s;
+  margin-top:6px;
+}
+.btn-secondary:hover{border-color:var(--amber);color:var(--amber)}
+
+/* Quick category pills (incident log) */
+.cat-pills{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:4px}
+.cat-pill{
+  padding:10px 6px;background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r);cursor:pointer;text-align:center;
+  font-family:var(--font-mono);font-size:.62rem;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--text2);transition:all .12s;
+}
+.cat-pill.selected{border-color:var(--amber);background:var(--amber-d);color:var(--amber)}
+
+/* Reason pills (waste log) */
+.reason-pills{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.reason-pill{
+  padding:10px;background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r);cursor:pointer;text-align:center;
+  font-size:.75rem;font-weight:600;color:var(--text2);transition:all .12s;
+}
+.reason-pill.selected{border-color:var(--amber);background:var(--amber-d);color:var(--amber)}
+
+/* Staff picker for notes */
+.staff-pick{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow-y:auto}
+.sp-item{
+  display:flex;align-items:center;gap:10px;padding:11px 12px;
+  background:var(--s2);border:1px solid var(--border);border-radius:var(--r);
+  cursor:pointer;transition:all .12s;
+}
+.sp-item:hover,.sp-item:active{border-color:var(--amber);background:var(--s3)}
+.sp-item .sp-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sp-item .sp-name{font-size:.85rem;font-weight:600;flex:1}
+.sp-item .sp-role{font-family:var(--font-mono);font-size:.58rem;color:var(--text3);text-transform:uppercase}
+
+/* ═══════════════════════════════════════════════
+   STICKY FAB — floating action button
+═══════════════════════════════════════════════ */
+.fab{
+  position:fixed;bottom:calc(24px + var(--safe-bottom));right:18px;
+  width:60px;height:60px;border-radius:50%;
+  background:var(--amber);color:#0a0908;border:none;
+  font-size:1.7rem;line-height:1;
+  cursor:pointer;box-shadow:0 4px 24px rgba(232,160,32,.35);
+  display:flex;align-items:center;justify-content:center;
+  z-index:400;transition:all .15s;
+  font-family:var(--font-head);font-weight:900;
+}
+.fab:hover{background:var(--amber2);transform:scale(1.05)}
+.fab:active{transform:scale(.95)}
+
+/* FAB menu */
+.fab-menu{
+  position:fixed;bottom:calc(96px + var(--safe-bottom));right:18px;
+  display:flex;flex-direction:column;gap:8px;align-items:flex-end;
+  z-index:400;
+  opacity:0;pointer-events:none;transform:translateY(10px);
+  transition:all .2s ease;
+}
+.fab-menu.open{opacity:1;pointer-events:all;transform:translateY(0)}
+.fab-option{
+  display:flex;align-items:center;gap:10px;cursor:pointer;
+}
+.fab-option .fo-label{
+  font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;
+  letter-spacing:.08em;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:6px 12px;color:var(--text);white-space:nowrap;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);
+}
+.fab-option .fo-btn{
+  width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;
+  font-size:1.1rem;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 12px rgba(0,0,0,.3);flex-shrink:0;
+}
+.fo-incident .fo-btn{background:#c04020;color:#fff}
+.fo-note .fo-btn{background:var(--service);color:#fff}
+.fo-waste .fo-btn{background:var(--kitchen);color:#0a0908}
+
+/* ═══════════════════════════════════════════════
+   COLLAPSIBLE PANEL HEADER
+═══════════════════════════════════════════════ */
+.panel-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 14px;cursor:pointer;user-select:none;
+  border-bottom:1px solid transparent;transition:border-color .15s;
+}
+.panel-header.expanded{border-bottom-color:var(--border)}
+.panel-header h3{
+  font-family:var(--font-head);font-size:1rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:.07em;
+}
+.panel-header .ph-right{display:flex;align-items:center;gap:8px}
+.panel-header .ph-badge{
+  font-family:var(--font-mono);font-size:.6rem;padding:2px 8px;
+  border-radius:10px;font-weight:500;
+}
+.ph-badge-red{background:var(--red-d);color:#e87858;border:1px solid var(--red-b)}
+.ph-badge-amber{background:var(--amber-d);color:var(--amber);border:1px solid rgba(232,160,32,.3)}
+.ph-badge-green{background:var(--green-d);color:var(--green-l);border:1px solid rgba(74,138,74,.3)}
+.ph-badge-gray{background:var(--s3);color:var(--text3);border:1px solid var(--border)}
+.panel-header .ph-chevron{color:var(--text3);font-size:.75rem;transition:transform .2s}
+.panel-header.expanded .ph-chevron{transform:rotate(180deg)}
+.panel-body{display:none}
+.panel-body.open{display:block}
+
+/* ═══════════════════════════════════════════════
+   TOAST NOTIFICATION
+═══════════════════════════════════════════════ */
+.toast{
+  position:fixed;top:70px;right:14px;left:14px;max-width:400px;margin:0 auto;
+  background:var(--surface);border:1px solid var(--amber);color:var(--text);
+  padding:11px 16px;border-radius:var(--r);font-family:var(--font-mono);
+  font-size:.72rem;letter-spacing:.04em;z-index:999;
+  opacity:0;transform:translateY(-6px);transition:all .2s;pointer-events:none;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* ═══════════════════════════════════════════════
+   EMPLOYEE NOTES BACK BUTTON
+═══════════════════════════════════════════════ */
+.back-btn{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--font-mono);font-size:.65rem;color:var(--amber);
+  cursor:pointer;padding:13px 14px;border-bottom:1px solid var(--border);
+  text-transform:uppercase;letter-spacing:.08em;
+}
+.back-btn:hover{color:var(--amber2)}
+
+/* Trend strip */
+.trend-strip{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:0;
+  border-top:1px solid var(--border);
+}
+.trend-cell{
+  padding:10px 8px;text-align:center;border-right:1px solid var(--border);
+}
+.trend-cell:last-child{border-right:none}
+.trend-cell .tc-val{font-family:var(--font-head);font-size:1.3rem;font-weight:800;color:var(--amber)}
+.trend-cell .tc-label{font-family:var(--font-mono);font-size:.56rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+
+/* Empty state */
+.empty-state{
+  padding:24px 14px;text-align:center;
+  font-family:var(--font-mono);font-size:.7rem;color:var(--text3);
+  letter-spacing:.05em;line-height:1.7;
+}
+
+/* ═══════════════════════════════════════════════
+   NOTES SELECTED EMPLOYEE HEADER
+═══════════════════════════════════════════════ */
+.notes-emp-header{
+  padding:13px 14px;background:var(--s2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.neh-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.neh-name{font-family:var(--font-head);font-size:1.1rem;font-weight:800;text-transform:uppercase;flex:1}
+.neh-count{font-family:var(--font-mono);font-size:.6rem;color:var(--text3)}
+
+/* Add note inline form */
+.add-note-form{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px}
+.add-note-form textarea{
+  flex:1;background:var(--s2);border:1px solid var(--border);color:var(--text);
+  border-radius:var(--r);padding:10px;font-size:.82rem;font-family:var(--font-body);
+  outline:none;resize:none;min-height:60px;line-height:1.45;
+}
+.add-note-form textarea:focus{border-color:var(--amber);background:var(--s3)}
+.add-note-form .anf-btn{
+  background:var(--amber);color:#0a0908;border:none;border-radius:var(--r);
+  padding:0 14px;font-family:var(--font-head);font-size:.9rem;font-weight:900;
+  cursor:pointer;flex-shrink:0;align-self:flex-end;height:42px;
+  text-transform:uppercase;letter-spacing:.05em;
+}
+.add-note-form .anf-btn:active{transform:scale(.97)}
+
+/* Scrollable notes in modal */
+.modal-notes-list{max-height:300px;overflow-y:auto}
+
+/* ═══════════════════════════════════════════════
+   LOADING SKELETON
+═══════════════════════════════════════════════ */
+.skel{
+  background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);
+  background-size:200% 100%;animation:skel .9s infinite;border-radius:3px;
+}
+@keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ═══════════════════════════════════════════════
+   UTILITY
+═══════════════════════════════════════════════ */
+.hidden{display:none!important}
+.mt4{margin-top:4px}
+.px14{padding-left:14px;padding-right:14px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ TOP BAR ═══════════════════ -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <h1>OVER<span>LOOK</span></h1>
+    <div class="day-badge" id="top-day">—</div>
+  </div>
+  <div class="topbar-time">
+    <div><span class="status-dot"></span><span id="top-time">—</span></div>
+    <div id="top-date" style="color:var(--text3);font-size:.58rem"></div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ═══════════════════ HERO STATS ═══════════════════ -->
+  <section>
+    <div class="sec-label">Today at a glance</div>
+    <div class="hero-grid">
+      <div class="hero-stat panel" onclick="scrollToSection('staff-panel')">
+        <div class="hs-num" id="hero-staff">—</div>
+        <div class="hs-label">On Shift</div>
+        <div class="hs-sub" id="hero-staff-roles"></div>
+      </div>
+      <div class="hero-stat panel" id="hero-res-card">
+        <div class="hs-num" id="hero-res">—</div>
+        <div class="hs-label">Reservations</div>
+        <div class="hs-sub" id="hero-res-sub">Today</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ ATTENTION NEEDED ═══════════════════ -->
+  <section id="alerts-section" class="panel">
+    <div class="panel-header expanded" onclick="togglePanel(this,'alerts-body')">
+      <h3>⚠ Attention Needed</h3>
+      <div class="ph-right">
+        <span class="ph-badge ph-badge-red hidden" id="alerts-badge">0</span>
+        <span class="ph-chevron">▼</span>
+      </div>
+    </div>
+    <div class="panel-body open" id="alerts-body">
+      <div class="alerts-list" id="alerts-list">
+        <div class="empty-state">Scanning for issues…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ TODAY'S STAFF ═══════════════════ -->
+  <section id="staff-panel" class="panel">
+    <div class="panel-header" onclick="togglePanel(this,'staff-body')">
+      <h3>Staff Today</h3>
+      <div class="ph-right">
+        <span class="ph-badge ph-badge-gray" id="staff-badge">—</span>
+        <span class="ph-chevron">▼</span>
+      </div>
+    </div>
+    <div class="panel-body" id="staff-body">
+      <div id="staff-today-list" class="staff-today">
+        <div class="staff-none">Loading schedule…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ CLEANING PROGRESS ═══════════════════ -->
+  <section class="panel">
+    <div class="panel-header" onclick="togglePanel(this,'clean-body')">
+      <h3>Cleaning</h3>
+      <div class="ph-right">
+        <span class="ph-badge" id="clean-badge">—</span>
+        <span class="ph-chevron">▼</span>
+      </div>
+    </div>
+    <div class="panel-body" id="clean-body">
+      <div class="clean-bar-wrap">
+        <div class="clean-bar-top">
+          <span class="cb-label">Today's Progress</span>
+          <span class="cb-pct" id="clean-pct">0%</span>
+        </div>
+        <div class="clean-bar"><div class="clean-bar-fill" id="clean-fill" style="width:0%"></div></div>
+        <div class="clean-bar-detail" id="clean-detail">Loading…</div>
+      </div>
+      <div class="trend-strip">
+        <div class="trend-cell"><div class="tc-val" id="trend-avg">—</div><div class="tc-label">7-day avg</div></div>
+        <div class="trend-cell"><div class="tc-val" id="trend-best">—</div><div class="tc-label">Best</div></div>
+        <div class="trend-cell"><div class="tc-val" id="trend-logs">—</div><div class="tc-label">Logs</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ INCIDENTS ═══════════════════ -->
+  <section class="panel">
+    <div class="panel-header" onclick="togglePanel(this,'inc-body')">
+      <h3>Incidents</h3>
+      <div class="ph-right">
+        <span class="ph-badge ph-badge-gray hidden" id="inc-badge">0 open</span>
+        <span class="ph-chevron">▼</span>
+      </div>
+    </div>
+    <div class="panel-body" id="inc-body">
+      <div id="incidents-list" class="inc-list">
+        <div class="inc-empty">No incidents logged</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ STAFF NOTES ═══════════════════ -->
+  <section class="panel">
+    <div class="panel-header" onclick="togglePanel(this,'notes-body')">
+      <h3>Staff Notes</h3>
+      <div class="ph-right">
+        <span class="ph-chevron">▼</span>
+      </div>
+    </div>
+    <div class="panel-body" id="notes-body">
+      <!-- employee list or selected employee notes shown here -->
+      <div id="notes-view">
+        <div id="notes-emp-list" class="notes-emp-list">
+          <div class="inc-empty">Loading employees…</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ WASTE LOG ═══════════════════ -->
+  <section class="panel">
+    <div class="panel-header" onclick="togglePanel(this,'waste-body')">
+      <h3>Waste / 86'd</h3>
+      <div class="ph-right">
+        <span class="ph-badge ph-badge-gray" id="waste-badge">Today: $0</span>
+        <span class="ph-chevron">▼</span>
+      </div>
+    </div>
+    <div class="panel-body" id="waste-body">
+      <div id="waste-list" class="waste-list">
+        <div class="waste-empty">Nothing logged today</div>
+      </div>
+      <div class="waste-summary">
+        <span class="ws-label">Today's estimated loss</span>
+        <span class="ws-total" id="waste-total">$0.00</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- bottom spacer -->
+  <div style="height:20px"></div>
+</main>
+
+<!-- ═══════════════════ FAB + MENU ═══════════════════ -->
+<div class="fab-menu" id="fab-menu">
+  <div class="fab-option fo-incident" onclick="openIncidentModal();closeFabMenu()">
+    <span class="fo-label">Log Incident</span>
+    <button class="fo-btn">⚡</button>
+  </div>
+  <div class="fab-option fo-note" onclick="openNotesModal();closeFabMenu()">
+    <span class="fo-label">Staff Note</span>
+    <button class="fo-btn">📝</button>
+  </div>
+  <div class="fab-option fo-waste" onclick="openWasteModal();closeFabMenu()">
+    <span class="fo-label">Log Waste</span>
+    <button class="fo-btn">🗑</button>
+  </div>
+</div>
+<button class="fab" id="fab" onclick="toggleFabMenu()">＋</button>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL: QUICK INCIDENT LOG
+═══════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-incident">
+  <div class="modal">
+    <h3>Log Incident <button class="m-close" onclick="closeModal('modal-incident')">✕</button></h3>
+    <!-- Category quick-select (no dropdown needed) -->
+    <div style="margin-bottom:14px">
+      <label style="font-family:var(--font-mono);font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:8px">Category</label>
+      <div class="cat-pills">
+        <div class="cat-pill" data-cat="Equipment" onclick="selectCat(this)">🔧 Equipment</div>
+        <div class="cat-pill" data-cat="Customer" onclick="selectCat(this)">👤 Customer</div>
+        <div class="cat-pill" data-cat="Health" onclick="selectCat(this)">🏥 Health</div>
+        <div class="cat-pill" data-cat="Staff" onclick="selectCat(this)">👥 Staff</div>
+        <div class="cat-pill" data-cat="Cleanliness" onclick="selectCat(this)">🧹 Cleaning</div>
+        <div class="cat-pill" data-cat="Other" onclick="selectCat(this)">• Other</div>
+      </div>
+    </div>
+    <div class="mf">
+      <div>
+        <label>What happened? <span style="color:var(--text3)">(keep it short)</span></label>
+        <textarea id="inc-desc" placeholder="e.g. Fryer temp dropping, couldn't maintain 350°F…" rows="3"></textarea>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;font-family:var(--font-mono);font-size:.62rem;color:var(--text3)">
+      Timestamp: <span id="inc-time-preview" style="color:var(--amber)"></span> · Status: <span style="color:var(--green-l)">Open</span>
+    </div>
+    <button class="btn-primary" onclick="submitIncident()">⚡ Log Incident</button>
+    <button class="btn-secondary" onclick="closeModal('modal-incident')">Cancel</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL: STAFF NOTE
+═══════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-note">
+  <div class="modal">
+    <h3>Staff Note <button class="m-close" onclick="closeModal('modal-note')">✕</button></h3>
+    <div style="margin-bottom:12px">
+      <label style="font-family:var(--font-mono);font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:8px">Select employee</label>
+      <div id="modal-staff-pick" class="staff-pick"></div>
+    </div>
+    <div class="mf" id="note-form-fields" style="display:none">
+      <div>
+        <label>Note</label>
+        <textarea id="note-text" placeholder="Performance, warning, conversation, accommodation…" rows="4"></textarea>
+      </div>
+    </div>
+    <div id="note-selected-name" style="display:none;font-family:var(--font-mono);font-size:.65rem;color:var(--amber);margin-bottom:12px"></div>
+    <button class="btn-primary hidden" id="note-submit-btn" onclick="submitNote()">Save Note</button>
+    <button class="btn-secondary" onclick="closeModal('modal-note')">Cancel</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL: WASTE LOG
+═══════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-waste">
+  <div class="modal">
+    <h3>Log Waste <button class="m-close" onclick="closeModal('modal-waste')">✕</button></h3>
+    <div class="mf">
+      <div>
+        <label>Item</label>
+        <input id="waste-item-input" list="waste-items-list" placeholder="e.g. Salmon, Beef ribeye…" autocomplete="off">
+        <datalist id="waste-items-list"></datalist>
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="font-family:var(--font-mono);font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:8px">Reason</label>
+      <div class="reason-pills">
+        <div class="reason-pill" data-reason="Prep Error" onclick="selectReason(this)">Prep Error</div>
+        <div class="reason-pill" data-reason="Spoilage" onclick="selectReason(this)">Spoilage</div>
+        <div class="reason-pill" data-reason="Over-Ordered" onclick="selectReason(this)">Over-Ordered</div>
+        <div class="reason-pill" data-reason="Sent Back" onclick="selectReason(this)">Sent Back</div>
+        <div class="reason-pill" data-reason="86'd" onclick="selectReason(this)">86'd</div>
+        <div class="reason-pill" data-reason="Other" onclick="selectReason(this)">Other</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div class="mf">
+        <div>
+          <label>Quantity</label>
+          <input id="waste-qty" type="number" min="0.1" step="0.1" value="1" placeholder="1">
+        </div>
+      </div>
+      <div class="mf">
+        <div>
+          <label>Est. unit cost ($)</label>
+          <input id="waste-cost" type="number" min="0" step="0.01" placeholder="0.00">
+        </div>
+      </div>
+    </div>
+    <div id="waste-cost-preview" style="font-family:var(--font-mono);font-size:.7rem;color:var(--text3);margin-bottom:14px;display:none">
+      Estimated loss: <span id="waste-loss-amt" style="color:#e87858;font-size:.85rem">$0.00</span>
+    </div>
+    <button class="btn-primary" onclick="submitWaste()">Log Waste</button>
+    <button class="btn-secondary" onclick="closeModal('modal-waste')">Cancel</button>
+  </div>
+</div>
+
+<!-- ═══════════════════ TOAST ═══════════════════ -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+// ═══════════════════════════════════════════════
+// FIREBASE SETUP — uses same config as parent app
+// ═══════════════════════════════════════════════
+import{initializeApp,getApps}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getFirestore,collection,addDoc,getDocs,deleteDoc,doc,updateDoc,query,where,orderBy}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getDatabase,ref,get}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+// ── Same Firebase projects as Overlook ──
+const appMgr = initializeApp({
+  apiKey:"AIzaSyDMVt5s2loFohJDoTMImzAq_gKl61fZf1g",
+  authDomain:"manager-overlook.firebaseapp.com",
+  projectId:"manager-overlook",
+  storageBucket:"manager-overlook.firebasestorage.app",
+  messagingSenderId:"64302920866",
+  appId:"1:64302920866:web:5dd1f24f6e1211458413fb"
+},'mgr-today');
+
+const appRes = initializeApp({
+  apiKey:"AIzaSyCMXA2a4RUUNuzmTz1QxdJbIciICojLjA8",
+  authDomain:"restaurant599-b5595.firebaseapp.com",
+  databaseURL:"https://restaurant599-b5595-default-rtdb.firebaseio.com",
+  projectId:"restaurant599-b5595",
+  storageBucket:"restaurant599-b5595.firebasestorage.app",
+  messagingSenderId:"141750935511",
+  appId:"1:141750935511:web:8ad37806a7d9a70a8e7592"
+},'res-today');
+
+const db  = getFirestore(appMgr);
+const rdb = getDatabase(appRes);
+
+// ── Firestore helpers ──
+const fsAdd = async (col, data) => { const r = await addDoc(collection(db,col),{...data,_ts:Date.now()}); return r.id; };
+const fsDel = async (col, id)   => deleteDoc(doc(db,col,id));
+const fsUp  = async (col, id, d)=> updateDoc(doc(db,col,id),d);
+const fsGet = async (col)       => (await getDocs(collection(db,col))).docs.map(d=>({id:d.id,...d.data()}));
+
+// ═══════════════════════════════════════════════
+// APP STATE
+// ═══════════════════════════════════════════════
+const S = {
+  employees: [],
+  shifts: [],
+  bills: [],
+  cleanLogs: [],
+  incidents: [],
+  staffNotes: [],
+  wasteItems: [],
+  priceItems: [],
+  // UI state
+  selectedNoteEmp: null,
+  selectedIncCat: null,
+  selectedReason: null,
+};
+
+// ═══════════════════════════════════════════════
+// UTILITY HELPERS
+// ═══════════════════════════════════════════════
+function todayKey(){ // "YYYY-MM-DD"
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function todayISO(){ return new Date().toISOString(); }
+function fmtTime(iso){
+  return new Date(iso).toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit',hour12:true});
+}
+function fmtDate(iso){
+  return new Date(iso).toLocaleDateString('en-CA',{month:'short',day:'numeric'});
+}
+function dayName(){ return new Date().toLocaleDateString('en-CA',{weekday:'long'}); }
+function getWeekKey(){
+  const d=new Date(); const day=d.getDay(); const diff=d.getDate()-day+(day===0?-6:1);
+  const mon=new Date(d); mon.setDate(diff);
+  return`${mon.getFullYear()}-${String(mon.getMonth()+1).padStart(2,'0')}-${String(mon.getDate()).padStart(2,'0')}`;
+}
+function escHtml(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function roleColor(role){
+  const r=(role||'').toUpperCase();
+  if(r==='TEPPAN')return'var(--teppan)';
+  if(r==='SUSHI')return'var(--sushi)';
+  if(r==='KITCHEN')return'var(--kitchen)';
+  if(r==='SERVICE')return'var(--service)';
+  return'var(--text2)';
+}
+function empPrimaryRole(emp){
+  if(Array.isArray(emp.roles)&&emp.roles.length)return emp.roles[0];
+  return emp.role||'KITCHEN';
+}
+
+// ═══════════════════════════════════════════════
+// CLOCK + DATE HEADER
+// ═══════════════════════════════════════════════
+function tickClock(){
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('top-time').textContent = `${h}:${m}`;
+  document.getElementById('top-date').textContent = now.toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'});
+  document.getElementById('top-day').textContent  = now.toLocaleDateString('en-CA',{weekday:'short'}).toUpperCase();
+}
+tickClock();
+setInterval(tickClock, 10000);
+
+// ═══════════════════════════════════════════════
+// BOOT — load all data from Firebase
+// ═══════════════════════════════════════════════
+async function boot(){
+  try{
+    const [employees, shifts, bills, cleanLogs, incidents, staffNotes, wasteItems, priceItems] = await Promise.all([
+      fsGet('employees').catch(()=>[]),
+      fsGet('shifts').catch(()=>[]),
+      fsGet('bills').catch(()=>[]),
+      fsGet('cleanLogs').catch(()=>[]),
+      fsGet('incidents').catch(()=>[]),
+      fsGet('staffNotes').catch(()=>[]),
+      fsGet('wasteLog').catch(()=>[]),
+      fsGet('priceItems').catch(()=>[]),
+    ]);
+    S.employees  = employees;
+    S.shifts     = shifts;
+    S.bills      = bills;
+    S.cleanLogs  = cleanLogs;
+    S.incidents  = incidents;
+    S.staffNotes = staffNotes;
+    S.wasteItems = wasteItems;
+    S.priceItems = priceItems;
+  } catch(e){
+    showToast('Firebase error — check connection');
+    console.error(e);
+  }
+
+  // Load reservation count from real-time DB
+  await loadReservations();
+
+  // Render all sections
+  renderHero();
+  renderAlerts();
+  renderStaffToday();
+  renderClean();
+  renderIncidents();
+  renderNotesEmpList();
+  renderWasteLog();
+  populateWasteDatalist();
+}
+
+// ═══════════════════════════════════════════════
+// RESERVATIONS (real-time DB)
+// ═══════════════════════════════════════════════
+async function loadReservations(){
+  try{
+    const snap = await get(ref(rdb,'reservations'));
+    if(!snap.exists()){ setHeroRes(0); return; }
+    const data = snap.val();
+    const today = todayKey();
+    // reservations keyed by date YYYY-MM-DD
+    const todayRes = Object.values(data[today]||{});
+    setHeroRes(todayRes.length);
+  }catch(e){
+    setHeroRes('—');
+  }
+}
+function setHeroRes(n){
+  document.getElementById('hero-res').textContent = n;
+  document.getElementById('hero-res-sub').textContent = n===1 ? 'reservation' : 'reservations';
+}
+
+// ═══════════════════════════════════════════════
+// HERO STATS
+// ═══════════════════════════════════════════════
+function renderHero(){
+  const wk = getWeekKey();
+  const today = new Date(); const dow = today.getDay(); // 0=Sun…6=Sat
+  const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const todayName = dayNames[dow];
+
+  // Filter shifts for this week + today's day name
+  const todayShifts = S.shifts.filter(s=>{
+    return s.week === wk && (s.day||'').toLowerCase() === todayName.toLowerCase();
+  });
+
+  // Deduplicate by employee name (same emp can appear in kitchen + serving)
+  const seen = new Set();
+  const uniqueShifts = todayShifts.filter(s=>{
+    if(seen.has(s.name)){return false;} seen.add(s.name); return true;
+  });
+
+  const count = uniqueShifts.length;
+  document.getElementById('hero-staff').textContent = count || 0;
+
+  // Role breakdown
+  const roleCounts = {};
+  todayShifts.forEach(s=>{
+    const r = (s.section||s.role||'Kitchen');
+    roleCounts[r] = (roleCounts[r]||0)+1;
+  });
+  const roleStr = Object.entries(roleCounts).map(([r,c])=>`${c} ${r}`).join(' · ') || 'No shifts';
+  document.getElementById('hero-staff-roles').textContent = roleStr;
+  document.getElementById('staff-badge').textContent = `${count} people`;
+}
+
+// ═══════════════════════════════════════════════
+// STAFF TODAY LIST
+// ═══════════════════════════════════════════════
+function renderStaffToday(){
+  const wk = getWeekKey();
+  const today = new Date(); const dow = today.getDay();
+  const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const todayName = dayNames[dow];
+
+  const todayShifts = S.shifts.filter(s=>
+    s.week === wk && (s.day||'').toLowerCase() === todayName.toLowerCase()
+  );
+
+  const el = document.getElementById('staff-today-list');
+  if(!todayShifts.length){
+    el.innerHTML = '<div class="staff-none">// No shifts scheduled today</div>'; return;
+  }
+
+  // Group by employee name
+  const byEmp = {};
+  todayShifts.forEach(s=>{
+    if(!byEmp[s.name]) byEmp[s.name] = {sections:[], time:s.time||''};
+    byEmp[s.name].sections.push(s.section||s.role||'Kitchen');
+    if(s.time) byEmp[s.name].time = s.time;
+  });
+
+  el.innerHTML = Object.entries(byEmp).map(([name,info])=>{
+    const mainRole = info.sections[0];
+    const color = roleColor(mainRole);
+    return `<div class="staff-row">
+      <div class="sr-dot" style="background:${color}"></div>
+      <div class="sr-name">${escHtml(name)}</div>
+      <div class="sr-role">${escHtml(info.sections.join(' / '))}</div>
+      ${info.time?`<div class="sr-time">${escHtml(info.time)}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// SMART ALERTS ENGINE
+// ═══════════════════════════════════════════════
+function buildAlerts(){
+  const alerts = [];
+  const today = todayKey();
+  const now = Date.now();
+  const oneDay = 86400000;
+
+  // 1. OVERDUE BILLS
+  const overdueBills = S.bills.filter(b=>{
+    if(b.paid==='Paid') return false;
+    if(!b.due) return false;
+    return new Date(b.due) < new Date(today);
+  });
+  overdueBills.forEach(b=>{
+    const days = Math.floor((Date.now() - new Date(b.due)) / oneDay);
+    alerts.push({
+      sev:'critical', icon:'💳', badge:'OVERDUE',
+      title:`${b.vendor||'Bill'} — $${Number(b.amount||0).toFixed(2)}`,
+      sub:`${days} day${days!==1?'s':''} overdue`,
+      action:()=>{ showToast('Open Overlook > Bill Tracking to pay'); }
+    });
+  });
+
+  // 2. BILLS DUE THIS WEEK
+  const soonBills = S.bills.filter(b=>{
+    if(b.paid==='Paid') return false;
+    if(!b.due) return false;
+    const dueDate = new Date(b.due);
+    const diff = dueDate - new Date(today);
+    return diff >= 0 && diff <= oneDay * 7;
+  });
+  soonBills.forEach(b=>{
+    const daysLeft = Math.ceil((new Date(b.due) - new Date(today)) / oneDay);
+    alerts.push({
+      sev:'warn', icon:'📋', badge: daysLeft===0?'TODAY':`${daysLeft}d`,
+      title:`${b.vendor||'Bill'} — $${Number(b.amount||0).toFixed(2)}`,
+      sub:`Due ${daysLeft===0?'today':fmtDate(b.due+' ')}`,
+      action:()=>{ showToast('Open Overlook > Bill Tracking'); }
+    });
+  });
+
+  // 3. OPEN INCIDENTS
+  const openInc = S.incidents.filter(i=>i.status==='Open');
+  if(openInc.length){
+    alerts.push({
+      sev: openInc.length>2?'critical':'warn',
+      icon:'⚡', badge:`${openInc.length} open`,
+      title: openInc.length===1 ? `Incident: ${openInc[0].desc||openInc[0].description||'No description'}` : `${openInc.length} open incidents`,
+      sub: openInc.length===1 ? `${openInc[0].category||'General'} · ${fmtTime(openInc[0].timestamp||openInc[0]._ts)}` : openInc.map(i=>i.category||'Issue').join(', '),
+      action:()=>{ openPanel('inc-body'); scrollToSection('staff-panel'); }
+    });
+  }
+
+  // 4. SCHEDULING GAPS (today has < 2 staff scheduled)
+  const wk = getWeekKey();
+  const dow = new Date().getDay();
+  const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const todayName = dayNames[dow];
+  const todayShifts = S.shifts.filter(s=>s.week===wk&&(s.day||'').toLowerCase()===todayName.toLowerCase());
+  if(todayShifts.length === 0){
+    alerts.push({
+      sev:'critical', icon:'📅', badge:'NO STAFF',
+      title:'No one scheduled for today',
+      sub:'Check Overlook > Scheduling',
+      action:()=>{ showToast('Open Overlook > Scheduling'); }
+    });
+  } else if(todayShifts.length < 3){
+    alerts.push({
+      sev:'info', icon:'📅', badge:'LOW',
+      title:`Only ${todayShifts.length} shift${todayShifts.length!==1?'s':''} today`,
+      sub:'May need additional coverage',
+      action:()=>{}
+    });
+  }
+
+  // 5. CLEANING — last log was yesterday or earlier and < 70%
+  if(S.cleanLogs.length){
+    const sorted = [...S.cleanLogs].sort((a,b)=>new Date(b.date)-new Date(a.date));
+    const last = sorted[0];
+    if(last.date < today && last.pct < 70){
+      alerts.push({
+        sev:'warn', icon:'🧹', badge:'INCOMPLETE',
+        title:`Yesterday's cleaning: ${last.pct}%`,
+        sub:`Logged by ${last.staff||'unknown'} on ${fmtDate(last.date)}`,
+        action:()=>{ showToast('Open Overlook > Cleaning'); }
+      });
+    }
+  }
+
+  return alerts;
+}
+
+function renderAlerts(){
+  const alerts = buildAlerts();
+  const el = document.getElementById('alerts-list');
+  const badge = document.getElementById('alerts-badge');
+  const header = document.querySelector('.panel-header');
+
+  const criticalCount = alerts.filter(a=>a.sev==='critical').length;
+  const total = alerts.length;
+
+  if(!total){
+    el.innerHTML='<div class="no-alerts">All clear — nothing needs attention</div>';
+    badge.classList.add('hidden');
+    return;
+  }
+
+  badge.textContent = total;
+  badge.classList.remove('hidden');
+
+  el.innerHTML = alerts.map((a,i)=>`
+    <div class="alert-item sev-${a.sev}" onclick="alertAction(${i})" style="animation-delay:${i*0.04}s">
+      <div class="ai-icon">${a.icon}</div>
+      <div class="ai-body">
+        <div class="ai-title">${escHtml(a.title)}</div>
+        <div class="ai-sub">${escHtml(a.sub)}</div>
+      </div>
+      <span class="ai-badge">${escHtml(a.badge)}</span>
+      <span class="ai-arrow">›</span>
+    </div>`).join('');
+
+  // Store actions for lookup
+  window._alertActions = alerts.map(a=>a.action);
+}
+
+window.alertAction = function(i){
+  if(window._alertActions && window._alertActions[i]) window._alertActions[i]();
+};
+
+// ═══════════════════════════════════════════════
+// CLEANING PROGRESS
+// ═══════════════════════════════════════════════
+function renderClean(){
+  const today = todayKey();
+  const logs7 = S.cleanLogs.filter(l=>{
+    const d = new Date(today); d.setDate(d.getDate()-7);
+    return new Date(l.date) >= d;
+  });
+
+  // Today's log (most recent today)
+  const todayLogs = S.cleanLogs.filter(l=>l.date===today).sort((a,b)=>b._ts-a._ts);
+  const todayLog = todayLogs[0];
+
+  const pct = todayLog ? todayLog.pct : 0;
+  const fill = document.getElementById('clean-fill');
+  const pctEl = document.getElementById('clean-pct');
+  const detail = document.getElementById('clean-detail');
+  const cleanBadge = document.getElementById('clean-badge');
+  const badgeClass = pct>=80?'ph-badge-green':pct>=50?'ph-badge-amber':'ph-badge-red';
+
+  pctEl.textContent = `${pct}%`;
+  fill.style.width = `${pct}%`;
+  fill.className = `clean-bar-fill${pct===100?' full':''}`;
+
+  if(todayLog){
+    detail.textContent = `${todayLog.done}/${todayLog.total} tasks · by ${todayLog.staff||'—'} · ${fmtTime(todayLog.date+'T00:00:00')}`;
+  } else {
+    detail.textContent = `No log saved yet today`;
+  }
+
+  cleanBadge.textContent = `${pct}%`;
+  cleanBadge.className = `ph-badge ${badgeClass}`;
+
+  // 7-day trend
+  const avg7 = logs7.length ? Math.round(logs7.reduce((s,l)=>s+l.pct,0)/logs7.length) : 0;
+  const best7 = logs7.length ? Math.max(...logs7.map(l=>l.pct)) : 0;
+  document.getElementById('trend-avg').textContent = `${avg7}%`;
+  document.getElementById('trend-best').textContent = `${best7}%`;
+  document.getElementById('trend-logs').textContent = logs7.length;
+}
+
+// ═══════════════════════════════════════════════
+// INCIDENTS
+// ═══════════════════════════════════════════════
+function renderIncidents(){
+  const el = document.getElementById('incidents-list');
+  const badge = document.getElementById('inc-badge');
+
+  // Sort: open first, then by most recent
+  const sorted = [...S.incidents].sort((a,b)=>{
+    if((a.status==='Open')!==( b.status==='Open')) return a.status==='Open'?-1:1;
+    return (b._ts||0)-(a._ts||0);
+  });
+
+  const openCount = S.incidents.filter(i=>i.status==='Open').length;
+  if(openCount>0){
+    badge.textContent=`${openCount} open`;
+    badge.className='ph-badge ph-badge-red';
+    badge.classList.remove('hidden');
+  } else {
+    badge.classList.add('hidden');
+  }
+
+  if(!sorted.length){
+    el.innerHTML='<div class="inc-empty">// No incidents logged</div>'; return;
+  }
+
+  // Show max 10 most recent in Today view; all available
+  el.innerHTML = sorted.slice(0,20).map(inc=>{
+    const catClass = `cat-${(inc.category||'other').toLowerCase().replace(/\s+/g,'')}`;
+    const isOpen = inc.status!=='Resolved';
+    return `<div class="inc-item${isOpen?'':' inc-resolved'}">
+      <span class="ii-cat ${catClass}">${escHtml(inc.category||'Other')}</span>
+      <div class="ii-body">
+        <div class="ii-desc">${escHtml(inc.description||inc.desc||'—')}</div>
+        <div class="ii-meta">${fmtTime(inc.timestamp||new Date(inc._ts).toISOString())} · ${isOpen?'<span style="color:var(--green-l)">Open</span>':'<span style="color:var(--text3)">Resolved</span>'}</div>
+      </div>
+      ${isOpen?`<button class="ii-resolve" onclick="resolveIncident('${inc.id}')">✓ Done</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+window.resolveIncident = async function(id){
+  await fsUp('incidents', id, {status:'Resolved'});
+  const inc = S.incidents.find(i=>i.id===id);
+  if(inc) inc.status='Resolved';
+  renderIncidents();
+  renderAlerts();
+  showToast('Marked resolved ✓');
+};
+
+// ═══════════════════════════════════════════════
+// STAFF NOTES
+// ═══════════════════════════════════════════════
+function renderNotesEmpList(){
+  const el = document.getElementById('notes-emp-list');
+  if(!S.employees.length){ el.innerHTML='<div class="inc-empty">// No employees on roster</div>'; return; }
+
+  el.innerHTML = S.employees.map(emp=>{
+    const role = empPrimaryRole(emp);
+    const color = roleColor(role);
+    const noteCount = S.staffNotes.filter(n=>n.empId===emp.id).length;
+    return `<div class="notes-emp-btn" onclick="openEmpNotes('${emp.id}')">
+      <div class="neb-dot" style="background:${color}"></div>
+      <div class="neb-name">${escHtml(emp.name||'—')}</div>
+      <div class="neb-count">${noteCount>0?`${noteCount} note${noteCount!==1?'s':''}`:'No notes'}</div>
+      <div class="neb-arrow">›</div>
+    </div>`;
+  }).join('');
+}
+
+window.openEmpNotes = function(empId){
+  S.selectedNoteEmp = empId;
+  const emp = S.employees.find(e=>e.id===empId);
+  if(!emp) return;
+  const role = empPrimaryRole(emp);
+  const color = roleColor(role);
+  const empNotes = S.staffNotes.filter(n=>n.empId===empId).sort((a,b)=>(b._ts||0)-(a._ts||0));
+  const notesView = document.getElementById('notes-view');
+  notesView.innerHTML = `
+    <div class="back-btn" onclick="closeEmpNotes()">‹ Back to all staff</div>
+    <div class="notes-emp-header">
+      <div class="neh-dot" style="background:${color}"></div>
+      <div class="neh-name">${escHtml(emp.name||'—')}</div>
+      <div class="neh-count">${empNotes.length} note${empNotes.length!==1?'s':''}</div>
+    </div>
+    <div class="add-note-form">
+      <textarea id="inline-note-text" placeholder="Add a note…" rows="2"></textarea>
+      <button class="anf-btn" onclick="submitInlineNote('${empId}')">Add</button>
+    </div>
+    <div class="note-list" id="inline-note-list">
+      ${empNotes.length ? empNotes.map(n=>`
+        <div class="note-item">
+          <span class="ni-date">${fmtDate(new Date(n._ts).toISOString())}</span>
+          <span class="ni-text">${escHtml(n.text||'—')}</span>
+          <button class="ni-del" onclick="deleteNote('${n.id}','${empId}')">✕</button>
+        </div>`).join('') : '<div class="inc-empty" style="padding:14px">No notes yet</div>'}
+    </div>`;
+};
+
+window.closeEmpNotes = function(){
+  S.selectedNoteEmp = null;
+  document.getElementById('notes-view').innerHTML = `<div id="notes-emp-list" class="notes-emp-list"></div>`;
+  renderNotesEmpList();
+};
+
+window.submitInlineNote = async function(empId){
+  const el = document.getElementById('inline-note-text');
+  const text = el.value.trim();
+  if(!text){ showToast('Write something first'); return; }
+  const rec = {empId, text};
+  rec.id = await fsAdd('staffNotes', rec);
+  S.staffNotes.push(rec);
+  el.value='';
+  openEmpNotes(empId); // re-render
+  showToast('Note saved ✓');
+};
+
+window.deleteNote = async function(noteId, empId){
+  if(!confirm('Delete this note?')) return;
+  await fsDel('staffNotes', noteId);
+  S.staffNotes = S.staffNotes.filter(n=>n.id!==noteId);
+  openEmpNotes(empId);
+};
+
+// ═══════════════════════════════════════════════
+// WASTE LOG
+// ═══════════════════════════════════════════════
+function renderWasteLog(){
+  const today = todayKey();
+  const todayItems = S.wasteItems.filter(w=>{
+    const d = new Date(w.timestamp||w._ts);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}` === today;
+  });
+
+  const el = document.getElementById('waste-list');
+  const totalLoss = todayItems.reduce((s,w)=>s+(parseFloat(w.estimatedLoss)||0),0);
+
+  document.getElementById('waste-total').textContent = `$${totalLoss.toFixed(2)}`;
+  document.getElementById('waste-badge').textContent = `Today: $${totalLoss.toFixed(2)}`;
+
+  if(!todayItems.length){
+    el.innerHTML='<div class="waste-empty">// Nothing logged today</div>'; return;
+  }
+
+  const sorted = [...todayItems].sort((a,b)=>(b._ts||0)-(a._ts||0));
+  el.innerHTML = sorted.map(w=>`
+    <div class="waste-item">
+      <div style="flex:1;min-width:0">
+        <div class="wi-item">${escHtml(w.item||'—')}</div>
+        <div class="wi-reason">${escHtml(w.reason||'—')} · qty ${w.quantity||1}</div>
+      </div>
+      <div class="wi-cost">$${parseFloat(w.estimatedLoss||0).toFixed(2)}</div>
+      <div class="wi-time">${fmtTime(new Date(w._ts||w.timestamp).toISOString())}</div>
+      <button class="wi-del" onclick="delWaste('${w.id}')">✕</button>
+    </div>`).join('');
+}
+
+window.delWaste = async function(id){
+  await fsDel('wasteLog', id);
+  S.wasteItems = S.wasteItems.filter(w=>w.id!==id);
+  renderWasteLog();
+};
+
+function populateWasteDatalist(){
+  const dl = document.getElementById('waste-items-list');
+  const names = [...new Set(S.priceItems.map(p=>p.itemName).filter(Boolean))];
+  dl.innerHTML = names.map(n=>`<option value="${escHtml(n)}">`).join('');
+}
+
+// ═══════════════════════════════════════════════
+// MODAL MANAGEMENT
+// ═══════════════════════════════════════════════
+window.openModal = function(id){ document.getElementById(id).classList.add('open'); };
+window.closeModal = function(id){ document.getElementById(id).classList.remove('open'); };
+
+// Close modal on backdrop click
+document.querySelectorAll('.modal-backdrop').forEach(bd=>{
+  bd.addEventListener('click', e=>{ if(e.target===bd) bd.classList.remove('open'); });
+});
+
+// ── INCIDENT MODAL ──
+window.openIncidentModal = function(){
+  // Reset state
+  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('selected'));
+  document.getElementById('inc-desc').value='';
+  S.selectedIncCat = null;
+  document.getElementById('inc-time-preview').textContent = new Date().toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit',hour12:true});
+  openModal('modal-incident');
+  setTimeout(()=>document.getElementById('inc-desc').focus(),250);
+};
+
+window.selectCat = function(el){
+  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+  S.selectedIncCat = el.dataset.cat;
+};
+
+window.submitIncident = async function(){
+  const desc = document.getElementById('inc-desc').value.trim();
+  if(!S.selectedIncCat){ showToast('Pick a category'); return; }
+  if(!desc){ showToast('Add a description'); return; }
+
+  const rec = {
+    category: S.selectedIncCat,
+    description: desc,
+    desc,
+    status: 'Open',
+    timestamp: new Date().toISOString(),
+  };
+  rec.id = await fsAdd('incidents', rec);
+  S.incidents.push(rec);
+  closeModal('modal-incident');
+  renderIncidents();
+  renderAlerts();
+  showToast('Incident logged ✓');
+};
+
+// ── STAFF NOTE MODAL (quick-pick) ──
+window.openNotesModal = function(){
+  S.selectedNoteEmp = null;
+  document.getElementById('note-text').value='';
+  document.getElementById('note-form-fields').style.display='none';
+  document.getElementById('note-selected-name').style.display='none';
+  document.getElementById('note-submit-btn').classList.add('hidden');
+
+  const pick = document.getElementById('modal-staff-pick');
+  pick.innerHTML = S.employees.map(emp=>{
+    const role = empPrimaryRole(emp);
+    const color = roleColor(role);
+    return `<div class="sp-item" onclick="pickNoteEmp('${emp.id}','${escHtml(emp.name||'')}')">
+      <div class="sp-dot" style="background:${color}"></div>
+      <div class="sp-name">${escHtml(emp.name||'—')}</div>
+      <div class="sp-role">${escHtml(role)}</div>
+    </div>`;
+  }).join('') || '<div class="inc-empty">No employees</div>';
+
+  openModal('modal-note');
+};
+
+window.pickNoteEmp = function(id, name){
+  S.selectedNoteEmp = id;
+  document.getElementById('modal-staff-pick').style.display='none';
+  document.getElementById('note-form-fields').style.display='block';
+  document.getElementById('note-selected-name').textContent = `Writing note for: ${name}`;
+  document.getElementById('note-selected-name').style.display='block';
+  document.getElementById('note-submit-btn').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('note-text').focus(),150);
+};
+
+window.submitNote = async function(){
+  const text = document.getElementById('note-text').value.trim();
+  if(!S.selectedNoteEmp){ showToast('Select an employee'); return; }
+  if(!text){ showToast('Write a note first'); return; }
+  const rec = {empId:S.selectedNoteEmp, text};
+  rec.id = await fsAdd('staffNotes', rec);
+  S.staffNotes.push(rec);
+  closeModal('modal-note');
+  renderNotesEmpList();
+  showToast('Note saved ✓');
+};
+
+// ── WASTE MODAL ──
+window.openWasteModal = function(){
+  document.querySelectorAll('.reason-pill').forEach(p=>p.classList.remove('selected'));
+  document.getElementById('waste-item-input').value='';
+  document.getElementById('waste-qty').value='1';
+  document.getElementById('waste-cost').value='';
+  document.getElementById('waste-cost-preview').style.display='none';
+  S.selectedReason = null;
+  openModal('modal-waste');
+  setTimeout(()=>document.getElementById('waste-item-input').focus(),250);
+};
+
+window.selectReason = function(el){
+  document.querySelectorAll('.reason-pill').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+  S.selectedReason = el.dataset.reason;
+};
+
+// Auto-suggest cost from priceItems
+document.getElementById('waste-item-input').addEventListener('input', function(){
+  const val = this.value.toLowerCase();
+  const match = S.priceItems.find(p=>(p.itemName||'').toLowerCase()===val);
+  if(match && match.price){
+    document.getElementById('waste-cost').value = match.price;
+    updateWasteLoss();
+  }
+});
+
+['waste-qty','waste-cost'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', updateWasteLoss);
+});
+
+function updateWasteLoss(){
+  const qty = parseFloat(document.getElementById('waste-qty').value)||0;
+  const cost = parseFloat(document.getElementById('waste-cost').value)||0;
+  const loss = qty * cost;
+  if(cost>0){
+    document.getElementById('waste-cost-preview').style.display='block';
+    document.getElementById('waste-loss-amt').textContent=`$${loss.toFixed(2)}`;
+  } else {
+    document.getElementById('waste-cost-preview').style.display='none';
+  }
+}
+
+window.submitWaste = async function(){
+  const item = document.getElementById('waste-item-input').value.trim();
+  if(!item){ showToast('Enter an item name'); return; }
+  if(!S.selectedReason){ showToast('Select a reason'); return; }
+  const qty = parseFloat(document.getElementById('waste-qty').value)||1;
+  const unitCost = parseFloat(document.getElementById('waste-cost').value)||0;
+  const estimatedLoss = qty * unitCost;
+
+  const rec = {
+    item, reason:S.selectedReason, quantity:qty,
+    unitCost, estimatedLoss,
+    timestamp: new Date().toISOString(),
+  };
+  rec.id = await fsAdd('wasteLog', rec);
+  S.wasteItems.push(rec);
+  closeModal('modal-waste');
+  renderWasteLog();
+  showToast(`Logged: ${item} · $${estimatedLoss.toFixed(2)} loss`);
+};
+
+// ═══════════════════════════════════════════════
+// FAB MENU
+// ═══════════════════════════════════════════════
+let fabOpen = false;
+window.toggleFabMenu = function(){
+  fabOpen = !fabOpen;
+  document.getElementById('fab-menu').classList.toggle('open', fabOpen);
+  document.getElementById('fab').textContent = fabOpen ? '✕' : '＋';
+};
+window.closeFabMenu = function(){
+  fabOpen = false;
+  document.getElementById('fab-menu').classList.remove('open');
+  document.getElementById('fab').textContent = '＋';
+};
+
+// Close FAB on outside click
+document.addEventListener('click', e=>{
+  if(fabOpen && !e.target.closest('.fab') && !e.target.closest('.fab-menu') && !e.target.closest('.fo-btn')){
+    closeFabMenu();
+  }
+});
+
+// Expose FAB openers to global scope
+window.openIncidentModal = window.openIncidentModal;
+window.openNotesModal = window.openNotesModal;
+window.openWasteModal = window.openWasteModal;
+
+// ═══════════════════════════════════════════════
+// COLLAPSIBLE PANELS
+// ═══════════════════════════════════════════════
+window.togglePanel = function(header, bodyId){
+  const body = document.getElementById(bodyId);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  header.classList.toggle('expanded', !isOpen);
+};
+window.openPanel = function(bodyId){
+  const body = document.getElementById(bodyId);
+  body.classList.add('open');
+  body.previousElementSibling && body.previousElementSibling.classList.add('expanded');
+};
+
+// ═══════════════════════════════════════════════
+// SCROLL HELPERS
+// ═══════════════════════════════════════════════
+window.scrollToSection = function(id){
+  const el = document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+};
+
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+let toastTimer;
+window.showToast = function(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2800);
+};
+
+// ═══════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){
+    document.querySelectorAll('.modal-backdrop.open').forEach(m=>m.classList.remove('open'));
+    if(fabOpen) closeFabMenu();
+  }
+});
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+boot();
+
+</script>
+</body>
+</html>
