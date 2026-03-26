@@ -564,7 +564,11 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <span style="font-family:var(--font-mono);font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">WEEK OF</span>
 <input type="date" id="sch-weekdate" class="iline" onchange="onWeekChange()">
 <span class="week-lbl" id="sch-week-label"></span>
-<div style="margin-left:auto;display:flex;align-items:center;gap:8px"><span id="res-sync-status"></span><button class="btn bo bs" onclick="loadReservations()" style="font-size:.65rem;padding:3px 8px">↻ Sync</button></div>
+<div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+  <button class="btn bo bs" onclick="manualCopyLastWeek()" style="font-size:.68rem;padding:5px 10px;color:var(--amber);border-color:rgba(232,160,32,.3)" title="Copy last week's schedule into this week">↩ Copy Last Week</button>
+  <span id="res-sync-status"></span>
+  <button class="btn bo bs" onclick="loadReservations()" style="font-size:.65rem;padding:3px 8px">↻ Sync</button>
+</div>
 </div>
 <div class="forecast-bar" id="forecast-bar"></div>
 <div class="rbox"><h4>// This week's restrictions & notes</h4><div class="rlist" id="restrict-list"><span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">None</span></div></div>
@@ -1120,7 +1124,9 @@ async function boot(){
   document.getElementById('sb-date').textContent=now.toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});
   document.getElementById('cl-date').valueAsDate=now;
   const mon=getMonday(now);
-  document.getElementById('sch-weekdate').valueAsDate=mon;
+  // Set date input via ISO string to avoid timezone shifts (valueAsDate uses UTC)
+  const monISO=`${mon.getFullYear()}-${String(mon.getMonth()+1).padStart(2,'0')}-${String(mon.getDate()).padStart(2,'0')}`;
+  document.getElementById('sch-weekdate').value=monISO;
   setWeekLabel('sch-weekdate','sch-week-label');
   // Copy last week's schedule into this week BEFORE rendering, so shifts are in S
   const wk=getWeekKey();
@@ -1145,7 +1151,14 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 // Upgrade copyEl to also show toast (module version overrides the stub above)
 window.copyEl=function(id){navigator.clipboard.writeText(document.getElementById(id).textContent);showToast('Copied ✓');};
 
-function getMonday(d){const dt=new Date(d),day=dt.getDay();dt.setDate(dt.getDate()-(day===0?6:day-1));return dt;}
+function getMonday(d){
+  // Use local date parts to avoid timezone shifts
+  const dt=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  const day=dt.getDay(); // 0=Sun,1=Mon...6=Sat
+  const diff=day===0?-6:1-day; // Mon=0 offset
+  dt.setDate(dt.getDate()+diff);
+  return dt;
+}
 function setWeekLabel(inputId,labelId){
   const v=document.getElementById(inputId).value;if(!v)return;
   const d=new Date(v+'T12:00:00'),e=new Date(d);e.setDate(e.getDate()+6);
@@ -1183,6 +1196,28 @@ async function copyFromPrevWeekForSections(wk,sections){
   await Promise.all(promises);
   return true;
 }
+// Force-copy all sections from last week, overwriting current week (with confirm)
+window.manualCopyLastWeek=async function(){
+  const wk=getWeekKey();if(!wk||wk==='default'){showToast('Select a week first');return;}
+  const prev=prevWeekKey(wk);if(!prev){showToast('No previous week found');return;}
+  const prevShifts=S.shifts.filter(s=>s.week===prev);
+  if(!prevShifts.length){showToast('No shifts found for last week');return;}
+  const curShifts=S.shifts.filter(s=>s.week===wk);
+  if(curShifts.length){
+    if(!confirm(`This will DELETE the ${curShifts.length} existing shifts for this week and replace with last week's schedule. Continue?`))return;
+    // Delete current week shifts
+    await Promise.all(curShifts.map(s=>fsDel('shifts',s.id)));
+    S.shifts=S.shifts.filter(s=>s.week!==wk);
+  }
+  // Copy all sections from prev week
+  const promises=prevShifts.map(async s=>{
+    const ns={week:wk,section:s.section,dayIdx:s.dayIdx,name:s.name,time:s.time||''};
+    ns.id=await fsAdd('shifts',ns);S.shifts.push(ns);
+  });
+  await Promise.all(promises);
+  renderSchedule();
+  showToast(`Copied ${prevShifts.length} shifts from last week ✓`);
+};
 async function renderScheduleWithCopy(){
   const wk=getWeekKey();
   if(wk&&wk!=='default'){
@@ -1723,167 +1758,182 @@ window.printScheduleSheet=function(){
   const wk=getWeekKey(),ws=S.shifts.filter(s=>s.week===wk);
   const v=document.getElementById('sch-weekdate').value,mon=v?new Date(v+'T12:00:00'):new Date();
   const wLabel=document.getElementById('sch-week-label').textContent||wk;
-  // Build date headers
-  const dateHeaders=DAYS_SHORT.map((_,i)=>{const d=new Date(mon);d.setDate(d.getDate()+i);return`<th><div class="day-name">${DAYS_SHORT[i]}</div><div class="day-date">${d.toLocaleDateString('en-CA',{month:'short',day:'numeric'})}</div></th>`;}).join('');
-  // Build section rows helper
-  function buildRows(sections){
+
+  // Date headers array
+  const dates=DAYS_SHORT.map((_,i)=>{const d=new Date(mon);d.setDate(d.getDate()+i);return{day:DAYS_SHORT[i],date:d.toLocaleDateString('en-CA',{month:'short',day:'numeric'})};});
+  const thRow=dates.map(h=>`<th><div class="dname">${h.day}</div><div class="ddate">${h.date}</div></th>`).join('');
+
+  // Build rows for a set of sections
+  function buildSectionRows(sections){
     let html='';
     sections.forEach(sec=>{
-      const secColors={SUSHI:'#1a6a8a',KITCHEN:'#8a6a00',TEPPAN:'#8a3a10',SERVING:'#5a3a8a'};
-      const secBg={SUSHI:'#e8f4f8',KITCHEN:'#fdf6e0',TEPPAN:'#fdf0ea',SERVING:'#f3eef8'};
-      const col=secColors[sec]||'#333';
-      const bg=secBg[sec]||'#f9f9f9';
-      // Find max slots needed
+      const cols={SUSHI:'#1565a0',KITCHEN:'#7a5800',TEPPAN:'#8a2800',SERVING:'#5a2a9a'};
+      const bgs={SUSHI:'#deeef8',KITCHEN:'#fdf3d0',TEPPAN:'#fde8dc',SERVING:'#ede0f8'};
+      const col=cols[sec]||'#222',bg=bgs[sec]||'#f5f5f5';
       let maxSlots=1;
       for(let di=0;di<7;di++){const cnt=ws.filter(s=>s.section===sec&&s.dayIdx===di).length;if(cnt>maxSlots)maxSlots=cnt;}
-      maxSlots=Math.max(maxSlots,3); // minimum 3 empty slots always
+      maxSlots=Math.max(maxSlots,4);
       for(let row=0;row<maxSlots;row++){
-        html+=`<tr class="${row===0?'first-row':'cont-row'}">`;
-        if(row===0){
-          html+=`<td class="sec-label" rowspan="${maxSlots}" style="color:${col};border-left:5px solid ${col};background:${bg}">${sec}</td>`;
-        }
+        html+=`<tr>`;
+        if(row===0) html+=`<td class="sec-lbl" rowspan="${maxSlots}" style="color:${col};background:${bg};border-left:6px solid ${col}">${sec}</td>`;
         for(let di=0;di<7;di++){
           const shifts=ws.filter(s=>s.section===sec&&s.dayIdx===di).sort((a,b)=>shiftSortKey(a.time)-shiftSortKey(b.time));
           const sh=shifts[row];
-          if(sh){
-            html+=`<td class="staff-cell filled">${sh.name}${sh.time?`<span class="time-tag">${sh.time}</span>`:''}</td>`;
-          }else{
-            html+=`<td class="staff-cell empty"></td>`;
-          }
+          html+=sh
+            ?`<td class="cell filled"><span class="sname">${sh.name}</span>${sh.time?`<span class="stime">${sh.time}</span>`:''}</td>`
+            :`<td class="cell empty"></td>`;
         }
-        html+='</tr>';
+        html+=`</tr>`;
       }
-      // Add a spacer row between sections
-      html+=`<tr class="spacer-row"><td colspan="8"></td></tr>`;
+      html+=`<tr class="gap"><td colspan="8"></td></tr>`;
     });
     return html;
   }
-  // Serving: AM block then PM block with gap
+
+  // Serving with AM/PM split
   function buildServingRows(){
-    const allShifts=ws.filter(s=>s.section==='SERVING');
+    const all=ws.filter(s=>s.section==='SERVING');
     let maxAM=1,maxPM=1;
     for(let di=0;di<7;di++){
-      const am=allShifts.filter(s=>s.dayIdx===di&&!isPmServing(s.time)).length;
-      const pm=allShifts.filter(s=>s.dayIdx===di&&isPmServing(s.time)).length;
+      const am=all.filter(s=>s.dayIdx===di&&!isPmServing(s.time)).length;
+      const pm=all.filter(s=>s.dayIdx===di&&isPmServing(s.time)).length;
       if(am>maxAM)maxAM=am;if(pm>maxPM)maxPM=pm;
     }
-    maxAM=Math.max(maxAM,3);maxPM=Math.max(maxPM,3);
+    maxAM=Math.max(maxAM,4);maxPM=Math.max(maxPM,4);
+    const col='#5a2a9a',bg='#ede0f8';
+    const totalSpan=maxAM+1+maxPM;
     let html='';
-    const col='#5a3a8a',bg='#f3eef8';
-    const totalRows=maxAM+1+maxPM; // +1 for AM/PM divider
     for(let row=0;row<maxAM;row++){
-      html+=`<tr class="${row===0?'first-row':'cont-row'}">`;
-      if(row===0) html+=`<td class="sec-label" rowspan="${totalRows}" style="color:${col};border-left:5px solid ${col};background:${bg}">SERVING</td>`;
+      html+=`<tr>`;
+      if(row===0) html+=`<td class="sec-lbl" rowspan="${totalSpan}" style="color:${col};background:${bg};border-left:6px solid ${col}">SERVING</td>`;
       for(let di=0;di<7;di++){
-        const shifts=allShifts.filter(s=>s.dayIdx===di&&!isPmServing(s.time)).sort((a,b)=>servingTimeOrder(a.time)-servingTimeOrder(b.time));
+        const shifts=all.filter(s=>s.dayIdx===di&&!isPmServing(s.time)).sort((a,b)=>servingTimeOrder(a.time)-servingTimeOrder(b.time));
         const sh=shifts[row];
-        html+=sh?`<td class="staff-cell filled">${sh.name}${sh.time?`<span class="time-tag">${sh.time}</span>`:''}</td>`:`<td class="staff-cell empty"></td>`;
+        html+=sh?`<td class="cell filled"><span class="sname">${sh.name}</span>${sh.time?`<span class="stime">${sh.time}</span>`:''}</td>`:`<td class="cell empty"></td>`;
       }
-      html+='</tr>';
+      html+=`</tr>`;
     }
-    // AM/PM divider row
-    html+=`<tr class="ampm-row"><td colspan="7" style="padding:4px 10px;font-size:9px;font-family:monospace;color:#999;letter-spacing:.08em;border-bottom:1px dashed #ccc">— PM —</td></tr>`;
+    html+=`<tr class="ampm-div"><td colspan="7"><span>— PM —</span></td></tr>`;
     for(let row=0;row<maxPM;row++){
-      html+=`<tr class="cont-row">`;
+      html+=`<tr>`;
       for(let di=0;di<7;di++){
-        const shifts=allShifts.filter(s=>s.dayIdx===di&&isPmServing(s.time)).sort((a,b)=>servingTimeOrder(a.time)-servingTimeOrder(b.time));
+        const shifts=all.filter(s=>s.dayIdx===di&&isPmServing(s.time)).sort((a,b)=>servingTimeOrder(a.time)-servingTimeOrder(b.time));
         const sh=shifts[row];
-        html+=sh?`<td class="staff-cell filled">${sh.name}${sh.time?`<span class="time-tag">${sh.time}</span>`:''}</td>`:`<td class="staff-cell empty"></td>`;
+        html+=sh?`<td class="cell filled"><span class="sname">${sh.name}</span>${sh.time?`<span class="stime">${sh.time}</span>`:''}</td>`:`<td class="cell empty"></td>`;
       }
-      html+='</tr>';
+      html+=`</tr>`;
     }
-    html+=`<tr class="spacer-row"><td colspan="8"></td></tr>`;
+    html+=`<tr class="gap"><td colspan="8"></td></tr>`;
     return html;
   }
 
-  const kitchenRows=buildRows(['SUSHI','KITCHEN','TEPPAN']);
+  const kitchenRows=buildSectionRows(['SUSHI','KITCHEN','TEPPAN']);
   const servingRows=buildServingRows();
+  const printed=new Date().toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
 
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
-<title>Schedule — ${wLabel}</title>
+  const html=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<title>Schedule ${wLabel}</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  @page{size:landscape;margin:12mm 10mm}
-  body{font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:#111;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .page{padding:16px 20px;max-width:100%}
-  /* Header */
-  .sheet-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;padding-bottom:10px;border-bottom:2.5px solid #111}
-  .sheet-title{font-size:26px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;line-height:1}
-  .sheet-week{font-size:13px;font-weight:600;color:#444;margin-top:4px;letter-spacing:.02em}
-  .sheet-meta{font-size:10px;color:#888;font-family:monospace;letter-spacing:.06em;text-align:right;line-height:1.6}
-  /* Table */
-  .sched-table{width:100%;border-collapse:collapse;table-layout:fixed}
-  .sched-table th{padding:10px 8px 8px;text-align:center;border:1px solid #ddd;background:#f5f5f5;border-bottom:2px solid #bbb}
-  .sched-table th.corner-th{background:#fff;border:none;width:72px}
-  .day-name{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#111}
-  .day-date{font-size:10px;color:#666;font-weight:400;margin-top:2px;letter-spacing:.03em}
-  /* Section label */
-  .sec-label{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;text-align:center;vertical-align:middle;width:72px;padding:8px 4px;writing-mode:horizontal-tb;border:1px solid #ddd}
-  /* Staff cells */
-  .staff-cell{padding:11px 9px;border:1px solid #ddd;vertical-align:top;min-height:42px;font-size:12px;font-weight:600;color:#111;position:relative}
-  .staff-cell.empty{background:#fafafa}
-  .staff-cell.filled{background:#fff}
-  .time-tag{display:inline-block;margin-left:5px;font-size:9px;font-weight:700;color:#666;font-family:monospace;background:#f0f0f0;padding:1px 4px;border-radius:2px;letter-spacing:.04em}
-  /* Section rows */
-  .first-row td{border-top:2px solid #bbb}
-  .cont-row td{border-top:1px solid #e8e8e8}
-  .spacer-row td{height:14px;background:#fff;border:none}
-  .ampm-row td{background:#f9f9f9}
-  /* Table labels */
-  .table-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#888;margin-bottom:6px;margin-top:18px;display:flex;align-items:center;gap:8px}
-  .table-label::after{content:'';flex:1;height:1px;background:#ddd}
-  /* Footer */
-  .sheet-footer{margin-top:18px;padding-top:8px;border-top:1px solid #ddd;display:flex;justify-content:space-between;font-size:9px;color:#bbb;font-family:monospace;letter-spacing:.05em}
-  /* Print */
-  @media print{
-    .no-print{display:none}
-    .page-break{page-break-before:always}
-    body{font-size:12px}
-  }
-  /* Screen-only actions */
-  .print-bar{position:fixed;top:0;left:0;right:0;background:#1a1916;padding:10px 20px;display:flex;gap:10px;align-items:center;z-index:100;border-bottom:2px solid #e8a020}
-  .print-bar button{padding:8px 18px;border-radius:3px;font-size:12px;font-weight:700;cursor:pointer;border:none;text-transform:uppercase;letter-spacing:.06em}
-  .btn-print{background:#e8a020;color:#0a0908}
-  .btn-close{background:transparent;color:#a09880;border:1px solid #353330 !important}
-  .print-bar-title{font-family:monospace;font-size:11px;color:#5a5648;letter-spacing:.1em;text-transform:uppercase;margin-left:8px}
-  @media print{.print-bar{display:none}.page{padding-top:0}}
-  .page{padding-top:52px}
-</style>
-</head><body>
-<div class="print-bar no-print">
-  <button class="btn-print" onclick="window.print()">🖨 Print / Save PDF</button>
-  <button class="btn-close" onclick="window.close()">✕ Close</button>
-  <span class="print-bar-title">Schedule — ${wLabel}</span>
+*{margin:0;padding:0;box-sizing:border-box}
+@page{size:landscape;margin:8mm 10mm}
+body{font-family:'Arial Black',Arial,sans-serif;background:#fff;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+
+/* ── PRINT BAR (screen only) ── */
+.pbar{position:fixed;top:0;left:0;right:0;height:48px;background:#111;display:flex;align-items:center;gap:10px;padding:0 20px;z-index:999;border-bottom:3px solid #e8a020}
+.pbar button{padding:8px 20px;font-size:13px;font-weight:800;border:none;border-radius:3px;cursor:pointer;text-transform:uppercase;letter-spacing:.05em}
+.pbtn-print{background:#e8a020;color:#111}
+.pbtn-close{background:transparent;color:#888;border:1px solid #444 !important}
+.pbar-lbl{color:#555;font-size:11px;font-family:monospace;letter-spacing:.1em;text-transform:uppercase;margin-left:6px}
+@media print{.pbar{display:none}}
+
+/* ── PAGE ── */
+.page{width:100%;min-height:100vh;padding:10px 12px;display:flex;flex-direction:column}
+@media screen{.page{padding-top:58px;min-height:calc(100vh - 0px)}}
+@media print{.page{padding:0;page-break-after:always;height:100vh}}
+
+/* ── HEADER ── */
+.hdr{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #111;padding-bottom:6px;margin-bottom:10px}
+.hdr-left .title{font-size:28px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;line-height:1}
+.hdr-left .subtitle{font-size:15px;font-weight:700;color:#444;margin-top:3px;letter-spacing:.02em}
+.hdr-right{font-size:11px;color:#888;font-family:monospace;letter-spacing:.06em;text-align:right;line-height:1.7}
+
+/* ── TABLE ── */
+.wrap{flex:1;display:flex;flex-direction:column}
+table{width:100%;border-collapse:collapse;table-layout:fixed;flex:1}
+col.col-lbl{width:80px}
+
+/* Day headers */
+th.corner{background:#fff;border:none;width:80px}
+th{background:#f0f0f0;border:1px solid #ccc;border-bottom:2px solid #999;padding:8px 4px;text-align:center}
+.dname{font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#111}
+.ddate{font-size:12px;font-weight:600;color:#555;margin-top:2px}
+
+/* Section label cell */
+.sec-lbl{font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;text-align:center;vertical-align:middle;padding:6px 3px;border:1px solid #ccc;border-bottom:2px solid #999}
+
+/* Staff cells */
+.cell{border:1px solid #ddd;text-align:center;vertical-align:middle;padding:6px 4px}
+.cell.empty{background:#f8f8f8}
+.cell.filled{background:#fff}
+.sname{display:block;font-size:17px;font-weight:900;color:#111;letter-spacing:.01em;line-height:1.1}
+.stime{display:block;font-size:15px;font-weight:800;color:#333;margin-top:3px;letter-spacing:.03em;font-family:'Arial Black',Arial,sans-serif}
+
+/* Spacer + dividers */
+tr.gap td{height:10px;background:#fff;border:none}
+tr.ampm-div td{background:#f0f0f0;padding:3px 8px;border:1px solid #ddd}
+tr.ampm-div span{font-size:11px;font-weight:700;color:#888;font-family:monospace;letter-spacing:.1em;text-transform:uppercase}
+
+/* Footer */
+.ftr{margin-top:6px;padding-top:5px;border-top:1px solid #ddd;display:flex;justify-content:space-between;font-size:10px;color:#bbb;font-family:monospace;letter-spacing:.05em}
+</style></head><body>
+
+<div class="pbar">
+  <button class="pbtn-print" onclick="window.print()">🖨 Print / Save PDF</button>
+  <button class="pbtn-close" onclick="window.close()">✕ Close</button>
+  <span class="pbar-lbl">Schedule — ${wLabel}</span>
 </div>
+
+<!-- PAGE 1: KITCHEN + SUSHI -->
 <div class="page">
-  <div class="sheet-header">
-    <div>
-      <div class="sheet-title">Weekly Schedule</div>
-      <div class="sheet-week">${wLabel}</div>
+  <div class="hdr">
+    <div class="hdr-left">
+      <div class="title">Kitchen + Sushi</div>
+      <div class="subtitle">${wLabel}</div>
     </div>
-    <div class="sheet-meta">
-      <div>Printed: ${new Date().toLocaleDateString('en-CA',{weekday:'short',year:'numeric',month:'short',day:'numeric'})}</div>
-      <div>OVERLOOK OPS</div>
-    </div>
+    <div class="hdr-right"><div>Printed: ${printed}</div><div>OVERLOOK OPS — Page 1 of 2</div></div>
   </div>
-  <div class="table-label">Kitchen + Sushi</div>
-  <table class="sched-table">
-    <thead><tr><th class="corner-th"></th>${dateHeaders}</tr></thead>
-    <tbody>${kitchenRows}</tbody>
-  </table>
-  <div class="table-label page-break" style="margin-top:24px">Serving</div>
-  <table class="sched-table">
-    <thead><tr><th class="corner-th"></th>${dateHeaders}</tr></thead>
-    <tbody>${servingRows}</tbody>
-  </table>
-  <div class="sheet-footer">
-    <span>OVERLOOK — OPERATIONS DASHBOARD</span>
-    <span>Week of ${wLabel}</span>
+  <div class="wrap">
+    <table>
+      <colgroup><col class="col-lbl">${DAYS_SHORT.map(()=>'<col>').join('')}</colgroup>
+      <thead><tr><th class="corner"></th>${thRow}</tr></thead>
+      <tbody>${kitchenRows}</tbody>
+    </table>
   </div>
+  <div class="ftr"><span>OVERLOOK — OPERATIONS DASHBOARD</span><span>Week of ${wLabel}</span></div>
 </div>
+
+<!-- PAGE 2: SERVING -->
+<div class="page">
+  <div class="hdr">
+    <div class="hdr-left">
+      <div class="title">Serving</div>
+      <div class="subtitle">${wLabel}</div>
+    </div>
+    <div class="hdr-right"><div>Printed: ${printed}</div><div>OVERLOOK OPS — Page 2 of 2</div></div>
+  </div>
+  <div class="wrap">
+    <table>
+      <colgroup><col class="col-lbl">${DAYS_SHORT.map(()=>'<col>').join('')}</colgroup>
+      <thead><tr><th class="corner"></th>${thRow}</tr></thead>
+      <tbody>${servingRows}</tbody>
+    </table>
+  </div>
+  <div class="ftr"><span>OVERLOOK — OPERATIONS DASHBOARD</span><span>Week of ${wLabel}</span></div>
+</div>
+
 </body></html>`;
 
-  const win=window.open('','_blank','width=1100,height=800');
+  const win=window.open('','_blank','width=1200,height=850');
   win.document.write(html);
   win.document.close();
   showToast('Print sheet opened ✓');
