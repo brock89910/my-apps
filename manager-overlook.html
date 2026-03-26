@@ -101,8 +101,8 @@ tr:hover td{background:rgba(232,160,32,.03)}
 .role-sushi{background:var(--sushi-d);color:var(--sushi);border:1px solid rgba(58,154,184,.3)}
 .role-kitchen{background:var(--kitchen-d);color:var(--kitchen);border:1px solid rgba(200,160,32,.3)}
 .role-service{background:var(--service-d);color:var(--service);border:1px solid rgba(138,90,184,.3)}
-.sch-tabs{display:flex;gap:0;margin-bottom:14px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;width:fit-content}
-.sch-tab{padding:8px 22px;cursor:pointer;font-family:var(--font-head);font-size:.88rem;font-weight:700;color:var(--text2);transition:all .12s;user-select:none;text-transform:uppercase;letter-spacing:.07em;border-right:1px solid var(--border)}
+.sch-tabs{display:flex;gap:0;margin-bottom:14px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;width:fit-content;max-width:100%}
+.sch-tab{padding:8px 22px;cursor:pointer;font-family:var(--font-head);font-size:.88rem;font-weight:700;color:var(--text2);transition:all .12s;user-select:none;text-transform:uppercase;letter-spacing:.07em;border-right:1px solid var(--border);white-space:nowrap}
 .sch-tab:last-child{border-right:none}
 .sch-tab:hover{background:var(--s2);color:var(--text)}
 .sch-tab.on{background:var(--amber);color:#0a0908}
@@ -338,7 +338,137 @@ tr:hover td{background:rgba(232,160,32,.03)}
 .price-input-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px}
 .quick-entry-note{font-family:var(--font-mono);font-size:.62rem;color:var(--text3);margin-bottom:8px;letter-spacing:.05em}
 
-@media(max-width:680px){body{flex-direction:column}aside{width:100%;min-height:auto;position:relative}main{padding:14px}.forecast-bar{grid-template-columns:repeat(4,1fr)}.price-input-row{grid-template-columns:1fr 1fr}}
+/* ── MOBILE BOTTOM NAV ── */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:200;height:56px;flex-direction:row;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.mobile-nav::-webkit-scrollbar{display:none}
+.mob-nav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 12px;cursor:pointer;min-width:64px;flex-shrink:0;color:var(--text3);font-family:var(--font-mono);font-size:.48rem;letter-spacing:.06em;text-transform:uppercase;transition:all .12s;border:none;background:none;-webkit-tap-highlight-color:transparent}
+.mob-nav-btn .mn-ico{font-size:1.1rem;line-height:1}
+.mob-nav-btn.on{color:var(--amber)}
+.mob-nav-btn.on .mn-ico{text-shadow:0 0 8px rgba(232,160,32,.5)}
+
+@media(max-width:760px){
+  body{flex-direction:column}
+  aside{display:none}
+  .mobile-nav{display:flex}
+  main{padding:12px 12px 68px;overflow-y:auto}
+  
+  /* Topbar */
+  .topbar{margin-bottom:16px;padding-bottom:12px;gap:8px}
+  .topbar-left h2{font-size:1.6rem}
+  .topbar-right{display:none}
+  .bc{display:none}
+  
+  /* Stats grid */
+  .stats{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+  .sc{padding:12px 14px}
+  .sc .vl{font-size:1.6rem}
+  
+  /* Panels */
+  .pn{padding:14px;margin-bottom:10px}
+  .pnh{margin-bottom:12px}
+  .pnh h3{font-size:.95rem}
+  
+  /* Forecast bar — 4 columns on mobile */
+  .forecast-bar{grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:10px}
+  .fc-day{padding:7px 4px}
+  .fc-day .fcn{font-size:.72rem}
+  
+  /* Schedule tabs — scrollable row on mobile */
+  .sch-tabs{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .sch-tab{flex:1;text-align:center;padding:9px 8px;font-size:.78rem;min-width:90px}
+  
+  /* Schedule grid — scrollable */
+  .sg-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .sg{min-width:520px}
+  .sg th{font-size:.7rem;padding:7px 5px}
+  .sg td{padding:4px 3px;min-width:70px}
+  .sg-chip{padding:3px 4px;font-size:.68rem}
+  .sg-chip .cn{font-size:.68rem}
+  .sg-chip .ct{font-size:.6rem}
+  
+  /* Staff quick panel */
+  .staff-quick-panel{padding:10px}
+  .staff-quick-panel h4{font-size:.58rem;margin-bottom:8px}
+  .staff-chip{padding:6px 10px;font-size:.78rem;min-height:36px}
+  .quick-add-section{margin-bottom:10px}
+  
+  /* Restriction + reqoff boxes */
+  .rbox{padding:10px;margin-bottom:8px}
+  .rbox h4{font-size:.58rem}
+  .rtag,.off-req-tag{font-size:.65rem;padding:4px 8px}
+  
+  /* Tables — scrollable */
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{min-width:560px}
+  td,th{padding:7px 8px;font-size:.76rem}
+  
+  /* Buttons */
+  .btn{padding:9px 14px;font-size:.78rem;min-height:38px}
+  .btn.bs{padding:8px 12px;font-size:.75rem;min-height:36px}
+  .topbar .btn,.topbar [style*="display:flex"]{gap:5px}
+  
+  /* Forms */
+  .g2{grid-template-columns:1fr}
+  .fg input,.fg select,.fg textarea{padding:10px;font-size:.85rem;min-height:40px}
+  
+  /* Modals */
+  .mo{width:96vw;padding:18px;max-height:88vh}
+  .mo h3{font-size:1.2rem}
+  
+  /* Employee grid */
+  .emp-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .emp-card{padding:12px}
+  .emp-card .ec-name{font-size:1rem}
+  
+  /* Role legend */
+  .role-legend{gap:6px;margin-bottom:10px}
+  .role-pill{font-size:.55rem;padding:3px 8px}
+  
+  /* Checklist */
+  .cl-filter-bar{gap:4px}
+  .cl-filter-btn{padding:5px 10px;font-size:.58rem}
+  .cl-item{padding:11px 12px;gap:8px}
+  .cl-title{font-size:.82rem}
+  .cl-desc{font-size:.72rem}
+  
+  /* Pricing */
+  .price-input-row{grid-template-columns:1fr 1fr;gap:6px}
+  .price-controls{gap:6px}
+  .vendor-header{flex-direction:column;align-items:flex-start;gap:4px}
+  .price-table th,.price-table td{padding:7px 8px;font-size:.74rem}
+  
+  /* AI prompt panel */
+  .aip{font-size:.68rem;padding:10px}
+  
+  /* Week controls row */
+  #sch-weekdate{min-height:40px;font-size:.85rem}
+  .week-lbl{font-size:.88rem}
+  
+  /* Sheet table */
+  .sheet-preview{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .sheet-table th,.sheet-table td{padding:5px 8px;font-size:.72rem}
+  
+  /* Sort btn group */
+  .sort-btn-group{flex-wrap:wrap}
+  .sort-btn{padding:5px 10px;font-size:.6rem}
+  
+  /* Cleaning */
+  .ci{gap:8px;padding:9px 0}
+  .ci label{font-size:.79rem}
+  
+  /* Step panels */
+  .step{padding:9px}
+  .step .stit{font-size:.79rem}
+  .step .sdesc{font-size:.73rem}
+}
+
+@media(max-width:400px){
+  .emp-grid{grid-template-columns:1fr}
+  .forecast-bar{grid-template-columns:repeat(4,1fr)}
+  .stats{grid-template-columns:1fr 1fr}
+  .topbar-left h2{font-size:1.35rem}
+  .sch-tab{padding:8px 5px;font-size:.7rem}
+}
 </style>
 </head>
 <body>
@@ -448,9 +578,35 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div class="sch-tabs">
   <div class="sch-tab on" onclick="switchSchTab('kitchen',this)">🍳 Kitchen + Sushi</div>
   <div class="sch-tab" onclick="switchSchTab('serving',this)">🍽 Serving</div>
+  <div class="sch-tab" onclick="switchSchTab('perma-restrict',this)">📌 Permanent Rules</div>
 </div>
 <div class="sch-tab-pane on" id="sch-pane-kitchen"><div class="pn" style="padding:10px"><div class="sg-wrap"><table class="sg" id="sg-kitchen"></table></div></div></div>
 <div class="sch-tab-pane" id="sch-pane-serving"><div class="pn" style="padding:10px"><div class="sg-wrap"><table class="sg" id="sg-serving"></table></div></div></div>
+<div class="sch-tab-pane" id="sch-pane-perma-restrict">
+<div class="pn">
+  <div class="pnh"><h3>Permanent Scheduling Rules</h3><button class="btn bg bs" onclick="openAddPermaRestrict()">＋ Add Rule</button></div>
+  <p style="font-family:var(--font-mono);font-size:.65rem;color:var(--text3);margin-bottom:14px;line-height:1.65;letter-spacing:.04em">Permanent rules always show in the AI prompt and are carried forward every week — e.g. "Yang never Saturday", "Kim max 4 days/week", "Teppan must have 2 staff Fri/Sat".</p>
+  <div id="perma-restrict-list"><span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">// No permanent rules yet</span></div>
+  <div id="perma-restrict-add" style="display:none;margin-top:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px">
+    <div style="display:grid;gap:10px">
+      <div class="fg"><label>Rule / Restriction</label><input id="perma-restrict-input" placeholder='e.g. "Yang never Saturday" or "Kim max 4 days"'></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="fg"><label>Category</label>
+          <select id="perma-restrict-cat">
+            <option value="availability">Availability</option>
+            <option value="hours">Max Hours / Days</option>
+            <option value="staffing">Staffing Level</option>
+            <option value="role">Role Constraint</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="fg"><label>Employee (optional)</label><input id="perma-restrict-emp" list="emp-name-list3" placeholder="Leave blank for general"><datalist id="emp-name-list3"></datalist></div>
+      </div>
+    </div>
+    <div class="mf"><button class="btn bo bs" onclick="cancelAddPermaRestrict()">Cancel</button><button class="btn bg bs" onclick="confirmAddPermaRestrict()">Save Rule</button></div>
+  </div>
+</div>
+</div>
 <div class="pn" id="sch-prompt-pn" style="display:none"><div class="pnh"><h3>AI Schedule Prompt</h3><button class="btn bo bs" onclick="copyEl('sch-prompt-txt')">Copy</button></div><div class="aip" id="sch-prompt-txt"></div></div>
 </div>
 
@@ -738,6 +894,17 @@ tr:hover td{background:rgba(232,160,32,.03)}
 
 <div class="toast" id="toast"></div>
 
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav" id="mobile-nav">
+  <button class="mob-nav-btn on" onclick="go('dashboard',null,'mob-0')" id="mob-0"><span class="mn-ico">◈</span>Dash</button>
+  <button class="mob-nav-btn" onclick="go('bills',null,'mob-1')" id="mob-1"><span class="mn-ico">▤</span>Bills</button>
+  <button class="mob-nav-btn" onclick="go('schedule',null,'mob-2')" id="mob-2"><span class="mn-ico">▦</span>Schedule</button>
+  <button class="mob-nav-btn" onclick="go('employees',null,'mob-3')" id="mob-3"><span class="mn-ico">◉</span>Staff</button>
+  <button class="mob-nav-btn" onclick="go('checklist',null,'mob-4')" id="mob-4"><span class="mn-ico">☑</span>Tasks</button>
+  <button class="mob-nav-btn" onclick="go('pricing',null,'mob-5')" id="mob-5"><span class="mn-ico">◎</span>Pricing</button>
+  <button class="mob-nav-btn" onclick="go('cleaning',null,'mob-6')" id="mob-6"><span class="mn-ico">✓</span>Clean</button>
+</nav>
+
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getFirestore,collection,addDoc,getDocs,deleteDoc,doc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -748,7 +915,7 @@ const db=getFirestore(appMgr);
 const appRes=initializeApp({apiKey:"AIzaSyCMXA2a4RUUNuzmTz1QxdJbIciICojLjA8",authDomain:"restaurant599-b5595.firebaseapp.com",databaseURL:"https://restaurant599-b5595-default-rtdb.firebaseio.com",projectId:"restaurant599-b5595",storageBucket:"restaurant599-b5595.firebasestorage.app",messagingSenderId:"141750935511",appId:"1:141750935511:web:8ad37806a7d9a70a8e7592"},'reservations');
 const resDb=getDatabase(appRes);
 
-const S={bills:[],shifts:[],cleanLogs:[],restrictions:[],reservations:{},reqOffs:[],employees:[],clTasks:[],vendors:[],priceItems:[]};
+const S={bills:[],shifts:[],cleanLogs:[],restrictions:[],reservations:{},reqOffs:[],employees:[],clTasks:[],vendors:[],priceItems:[],permaRestrictions:[]};
 const DAYS_SHORT=['MON','TUE','WED','THU','FRI','SAT','SUN'];
 const COOK_SECTIONS=['SUSHI','KITCHEN','TEPPAN'];
 const SERVICE_SECTIONS=['SERVING'];
@@ -809,11 +976,11 @@ async function boot(){
       fsGet('bills'),fsGet('shifts'),fsGet('cleanLogs'),fsGet('restrictions'),
       fsGet('reqOffs').catch(()=>[]),fsGet('employees').catch(()=>[]),
       fsGet('clTasks').catch(()=>[]),fsGet('vendors').catch(()=>[]),
-      fsGet('priceItems').catch(()=>[])
+      fsGet('priceItems').catch(()=>[]),fsGet('permaRestrictions').catch(()=>[])
     ]);
     S.bills=results[0];S.shifts=results[1];S.cleanLogs=results[2];S.restrictions=results[3];
     S.reqOffs=results[4];S.employees=results[5];S.clTasks=results[6];
-    S.vendors=results[7];S.priceItems=results[8];
+    S.vendors=results[7];S.priceItems=results[8];S.permaRestrictions=results[9]||[];
   }catch(e){showToast('Firebase error');console.error(e);}
 
   // Seed checklist tasks if none exist
@@ -938,12 +1105,17 @@ async function boot(){
 }
 boot();
 
-function renderAll(){renderDash();renderBills();renderSchedule();renderCleanLog();renderRestrictions();renderReqOffs();renderEmployees();updateEmpDatalist();renderClTasks();renderPricing();renderVendorDropdown();updatePiItemList();}
+function renderAll(){renderDash();renderBills();renderSchedule();renderCleanLog();renderRestrictions();renderReqOffs();renderEmployees();updateEmpDatalist();renderClTasks();renderPricing();renderVendorDropdown();updatePiItemList();renderPermaRestrictions();updatePermaRestrictDatalist();}
 
-window.go=function(id,el){
+const MOB_NAV_MAP={dashboard:'mob-0',bills:'mob-1',schedule:'mob-2',employees:'mob-3',checklist:'mob-4',pricing:'mob-5',cleaning:'mob-6'};
+window.go=function(id,el,mobId){
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
-  document.getElementById('pg-'+id).classList.add('on');el.classList.add('on');
+  document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  if(el)el.classList.add('on');
+  const mobBtn=document.getElementById(mobId||MOB_NAV_MAP[id]);if(mobBtn)mobBtn.classList.add('on');
+  document.querySelector('main').scrollTop=0;
 };
 window.switchSchTab=function(tab,el){
   document.querySelectorAll('.sch-tab').forEach(t=>t.classList.remove('on'));
@@ -981,21 +1153,29 @@ function prevWeekKey(wk){
   if(!wk||wk==='default')return null;
   try{const d=new Date(wk+'T12:00:00');d.setDate(d.getDate()-7);return d.toISOString().slice(0,10);}catch(e){return null;}
 }
-async function copyFromPrevWeek(wk){
-  const prev=prevWeekKey(wk);if(!prev)return;
-  const prevShifts=S.shifts.filter(s=>s.week===prev);
-  if(!prevShifts.length)return;
-  const curShifts=S.shifts.filter(s=>s.week===wk);
-  if(curShifts.length)return;
+// Copy a specific group of sections from prev week only if that group has no shifts this week
+async function copyFromPrevWeekForSections(wk,sections){
+  const prev=prevWeekKey(wk);if(!prev)return false;
+  const prevShifts=S.shifts.filter(s=>s.week===prev&&sections.includes((s.section||'').toUpperCase()));
+  if(!prevShifts.length)return false;
+  const curShifts=S.shifts.filter(s=>s.week===wk&&sections.includes((s.section||'').toUpperCase()));
+  if(curShifts.length)return false; // already has data for this group
   const promises=prevShifts.map(async s=>{
     const ns={week:wk,section:s.section,dayIdx:s.dayIdx,name:s.name,time:s.time||''};
     ns.id=await fsAdd('shifts',ns);S.shifts.push(ns);
   });
   await Promise.all(promises);
+  return true;
 }
 async function renderScheduleWithCopy(){
   const wk=getWeekKey();
-  if(wk&&wk!=='default'){const cur=S.shifts.filter(s=>s.week===wk);if(!cur.length)await copyFromPrevWeek(wk);}
+  if(wk&&wk!=='default'){
+    // Copy each tab group independently — kitchen/sushi separate from serving
+    await Promise.all([
+      copyFromPrevWeekForSections(wk,['SUSHI','KITCHEN','TEPPAN']),
+      copyFromPrevWeekForSections(wk,['SERVING']),
+    ]);
+  }
   renderSchedule();
 }
 
@@ -1292,6 +1472,66 @@ function renderRestrictions(){
 }
 window.delRestriction=async function(id){await fsDel('restrictions',id);S.restrictions=S.restrictions.filter(r=>r.id!==id);renderRestrictions();};
 
+// ── PERMANENT RESTRICTIONS ──
+window.openAddPermaRestrict=function(){
+  document.getElementById('perma-restrict-add').style.display='block';
+  document.getElementById('perma-restrict-input').focus();
+};
+window.cancelAddPermaRestrict=function(){
+  document.getElementById('perma-restrict-add').style.display='none';
+  document.getElementById('perma-restrict-input').value='';
+};
+window.confirmAddPermaRestrict=async function(){
+  const txt=document.getElementById('perma-restrict-input').value.trim();
+  if(!txt){showToast('Enter a rule');return;}
+  const cat=document.getElementById('perma-restrict-cat').value;
+  const emp=document.getElementById('perma-restrict-emp').value.trim();
+  const rec={text:txt,category:cat,employee:emp,permanent:true};
+  rec.id=await fsAdd('permaRestrictions',rec);
+  S.permaRestrictions.push(rec);
+  document.getElementById('perma-restrict-input').value='';
+  document.getElementById('perma-restrict-emp').value='';
+  document.getElementById('perma-restrict-add').style.display='none';
+  renderPermaRestrictions();showToast('Rule saved ✓');
+};
+window.delPermaRestriction=async function(id){
+  if(!confirm('Remove this permanent rule?'))return;
+  await fsDel('permaRestrictions',id);
+  S.permaRestrictions=S.permaRestrictions.filter(r=>r.id!==id);
+  renderPermaRestrictions();showToast('Rule removed ✓');
+};
+const CAT_LABELS={availability:'Availability',hours:'Max Hours/Days',staffing:'Staffing Level',role:'Role Constraint',other:'Other'};
+const CAT_COLORS={availability:'var(--red)',hours:'var(--amber)',staffing:'var(--sushi)',role:'var(--teppan)',other:'var(--text2)'};
+function renderPermaRestrictions(){
+  const list=S.permaRestrictions||[];
+  const container=document.getElementById('perma-restrict-list');
+  if(!container)return;
+  if(!list.length){container.innerHTML='<span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">// No permanent rules yet</span>';return;}
+  // Group by category
+  const groups={};list.forEach(r=>{const c=r.category||'other';if(!groups[c])groups[c]=[];groups[c].push(r);});
+  let html='';
+  Object.entries(groups).forEach(([cat,rules])=>{
+    const col=CAT_COLORS[cat]||'var(--text2)';
+    html+=`<div style="margin-bottom:14px"><div style="font-family:var(--font-mono);font-size:.6rem;color:${col};text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;display:flex;align-items:center;gap:6px"><span>// ${CAT_LABELS[cat]||cat}</span><span style="color:var(--text3)">(${rules.length})</span></div><div class="rlist" style="flex-direction:column;gap:5px">`;
+    rules.forEach(r=>{
+      html+=`<div style="display:flex;align-items:flex-start;gap:8px;background:var(--s2);border:1px solid var(--border);border-left:2px solid ${col};border-radius:var(--r);padding:9px 12px">
+        <div style="flex:1">
+          <div style="font-size:.8rem;font-weight:600;line-height:1.4">${r.text}</div>
+          ${r.employee?`<div style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3);margin-top:2px">→ ${r.employee}</div>`:''}
+        </div>
+        <button onclick="window.delPermaRestriction('${r.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:.7rem;padding:2px 5px;border-radius:2px;transition:all .1s;flex-shrink:0" onmouseover="this.style.color='var(--red)';this.style.background='var(--red-d)'" onmouseout="this.style.color='var(--text3)';this.style.background='none'">✕</button>
+      </div>`;
+    });
+    html+='</div></div>';
+  });
+  container.innerHTML=html;
+}
+function updatePermaRestrictDatalist(){
+  const dl=document.getElementById('emp-name-list3');if(!dl)return;
+  const names=S.employees.length?S.employees.map(e=>e.name):[...new Set(S.shifts.map(s=>s.name))];
+  dl.innerHTML=names.map(n=>`<option value="${n}">`).join('');
+}
+
 // ── REQUEST OFF ──
 window.updateReqOffUI=function(){
   const t=document.getElementById('ro-type').value;
@@ -1465,13 +1705,14 @@ window.copySheetData=function(which){
 window.buildSchPrompt=function(){
   const wk=getWeekKey(),wLabel=document.getElementById('sch-week-label').textContent,ws=S.shifts.filter(s=>s.week===wk);
   const restrictions=S.restrictions.filter(r=>r.week===wk).map(r=>`- ${r.text}`).join('\n')||'None';
+  const permaRules=(S.permaRestrictions||[]).map(r=>`- [${(CAT_LABELS[r.category]||r.category||'General').toUpperCase()}]${r.employee?' ('+r.employee+')':''} ${r.text}`).join('\n')||'None';
   const dates=getWeekDates('sch-weekdate');
   const forecastLines=dates.map((d,i)=>{const res=S.reservations[d]||{bookings:0,guests:0,grills:0};return`  ${DAYS_SHORT[i]} (${d}): ${res.bookings} bookings, ${res.guests} guests, ${res.grills} grills`;}).join('\n');
   const allSec=['SUSHI','KITCHEN','TEPPAN','SERVING'];
   const currentSched=allSec.map(sec=>{const row=DAYS_SHORT.map((_,i)=>{const cs=ws.filter(s=>s.section===sec&&s.dayIdx===i);return cs.length?cs.map(s=>s.time?`${s.name} ${s.time}`:s.name).join(', '):'—';});return`${sec}: ${row.join(' | ')}`;}).join('\n');
   const roster=S.employees.length?S.employees.map(e=>`- ${e.name} (${getEmpRoles(e).join('/')})`).join('\n'):(S.shifts.length?[...new Set(S.shifts.map(s=>s.name))].map(n=>`- ${n}`).join('\n'):'[No staff scheduled]');
   const offRequests=S.reqOffs.length?S.reqOffs.map(r=>{const t=r.timeFrom?` (${r.timeFrom}–${r.timeTo})`:'';return`- ${r.name}: ${r.dateFrom}${r.dateTo!==r.dateFrom?' → '+r.dateTo:''}${t}`;}).join('\n'):'None';
-  const p=`Create a weekly staff schedule for the week of ${wLabel||wk}.\n\nSTAFF ROSTER:\n${roster}\n\nROLES: TEPPAN, SUSHI, KITCHEN, SERVING\n\nCLOCK-IN FORMAT:\n- Opening = earliest shift. Half or 1/2 = starts mid-day.\n- Format: Name + time (e.g. "Kim 11", "Yang 1/2")\n\nCURRENT SCHEDULE:\n${currentSched}\n\nRESERVATION FORECAST (Hibachi):\n${forecastLines}\n\nRESTRICTIONS:\n${restrictions}\n\nTIME-OFF REQUESTS:\n${offRequests}\n\nSuggest changes based on restrictions and time-off requests. Consider day off on quiet days. Format as TEPPAN / SUSHI / KITCHEN / SERVING rows, MON–SUN columns.`;
+  const p=`Create a weekly staff schedule for the week of ${wLabel||wk}.\n\nSTAFF ROSTER:\n${roster}\n\nROLES: TEPPAN, SUSHI, KITCHEN, SERVING\n\nCLOCK-IN FORMAT:\n- Opening = earliest shift. Half or 1/2 = starts mid-day.\n- Format: Name + time (e.g. "Kim 11", "Yang 1/2")\n\nCURRENT SCHEDULE:\n${currentSched}\n\nRESERVATION FORECAST (Hibachi):\n${forecastLines}\n\nPERMANENT RULES (always apply every week):\n${permaRules}\n\nTHIS WEEK RESTRICTIONS:\n${restrictions}\n\nTIME-OFF REQUESTS:\n${offRequests}\n\nSuggest changes based on restrictions and time-off requests. Consider day off on quiet days. Format as TEPPAN / SUSHI / KITCHEN / SERVING rows, MON–SUN columns.`;
   document.getElementById('sch-prompt-txt').textContent=p;document.getElementById('sch-prompt-pn').style.display='block';showToast('Prompt ready ✓');
 };
 
