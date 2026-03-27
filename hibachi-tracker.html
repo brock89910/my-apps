@@ -1703,13 +1703,25 @@ async function unlockExport() {
 /* ── FIREBASE SUBSCRIPTION ── */
 let fbHistoryListener=null, auditLog={};
 
+// ── DEBOUNCED RENDER ─────────────────────────────────────────────────────
+// All 6 Firebase listeners call this instead of renderHibachi() directly.
+// Batches rapid successive calls into a single render ~50ms after the last one.
+var _renderDebounceTimer = null;
+function scheduleRender() {
+  if (_renderDebounceTimer) clearTimeout(_renderDebounceTimer);
+  _renderDebounceTimer = setTimeout(function() {
+    _renderDebounceTimer = null;
+    renderHibachi();
+  }, 50);
+}
+
 function subscribeToDate() {
   if (!window._db) return;
   const key = dateKey(currentDate);
   delete weekDataCache[key];
   if (fbListener) fbListener();
   fbListener=window._onValue(window._ref(window._db,`reservations/${key}`), snap=>{
-    reservations[key]=snap.val()||{}; renderHibachi();
+    reservations[key]=snap.val()||{}; scheduleRender();
   });
   if (fbDiningListener) fbDiningListener();
   fbDiningListener=window._onValue(window._ref(window._db,`dining/${key}`), snap=>{
@@ -1717,11 +1729,11 @@ function subscribeToDate() {
   });
   if (fbBlocksListener) fbBlocksListener();
   fbBlocksListener=window._onValue(window._ref(window._db,`blockedSlots/${key}`), snap=>{
-    blockedSlots[key]=snap.val()||{}; renderHibachi();
+    blockedSlots[key]=snap.val()||{}; scheduleRender();
   });
   if (fbCapsListener) fbCapsListener();
   fbCapsListener=window._onValue(window._ref(window._db,`slotCaps/${key}`), snap=>{
-    slotCaps[key]=snap.val()||{}; renderHibachi();
+    slotCaps[key]=snap.val()||{}; scheduleRender();
   });
   const mk=key.slice(0,7);
   if (fbHistoryListener) fbHistoryListener();
@@ -1739,7 +1751,7 @@ function subscribeToDate() {
       delete chefDayOverrideData[key];
     }
     renderChefRemovedBanner();
-    renderHibachi();
+    scheduleRender();
   });
 }
 
@@ -4190,24 +4202,28 @@ function sanitizeGuests(val) {
 }
 
 /* ── INIT ── */
-// init() runs after both DOM is ready AND Firebase auth has confirmed a logged-in user.
-// The fbReady event is now dispatched inside onAuthStateChanged (user truthy branch)
-// so _fbReady is always true by the time init() is called.
 function init() {
   updateLockoutUI();
-  // Only auto-focus the PIN field if the login screen is actually visible
   const loginScreen = document.getElementById('loginScreen');
   if (loginScreen && loginScreen.style.display !== 'none' && !isLockedOut()) {
     document.getElementById('staffPin')?.focus();
   }
 }
 
-// Wait for fbReady (which is now gated behind Firebase auth)
-if (window._fbReady) { init(); }
-else {
-  document.addEventListener('fbReady', init);
-  // No fallback focus timeout — we must wait for auth before doing anything
-}
+// ── RELIABLE fbReady HANDLER ──────────────────────────────────────────────
+// The module script's onAuthStateChanged may fire BEFORE or AFTER this
+// non-module script registers its listener — both cases are handled here.
+(function waitForFbReady() {
+  if (window._fbReady) { init(); return; }
+  var _done = false;
+  function onReady() { if (_done) return; _done = true; clearInterval(poll); init(); }
+  document.addEventListener('fbReady', onReady, { once: true });
+  // Poll fallback: if the event fired before this listener registered, catch it here
+  var poll = setInterval(function() {
+    if (window._fbReady) onReady();
+  }, 200);
+  setTimeout(function() { clearInterval(poll); }, 15000);
+})();
 
 setInterval(()=>{ if(activeTab==='hibachi') renderTimeSlots(); }, 60000);
 
