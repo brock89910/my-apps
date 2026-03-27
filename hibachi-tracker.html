@@ -1223,6 +1223,52 @@ body.staff-mode .real-name { display: inline; }
 
 <!-- ════ SCRIPT ════ -->
 <script>
+  const S = {...}
+
+  function showPage() {
+    ...
+  }
+
+  // your existing code...
+
+
+  // 👇 PASTE LOGIN CODE HERE 👇
+
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  function login() {
+    firebase.auth().signInWithPopup(provider)
+      .then((result) => {
+        console.log("Logged in:", result.user.email);
+        location.reload();
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  }
+
+  function logout() {
+    firebase.auth().signOut().then(() => {
+      location.reload();
+    });
+  }
+
+  firebase.auth().onAuthStateChanged((user) => {
+    if (!user) {
+      document.body.innerHTML = `
+        <div style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;">
+          <button onclick="login()" style="font-size:20px;padding:15px 25px;">
+            Login with Google
+          </button>
+        </div>
+      `;
+    } else {
+      console.log("User signed in:", user.email);
+    }
+  });
+
+</script>
+  <script>
 /* ── CHEF SCHEDULE ── */
 const CHEF_SCHEDULE = {
   0: [{ start:'12:00', end:'21:00', chefs:2 }],
