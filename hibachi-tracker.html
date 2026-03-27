@@ -10,15 +10,15 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, onValue, remove, push, get }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getDatabase, ref, set, onValue, remove, push, get }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   // ── SECURITY NOTE ─────────────────────────────────────────────
   // These credentials are scoped to this app's Firebase project.
   // Protect your database via Firebase Rules (not by hiding keys).
+  // Database rules should require auth.token.email to match approved emails.
   // See: https://firebase.google.com/docs/database/security
   // ──────────────────────────────────────────────────────────────
   const firebaseConfig = {
@@ -32,47 +32,90 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signO
     measurementId:     "G-MVT5RGJBLL"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-  const db  = getDatabase(app);
-  window._db  = db;
-  window._ref = ref;
-  window._set = set;
+  const app      = initializeApp(firebaseConfig);
+  const auth     = getAuth(app);
+  const provider = new GoogleAuthProvider();
+  const db       = getDatabase(app);
+
+  // Expose DB helpers to the non-module script (unchanged contract)
+  window._db      = db;
+  window._ref     = ref;
+  window._set     = set;
   window._onValue = onValue;
   window._remove  = remove;
   window._push    = push;
   window._get     = get;
-  window._fbReady = true;
-  document.dispatchEvent(new Event('fbReady'));
-function login() {
-  signInWithPopup(auth, provider)
-    .then((result) => {
-      console.log("Logged in:", result.user.email);
-      location.reload();
-    })
-    .catch((error) => {
-      alert(error.message);
+
+  // Expose auth actions to inline onclick handlers (module scope is isolated)
+  window._firebaseLogin = function () {
+    const btn = document.getElementById('googleSignInBtn');
+    const err = document.getElementById('googleSignInErr');
+    if (btn) { btn.disabled = true; btn.textContent = 'Signing in…'; }
+    if (err) err.textContent = '';
+    signInWithPopup(auth, provider)
+      .catch((error) => {
+        if (btn) { btn.disabled = false; btn.textContent = 'Sign in with Google'; }
+        if (err) {
+          // user_cancelled / popup-closed is not an error worth alarming
+          if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+            err.textContent = 'Sign-in cancelled.';
+          } else {
+            err.textContent = error.message;
+          }
+        }
+      });
+  };
+
+  window._firebaseLogout = function () {
+    signOut(auth).then(() => {
+      // Clear app state and show login screen
+      const app    = document.getElementById('app');
+      const login  = document.getElementById('loginScreen');
+      if (app)   app.style.display   = 'none';
+      if (login) login.style.display = '';
+      // Re-show the Google sign-in panel, reset PIN field
+      const googlePanel = document.getElementById('googleSignInPanel');
+      if (googlePanel) googlePanel.style.display = '';
+      const pinEl = document.getElementById('staffPin');
+      if (pinEl)  { pinEl.value = ''; pinEl.focus(); }
+      const gBtn = document.getElementById('googleSignInBtn');
+      if (gBtn) { gBtn.disabled = false; gBtn.textContent = 'Sign in with Google'; }
     });
-}
+  };
 
-function logout() {
-  signOut(auth).then(() => location.reload());
-}
+  // ── AUTH STATE GATE ────────────────────────────────────────────
+  // Nothing loads until Firebase confirms a signed-in user.
+  // The existing login screen (PIN + guest) stays visible while waiting.
+  // ──────────────────────────────────────────────────────────────
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // Authenticated — hide the Google sign-in panel (PIN flow takes over)
+      const googlePanel = document.getElementById('googleSignInPanel');
+      if (googlePanel) googlePanel.style.display = 'none';
 
-onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    document.body.innerHTML = `
-      <div style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;">
-        <button onclick="login()" style="font-size:20px;padding:15px 25px;">
-          Login with Google
-        </button>
-      </div>
-    `;
-  } else {
-    console.log("Signed in:", user.email);
-  }
-});
+      // Store current user email for history attribution if desired
+      window._currentUserEmail = user.email;
+
+      // Now signal that Firebase is ready and run init
+      if (!window._fbReady) {
+        window._fbReady = true;
+        document.dispatchEvent(new Event('fbReady'));
+      }
+    } else {
+      // Not authenticated — make sure login screen is visible and app is hidden
+      const appEl   = document.getElementById('app');
+      const loginEl = document.getElementById('loginScreen');
+      if (appEl)   appEl.style.display   = 'none';
+      if (loginEl) loginEl.style.display = '';
+
+      // Show the Google sign-in panel
+      const googlePanel = document.getElementById('googleSignInPanel');
+      if (googlePanel) googlePanel.style.display = '';
+
+      window._currentUserEmail = null;
+      window._fbReady = false;
+    }
+  });
 </script>
 
 <style>
@@ -1041,6 +1084,39 @@ body.staff-mode .real-name { display: inline; }
     <div class="login-note">
       Password required to create, edit, or view reservation details.
     </div>
+
+    <!-- ── GOOGLE SIGN-IN (required for Firebase access) ── -->
+    <div id="googleSignInPanel" style="width:100%;margin-top:16px;display:none">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span style="font-family:var(--mono);font-size:0.56rem;color:var(--text3);letter-spacing:0.1em;white-space:nowrap">STAFF AUTHENTICATION REQUIRED</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+      <div style="font-family:var(--mono);font-size:0.62rem;color:var(--text3);line-height:1.6;margin-bottom:12px;text-align:center">
+        Sign in with your approved Google account to access the reservation system.
+      </div>
+      <button id="googleSignInBtn"
+        onclick="window._firebaseLogin()"
+        style="width:100%;padding:12px 16px;
+               background:var(--bg2);
+               border:1px solid var(--border);
+               border-radius:var(--r);
+               color:var(--text);
+               font-family:var(--mono);font-size:0.75rem;font-weight:500;
+               letter-spacing:0.08em;text-transform:uppercase;
+               cursor:pointer;transition:all 0.15s;
+               display:flex;align-items:center;justify-content:center;gap:10px">
+        <svg width="16" height="16" viewBox="0 0 48 48" style="flex-shrink:0">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          <path fill="none" d="M0 0h48v48H0z"/>
+        </svg>
+        Sign in with Google
+      </button>
+      <div id="googleSignInErr" style="font-family:var(--mono);font-size:0.62rem;color:#c04040;min-height:14px;margin-top:8px;letter-spacing:0.04em;text-align:center"></div>
+    </div>
   </div>
 </div>
 
@@ -1057,6 +1133,16 @@ body.staff-mode .real-name { display: inline; }
       <div style="display:flex;align-items:center;gap:8px">
         <span id="modeIndicator"></span>
         <div class="live-dot" id="liveStatus">Live</div>
+        <button onclick="window._firebaseLogout()"
+          title="Sign out"
+          style="background:transparent;border:1px solid var(--border);border-radius:5px;
+                 color:var(--text3);font-family:var(--mono);font-size:0.58rem;
+                 letter-spacing:0.06em;padding:3px 8px;cursor:pointer;
+                 transition:all 0.15s;white-space:nowrap"
+          onmouseover="this.style.color='var(--red)';this.style.borderColor='rgba(224,64,64,0.4)'"
+          onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">
+          Sign out
+        </button>
       </div>
     </div>
     <div class="date-nav">
@@ -4150,15 +4236,23 @@ function sanitizeGuests(val) {
 }
 
 /* ── INIT ── */
+// init() runs after both DOM is ready AND Firebase auth has confirmed a logged-in user.
+// The fbReady event is now dispatched inside onAuthStateChanged (user truthy branch)
+// so _fbReady is always true by the time init() is called.
 function init() {
   updateLockoutUI();
-  if (!isLockedOut()) document.getElementById('staffPin')?.focus();
+  // Only auto-focus the PIN field if the login screen is actually visible
+  const loginScreen = document.getElementById('loginScreen');
+  if (loginScreen && loginScreen.style.display !== 'none' && !isLockedOut()) {
+    document.getElementById('staffPin')?.focus();
+  }
 }
 
+// Wait for fbReady (which is now gated behind Firebase auth)
 if (window._fbReady) { init(); }
 else {
   document.addEventListener('fbReady', init);
-  setTimeout(()=>{ if(!window._fbReady) document.getElementById('staffPin')?.focus(); },2000);
+  // No fallback focus timeout — we must wait for auth before doing anything
 }
 
 setInterval(()=>{ if(activeTab==='hibachi') renderTimeSlots(); }, 60000);
