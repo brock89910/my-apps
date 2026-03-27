@@ -10,8 +10,11 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, set, onValue, remove, push, get }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, set, onValue, remove, push, get }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   // ── SECURITY NOTE ─────────────────────────────────────────────
   // These credentials are scoped to this app's Firebase project.
@@ -30,6 +33,8 @@
   };
 
   const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
   const db  = getDatabase(app);
   window._db  = db;
   window._ref = ref;
@@ -40,6 +45,34 @@
   window._get     = get;
   window._fbReady = true;
   document.dispatchEvent(new Event('fbReady'));
+function login() {
+  signInWithPopup(auth, provider)
+    .then((result) => {
+      console.log("Logged in:", result.user.email);
+      location.reload();
+    })
+    .catch((error) => {
+      alert(error.message);
+    });
+}
+
+function logout() {
+  signOut(auth).then(() => location.reload());
+}
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    document.body.innerHTML = `
+      <div style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;">
+        <button onclick="login()" style="font-size:20px;padding:15px 25px;">
+          Login with Google
+        </button>
+      </div>
+    `;
+  } else {
+    console.log("Signed in:", user.email);
+  }
+});
 </script>
 
 <style>
