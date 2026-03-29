@@ -938,13 +938,14 @@ window.copyEl=function(id){var el=document.getElementById(id);if(el)navigator.cl
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getFirestore,collection,addDoc,getDocs,deleteDoc,doc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import{getDatabase,ref,get}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import{getAuth,signInAnonymously}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const appMgr=initializeApp({apiKey:"AIzaSyDMVt5s2loFohJDoTMImzAq_gKl61fZf1g",authDomain:"manager-overlook.firebaseapp.com",projectId:"manager-overlook",storageBucket:"manager-overlook.firebasestorage.app",messagingSenderId:"64302920866",appId:"1:64302920866:web:5dd1f24f6e1211458413fb"},'manager');
 const db=getFirestore(appMgr);
 const appRes=initializeApp({apiKey:"AIzaSyCMXA2a4RUUNuzmTz1QxdJbIciICojLjA8",authDomain:"restaurant599-b5595.firebaseapp.com",databaseURL:"https://restaurant599-b5595-default-rtdb.firebaseio.com",projectId:"restaurant599-b5595",storageBucket:"restaurant599-b5595.firebasestorage.app",messagingSenderId:"141750935511",appId:"1:141750935511:web:8ad37806a7d9a70a8e7592"},'reservations');
 const resDb=getDatabase(appRes);
-const resAuth = getAuth(appRes);
-signInAnonymously(resAuth);
+const resAuth=getAuth(appRes);
+await signInAnonymously(resAuth);
 const S={bills:[],shifts:[],cleanLogs:[],restrictions:[],reservations:{},reqOffs:[],employees:[],clTasks:[],vendors:[],priceItems:[],permaRestrictions:[]};
 const DAYS_SHORT=['MON','TUE','WED','THU','FRI','SAT','SUN'];
 const COOK_SECTIONS=['SUSHI','KITCHEN','TEPPAN'];
