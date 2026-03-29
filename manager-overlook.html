@@ -943,7 +943,8 @@ const appMgr=initializeApp({apiKey:"AIzaSyDMVt5s2loFohJDoTMImzAq_gKl61fZf1g",aut
 const db=getFirestore(appMgr);
 const appRes=initializeApp({apiKey:"AIzaSyCMXA2a4RUUNuzmTz1QxdJbIciICojLjA8",authDomain:"restaurant599-b5595.firebaseapp.com",databaseURL:"https://restaurant599-b5595-default-rtdb.firebaseio.com",projectId:"restaurant599-b5595",storageBucket:"restaurant599-b5595.firebasestorage.app",messagingSenderId:"141750935511",appId:"1:141750935511:web:8ad37806a7d9a70a8e7592"},'reservations');
 const resDb=getDatabase(appRes);
-
+const resAuth = getAuth(appRes);
+signInAnonymously(resAuth);
 const S={bills:[],shifts:[],cleanLogs:[],restrictions:[],reservations:{},reqOffs:[],employees:[],clTasks:[],vendors:[],priceItems:[],permaRestrictions:[]};
 const DAYS_SHORT=['MON','TUE','WED','THU','FRI','SAT','SUN'];
 const COOK_SECTIONS=['SUSHI','KITCHEN','TEPPAN'];
