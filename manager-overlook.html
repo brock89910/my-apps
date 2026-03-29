@@ -6,6 +6,8 @@
 <title>OVERLOOK — OPS</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  .chip-warn{border-color:rgba(208,72,40,.5)!important;background:rgba(208,72,40,.1)!important}
+.chip-warn-ico{color:#e87858;font-size:.65rem;flex-shrink:0}
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
 --bg:#0a0908;--bg2:#0f0e0c;--surface:#141310;--s2:#1a1916;--s3:#201f1c;
@@ -705,6 +707,12 @@ tr:hover td{background:rgba(232,160,32,.03)}
 
 <!-- MODALS -->
 <div class="mb" id="shift-modal"><div class="mo">
+  <div id="sh-warn-box" style="display:none;background:rgba(208,72,40,.1);border:1px solid rgba(208,72,40,.3);border-radius:var(--r);padding:10px 12px;margin-top:10px">
+  <div id="sh-warn-txt" style="font-size:.78rem;color:#e87858;margin-bottom:8px"></div>
+  <label style="display:flex;align-items:center;gap:8px;font-size:.76rem;cursor:pointer">
+    <input type="checkbox" id="sh-force-override" style="accent-color:var(--amber)"> Force add anyway
+  </label>
+</div>
 <h3>Add to Schedule</h3>
 <p style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.07em" id="shift-cell-label"></p>
 <div style="display:grid;gap:10px">
@@ -1379,12 +1387,58 @@ window.delBill=async function(id){if(!confirm('Delete?'))return;await fsDel('bil
 
 // ── SCHEDULE ──
 let pendingCell=null;
+
+// Parse restrictions to extract blocked employee+day combos
+function parseRestrictionBlocks(){
+  const wk=getWeekKey();
+  const blocked=[]; // [{name,dayIdx}]
+  const allR=[...S.restrictions.filter(r=>r.week===wk),...(S.permaRestrictions||[])];
+  const dayMap={mon:0,tue:1,wed:2,thu:3,fri:4,sat:5,sun:6,monday:0,tuesday:1,wednesday:2,thursday:3,friday:4,saturday:5,sunday:6};
+  allR.forEach(r=>{
+    const txt=(r.text||'').toLowerCase();
+    // Match patterns like "kim off friday" / "kim never saturday" / "kim no sunday"
+    const dayMatch=Object.keys(dayMap).find(d=>txt.includes(d));
+    if(!dayMatch)return;
+    const dayIdx=dayMap[dayMatch];
+    // Try to find employee name: check against roster first, else grab first word
+    let empName=r.employee||'';
+    if(!empName){
+      S.employees.forEach(e=>{if(txt.includes(e.name.toLowerCase()))empName=e.name;});
+    }
+    if(!empName){
+      // fallback: first capitalized-looking token before the day keyword
+      const words=r.text.trim().split(/\s+/);
+      if(words.length>0)empName=words[0];
+    }
+    if(empName)blocked.push({name:empName.toLowerCase(),dayIdx});
+  });
+  // Also parse reqOffs that overlap this week
+  const weekDates=getWeekDates('sch-weekdate');
+  S.reqOffs.forEach(r=>{
+    if(!r.dateFrom||!r.name)return;
+    const from=r.dateFrom,to=r.dateTo||r.dateFrom;
+    weekDates.forEach((date,idx)=>{
+      if(date>=from&&date<=to)blocked.push({name:r.name.toLowerCase(),dayIdx:idx});
+    });
+  });
+  return blocked;
+}
+
+function checkRestrictionViolation(empName,dayIdx){
+  const blocked=parseRestrictionBlocks();
+  return blocked.find(b=>b.name===empName.toLowerCase()&&b.dayIdx===dayIdx)||null;
+}
+
 function shiftSortKey(time){
   const t=(time||'').trim().toLowerCase();
-  if(!t)return 0; // name only = first
-  if(t==='half'||t==='1/2')return 1; // half = second
-  return 2; // everything else = last
+  if(!t)return 0;
+  if(t==='half'||t==='1/2')return 1;
+  return 2;
 }
+
+// Section print order: determines employee row order in print sheet (roster order, not time-based for kitchen+sushi)
+const SECTION_PRINT_ORDER=['SUSHI','KITCHEN','TEPPAN'];
+
 function buildScheduleGrid(tableId,sections){
   const wk=getWeekKey(),ws=S.shifts.filter(s=>s.week===wk);
   const v=document.getElementById('sch-weekdate').value,mon=v?new Date(v+'T12:00:00'):new Date();
@@ -1401,7 +1455,12 @@ function buildScheduleGrid(tableId,sections){
       html+=`<td onclick="window.handleCellClick('${sec}',${di})">`;
       cs.forEach(sh=>{
         const cc2=chipClass(sec);
-        html+=`<div class="sg-chip ${cc2}"><span class="cn">${sh.name}</span>${sh.time?`<span class="ct">${sh.time}</span>`:''}<button class="cx" onclick="event.stopPropagation();window.delShift('${sh.id}')">✕</button></div>`;
+        const hasViolation=checkRestrictionViolation(sh.name,di);
+        html+=`<div class="sg-chip ${cc2}${hasViolation?' chip-warn':''}" title="${hasViolation?'⚠ Restriction: '+hasViolation.name+' this day':''}">
+          <span class="cn">${sh.name}</span>${sh.time?`<span class="ct">${sh.time}</span>`:''}
+          ${hasViolation?'<span class="chip-warn-ico">⚠</span>':''}
+          <button class="cx" onclick="event.stopPropagation();window.delShift('${sh.id}')">✕</button>
+        </div>`;
       });
       html+=`<div class="sg-add">+</div></td>`;
     });
@@ -1410,6 +1469,7 @@ function buildScheduleGrid(tableId,sections){
   html+='</tbody>';
   document.getElementById(tableId).innerHTML=html;
 }
+
 function renderSchedule(){
   buildScheduleGrid('sg-kitchen',['SUSHI','KITCHEN','TEPPAN']);
   buildScheduleGrid('sg-serving',['SERVING']);
@@ -1421,7 +1481,6 @@ function renderStaffQuickPanel(){
   const panel=document.getElementById('staff-quick-chips');
   if(!panel)return;
   if(!S.employees.length){panel.innerHTML='<span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">No employees — add them in the Employees tab</span>';return;}
-  // Group by primary role
   const groups={TEPPAN:[],SUSHI:[],KITCHEN:[],SERVICE:[]};
   S.employees.forEach(emp=>{
     const roles=getEmpRoles(emp);
@@ -1433,7 +1492,6 @@ function renderStaffQuickPanel(){
   let html='';
   Object.entries(groups).forEach(([role,emps])=>{
     if(!emps.length)return;
-    // Deduplicate by id
     const seen=new Set();const uniq=emps.filter(e=>{if(seen.has(e.id))return false;seen.add(e.id);return true;});
     html+=`<div class="quick-add-section"><div class="quick-add-section-label">${roleLabels[role]}</div><div style="display:flex;flex-wrap:wrap;gap:5px">`;
     html+=uniq.map(emp=>{
@@ -1452,51 +1510,55 @@ window.selectQuickEmp=function(empId,role){
     quickAddEmp=null;showToast('Selection cleared');
   }else{
     quickAddEmp={id:empId,name:emp.name,role};
-    showToast(`Selected: ${emp.name} (${role}) — tap a schedule cell`);
+    showToast(`${emp.name} selected — tap a day cell to slot in`);
   }
   renderStaffQuickPanel();
 };
 
+// Inline cell picker — shows directly in the cell instead of a modal
 window.handleCellClick=function(section,dayIdx){
   if(quickAddEmp){
-    // Quick-add mode: open quick-shift modal
-    pendingQuickCell={section,dayIdx};
-    document.getElementById('qs-name-label').textContent=quickAddEmp.name;
-    document.getElementById('qs-cell-label').textContent=`${section} — ${DAYS_SHORT[dayIdx]}`;
-    // Populate section dropdown with employee's roles mapped to sections
-    const emp=S.employees.find(e=>e.id===quickAddEmp.id);
-    const roles=emp?getEmpRoles(emp):[quickAddEmp.role];
-    const secEl=document.getElementById('qs-section');
-    secEl.innerHTML='';
-    const allSecs=['TEPPAN','SUSHI','KITCHEN','SERVING'];
-    // Preferred: map role to section. SERVICE→SERVING
-    const mappedSecs=roles.map(r=>r==='SERVICE'?'SERVING':r);
-    const defaultSec=section;
-    allSecs.forEach(sec=>{
-      const opt=document.createElement('option');opt.value=sec;opt.textContent=sec;
-      if(sec===defaultSec)opt.selected=true;
-      secEl.appendChild(opt);
+    // Restriction check first
+    const violation=checkRestrictionViolation(quickAddEmp.name,dayIdx);
+    if(violation&&!quickAddEmp.forceOverride){
+      // Show warning inline — ask for confirmation before adding
+      const warnKey=`warn_${quickAddEmp.id}_${dayIdx}`;
+      if(!window._warnShown||window._warnShown!==warnKey){
+        window._warnShown=warnKey;
+        showToast(`⚠ ${quickAddEmp.name} has a restriction this day — tap again to force add`,4000);
+        quickAddEmp={...quickAddEmp,forceOverride:true};
+        renderStaffQuickPanel();
+        return;
+      }
+    }
+    window._warnShown=null;
+    // Direct add — no modal needed for quick-add
+    _doAddShift(section,dayIdx,quickAddEmp.name,'').then(()=>{
+      const wasForce=quickAddEmp&&quickAddEmp.forceOverride;
+      quickAddEmp=null;
+      renderSchedule();
+      showToast(wasForce?`${section}: added (override) ✓`:`Added ✓`);
     });
-    document.getElementById('qs-time').value='';
-    document.getElementById('qs-custom-wrap').style.display='none';
-    document.getElementById('qs-time').onchange=function(){document.getElementById('qs-custom-wrap').style.display=this.value==='custom'?'block':'none';};
-    openModal('quick-shift-modal');
   }else{
-    // Normal shift modal
+    // No employee selected — open inline time picker if cell clicked directly
     window.openShiftModal(section,dayIdx);
   }
 };
+
+async function _doAddShift(section,dayIdx,name,time){
+  const sh={week:getWeekKey(),section,dayIdx,name,time:time||''};
+  sh.id=await fsAdd('shifts',sh);S.shifts.push(sh);
+}
 
 window.confirmQuickShift=async function(){
   if(!pendingQuickCell||!quickAddEmp)return;
   const section=document.getElementById('qs-section').value;
   let time=document.getElementById('qs-time').value;
   if(time==='custom')time=document.getElementById('qs-custom').value.trim();
-  const sh={week:getWeekKey(),section,dayIdx:pendingQuickCell.dayIdx,name:quickAddEmp.name,time:time||''};
-  sh.id=await fsAdd('shifts',sh);S.shifts.push(sh);
+  await _doAddShift(section,pendingQuickCell.dayIdx,quickAddEmp.name,time);
   closeModal('quick-shift-modal');
   quickAddEmp=null;
-  renderSchedule();showToast(`${sh.name} added to ${section} ✓`);
+  renderSchedule();showToast('Added ✓');
 };
 
 window.openShiftModal=function(section,dayIdx){
@@ -1510,8 +1572,20 @@ window.openShiftModal=function(section,dayIdx){
 window.confirmAddShift=async function(){
   const name=document.getElementById('sh-name').value.trim();if(!name){showToast('Enter a name');return;}
   let time=document.getElementById('sh-time').value;if(time==='custom')time=document.getElementById('sh-custom').value.trim();
-  const sh={week:getWeekKey(),section:pendingCell.section,dayIdx:pendingCell.dayIdx,name,time:time||''};
-  sh.id=await fsAdd('shifts',sh);S.shifts.push(sh);closeModal('shift-modal');renderSchedule();showToast('Added ✓');
+  // Restriction check
+  const violation=checkRestrictionViolation(name,pendingCell.dayIdx);
+  if(violation){
+    if(!document.getElementById('sh-force-override')?.checked){
+      document.getElementById('sh-warn-box').style.display='block';
+      document.getElementById('sh-warn-txt').textContent=`⚠ Restriction found for ${name} on ${DAYS_SHORT[pendingCell.dayIdx]} — check override to force add.`;
+      return;
+    }
+  }
+  await _doAddShift(pendingCell.section,pendingCell.dayIdx,name,time);
+  closeModal('shift-modal');
+  document.getElementById('sh-warn-box').style.display='none';
+  if(document.getElementById('sh-force-override'))document.getElementById('sh-force-override').checked=false;
+  renderSchedule();showToast('Added ✓');
 };
 window.delShift=async function(id){await fsDel('shifts',id);S.shifts=S.shifts.filter(s=>s.id!==id);renderSchedule();};
 window.addRestriction=async function(){
@@ -1560,7 +1634,6 @@ function renderPermaRestrictions(){
   const container=document.getElementById('perma-restrict-list');
   if(!container)return;
   if(!list.length){container.innerHTML='<span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">// No permanent rules yet</span>';return;}
-  // Group by category
   const groups={};list.forEach(r=>{const c=r.category||'other';if(!groups[c])groups[c]=[];groups[c].push(r);});
   let html='';
   Object.entries(groups).forEach(([cat,rules])=>{
@@ -1766,23 +1839,44 @@ window.printScheduleSheet=function(){
   const thRow=dates.map(h=>`<th><div class="dname">${h.day}</div><div class="ddate">${h.date}</div></th>`).join('');
 
   // Build rows for a set of sections
-  function buildSectionRows(sections){
+ function buildSectionRows(sections){
     let html='';
-    sections.forEach(sec=>{
-      const cols={SUSHI:'#1565a0',KITCHEN:'#7a5800',TEPPAN:'#8a2800',SERVING:'#5a2a9a'};
-      const bgs={SUSHI:'#deeef8',KITCHEN:'#fdf3d0',TEPPAN:'#fde8dc',SERVING:'#ede0f8'};
+    // Use SECTION_PRINT_ORDER to ensure SUSHI→KITCHEN→TEPPAN
+    const orderedSections=SECTION_PRINT_ORDER.filter(s=>sections.includes(s));
+    orderedSections.forEach(sec=>{
+      const cols={SUSHI:'#1565a0',KITCHEN:'#7a5800',TEPPAN:'#8a2800'};
+      const bgs={SUSHI:'#deeef8',KITCHEN:'#fdf3d0',TEPPAN:'#fde8dc'};
       const col=cols[sec]||'#222',bg=bgs[sec]||'#f5f5f5';
-      let maxSlots=1;
-      for(let di=0;di<7;di++){const cnt=ws.filter(s=>s.section===sec&&s.dayIdx===di).length;if(cnt>maxSlots)maxSlots=cnt;}
-      maxSlots=Math.max(maxSlots,4);
-      for(let row=0;row<maxSlots;row++){
+      // Build per-day: group employees by time slot, ordered by roster position
+      const rosterOrder=S.employees.map(e=>e.name);
+      const getRosterIdx=name=>{const i=rosterOrder.findIndex(n=>n.toLowerCase()===name.toLowerCase());return i<0?999:i;};
+      // Collect all unique time slots per day, then group names sharing same slot
+      let maxRows=4;
+      // Pre-calc rows per day as groups of same-time people
+      const dayGroups=[];
+      for(let di=0;di<7;di++){
+        const dayShifts=ws.filter(s=>s.section===sec&&s.dayIdx===di)
+          .sort((a,b)=>getRosterIdx(a.name)-getRosterIdx(b.name));
+        // Group by time: people with same time share a cell row
+        const timeMap=new Map();
+        dayShifts.forEach(sh=>{
+          const t=sh.time||'';
+          if(!timeMap.has(t))timeMap.set(t,[]);
+          timeMap.get(t).push(sh.name);
+        });
+        // Flatten: each time slot = one row entry (names joined with /)
+        const rows=[...timeMap.entries()].map(([t,names])=>({time:t,label:names.join(' / ')+(t?` ${t}`:'')}));
+        dayGroups.push(rows);
+        if(rows.length>maxRows)maxRows=rows.length;
+      }
+      maxRows=Math.max(maxRows,4);
+      for(let row=0;row<maxRows;row++){
         html+=`<tr>`;
-        if(row===0) html+=`<td class="sec-lbl" rowspan="${maxSlots}" style="color:${col};background:${bg};border-left:6px solid ${col}">${sec}</td>`;
+        if(row===0)html+=`<td class="sec-lbl" rowspan="${maxRows}" style="color:${col};background:${bg};border-left:6px solid ${col}">${sec}</td>`;
         for(let di=0;di<7;di++){
-          const shifts=ws.filter(s=>s.section===sec&&s.dayIdx===di).sort((a,b)=>shiftSortKey(a.time)-shiftSortKey(b.time));
-          const sh=shifts[row];
-          html+=sh
-            ?`<td class="cell filled"><span class="sname">${sh.name}</span>${sh.time?`<span class="stime">${sh.time}</span>`:''}</td>`
+          const entry=dayGroups[di][row];
+          html+=entry
+            ?`<td class="cell filled"><span class="sname">${entry.label}</span></td>`
             :`<td class="cell empty"></td>`;
         }
         html+=`</tr>`;
@@ -1791,7 +1885,6 @@ window.printScheduleSheet=function(){
     });
     return html;
   }
-
   // Serving with AM/PM split
   function buildServingRows(){
     const all=ws.filter(s=>s.section==='SERVING');
