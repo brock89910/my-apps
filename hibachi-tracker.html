@@ -2391,10 +2391,6 @@ function printDailySheet() {
   const hibachi=allRes.slice().sort((a,b)=>(a.slot||'').localeCompare(b.slot||''));
   const dining=allDining.slice().sort((a,b)=>(a.time||'').localeCompare(b.time||''));
   const dateStr=currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-  const totalHGrp=hibachi.length;
-  const totalHGuests=hibachi.reduce((s,r)=>s+(r.guests||0),0);
-  const totalDGrp=dining.length;
-  const totalDGuests=dining.reduce((s,r)=>s+(r.guests||0),0);
 
   // Group hibachi by slot, sorted guests desc within each slot
   const hSlotGroups={};
@@ -2410,41 +2406,34 @@ function printDailySheet() {
   const allSlots=[...new Set([...hSlots,...Object.keys(dTimeGroups)])].sort();
 
   const css=`*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Mono',Courier,monospace;font-size:14px;color:#111;background:#fff;padding:28px;max-width:920px;margin:0 auto}
-.page-title{font-family:Georgia,serif;font-size:22px;font-weight:700;margin-bottom:3px}
-.page-sub{font-size:12px;color:#555;margin-bottom:18px}
-table{width:100%;border-collapse:collapse;margin-bottom:12px}
-th{text-align:left;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#555;padding:8px 8px;border-bottom:2px solid #111}
-th.divider-col{border-left:2px solid #999;padding-left:12px}
-td{padding:10px 8px;border-bottom:1px solid #ddd;vertical-align:middle;font-size:14px}
-tr.slot-row td{background:#e8e8e8;font-weight:700;font-size:15px;color:#222;padding:6px 10px}
-tr.data-row-even td{background:#fff}
-tr.data-row-odd td{background:#f8f8f8}
-tr.large-hl td{background:#d6eaff!important;font-weight:700}
-.guests-bold{font-weight:700;font-size:15px}
-.grill-cell{font-weight:700;font-size:14px;color:#333}
-.divider-col{border-left:2px solid #999;padding-left:12px!important}
-.din-name{font-size:13px;color:#333}
-.din-guests{font-size:12px;color:#666;font-weight:600}
-.badge{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;margin-left:4px}
-.allergy{background:#fee;color:#c00;border:1px solid #faa}
-.restriction{background:#fff8e1;color:#a60;border:1px solid #fcc}
-.note-text{font-size:12px;color:#555;font-style:italic;margin-top:2px}
-.total{font-size:13px;font-weight:700;margin-top:10px;margin-bottom:6px;padding:9px 12px;background:#f5f5f5;border:1px solid #ddd}
-.footer{margin-top:24px;font-size:10px;color:#aaa;border-top:1px solid #eee;padding-top:8px;display:flex;justify-content:space-between}
-@media print{body{padding:14px}@page{size:letter portrait;margin:12mm}}`;
+body{font-family:'DM Mono','Courier New',monospace;font-size:12px;color:#111;background:#fff;padding:28px;max-width:960px;margin:0 auto}
+.page-title{font-family:Georgia,serif;font-size:17px;font-weight:700;text-align:center;margin-bottom:14px;letter-spacing:0.03em}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+col.cg{width:30px}col.cn{width:auto}col.cp{width:120px}col.cgr{width:28px}col.cdg{width:28px}col.cdn{width:150px}col.cdp{width:108px}
+thead th{font-family:'DM Mono','Courier New',monospace;font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#555;padding:5px 6px;border-bottom:2px solid #111;text-align:left;white-space:nowrap}
+th.th-dining{border-left:2.5px solid #888;padding-left:9px}
+tr.slot-row td{background:#e6e6e6;color:#666;font-family:Georgia,serif;font-size:13px;font-weight:600;padding:3px 8px;letter-spacing:0.03em;border-top:1px solid #ccc;border-bottom:1px solid #ccc}
+tr.data-row td{padding:6px 6px;border-bottom:1px solid #e4e4e4;vertical-align:middle;font-size:12px;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+tr.dr-even td{background:#fff}
+tr.dr-odd td{background:#f7f7f7}
+tr.large-hl td{background:#ddeeff!important;font-weight:700}
+.num{font-weight:700;font-size:13px;display:block;text-align:right;padding-right:4px}
+.hname{font-size:12px;font-weight:600}
+.badge{display:inline-block;font-size:8px;font-weight:700;padding:0 4px;border-radius:2px;margin-left:4px;vertical-align:middle;letter-spacing:0.04em}
+.badge-a{background:#fee;color:#c00;border:1px solid #faa}
+.badge-r{background:#fff8e1;color:#a60;border:1px solid #fcc}
+.note-inline{font-size:9px;color:#777;font-style:italic;margin-left:5px}
+.gr{font-size:10px;font-weight:700;color:#444;display:block;text-align:center}
+td.d-start{border-left:2.5px solid #999;padding-left:9px!important}
+.dnum{font-weight:700;font-size:13px;display:block;text-align:right;padding-right:4px}
+.dname{font-size:12px;font-weight:600;color:#222}
+.dphone{font-size:11px;color:#555}
+@media print{body{padding:0}@page{size:letter portrait;margin:11mm 12mm}tr{page-break-inside:avoid}}`;
 
   let html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Daily Sheet \u2014 ${dateStr}</title><style>${css}</style></head><body>`;
-  html+=`<div class="page-title">OSAKA HIBACHI</div>`;
-  html+=`<div class="page-sub">${dateStr} &nbsp;\u00b7&nbsp; Hibachi: ${totalHGrp} group${totalHGrp!==1?'s':''} \u00b7 ${totalHGuests} guests &nbsp;\u00b7&nbsp; Dining: ${totalDGrp} group${totalDGrp!==1?'s':''} \u00b7 ${totalDGuests} guests</div>`;
-
-  html+=`<table><thead><tr>
-    <th style="width:36px">#</th>
-    <th>Name</th>
-    <th style="width:150px">Phone</th>
-    <th style="width:44px">G</th>
-    <th class="divider-col" style="width:170px">Dining</th>
-  </tr></thead><tbody>`;
+  html+=`<div class="page-title">${dateStr}</div>`;
+  html+=`<table><colgroup><col class="cg"><col class="cn"><col class="cp"><col class="cgr"><col class="cdg"><col class="cdn"><col class="cdp"></colgroup>`;
+  html+=`<thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Gr.</th><th class="th-dining">#</th><th>Dining Name</th><th>Phone</th></tr></thead><tbody>`;
 
   let rowParity=0;
   allSlots.forEach(slot=>{
@@ -2453,15 +2442,15 @@ tr.large-hl td{background:#d6eaff!important;font-weight:700}
     const rowCount=Math.max(hRows.length,dRows.length,1);
     const slotLabel=slot!=='?'?displayTime(slot):slot;
 
-    html+=`<tr class="slot-row"><td colspan="5">${slotLabel}</td></tr>`;
+    html+=`<tr class="slot-row"><td colspan="7">${slotLabel}</td></tr>`;
     rowParity=0;
 
     for(let i=0;i<rowCount;i++){
       const r=hRows[i]||null;
       const d=dRows[i]||null;
-      const shade=rowParity%2===0?'data-row-even':'data-row-odd';
+      const shade=rowParity%2===0?'dr-even':'dr-odd';
       const isLarge=r&&(r.guests||0)>=15;
-      const rowCls=isLarge?'large-hl':shade;
+      const rowCls='data-row '+(isLarge?'large-hl':shade);
 
       // hibachi cells
       let guestCell='<td></td>';
@@ -2469,33 +2458,35 @@ tr.large-hl td{background:#d6eaff!important;font-weight:700}
       let phoneCell='<td></td>';
       let grillCell='<td></td>';
       if(r){
-        const nb=r.noteType==='allergy'?'<span class="badge allergy">ALLERGY</span>':r.noteType==='restriction'?'<span class="badge restriction">RESTR.</span>':'';
-        const nd=(r.noteType==='allergy'||r.noteType==='restriction')&&r.noteText?`<div class="note-text">${escHtml(r.noteText)}</div>`:'';
+        const grillStr=r.isDouble?`${r.grill}+${r.grill2}`:(r.grill||'G');
+        const nb=r.noteType==='allergy'?'<span class="badge badge-a">ALLERGY</span>':r.noteType==='restriction'?'<span class="badge badge-r">RESTR.</span>':'';
         let noteInline='';
-        if(!nb&&r.noteType&&r.noteText) noteInline=`<div class="note-text">${escHtml(r.noteText)}</div>`;
-        else if(!nb&&r.noteType&&!r.noteText) noteInline=`<div class="note-text">${escHtml(r.noteType==='chef'?'Chef req':r.noteType==='table'?'Table req':'')}</div>`;
-        guestCell=`<td class="guests-bold">${r.guests||'?'}</td>`;
-        nameCell=`<td>${escHtml(r.name||'Guest')}${nb}${nd}${noteInline}</td>`;
+        if(r.noteText&&(r.noteType==='allergy'||r.noteType==='restriction')) noteInline=`<span class="note-inline">${escHtml(r.noteText)}</span>`;
+        else if(r.noteType==='chef'&&r.noteText) noteInline=`<span class="note-inline">${escHtml(r.noteText)}</span>`;
+        else if(r.noteType==='table'&&r.noteText) noteInline=`<span class="note-inline">${escHtml(r.noteText)}</span>`;
+        else if(r.noteType&&r.noteText) noteInline=`<span class="note-inline">${escHtml(r.noteText)}</span>`;
+        guestCell=`<td><span class="num">${r.guests||'?'}</span></td>`;
+        nameCell=`<td><span class="hname">${escHtml(r.name||'Guest')}${nb}${noteInline}</span></td>`;
         phoneCell=`<td>${escHtml(r.phone||'')}</td>`;
-        grillCell=`<td class="grill-cell">G</td>`;
+        grillCell=`<td><span class="gr">${escHtml(grillStr)}</span></td>`;
       }
 
-      // dining cell — name + guests only, no phone
-      let dinCell=`<td class="divider-col"></td>`;
+      // dining cells
+      let dGuestCell=`<td class="d-start"></td>`;
+      let dNameCell=`<td></td>`;
+      let dPhoneCell=`<td></td>`;
       if(d){
-        dinCell=`<td class="divider-col"><span class="din-name">${escHtml(d.name||'Guest')}</span> <span class="din-guests">${d.guests||'?'}</span></td>`;
+        dGuestCell=`<td class="d-start"><span class="dnum">${d.guests||'?'}</span></td>`;
+        dNameCell=`<td><span class="dname">${escHtml(d.name||'Guest')}</span></td>`;
+        dPhoneCell=`<td><span class="dphone">${escHtml(d.phone||'')}</span></td>`;
       }
 
-      html+=`<tr class="${rowCls}">${guestCell}${nameCell}${phoneCell}${grillCell}${dinCell}</tr>`;
+      html+=`<tr class="${rowCls}">${guestCell}${nameCell}${phoneCell}${grillCell}${dGuestCell}${dNameCell}${dPhoneCell}</tr>`;
       rowParity++;
     }
   });
 
-  html+=`</tbody></table>`;
-  html+=`<div class="total">Hibachi: ${totalHGrp} group${totalHGrp!==1?'s':''} \u00b7 ${totalHGuests} guests &nbsp;&nbsp;|\u00a0&nbsp; Dining: ${totalDGrp} group${totalDGrp!==1?'s':''} \u00b7 ${totalDGuests} guests</div>`;
-  const now=new Date().toLocaleDateString('en-CA',{year:'numeric',month:'2-digit',day:'2-digit'});
-  html+=`<div class="footer"><span>Generated ${now} \u00b7 Osaka Hibachi \u00b7 Phone: last 4 digits only</span><span>Hibachi ${totalHGrp} grp / ${totalHGuests}g \u00b7 Dining ${totalDGrp} grp / ${totalDGuests}g</span></div>`;
-  html+=`</body></html>`;
+  html+=`</tbody></table></body></html>`;
 
   const win=window.open('','_blank');
   if(win){win.document.write(html);win.document.close();win.focus();setTimeout(()=>win.print(),400);}
