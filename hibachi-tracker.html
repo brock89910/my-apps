@@ -1336,6 +1336,36 @@ body.staff-mode .real-name { display: inline; }
       <div class="modal-title" id="modalTitle">New Reservation</div>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
+    <!-- ── MOVE RESERVATION SECTION ── hidden until editing an existing res -->
+    <div id="transferSection" style="display:none;padding:10px 16px 0;border-bottom:1px solid var(--border2)">
+      <div style="font-family:var(--mono);font-size:0.62rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px">Move to a Different Slot</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px">
+        <div style="flex:1;min-width:130px">
+          <label style="font-family:var(--mono);font-size:0.65rem;color:var(--text2);display:block;margin-bottom:4px">Date</label>
+          <input class="form-input" type="date" id="moveDate" style="padding:8px 10px;font-size:0.85rem">
+        </div>
+        <div style="flex:1;min-width:130px">
+          <label style="font-family:var(--mono);font-size:0.65rem;color:var(--text2);display:block;margin-bottom:4px">Time</label>
+          <select class="form-select" id="moveTime" style="padding:8px 10px;font-size:0.85rem">
+            <option value="16:30">4:30</option>
+            <option value="17:00">5:00</option>
+            <option value="17:30">5:30</option>
+            <option value="18:00">6:00</option>
+            <option value="18:30">6:30</option>
+            <option value="19:00">7:00</option>
+            <option value="19:30">7:30</option>
+            <option value="20:00">8:00</option>
+            <option value="20:30">8:30</option>
+            <option value="21:00">9:00</option>
+          </select>
+        </div>
+        <button onclick="moveReservation()"
+          style="flex:0 0 auto;padding:8px 14px;background:rgba(90,144,200,0.1);border:1px solid rgba(90,144,200,0.35);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:600;color:var(--blue);cursor:pointer;white-space:nowrap;letter-spacing:0.04em">
+          ↗ Confirm Move
+        </button>
+      </div>
+      <div id="moveErr" style="font-family:var(--mono);font-size:0.67rem;color:#c04040;min-height:12px;margin-bottom:6px"></div>
+    </div>
     <div class="modal-body" id="modalBody"></div>
   </div>
 </div>
@@ -2683,6 +2713,28 @@ function _openHibachiModalInner(slot, editId) {
   document.getElementById('modalTitle').textContent=editId?'Edit Reservation':'New Hibachi Reservation';
   const needCard=cardRequired(existing?existing.guests||0:0,dateKey(currentDate));
 
+  // ── MOVE SECTION: show when editing, default to current date/slot ──
+  _editingSlot = slot;
+  _editingResId = editId || null;
+  const ts = document.getElementById('transferSection');
+  const me = document.getElementById('moveErr');
+  if (ts) {
+    if (editId) {
+      ts.style.display = '';
+      const moveDateEl = document.getElementById('moveDate');
+      const moveTimeEl = document.getElementById('moveTime');
+      if (moveDateEl) moveDateEl.value = key;
+      if (moveTimeEl && slot) {
+        // Select matching option or default to first
+        const opt = moveTimeEl.querySelector('option[value="'+slot+'"]');
+        if (opt) moveTimeEl.value = slot;
+      }
+    } else {
+      ts.style.display = 'none';
+    }
+    if (me) me.textContent = '';
+  }
+
   const slotOptions=generateTimeSlots(dow)
     .filter(s=>getChefsAtTime(dow,timeToMinutes(s))>0)
     .map(s=>{
@@ -3762,9 +3814,77 @@ async function toggleBlockSlot(slot) {
 }
 
 /* ── MODAL UTILS ── */
+// Track currently-editing reservation for the Move feature
+let _editingSlot = null;
+let _editingResId = null;
+
 function showModal() { document.getElementById('modalOverlay').style.display='flex'; document.body.style.overflow='hidden'; }
-function closeModal() { document.getElementById('modalOverlay').style.display='none'; document.body.style.overflow=''; unlockedCardIds.clear(); }
+function closeModal() {
+  document.getElementById('modalOverlay').style.display='none';
+  document.body.style.overflow='';
+  unlockedCardIds.clear();
+  // Hide and reset the move section
+  const ts = document.getElementById('transferSection');
+  if (ts) ts.style.display = 'none';
+  const me = document.getElementById('moveErr');
+  if (me) me.textContent = '';
+  _editingSlot = null;
+  _editingResId = null;
+}
 function closeModalIfOutside(e) { if (e.target.id==='modalOverlay') closeModal(); }
+
+async function moveReservation() {
+  const me = document.getElementById('moveErr');
+  if (me) me.textContent = '';
+
+  const newDate = document.getElementById('moveDate')?.value;
+  const newTime = document.getElementById('moveTime')?.value;
+  const oldDate = dateKey(currentDate);
+  const oldTime = _editingSlot;
+  const resId   = _editingResId;
+
+  if (!resId)    { if (me) me.textContent = '⚠ No reservation selected.'; return; }
+  if (!newDate)  { if (me) me.textContent = '⚠ Please select a date.'; return; }
+  if (!newTime)  { if (me) me.textContent = '⚠ Please select a time.'; return; }
+  if (newDate === oldDate && newTime === oldTime) {
+    if (me) me.textContent = '⚠ New slot is the same as the current slot.'; return;
+  }
+
+  if (!window._db || !window._ref || !window._get || !window._push || !window._remove) {
+    if (me) me.textContent = '⚠ Firebase not ready. Please wait and try again.'; return;
+  }
+
+  try {
+    // Read from old path
+    const oldSnap = await window._get(window._ref(window._db, `reservations/${oldDate}/${resId}`));
+    const guestData = oldSnap.val();
+    if (!guestData) { if (me) me.textContent = '⚠ Reservation not found. It may have been deleted.'; return; }
+
+    // Prompt for initials to log the move
+    const initials = sanitizeInitials(prompt('Enter your initials to confirm the move:') || '');
+    if (!initials) { if (me) me.textContent = '⚠ Initials are required to move a reservation.'; return; }
+
+    // Write to new path
+    const updatedData = Object.assign({}, guestData, { slot: newTime, updatedAt: Date.now() });
+    await window._push(window._ref(window._db, `reservations/${newDate}`), updatedData);
+
+    // Delete from old path
+    await window._remove(window._ref(window._db, `reservations/${oldDate}/${resId}`));
+
+    // Log the move
+    const name = guestData.name || 'Guest';
+    const guests = guestData.guests || '?';
+    await logAudit('edit',
+      'MOVED — ' + name + ' · ' + guests + 'p · from ' + oldDate + ' ' + displayTime(oldTime) + ' → ' + newDate + ' ' + displayTime(newTime),
+      initials
+    );
+
+    closeModal();
+    alert('✓ Reservation moved to ' + newDate + ' at ' + displayTime(newTime) + '.');
+  } catch(e) {
+    if (me) me.textContent = '⚠ Error: ' + e.message;
+  }
+}
 function showErr(msg) { const el=document.getElementById('formErr'); if(el) el.innerHTML='<div class="err-banner">'+escHtml(msg)+'</div>'; }
 
 /* ── INPUT FORMATTERS ── */
