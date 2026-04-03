@@ -2439,7 +2439,7 @@ function printDailySheet() {
       dRowsHtml+=`<div class="dr ${isLarge?'lh':shade}">
         <span class="dn">${r.guests||'?'}</span>
         <span class="dm">${escHtml(r.name||'Guest')}</span>
-        <span class="dp">${escHtml(r.phone||'')}</span>
+        <span class="dph">${escHtml(r.phone||'')}</span>
       </div>`;
     });
   });
@@ -2452,7 +2452,7 @@ body{font-family:'DM Mono','Courier New',monospace;font-size:12px;color:#111;bac
 .pt{font-family:Georgia,serif;font-size:17px;font-weight:700;text-align:center;margin-bottom:10px;letter-spacing:0.03em;flex-shrink:0}
 .panels{display:flex;gap:0;flex:1;min-height:0;overflow:hidden}
 .hp{flex:1;min-width:0;border-right:2.5px solid #999;padding-right:12px;display:flex;flex-direction:column}
-.dp{width:210px;flex-shrink:0;padding-left:12px;display:flex;flex-direction:column}
+.din-panel{width:210px;flex-shrink:0;padding-left:12px;display:flex;flex-direction:column}
 .ph{font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#555;
   border-bottom:2px solid #111;padding-bottom:4px;margin-bottom:0;flex-shrink:0;display:flex}
 .ph-n{width:26px;flex-shrink:0;text-align:right;padding-right:6px}
@@ -2473,7 +2473,7 @@ body{font-family:'DM Mono','Courier New',monospace;font-size:12px;color:#111;bac
 .cg{width:28px;flex-shrink:0;font-size:10px;font-weight:700;color:#555;text-align:center}
 .dn{width:26px;flex-shrink:0;font-weight:700;font-size:12px;text-align:right;padding-right:6px}
 .dm{flex:1;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:4px}
-.dp{width:88px;flex-shrink:0;font-size:11px;color:#444;white-space:nowrap;overflow:hidden}
+.dph{width:88px;flex-shrink:0;font-size:11px;color:#444;white-space:nowrap;overflow:hidden}
 .badge{display:inline-block;font-size:7px;font-weight:700;padding:0 3px;border-radius:2px;margin-left:3px;vertical-align:middle;letter-spacing:0.04em}
 .badge-a{background:#fee;color:#c00;border:1px solid #faa}
 .badge-r{background:#fff8e1;color:#a60;border:1px solid #fcc}
@@ -2491,7 +2491,7 @@ body{font-family:'DM Mono','Courier New',monospace;font-size:12px;color:#111;bac
     </div>
     <div class="rows">${hRowsHtml}</div>
   </div>
-  <div class="dp">
+  <div class="din-panel">
     <div class="ph">
       <span class="dph-n">#</span><span class="dph-m">Dining Name</span>
       <span class="dph-p">Phone</span>
