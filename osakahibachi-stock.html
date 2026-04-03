@@ -1309,7 +1309,6 @@ function renderML(){
         <div class="ml-chk"><input type="checkbox" ${item.done?'checked':''} onchange="mlTog('${item.id}',this.checked)"></div>
         <div class="ml-name ${item.done?'done':''}">${item.key?'<span class="ml-key-badge">KEY</span>':''}${item.name}</div>
         ${statsHtml}
-        <div class="ml-tag" style="background:${c.hex}">${item.store}</div>
         <div class="ml-acts"><button class="ml-del" onclick="mlDel('${item.id}')">✕</button></div>`;
       sec.appendChild(row);
     });
