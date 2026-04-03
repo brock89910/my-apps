@@ -2391,53 +2391,147 @@ function printDailySheet() {
   const hibachi=allRes.slice().sort((a,b)=>(a.slot||'').localeCompare(b.slot||''));
   const dining=allDining.slice().sort((a,b)=>(a.time||'').localeCompare(b.time||''));
   const dateStr=currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-  let html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Daily Sheet — '+dateStr+'</title><style>body{font-family:"DM Mono",monospace;font-size:15px;color:#111;background:#fff;padding:28px;max-width:780px;margin:0 auto}h1{font-family:Georgia,serif;font-size:22px;font-weight:700;margin:0 0 6px}h2{font-family:Georgia,serif;font-size:14px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#666;margin:26px 0 10px;border-bottom:2px solid #ccc;padding-bottom:5px}table{width:100%;border-collapse:collapse;margin-bottom:10px}th{text-align:left;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#555;padding:7px 10px;border-bottom:2px solid #111}td{padding:8px 10px;border-bottom:1px solid #ddd;vertical-align:top;font-size:14px}.slot{font-weight:700;white-space:nowrap;font-size:15px}.badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:3px;margin-left:5px}.allergy{background:#fee;color:#c00;border:1px solid #faa}.restriction{background:#fff8e1;color:#a60;border:1px solid #fcc}.note{font-size:12px;color:#444;font-style:italic;margin-top:2px}.total{font-size:13px;font-weight:700;margin-top:14px;padding:8px 10px;background:#f5f5f5;border:1px solid #ddd}.divider-col{border-left:1px solid #bbb}.large-hl{background:#ddeeff;font-weight:700}@media print{body{padding:14px}}</style></head><body>';
-  html+='<div style="font-family:Georgia,serif;font-size:22px;font-weight:700;margin:0 0 14px">'+dateStr+'</div>';
-  html+='<h2>Hibachi</h2>';
-  if (hibachi.length) {
-    // Group by slot, sort each slot's reservations by guests descending, then flatten
-    const slotGroups={};
-    hibachi.forEach(r=>{ const s=r.slot||'?'; if(!slotGroups[s]) slotGroups[s]=[]; slotGroups[s].push(r); });
-    Object.values(slotGroups).forEach(group=>group.sort((a,b)=>(b.guests||0)-(a.guests||0)));
-    const sortedHibachi=hibachi.slice().sort((a,b)=>(a.slot||'').localeCompare(b.slot||''));
-    const hibachiSorted=[];
-    const seen=new Set();
-    sortedHibachi.forEach(r=>{ const s=r.slot||'?'; if(!seen.has(s)){ seen.add(s); slotGroups[s].forEach(x=>hibachiSorted.push(x)); }});
-    html+='<table><thead><tr><th style="width:60px">Time</th><th style="width:30px">#</th><th>Name</th><th class="divider-col">Phone</th><th>Grill</th><th>Note</th></tr></thead><tbody>';
-    let lastSlot='';
-    hibachiSorted.forEach(r=>{
-      const nb=r.noteType==='allergy'?'<span class="badge allergy">ALLERGY</span>':r.noteType==='restriction'?'<span class="badge restriction">RESTRICTION</span>':'';
-      const nd=(r.noteType==='allergy'||r.noteType==='restriction')&&r.noteText?'<div class="note">'+escHtml(r.noteText)+'</div>':'';
-      const gs=r.grill2?'G'+r.grill+'+G'+r.grill2:'G'+(r.grill||'?');
-      const slotDisplay=r.slot||'?';
-      const timeCell=slotDisplay!==lastSlot?'<td class="slot">'+(r.slot?displayTime(r.slot):'?')+'</td>':'<td></td>';
-      lastSlot=slotDisplay;
-      const isLarge=(r.guests||0)>=15;
-      const rowStyle=isLarge?' class="large-group"':'';
-      // For notes: allergy/restriction show badge+text; other just show the noteText directly (no category prefix); chef/table show noteText
-      let noteCell='';
-      if (r.noteType==='allergy'||r.noteType==='restriction') { noteCell=''; }
-      else if (r.noteType&&r.noteText) { noteCell=escHtml(r.noteText); }
-      else if (r.noteType&&!r.noteText) { noteCell=escHtml(r.noteType==='chef'?'Chef request':r.noteType==='table'?'Table request':''); }
-      html+='<tr'+rowStyle+'>'+timeCell+'<td'+(isLarge?' class="large-hl"':'')+'>'+(r.guests||'?')+'</td><td'+(isLarge?' class="large-hl"':'')+'>'+(nb?escHtml(r.name||'Guest')+nb+nd:escHtml(r.name||'Guest'))+'</td><td class="divider-col">'+escHtml(r.phone||'')+'</td><td>'+gs+'</td><td>'+noteCell+'</td></tr>';
-    });
-    html+='</tbody></table><div class="total">Total: '+hibachi.length+' group'+(hibachi.length!==1?'s':'')+' · '+hibachi.reduce((s,r)=>s+(r.guests||0),0)+' guests</div>';
-  } else { html+='<div style="color:#888;font-size:11px;padding:6px">No hibachi reservations.</div>'; }
-  html+='<h2>Dining Room</h2>';
-  if (dining.length) {
-    html+='<table><thead><tr><th style="width:60px">Time</th><th style="width:30px">#</th><th>Name</th><th>Phone</th><th>Notes</th></tr></thead><tbody>';
-    let lastDiningTime='';
-    dining.forEach(r=>{
-      const timeCell=r.time!==lastDiningTime?'<td class="slot">'+(r.time?displayTime(r.time):'—')+'</td>':'<td></td>';
-      lastDiningTime=r.time||'';
-      html+='<tr>'+timeCell+'<td>'+(r.guests||'?')+'</td><td>'+escHtml(r.name||'Guest')+'</td><td>'+escHtml(r.phone||'')+'</td><td>'+escHtml(r.notes||'')+'</td></tr>';
-    });
-    html+='</tbody></table><div class="total">Total: '+dining.length+' group'+(dining.length!==1?'s':'')+' · '+dining.reduce((s,r)=>s+(r.guests||0),0)+' guests</div>';
-  } else { html+='<div style="color:#888;font-size:11px;padding:6px">No dining reservations.</div>'; }
-  html+='<div style="margin-top:22px;font-size:10px;color:#aaa;border-top:1px solid #eee;padding-top:7px">Generated '+new Date().toLocaleString('en-CA')+' · Osaka Hibachi</div></body></html>';
-  const win=window.open('','_blank');
-  if (win) { win.document.write(html); win.document.close(); win.focus(); setTimeout(()=>win.print(),400); }
+  const totalHGrp=hibachi.length;
+  const totalHGuests=hibachi.reduce((s,r)=>s+(r.guests||0),0);
+  const totalDGrp=dining.length;
+  const totalDGuests=dining.reduce((s,r)=>s+(r.guests||0),0);
+
+  // Group hibachi by slot
+  const hSlotGroups={};
+  hibachi.forEach(r=>{
+    const s=r.slot||'?';
+    if(!hSlotGroups[s]) hSlotGroups[s]=[];
+    hSlotGroups[s].push(r);
+  });
+  // Sort each slot by guests desc
+  Object.values(hSlotGroups).forEach(g=>g.sort((a,b)=>(b.guests||0)-(a.guests||0)));
+  const hSlots=[...new Set(hibachi.map(r=>r.slot||'?'))];
+
+  // Group dining by time
+  const dTimeGroups={};
+  dining.forEach(r=>{
+    const t=r.time||'?';
+    if(!dTimeGroups[t]) dTimeGroups[t]=[];
+    dTimeGroups[t].push(r);
+  });
+
+  // Build unified slot list (all time keys from either side)
+  const allSlots=[...new Set([...hSlots,...Object.keys(dTimeGroups)])].sort();
+
+  // ── HTML ──────────────────────────────────────────────────────────────
+  let html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>Daily Sheet — ${dateStr}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Mono',monospace,Courier;font-size:12px;color:#111;background:#fff;padding:22px 24px;max-width:780px;margin:0 auto}
+.page-title{font-family:Georgia,serif;font-size:20px;font-weight:700;margin-bottom:2px}
+.page-sub{font-size:11px;color:#555;margin-bottom:10px}
+/* Two-column wrapper */
+.sheet{width:100%}
+/* Column header bar */
+.col-hdr{display:grid;grid-template-columns:56px 24px 1fr 66px 130px;gap:0;background:#222;color:#fff;font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;padding:4px 0}
+.col-hdr span{padding:0 4px}
+.col-hdr .c-dining{text-align:left}
+/* Row = time + hibachi cols + dining sidebar */
+.time-block{margin-bottom:14px}
+.time-label{font-weight:700;font-size:13px;padding:3px 6px;background:#1a1a2e;color:#fff;margin-bottom:0;letter-spacing:0.04em}
+/* Each data row */
+.row{display:grid;grid-template-columns:56px 24px 1fr 66px 130px;align-items:center;min-height:26px;border-bottom:1px solid #e0e0e0}
+.row.shade{background:#f5f5f5}
+.row.no-shade{background:#fff}
+.row.large-row td,.row.large-row .c{font-weight:700}
+/* cells */
+.c{padding:3px 4px;font-size:12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.c-time{font-weight:700;font-size:13px;white-space:nowrap}
+.c-g{display:flex;align-items:center;justify-content:center}
+.gbox{width:15px;height:17px;border:1.2px solid #333;display:inline-block;flex-shrink:0;margin:0 auto}
+.c-name{font-size:12px}
+.c-phone{font-family:monospace;font-size:11px;color:#444;letter-spacing:0.04em}
+.c-dining-cell{font-size:11px;color:#333;border-left:2px solid #aaa;padding-left:6px}
+.din-line{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5}
+.din-name{font-weight:600}
+.din-guests{color:#555}
+/* column header dining */
+.col-hdr .c-dining{border-left:2px solid rgba(255,255,255,0.3);padding-left:6px}
+.footer{margin-top:18px;font-size:9px;color:#aaa;border-top:1px solid #e0e0e0;padding-top:6px;display:flex;justify-content:space-between}
+@media print{
+  body{padding:12px 14px}
+  .time-block{margin-bottom:10px}
+  @page{size:letter portrait;margin:14mm}
 }
+</style></head><body>`;
+
+  html+=`<div class="page-title">OSAKA HIBACHI</div>`;
+  html+=`<div class="page-sub">${dateStr} &nbsp;·&nbsp; Hibachi: ${totalHGrp} group${totalHGrp!==1?'s':''} · ${totalHGuests} guests &nbsp;·&nbsp; Dining: ${totalDGrp} group${totalDGrp!==1?'s':''} · ${totalDGuests} guests</div>`;
+
+  // Column header
+  html+=`<div class="col-hdr">
+    <span>TIME</span>
+    <span>#</span>
+    <span>NAME &amp; PHONE</span>
+    <span>G #</span>
+    <span class="c-dining">DINING</span>
+  </div>`;
+
+  // Render each time block
+  allSlots.forEach(slot=>{
+    const hRows=hSlotGroups[slot]||[];
+    const dRows=dTimeGroups[slot]||[];
+    const rowCount=Math.max(hRows.length, dRows.length, 1);
+
+    const slotLabel=slot!=='?'?displayTime(slot):slot;
+    html+=`<div class="time-block">`;
+    html+=`<div class="time-label">${slotLabel}</div>`;
+
+    for(let i=0;i<rowCount;i++){
+      const r=hRows[i]||null;
+      const d=dRows[i]||null;
+      const shade=i%2===0?'shade':'no-shade';
+
+      // hibachi cells
+      let timeCell='';  // time shown in label above, not repeated per row
+      let gCell=`<div class="c c-g"><span class="gbox"></span></div>`;
+      let namePhone='';
+      if(r){
+        const ph=r.phone?('···'+(String(r.phone).replace(/\D/g,'').slice(-4))):'';
+        const nm=escHtml(r.name||'Guest');
+        const gCount=r.guests||'?';
+        namePhone=`<div class="c c-name"><b>${gCount}</b> &nbsp;${nm} &nbsp;<span class="c-phone">${ph}</span>`;
+        // note badge
+        if(r.noteType==='allergy') namePhone+=` <span style="font-size:9px;background:#fee;color:#c00;border:1px solid #faa;padding:0 4px;border-radius:2px">ALLERGY</span>`;
+        else if(r.noteType==='restriction') namePhone+=` <span style="font-size:9px;background:#fff8e1;color:#a60;border:1px solid #fcc;padding:0 4px;border-radius:2px">RESTR.</span>`;
+        namePhone+='</div>';
+      } else {
+        namePhone=`<div class="c c-name"></div>`;
+        gCell=`<div class="c c-g"></div>`;
+      }
+
+      // dining cell
+      let dinCell='';
+      if(d){
+        const dPh=d.phone?('···'+(String(d.phone).replace(/\D/g,'').slice(-4))):'';
+        dinCell=`<div class="c c-dining-cell"><span class="din-name">${escHtml(d.name||'Guest')}</span> <span class="din-guests">${d.guests||'?'}</span>${dPh?' <span class="c-phone">'+dPh+'</span>':''}</div>`;
+      } else {
+        dinCell=`<div class="c c-dining-cell"></div>`;
+      }
+
+      html+=`<div class="row ${shade}">${gCell}${r?`<div class="c" style="font-size:10px;color:#777">${r.guests||''}</div>`:'<div class="c"></div>'}${namePhone}<div class="c c-phone" style="font-size:10px">${r?(r.grill?'G'+r.grill+(r.grill2?'+G'+r.grill2:''):'—'):''}</div>${dinCell}</div>`;
+    }
+    html+=`</div>`;
+  });
+
+  // Footer
+  const now=new Date().toLocaleDateString('en-CA',{year:'numeric',month:'2-digit',day:'2-digit'});
+  html+=`<div class="footer">
+    <span>Generated ${now} · Osaka Hibachi · Phone: last 4 digits only</span>
+    <span>Hibachi ${totalHGrp} grp / ${totalHGuests}g &nbsp;·&nbsp; Dining ${totalDGrp} grp / ${totalDGuests}g</span>
+  </div>`;
+
+  html+=`</body></html>`;
+  const win=window.open('','_blank');
+  if(win){win.document.write(html);win.document.close();win.focus();setTimeout(()=>win.print(),400);}
+}
+
 
 function renderHibachi() {
   if (appMode==='guest') {
