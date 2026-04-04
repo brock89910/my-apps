@@ -1449,15 +1449,12 @@ const SECTION_PRINT_ORDER=['SUSHI','KITCHEN','TEPPAN'];
 
 // Fixed named-row config for the on-screen grid (mirrors print sheet)
 const GRID_SECTION_ROWS={
-  SUSHI:['Kim','Gu','Lee / Aladin'],
+  SUSHI:['Kim','Lee','Gu','Aladin'],
   KITCHEN:['Kim','Yang','Mike'],
   TEPPAN:['D.D','YOM','C.P']
 };
-const GRID_SHARED_NAMES={SUSHI:['lee','aladin']};
 const normG=n=>(n||'').toLowerCase().replace(/[\s.]/g,'');
 function gridRowMatch(sec,rowLabel,shiftName){
-  const shared=GRID_SHARED_NAMES[sec];
-  if(shared&&rowLabel.includes('/')){return shared.some(n=>normG(shiftName).includes(n));}
   return normG(shiftName).includes(normG(rowLabel.split('/')[0].trim()));
 }
 
@@ -1473,8 +1470,10 @@ function buildScheduleGrid(tableId,sections){
     const cc=secClass(sec);
     const namedRows=GRID_SECTION_ROWS[sec];
     if(namedRows){
-      // Fixed named rows
+      // Fixed named rows — skip row entirely if no one is scheduled this whole week
       namedRows.forEach((rowLabel,rIdx)=>{
+        const weekShifts=ws.filter(s=>s.section===sec&&gridRowMatch(sec,rowLabel,s.name));
+        if(!weekShifts.length)return; // skip empty rows
         html+=`<tr><td class="sc2 ${cc}" style="font-size:.62rem;opacity:.75">${rIdx===0?sec:''}<br><span style="font-size:.68rem;color:var(--text2);font-family:var(--font-mono);text-transform:none;letter-spacing:0;font-weight:400">${rowLabel}</span></td>`;
         DAYS_SHORT.forEach((_,di)=>{
           const cs=ws.filter(s=>s.section===sec&&s.dayIdx===di&&gridRowMatch(sec,rowLabel,s.name)).sort((a,b)=>shiftSortKey(a.time)-shiftSortKey(b.time));
@@ -1915,15 +1914,11 @@ window.printScheduleSheet=function(){
   // Build rows for a set of sections
  // Fixed named-row order per section (from manager spec)
   const SECTION_ROWS={
-    SUSHI:['Kim','Gu','Lee+Aladin'],  // Lee & Aladin share one row
+    SUSHI:['Kim','Lee','Gu','Aladin'],
     KITCHEN:['Kim','Yang','Mike'],
     TEPPAN:['D.D','YOM','C.P']
   };
-  // Normalize name matching: strip spaces, lowercase
   const norm=n=>(n||'').toLowerCase().replace(/[\s.]/g,'');
-  // For Lee+Aladin row: any shift whose name matches Lee OR Aladin merges into one cell
-  const SUSHI_SHARED_NAMES=['lee','aladin'];
-  const isSushiShared=name=>SUSHI_SHARED_NAMES.some(n=>norm(name).includes(n));
 
   function buildSectionRows(sections){
     let html='';
@@ -1933,25 +1928,25 @@ window.printScheduleSheet=function(){
       const bgs={SUSHI:'#deeef8',KITCHEN:'#fdf3d0',TEPPAN:'#fde8dc'};
       const col=cols[sec]||'#222',bg=bgs[sec]||'#f5f5f5';
       const namedRows=SECTION_ROWS[sec]||[];
-      const numRows=Math.max(namedRows.length,1);
 
-      // For each named row, find matching shifts per day
+      // Only include rows that have at least one shift this week
+      const activeRows=namedRows.filter(rowLabel=>{
+        return ws.some(s=>s.section===sec&&norm(s.name).includes(norm(rowLabel)));
+      });
+      if(!activeRows.length)return;
+      const numRows=activeRows.length;
+
       const getMatchingShifts=(rowLabel,di)=>{
-        const dayShifts=ws.filter(s=>s.section===sec&&s.dayIdx===di);
-        if(sec==='SUSHI'&&rowLabel==='Lee+Aladin'){
-          return dayShifts.filter(s=>isSushiShared(s.name));
-        }
         const rn=norm(rowLabel);
-        return dayShifts.filter(s=>norm(s.name).includes(rn));
+        return ws.filter(s=>s.section===sec&&s.dayIdx===di&&norm(s.name).includes(rn));
       };
 
-      namedRows.forEach((rowLabel,row)=>{
+      activeRows.forEach((rowLabel,row)=>{
         html+=`<tr>`;
         if(row===0)html+=`<td class="sec-lbl" rowspan="${numRows}" style="color:${col};background:${bg};border-left:6px solid ${col}">${sec}</td>`;
         for(let di=0;di<7;di++){
           const shifts=getMatchingShifts(rowLabel,di);
           if(shifts.length){
-            // Merge: show all names with their times in one cell
             const label=shifts.map(sh=>sh.time?`${sh.name} ${sh.time}`:sh.name).join(' / ');
             html+=`<td class="cell filled"><span class="sname">${label}</span></td>`;
           }else{
@@ -1973,7 +1968,7 @@ window.printScheduleSheet=function(){
       const pm=all.filter(s=>s.dayIdx===di&&isPmServing(s.time)).length;
       if(am>maxAM)maxAM=am;if(pm>maxPM)maxPM=pm;
     }
-    maxAM=Math.max(maxAM,4);maxPM=Math.max(maxPM,4);
+    maxAM=Math.max(maxAM,1);maxPM=Math.max(maxPM,1);
     const col='#5a2a9a',bg='#ede0f8';
     const totalSpan=maxAM+1+maxPM;
     let html='';
