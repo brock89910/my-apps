@@ -576,8 +576,9 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <span class="week-lbl" id="sch-week-label"></span>
 <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
   <button class="btn bo bs" onclick="manualCopyLastWeek()" style="font-size:.68rem;padding:5px 10px;color:var(--amber);border-color:rgba(232,160,32,.3)" title="Copy last week's schedule into this week">↩ Copy Last Week</button>
-  <span id="res-sync-status"></span>
-  <button class="btn bo bs" onclick="loadReservations()" style="font-size:.65rem;padding:3px 8px">↻ Sync</button>
+  <span id="res-sync-status" style="font-family:var(--font-mono);font-size:.62rem"></span>
+  <button id="res-connect-btn" class="btn bo bs" onclick="connectHibachi()" style="font-size:.65rem;padding:4px 10px;color:var(--sushi);border-color:rgba(58,154,184,.4);display:none">🔗 Connect Hibachi</button>
+  <button id="res-sync-btn" class="btn bo bs" onclick="loadReservations()" style="font-size:.65rem;padding:3px 8px;display:none">↻ Sync</button>
 </div>
 </div>
 <div class="forecast-bar" id="forecast-bar"></div>
@@ -954,14 +955,22 @@ window.copyEl=function(id){var el=document.getElementById(id);if(el)navigator.cl
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getFirestore,collection,addDoc,getDocs,deleteDoc,doc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import{getDatabase,ref,get}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import{getAuth,signInAnonymously}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getAuth,signInAnonymously,GoogleAuthProvider,signInWithPopup,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const appMgr=initializeApp({apiKey:"AIzaSyDMVt5s2loFohJDoTMImzAq_gKl61fZf1g",authDomain:"manager-overlook.firebaseapp.com",projectId:"manager-overlook",storageBucket:"manager-overlook.firebasestorage.app",messagingSenderId:"64302920866",appId:"1:64302920866:web:5dd1f24f6e1211458413fb"},'manager');
 const db=getFirestore(appMgr);
 const appRes=initializeApp({apiKey:"AIzaSyCMXA2a4RUUNuzmTz1QxdJbIciICojLjA8",authDomain:"restaurant599-b5595.firebaseapp.com",databaseURL:"https://restaurant599-b5595-default-rtdb.firebaseio.com",projectId:"restaurant599-b5595",storageBucket:"restaurant599-b5595.firebasestorage.app",messagingSenderId:"141750935511",appId:"1:141750935511:web:8ad37806a7d9a70a8e7592"},'reservations');
 const resDb=getDatabase(appRes);
 const resAuth=getAuth(appRes);
-await signInAnonymously(resAuth);
+// Manager app — anonymous is fine (our own rules)
+await signInAnonymously(getAuth(appMgr)).catch(()=>{});
+// Hibachi tracker — needs Google auth; listen for state and auto-sync once signed in
+let resUser=null;
+onAuthStateChanged(resAuth,user=>{
+  resUser=user;
+  updateResAuthUI();
+  if(user)window.loadReservations();
+});
 const S={bills:[],shifts:[],cleanLogs:[],restrictions:[],reservations:{},reqOffs:[],employees:[],clTasks:[],vendors:[],priceItems:[],permaRestrictions:[]};
 const DAYS_SHORT=['MON','TUE','WED','THU','FRI','SAT','SUN'];
 const COOK_SECTIONS=['SUSHI','KITCHEN','TEPPAN'];
@@ -1154,7 +1163,7 @@ async function boot(){
       copyFromPrevWeekForSections(wk,['SERVING']),
     ]);
   }
-  buildCleaning();renderAll();loadReservations();
+  buildCleaning();renderAll();updateResAuthUI(); // auth state listener handles actual load
   // Price item modal live calc
   document.getElementById('pi-price').addEventListener('input',updatePiCalc);
   document.getElementById('pi-weight').addEventListener('input',updatePiCalc);
@@ -1249,11 +1258,45 @@ async function renderScheduleWithCopy(){
 }
 
 // ── RESERVATIONS ──
+function updateResAuthUI(){
+  const statusEl=document.getElementById('res-sync-status');
+  const btnEl=document.getElementById('res-connect-btn');
+  const syncBtn=document.getElementById('res-sync-btn');
+  if(!statusEl)return;
+  if(resUser){
+    statusEl.textContent=resUser.email||'Connected';
+    statusEl.style.color='var(--green-l)';
+    if(btnEl)btnEl.style.display='none';
+    if(syncBtn)syncBtn.style.display='';
+  }else{
+    statusEl.textContent='';
+    if(btnEl)btnEl.style.display='';
+    if(syncBtn)syncBtn.style.display='none';
+  }
+}
+
+window.connectHibachi=async function(){
+  const statusEl=document.getElementById('res-sync-status');
+  try{
+    statusEl.textContent='Signing in…';
+    const provider=new GoogleAuthProvider();
+    provider.setCustomParameters({prompt:'select_account'});
+    await signInWithPopup(resAuth,provider);
+    // onAuthStateChanged will fire and call loadReservations automatically
+  }catch(e){
+    statusEl.textContent='Sign-in failed';
+    statusEl.style.color='var(--red)';
+    console.error('Hibachi auth error:',e);
+  }
+};
+
 window.loadReservations=async function(){
-  document.getElementById('res-sync-status').textContent='Syncing...';
+  const statusEl=document.getElementById('res-sync-status');
+  if(!resUser){updateResAuthUI();return;}
+  if(statusEl){statusEl.textContent='Syncing…';statusEl.style.color='var(--text2)';}
   try{
     const snap=await get(ref(resDb,'reservations'));
-    if(!snap.exists()){document.getElementById('res-sync-status').textContent='No reservations found';renderForecast();return;}
+    if(!snap.exists()){if(statusEl)statusEl.textContent='No reservations found';renderForecast();return;}
     const byDate={};
     snap.forEach(dateSnap=>{
       const date=dateSnap.key;let totalGuests=0,totalGrills=0,bookings=0;
@@ -1261,8 +1304,13 @@ window.loadReservations=async function(){
       byDate[date]={bookings,guests:totalGuests,grills:totalGrills};
     });
     S.reservations=byDate;
-    document.getElementById('res-sync-status').textContent=Object.keys(byDate).length+' days synced';
-  }catch(e){document.getElementById('res-sync-status').textContent='Sync failed';console.error('Res sync error:',e);}
+    const count=Object.keys(byDate).length;
+    if(statusEl){statusEl.textContent=`✓ ${count} days`;statusEl.style.color='var(--green-l)';}
+  }catch(e){
+    const msg=e.code==='PERMISSION_DENIED'?'Access denied — wrong account':'Sync failed';
+    if(statusEl){statusEl.textContent=msg;statusEl.style.color='var(--red)';}
+    console.error('Res sync error:',e);
+  }
   renderForecast();
 };
 
