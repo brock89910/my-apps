@@ -955,21 +955,22 @@ window.copyEl=function(id){var el=document.getElementById(id);if(el)navigator.cl
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getFirestore,collection,addDoc,getDocs,deleteDoc,doc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import{getDatabase,ref,get}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import{getAuth,signInAnonymously,GoogleAuthProvider,signInWithPopup,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getAuth,signInAnonymously,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const appMgr=initializeApp({apiKey:"AIzaSyDMVt5s2loFohJDoTMImzAq_gKl61fZf1g",authDomain:"manager-overlook.firebaseapp.com",projectId:"manager-overlook",storageBucket:"manager-overlook.firebasestorage.app",messagingSenderId:"64302920866",appId:"1:64302920866:web:5dd1f24f6e1211458413fb"},'manager');
 const db=getFirestore(appMgr);
 const appRes=initializeApp({apiKey:"AIzaSyCMXA2a4RUUNuzmTz1QxdJbIciICojLjA8",authDomain:"restaurant599-b5595.firebaseapp.com",databaseURL:"https://restaurant599-b5595-default-rtdb.firebaseio.com",projectId:"restaurant599-b5595",storageBucket:"restaurant599-b5595.firebasestorage.app",messagingSenderId:"141750935511",appId:"1:141750935511:web:8ad37806a7d9a70a8e7592"},'reservations');
 const resDb=getDatabase(appRes);
 const resAuth=getAuth(appRes);
-// Manager app — anonymous is fine (our own rules)
+// Manager app auth
 await signInAnonymously(getAuth(appMgr)).catch(()=>{});
-// Hibachi tracker — needs Google auth; listen for state and auto-sync once signed in
+// Hibachi — check redirect result first (handles post-redirect sign-in)
 let resUser=null;
+try{const rr=await getRedirectResult(resAuth);if(rr?.user)console.log('Hibachi redirect sign-in OK:',rr.user.email);}catch(e){console.warn('Redirect result:',e.code,e.message);}
 onAuthStateChanged(resAuth,user=>{
   resUser=user;
   updateResAuthUI();
-  if(user)window.loadReservations();
+  if(user){console.log('Hibachi auth user:',user.email||user.uid);window.loadReservations();}
 });
 const S={bills:[],shifts:[],cleanLogs:[],restrictions:[],reservations:{},reqOffs:[],employees:[],clTasks:[],vendors:[],priceItems:[],permaRestrictions:[]};
 const DAYS_SHORT=['MON','TUE','WED','THU','FRI','SAT','SUN'];
@@ -1163,7 +1164,9 @@ async function boot(){
       copyFromPrevWeekForSections(wk,['SERVING']),
     ]);
   }
-  buildCleaning();renderAll();updateResAuthUI(); // auth state listener handles actual load
+  buildCleaning();renderAll();updateResAuthUI();
+  // Also attempt a read immediately (works if rules allow public read, or if session already exists)
+  window.loadReservations();
   // Price item modal live calc
   document.getElementById('pi-price').addEventListener('input',updatePiCalc);
   document.getElementById('pi-weight').addEventListener('input',updatePiCalc);
@@ -1264,7 +1267,7 @@ function updateResAuthUI(){
   const syncBtn=document.getElementById('res-sync-btn');
   if(!statusEl)return;
   if(resUser){
-    statusEl.textContent=resUser.email||'Connected';
+    statusEl.textContent='✓ '+( resUser.email||'Connected');
     statusEl.style.color='var(--green-l)';
     if(btnEl)btnEl.style.display='none';
     if(syncBtn)syncBtn.style.display='';
@@ -1277,26 +1280,37 @@ function updateResAuthUI(){
 
 window.connectHibachi=async function(){
   const statusEl=document.getElementById('res-sync-status');
+  const provider=new GoogleAuthProvider();
+  provider.addScope('email');
+  provider.setCustomParameters({prompt:'select_account'});
+  // Try popup first; if it fails (blocked, wrong origin, etc.) fall back to redirect
   try{
-    statusEl.textContent='Signing in…';
-    const provider=new GoogleAuthProvider();
-    provider.setCustomParameters({prompt:'select_account'});
+    statusEl.textContent='Opening sign-in…';statusEl.style.color='var(--text2)';
     await signInWithPopup(resAuth,provider);
-    // onAuthStateChanged will fire and call loadReservations automatically
-  }catch(e){
-    statusEl.textContent='Sign-in failed';
-    statusEl.style.color='var(--red)';
-    console.error('Hibachi auth error:',e);
+    // onAuthStateChanged fires → loadReservations called automatically
+  }catch(popupErr){
+    console.warn('Popup failed:',popupErr.code,popupErr.message);
+    if(popupErr.code==='auth/popup-blocked'||popupErr.code==='auth/popup-closed-by-user'||popupErr.code==='auth/cancelled-popup-request'){
+      statusEl.textContent='Popup blocked — trying redirect…';
+      try{await signInWithRedirect(resAuth,provider);}
+      catch(redirErr){statusEl.textContent='Sign-in failed: '+redirErr.code;statusEl.style.color='var(--red)';console.error('Redirect failed:',redirErr);}
+    }else if(popupErr.code==='auth/unauthorized-domain'){
+      statusEl.innerHTML='Domain not authorized — <a href="https://console.firebase.google.com/project/restaurant599-b5595/authentication/settings" target="_blank" style="color:var(--amber)">add this domain in Firebase Console</a>';
+      statusEl.style.color='var(--red)';
+    }else{
+      statusEl.textContent='Error: '+popupErr.code;statusEl.style.color='var(--red)';
+    }
   }
 };
 
 window.loadReservations=async function(){
   const statusEl=document.getElementById('res-sync-status');
-  if(!resUser){updateResAuthUI();return;}
-  if(statusEl){statusEl.textContent='Syncing…';statusEl.style.color='var(--text2)';}
+  const setStatus=(msg,col)=>{if(statusEl){statusEl.textContent=msg;statusEl.style.color=col||'var(--text2)';}};
+  setStatus('Syncing…');
+  // Try reading — works if auth is valid OR if rules allow public read
   try{
     const snap=await get(ref(resDb,'reservations'));
-    if(!snap.exists()){if(statusEl)statusEl.textContent='No reservations found';renderForecast();return;}
+    if(!snap.exists()){setStatus('No reservations found','var(--text3)');renderForecast();return;}
     const byDate={};
     snap.forEach(dateSnap=>{
       const date=dateSnap.key;let totalGuests=0,totalGrills=0,bookings=0;
@@ -1305,13 +1319,22 @@ window.loadReservations=async function(){
     });
     S.reservations=byDate;
     const count=Object.keys(byDate).length;
-    if(statusEl){statusEl.textContent=`✓ ${count} days`;statusEl.style.color='var(--green-l)';}
+    setStatus('✓ '+count+' days','var(--green-l)');
+    renderForecast();
   }catch(e){
-    const msg=e.code==='PERMISSION_DENIED'?'Access denied — wrong account':'Sync failed';
-    if(statusEl){statusEl.textContent=msg;statusEl.style.color='var(--red)';}
-    console.error('Res sync error:',e);
+    console.error('Hibachi read error:',e.code,e.message);
+    if(e.code==='PERMISSION_DENIED'||e.message?.includes('Permission denied')){
+      setStatus('Access denied','var(--red)');
+      // Show connect button again so they can sign in
+      const btnEl=document.getElementById('res-connect-btn');
+      if(btnEl)btnEl.style.display='';
+      const syncBtn=document.getElementById('res-sync-btn');
+      if(syncBtn)syncBtn.style.display='none';
+    }else{
+      setStatus('Error: '+(e.code||e.message),'var(--red)');
+    }
+    renderForecast();
   }
-  renderForecast();
 };
 
 function getWeekKey(){return document.getElementById('sch-weekdate').value||'default';}
