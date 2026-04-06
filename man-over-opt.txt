@@ -1,0 +1,156 @@
+// OVERLOOK — LANDMARK MAP (paste once per session, no need to repeat)
+
+── DATA ──
+S{}                          → global state object (shifts, bills, employees, etc.)
+fsAdd/fsUp/fsDel()           → Firebase CRUD helpers
+boot()                       → app init, seeds data, calls renderAll()
+renderAll()                  → calls every render function at once
+
+── NAVIGATION ──
+go(id)                       → switches main page tab
+switchSchTab(tab)            → switches Kitchen/Serving/Perma tabs
+openModal(id)/closeModal(id) → generic modal open/close
+showToast(msg)               → bottom toast notification
+
+── DASHBOARD ──
+renderDash()                 → dashboard stats, bill reminders, print alerts
+markPrintDone(id)            → clears autopay print reminder
+countTodayStaff()            → staff count shown on forecast bar
+
+── BILLS ──
+addBill()                    → add new bill form submit
+renderBills()                → renders bills table with filters
+togglePaid(id)               → mark bill paid/unpaid, spawns recurring
+setDoneAt(id)                → set manual payment date
+delBill(id)                  → delete bill
+nextDueDate(due,freq)        → calculates next recurring due date
+isDueSoon(due)               → returns true if due within 7 days
+
+── SCHEDULE ──
+renderSchedule()             → rebuilds both grid tables
+buildScheduleGrid(id,secs)   → renders one schedule grid (kitchen or serving)
+renderScheduleWithCopy()     → renders + auto-copies prev week if empty
+manualCopyLastWeek()         → force-copy last week's schedule (with confirm)
+copyFromPrevWeekForSections()→ silent auto-copy for a section group
+onWeekChange()               → fired when week date picker changes
+getWeekKey()                 → returns current selected week (YYYY-MM-DD Mon)
+getWeekDates()               → returns array of 7 date strings for current week
+getMonday(d)                 → returns Monday of any given date
+setWeekLabel()               → updates the "Mar 24 – Mar 30" label
+
+── SCHEDULE GRID CONFIG ──
+GRID_SECTION_ROWS{}          → fixed named rows per section (Kim, Lee, Gu, etc.)
+SECTION_PRINT_ORDER[]        → [SUSHI, KITCHEN, TEPPAN] print order
+gridRowMatch()               → fuzzy name match for grid rows
+shiftSortKey()               → sort order: name-only first, half, then timed
+
+── SHIFT ACTIONS ──
+handleCellClick(sec,day,el)  → click handler on grid cell
+showInlineTimePicker()       → inline time picker popup in cell
+pickInlineTime()             → confirms inline time selection
+openShiftModal()             → fallback modal shift add
+confirmAddShift()            → modal shift form submit
+_doAddShift()                → core shift write to Firebase
+delShift(id)                 → remove a shift
+confirmQuickShift()          → quick-shift modal submit
+
+── QUICK-ADD STAFF PANEL ──
+renderStaffQuickPanel()      → renders clickable staff chips above grid
+selectQuickEmp(id,role)      → selects/deselects a staff chip
+
+── RESTRICTIONS ──
+parseRestrictionBlocks()     → parses all restrictions + reqOffs into blocked[]
+checkRestrictionViolation()  → returns violation if name+day is blocked
+addRestriction()             → adds weekly restriction
+renderRestrictions()         → renders restriction tags for current week
+confirmAddPermaRestrict()    → saves permanent rule
+renderPermaRestrictions()    → renders permanent rules list
+confirmReqOff()              → saves time-off request
+renderReqOffs()              → renders reqoff tags for current week
+
+── RESERVATIONS / FORECAST ──
+loadReservations()           → fetches from Hibachi Firebase
+connectHibachi()             → Google sign-in for reservation DB
+updateResAuthUI()            → shows/hides connect/sync buttons
+renderForecast()             → builds 8-day rolling forecast bar
+getBizLevel(guests,date)     → returns busy/slow/silent class + label
+
+── SHEET / COPY ──
+openSheetModal()             → opens sheet modal + builds previews
+buildSheetPreviews()         → calls both preview builders
+buildSheetPreview(id,secs)   → renders printable sheet preview HTML
+copySheetData(which)         → copies kitchen or serving as TSV for Sheets
+printScheduleSheet()         → opens print window with formatted sheet
+servingTimeOrder(time)       → sort order for serving AM/PM slots
+isPmServing()/isAmServing()  → classifies serving shift time as AM or PM
+
+── DAYS WORKED (BOH) ──
+openDaysWorkedModal()        → opens modal, auto-detects range
+autoDetectDWRange()          → sets last 2 full Mon–Sun weeks
+renderDaysWorked()           → computes + renders BOH 2-week day count
+copyDaysWorked()             → copies output to clipboard
+mapDWName(name)              → normalizes shift name to canonical (DD/Kim/etc.)
+getLastFullTwoWeekMondays()  → util: returns [week1Mon, week2Mon] ISO strings
+DW_ORDER[]                   → output order: DD,Yom,Kim,Yang,Gu,Mike,null,Lee
+DW_EXCLUDE[]                 → excluded: cp, aladin
+DW_SECTIONS[]                → counted sections: SUSHI, KITCHEN, TEPPAN
+
+── SERVING SUMMARY ──
+openServingSummaryModal()    → opens modal, auto-detects range
+autoDetectSSRange()          → sets last 2 full weeks
+renderServingSummary()       → computes + renders serving days + hours
+computeServingSummary(weeks) → core logic: days (unique) + hours per staff
+parseSSStartHour(time)       → parses clock-in time string to number
+ssCloseHour(wk,dayIdx)       → returns 22 (Fri/Sat) or 21 (other days)
+
+── EMPLOYEES ──
+renderEmployees()            → renders employee grid cards
+confirmEmployee()            → add/edit employee form submit
+delEmployee(id)              → delete employee
+getEmpRoles(emp)             → returns array of role strings for an employee
+toggleRoleCb(role)           → toggles role checkbox in add/edit modal
+updateEmpDatalist()          → populates name autocomplete datalists
+
+── CHECKLIST / TASKS ──
+renderClTasks()              → renders task list with current filter+sort
+confirmClTask()              → add/edit task submit
+delClTask(id)                → delete task
+setClFilter(f)               → sets active filter (urgent/action/open/etc.)
+setClSort(s)                 → sets sort mode (importance/status/flag/manual)
+toggleClTask(id)             → toggle task done/undone
+reorderTask(id,dir)          → move task up/down in manual sort
+
+── PRICING ──
+renderPricing()              → renders vendor pricing in current view mode
+setPriceView(mode)           → switches by-vendor / by-item / compare
+setPriceSort(mode)           → sort by cheapest/expensive/name/unit
+confirmPriceItem()           → add/edit price item submit
+delPriceItem(id)             → delete price item
+confirmVendor()              → add vendor submit
+delVendor(id)                → delete vendor + its items
+updatePiCalc()               → live cost/100g preview in price item modal
+renderVendorDropdown()       → populates vendor select in price item modal
+updatePiItemList()           → populates item name datalist
+
+── CLEANING ──
+buildCleaning()              → builds daily checklist from DAILY_TASKS[]
+saveChecklist()              → saves completion log to Firebase
+renderCleanLog()             → renders log history table
+resetChecks()                → unchecks all checkboxes
+
+── MODALS (HTML IDs) ──
+shift-modal                  → manual add shift
+quick-shift-modal            → quick-add from staff panel
+sheet-modal                  → schedule sheet + copy buttons
+days-worked-modal            → BOH 2-week day count
+serving-summary-modal        → serving days + hours summary
+emp-modal                    → add/edit employee
+cl-task-modal                → add/edit checklist task
+restrict-modal               → add weekly restriction
+reqoff-modal                 → add time-off request
+vendor-modal                 → add vendor
+price-item-modal             → add/edit price item
+
+── PAGES (HTML IDs) ──
+pg-dashboard / pg-bills / pg-schedule / pg-employees
+pg-checklist / pg-pricing / pg-cleaning
