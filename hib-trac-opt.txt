@@ -1,0 +1,336 @@
+── FIREBASE / AUTH ──
+_firebaseLogin()            → triggers Google sign-in popup; disables button during flow
+_firebaseLogout()           → signs out, hides app, shows login screen, resets PIN field
+onAuthStateChanged()        → auth gate: hides Google panel on login, blocks app until authed
+window._fbReady             → boolean flag: Firebase is authenticated and ready
+window._currentUserEmail    → stores signed-in user's email for attribution
+fbReady (event)             → dispatched by auth module; triggers init() in main script
+
+firebaseConfig{}            → API key, authDomain, databaseURL, projectId, appId, etc.
+window._db                  → exposed Firebase db instance (used by all write/read ops)
+window._ref / _set / _get   → exposed Firebase ref/set/get helpers
+window._push / _remove      → exposed Firebase push/remove helpers
+window._onValue             → exposed Firebase realtime listener helper
+
+── FIREBASE DB PATHS ──
+reservations/{dk}/          → hibachi reservations for a date; keyed by push ID
+reservations/{dk}/__chefRemoved  → special marker: {removed, initials, removedAt}
+dining/{dk}/                → dining room reservations for a date
+blockedSlots/{dk}/{slotKey} → manually blocked time slots {by, reason, ts}
+slotCaps/{dk}/{slotKey}     → custom guest caps per slot (integer)
+auditlog/{mk}/              → audit/history entries per month (YYYY-MM)
+
+── APP STATE (global vars) ──
+appMode                     → 'guest' | 'staff' | 'staff2' | 'manager' | null
+currentDate                 → Date object; currently viewed date (midnight-normalized)
+activeTab                   → 'hibachi' | 'dining' | 'history' | 'export'
+reservations{}              → local cache: {dateKey: {resId: reservationObject}}
+diningReservations{}        → local cache: {dateKey: {resId: diningObject}}
+blockedSlots{}              → local cache: {dateKey: {slotKey: blockObject}}
+slotCaps{}                  → local cache: {dateKey: {slotKey: number}}
+auditLog{}                  → local cache: {monthKey: {entryId: auditEntry}}
+chefDayOverrides{}          → {dk: 0 or 1} — chef reduction per date
+chefDayOverrideData{}       → {dk: {removed, initials, removedAt}} — for banner display
+exportUnlocked              → boolean; whether export tab is unlocked this session
+exportRows[]                → array of flattened reservation objects for export
+weekDataCache{}             → {dk: {guests, bookings, hasOverride, hasLargeGroup, hasLargeGroup15, hasManyDining}}
+_rateBuckets{}              → per-action write timestamps for client-side rate limiting
+unlockedCardIds             → Set of reservation IDs whose card details have been unlocked
+_editingSlot                → slot string of reservation currently open in edit modal
+_editingResId               → Firebase push ID of reservation currently open in edit modal
+_sr{}                       → stepped-add wizard state: slot, guests, name, phone, card, expiry, initials, noteType, noteText, assign, isOverride, isHold, forceOverride
+fbListener                  → unsub fn for reservations realtime listener
+fbDiningListener            → unsub fn for dining realtime listener
+fbBlocksListener            → unsub fn for blockedSlots realtime listener
+fbCapsListener              → unsub fn for slotCaps realtime listener
+fbHistoryListener           → unsub fn for auditlog realtime listener
+fbChefOverrideListener      → unsub fn for __chefRemoved realtime listener
+calViewYear / calViewMonth  → calendar dropdown navigation state
+historySelectedMonth        → currently selected month in history tab (YYYY-MM or null)
+historyMode                 → 'day' | 'month' — history display mode
+historyFilter               → active filter: 'all' | 'create' | 'edit' | 'delete'
+_lastWipeDate               → last date string for which midnight card wipe ran
+_stripCollapsed             → boolean; week strip scroll-collapse state
+_lastScrollY                → last scroll position for strip collapse logic
+_renderDebounceTimer        → timer ID for debounced renderHibachi() calls
+genericNameMap{}            → {dk:resId → generic name} for guest mode
+genericNameCounters{}       → {dk → counter} for cycling GENERIC_NAMES[]
+
+── CONFIGURATION CONSTANTS ──
+CHEF_SCHEDULE{}             → {0–6: [{start, end, chefs}]} — daily chef shift segments
+GRILL_PAIRS[]               → [[1,2],[3,4]] — grills that share a double-grill group
+SINGLE_GRILL_CAP{}          → {1:14, 2:13, default:12} — per-group cap by group count
+DOUBLE_GRILL_SOLO_MAX       → 30 — max guests for double-grill booking
+DOUBLE_GRILL_COMBINED_MAX   → 24 — combined max for two groups sharing double grill
+DOUBLE_GRILL_MIN_GUESTS     → 15 — threshold to trigger double-grill assignment
+DOUBLE_GRILL_BLOCK_MINUTES  → 120 — hard cooldown between double-grill slots
+DOUBLE_GRILL_WARN_MINUTES   → 150 — soft warning cooldown
+OVERRIDE_MAX_GUESTS         → 42 — hard cap even with override
+LARGE_GROUP_PASSWORD_MIN    → 30 — guests at which manager password is required
+WARN_GUESTS                 → 10 — threshold for tight-timing warning display
+COOK_BLOCK_MINUTES          → 60 — chef busy window after cooking starts
+SEAT_BLOCK_MINUTES          → 90 — hard block window for reusing a grill
+SEAT_WARN_MINUTES           → 120 — soft warning window for reusing a grill
+CARD_REQUIRED_MIN           → 4 — min guests requiring a card on file
+CARD_SAMEDAY_MAX_NO_CARD    → 5 — same-day bookings at or below this skip the card rule
+GENERIC_NAMES[]             → 29-name pool for anonymizing names in guest mode
+
+── PASSWORD HASHES (SHA-256) ──
+STAFF_PIN_HASH              → staff login (1599)
+STAFF2_PIN_HASH             → staff2 login / large group password (2599)
+MANAGER_PIN_HASH_A          → manager login option A (g14022603)
+MANAGER_PIN_HASH_B          → manager login option B (nathanongame)
+BYPASS_LOCKOUT_HASH         → bypass login lockout only (Funorange34)
+PWD_HASH_CARD               → unlock card details in edit modal (2017040334)
+PWD_HASH_LARGE              → large group override / force add / block slot (2599)
+PWD_HASH_EXPORT             → unlock export tab (2017040334)
+PWD_HASH_CHEF               → remove/restore chef for day (2017040334)
+PWD_HASH_EDIT               → edit existing reservation (0709)
+LOGIN_MAX_ATTEMPTS          → 3 — failed attempts before lockout
+LOGIN_LOCKOUT_MS            → 3600000 (1 hr) — lockout duration
+LOGIN_STORAGE_KEY           → 'osaka_login_lock' — localStorage key for lockout state
+
+── LOGIN / ACCESS CONTROL ──
+submitPin()                 → hashes PIN, checks against all role hashes, routes to enter*Mode()
+submitStaffPin()            → alias for submitPin() (legacy)
+enterStaffMode()            → sets appMode='staff', hides login, starts app
+enterStaff2Mode()           → sets appMode='staff2', hides login, starts app
+enterManagerMode()          → sets appMode='manager', shows export tab, starts app
+enterGuestMode()            → sets appMode='guest', hides history/add/block buttons, starts app
+init()                      → called on fbReady: updates lockout UI, focuses PIN field
+hashPassword(str)           → SHA-256 hash via Web Crypto API → hex string
+checkPassword(val, hash)    → async boolean — compares hashed val to expected hash
+isManager()                 → returns appMode === 'manager'
+getLockState()              → reads {attempts, lockedUntil} from localStorage
+saveLockState(state)        → writes lock state to localStorage
+clearLockState()            → removes lockout entry from localStorage
+isLockedOut()               → boolean; true if lockedUntil > now
+getRemainingLockMinutes()   → minutes remaining in lockout
+recordFailedAttempt()       → increments attempts; sets lockedUntil if >= max; returns count
+updateLockoutUI()           → disables PIN/button and shows countdown if locked out
+getGenericName(dk, resId)   → returns a stable anonymized name for guest mode
+getDisplayName(resId, realName, dateStr) → returns generic name (guest) or real name (staff)
+
+── APP BOOTSTRAP ──
+startApp()                  → renders date header, subscribes to Firebase, starts pollers
+subscribeToDate()           → attaches all 6 Firebase realtime listeners for currentDate
+scheduleRender()            → debounces renderHibachi() calls (50ms timer)
+logAudit(action, details, initials) → async; pushes entry to auditlog/{mk}
+safeWrite(ref, data, action) → rate-limited wrapper for push/set/remove (20/min)
+rateLimitCheck(action, max) → sliding-window rate limiter; returns false if exceeded
+
+── DATE / TIME UTILITIES ──
+dateKey(d)                  → Date → 'YYYY-MM-DD' string
+formatDateLabel(d)          → 'Jan 6, 2025' display string
+formatDateSub(d)            → 'MONDAY' uppercase weekday
+timeToMinutes(t)            → 'HH:MM' → integer minutes since midnight
+minutesToTime(m)            → integer minutes → 'HH:MM'
+displayTime(t)              → 'HH:MM' (24h) → 'H:MM' (no AM/PM, PM-biased display)
+fmtDateDisplay(dk)          → 'YYYY-MM-DD' → 'Mon, Jan 6, 2025'
+
+── NAVIGATION ──
+changeDay(dir)              → advances/retreats currentDate by 1 day; re-subscribes
+toggleCalendar()            → shows/hides calendar dropdown (blocked in guest mode)
+calShiftMonth(dir)          → navigates calendar dropdown month
+renderCalGrid()             → builds calendar day grid with alert/selected/today highlights
+pickDate(val)               → sets currentDate from 'YYYY-MM-DD', re-subscribes, closes calendar
+renderDateHeader()          → updates dateLabel + dateSub text elements
+switchTab(tab)              → switches active view; guards export tab with password
+showExportLock()            → shows export lock screen before tab is unlocked
+unlockExport()              → validates password, sets exportUnlocked=true, switches tab
+
+── WEEK STRIP ──
+getRolling7Days()           → returns array of 7 Date objects (today+6, or Mon–Sun of selected week)
+loadWeekData()              → async; fetches reservations+dining counts for all 7 days → weekDataCache
+renderWeekStrip()           → builds week hotbar strip with day/date/guest tally cells; adds Daily Sheet + Remove Chef buttons
+initStripScrollCollapse()   → attaches scroll listener to hibachiScroll; collapses/restores weekStrip
+weekStrip                   → collapsible week navigation strip element
+
+── HIBACHI SCHEDULE ENGINE ──
+getServiceWindow(dow)       → {start, end} in minutes for day-of-week
+getChefsAtTime(dow, timeMins, dateStr) → effective chef count at a time (accounting for overrides)
+generateTimeSlots(dow)      → array of 'HH:MM' strings (every 30min within service window)
+getLastBookableMinutes(dow) → last slot minute: Fri/Sat=21:00, else 20:00
+prefersHourlySlots(dow)     → true Mon–Thu (hourly display preference)
+isHalfHourSlot(slot)        → boolean; slot ends in ':30'
+getSingleGrillCap(groupCount) → guest cap for a single grill based on existing group count
+getGrillCap(n)              → alias for getSingleGrillCap()
+grillLabel(g)               → 'Grill 1' etc. from grillLabels map
+grillLabels{}               → {G1:'Grill 1', G2:'Grill 2', G3:'Grill 3', G4:'Grill 4'}
+grillsUsedByRes(r)          → returns array of grill numbers used by a reservation
+
+── GRILL ASSIGNMENT ENGINE ──
+autoAssignGrill(dateStr, slot, guests, chefs, excludeId) → {grill, grill2, isDouble, tightTiming} or null
+getAllResForDate(dateStr)    → array of all reservations (excluding __chefRemoved marker)
+getGroupsAtGrillAtSlot(dateStr, grill, slotMins, excludeId) → array of matching reservations
+isGrillBlockedExcluding(dateStr, grill, slotMins, excludeId) → {reason:'cook'|'seat'|'tight', bookedAt} or null
+isGrillBlocked(dateStr, grill, slotMins) → wrapper with excludeId=null
+getChefsCommittedAtSlot(all, slotMins) → Set of 'chef_N' strings for grills in use
+checkDoubleCooldown(all, slotMins, excludeId) → 'blocked' | 'tight' | 'ok'
+cardRequired(guests, dateKey) → boolean; requires card for ≥4 guests (same-day exemption ≤5)
+
+── HIBACHI RENDERING ──
+renderHibachi()             → top-level: shows/hides week strip, calls renderTimeSlots(), hides controls in guest mode
+renderTimeSlots()           → builds all time-block elements for currentDate's slots into #timeSlots
+getSlotDefaultCap(chefs)    → 12 (1 chef) or 24 (2+ chefs)
+printDailySheet()           → builds and opens print window with hibachi + dining layout
+
+── NEW RESERVATION STEPPED WIZARD (_sr flow) ──
+_srStep1()                  → guests step: input number of guests; validates against caps
+_srStep1Force()             → force-add variant: skips cap check; shows override banner
+_srNext1() / srNext1Force() → validates guest count, calls autoAssignGrill, advances to step 2
+_srStep2()                  → name step: text input for guest name
+srNext2()                   → validates and stores name, advances to step 3
+_srStep3()                  → phone step: tel input with live formatter
+srNext3()                   → validates phone (7 or 10 digits), routes to step 4 or 6 based on cardRequired
+_srStep4()                  → card number step (if required): formatted input + skip/hold option
+srNext4()                   → validates card (≥12 digits), advances to step 5
+srSkipCard()                → marks _sr.isHold=true, skips to step 6
+_srStep5()                  → expiry step: MM/YY input
+srNext5()                   → validates expiry, advances to step 6
+_srStep6()                  → initials step: staff initials input
+srNext6()                   → validates initials, advances to step 7
+_srStep7()                  → notes step: note type select + text input; final confirm button
+srSave()                    → async; re-verifies grill assignment, writes reservation to Firebase, logs audit
+checkNoteWordLimit_sr()     → enforces 10-word note limit in step 7
+_srHeader()                 → returns HTML string: slot time display for wizard header
+_srProgress(step)           → returns HTML string: numbered progress bar (steps 1–7)
+_srContinueBtn(label, fn)   → returns HTML string: gold continue button
+_srErr(msg)                 → shows error in #srErr element
+
+── LARGE GROUP / OVERRIDE FLOWS ──
+showOverrideBlock(guests)   → injects override password block into step 1 when slot is full
+srApplyOverride(g)          → validates large-group password, sets _sr.isOverride, calls _srStep2
+openForceAddModal(slot)     → force-add modal (bypasses all grill checks) with password gate
+submitForceAdd(slot)        → validates force password, sets _sr.forceOverride, calls _srStep1Force
+showLargeGroupPwdField()    → injects manager password field into edit form for ≥30 guests
+checkLargeGroupPwd()        → shows/hides large group password field based on guest count input
+
+── EDIT / VIEW RESERVATION MODAL ──
+openResModal(dk, id)        → opens view/edit modal for existing reservation; populates all fields
+saveHibachi(dk, editId)     → async; validates edit form, checks card/hold logic, writes update to Firebase
+confirmDelete(dk, id)       → injects inline delete confirm (initials required) into edit form
+deleteRes(dk, id)           → async; logs audit + removes reservation from Firebase
+quickDeleteRes(dk, id, name) → opens standalone delete confirm modal
+quickDeleteConfirm(dk, id)  → async; validates initials + removes reservation
+unlockCardDetails(editId)   → password-gates card field reveal in edit modal; populates card inputs
+showHoldWarning(dk, editId) → injects hold/card options panel when card is missing on save
+applyNoCardOverride(dk, editId) → manager override to save without card
+moveReservation()           → async; reads move date/time inputs, writes to new path, deletes from old, logs audit
+showErr(msg)                → injects error banner into #formErr
+
+── CONFIRM RESERVATION (arrival) ──
+openConfirmModal(dk, resId) → opens modal to toggle confirmed status on a reservation
+saveConfirm / unconfirmRes  → set/clear r.confirmed flag in Firebase
+
+── DINING ROOM ──
+renderDining()              → builds dining card list into #diningList for currentDate
+openDiningModal(existing)   → opens create/edit dining modal; populates fields if editing
+saveDining(dk, editId)      → async; validates and writes dining reservation to Firebase
+deleteDining(dk, id)        → confirm + removes dining reservation from Firebase
+
+── SLOT MANAGEMENT ──
+toggleBlockSlot(slot)       → password-gated: blocks/unblocks a time slot in Firebase
+toggleCapInput(slot)        → shows/hides inline cap number input for a slot
+saveSlotCap(slot, chefs)    → async; saves custom cap to Firebase (removes if matches default)
+getSlotDefaultCap(chefs)    → 12 or 24 depending on chef count
+
+── CHEF DAY OVERRIDE ──
+getBaseChefs()              → max scheduled chefs for currentDate (for banner display)
+renderChefRemovedBanner()   → shows/hides amber banner when a chef has been removed today
+promptRemoveChef()          → opens password modal to remove 1 chef for today only
+confirmRemoveChef()         → async; validates password+initials, writes __chefRemoved to Firebase
+restoreChefForDay()         → opens password modal to restore removed chef
+confirmRestoreChef()        → async; validates password+initials, removes __chefRemoved from Firebase
+
+── HOLDS & CARD WIPE ──
+purgeExpiredHolds()         → async; scans last 7 days, deletes reservations past holdUntil date, logs audit
+wipeCardsForDate(dk)        → async; nulls card+expiry fields for all reservations on a date, logs audit
+startMidnightWipePoller()   → on startup wipes cards for today+30 days; then polls every 30s for 23:59 trigger
+_lastWipeDate               → prevents double-wipe per date
+
+── HISTORY TAB ──
+renderHistoryFilterBar()    → builds action filter buttons (ALL / CREATE / EDIT / DELETE) + mode toggle
+renderHistory()             → renders audit entries for selected day or month; handles filter + mode
+loadMoreHistory()           → async; fetches 6 prior months of auditlog from Firebase
+historySelectedMonth        → YYYY-MM string; currently selected month in month mode
+historyMode                 → 'day' | 'month'
+historyFilter               → 'all' | 'create' | 'edit' | 'delete'
+
+── EXPORT TAB ──
+initExportTab()             → sets default date range to current year; restores Apps Script URL
+setExportRange(mode)        → sets exportFrom/exportTo to 'month' | 'year' | 'all'
+runExport()                 → async; fetches all reservations+dining in date range → exportRows[]
+renderExportTable()         → builds export table rows in #exportTbody; updates #exportSummary
+buildTsv()                  → builds tab-separated string into #exportTsv textarea
+copyTsv()                   → copies TSV textarea content to clipboard
+emailExport()               → formats plain-text export body and opens mailto: link
+syncToSheet()               → async; POSTs exportRows to Google Apps Script Web App URL
+runImport()                 → async; parses TSV from #importTsv, writes each row to Firebase (hibachi or dining)
+parseDateStr() [local]      → inside runImport: parses 'YYYY-MM-DD' or 'Mon, Jan 6, 2025' → 'YYYY-MM-DD'
+parseTimeStr() [local]      → inside runImport: parses '6:00' or '6:00 PM' → 24h 'HH:MM'
+fmtDateDisplay(dk)          → 'YYYY-MM-DD' → short locale date string for export display
+
+── INPUT FORMATTERS ──
+fmtCard(el)                 → live-formats card input as '#### #### #### ####'
+fmtExpiry(el)               → live-formats expiry input as 'MM/YY'
+fmtPhone(el)                → live-formats phone as '(NNN) NNN-NNNN'
+
+── INPUT SANITIZATION ──
+sanitizeText(val, maxLen)   → strips control chars, trims, truncates to maxLen (default 200)
+sanitizeInitials(val)       → strips non-alpha, uppercases, max 4 chars
+sanitizePhone(val)          → strips invalid phone chars, max 20 chars
+sanitizeGuests(val)         → parses int, validates 1–999, returns 0 if invalid
+
+── MODAL UTILS ──
+showModal()                 → displays #modalOverlay, locks body scroll
+closeModal()                → hides #modalOverlay, restores scroll, clears unlockedCardIds + move state
+closeModalIfOutside(e)      → closes modal if click was on overlay backdrop
+
+── HTML ELEMENT IDs ──
+loginScreen                 → full-screen login overlay (shown until authenticated)
+staffPin                    → PIN/password input field on login screen
+staffPinErr                 → error text below PIN input
+googleSignInPanel           → Google sign-in section (shown when not Firebase-authenticated)
+googleSignInBtn             → Google sign-in button
+googleSignInErr             → error text below Google sign-in button
+
+app                         → main app wrapper (hidden until authenticated)
+modeIndicator               → role badge (Staff / Manager / Guest)
+liveStatus                  → live dot indicator (shown when Firebase connected)
+dateLabel                   → primary date display (e.g. 'Jan 6, 2025')
+dateSub                     → weekday display (e.g. 'MONDAY ▾')
+calDropdown                 → inline calendar dropdown panel
+calMonthLabel               → month/year label inside calendar dropdown
+calGrid                     → grid container for calendar day cells
+
+weekStrip                   → collapsible 7-day hotbar strip
+chefRemovedBanner           → amber banner shown when a chef is removed today
+
+tab-hibachi / tab-dining / tab-history / tab-export  → tab button elements
+view-hibachi / view-dining / view-history / view-export → tab content panels
+view-export-lock            → export password gate screen
+exportLockPwd               → password input on export lock screen
+exportLockErr               → error text on export lock screen
+
+hibachiScroll               → scrollable container for hibachi time slots
+timeSlots                   → container div where time-block elements are rendered
+diningList                  → container div where dining cards are rendered
+
+modalOverlay                → full-screen modal backdrop
+modalSheet                  → bottom-sheet modal card
+modalTitle                  → modal heading text
+modalBody                   → dynamic modal content area
+transferSection             → move-reservation section inside modal (hidden by default)
+moveDate / moveTime         → date + time inputs for reservation move
+moveErr                     → error text for move validation
+
+exportFrom / exportTo       → date range inputs for export
+exportStatus                → status message below export controls
+exportTsv                   → readonly textarea with TSV output
+exportTable / exportTbody   → export preview table and its body
+exportSummary               → summary stats row below export table
+importTsv                   → textarea for pasting import data
+importStatus                → status message after import
+appsScriptUrl               → Google Apps Script URL input for sheet sync
+copyBtn / emailBtn / sheetBtn → export action buttons
