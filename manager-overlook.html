@@ -781,12 +781,43 @@ tr:hover td{background:rgba(232,160,32,.03)}
   <button class="btn bg" onclick="printScheduleSheet()">🖨 Print Sheet</button>
   <button class="btn bo" onclick="copySheetData('kitchen')">Copy Kitchen+Sushi</button>
   <button class="btn bo" onclick="copySheetData('serving')" style="border-color:var(--service);color:var(--service)">Copy Serving</button>
+  <button class="btn bo" onclick="openDaysWorkedModal()" style="border-color:var(--amber);color:var(--amber)">📊 Days Worked</button>
   <button class="btn bo" onclick="closeModal('sheet-modal')">Close</button>
 </div>
 <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">🍳 Kitchen + Sushi</div>
 <div class="sheet-preview" id="sheet-preview-kitchen"></div>
 <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3);margin-top:14px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">🍽 Serving</div>
 <div class="sheet-preview" id="sheet-preview-serving"></div>
+</div></div>
+
+<!-- DAYS WORKED MODAL -->
+<div class="mb" id="days-worked-modal"><div class="mo mo-wide">
+<h3>Days Worked — 2-Week Count</h3>
+<p style="font-family:var(--font-mono);font-size:.62rem;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.07em">Kitchen · Sushi · Teppan only — excludes Service, CP, Aladin</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+  <div class="fg" style="flex:none">
+    <label>Week 1 Start (Mon)</label>
+    <input type="date" id="dw-week1" class="iline" style="width:150px" oninput="renderDaysWorked()">
+  </div>
+  <div class="fg" style="flex:none">
+    <label>Week 2 Start (Mon)</label>
+    <input type="date" id="dw-week2" class="iline" style="width:150px" oninput="renderDaysWorked()">
+  </div>
+  <button class="btn bo bs" onclick="autoDetectDWRange()" style="margin-top:14px;font-size:.68rem;color:var(--amber);border-color:rgba(232,160,32,.3)">↺ Auto-Detect Last 2 Weeks</button>
+</div>
+<div id="dw-range-label" style="font-family:var(--font-mono);font-size:.62rem;color:var(--text2);margin-bottom:10px"></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start">
+  <div style="flex:1;min-width:200px">
+    <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:8px">// Breakdown</div>
+    <div id="dw-breakdown" style="font-family:var(--font-mono);font-size:.75rem;line-height:2;color:var(--text2)"></div>
+  </div>
+  <div style="min-width:180px">
+    <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:8px">// Google Sheets Output</div>
+    <pre id="dw-output" style="background:var(--bg2);border:1px solid var(--amber);border-radius:var(--r);padding:12px 16px;font-family:var(--font-mono);font-size:1rem;color:var(--amber);line-height:2.1;min-width:80px;white-space:pre"></pre>
+    <button class="btn bg" style="margin-top:8px;width:100%" onclick="copyDaysWorked()">📋 Copy for Sheets</button>
+  </div>
+</div>
+<div class="mf" style="margin-top:14px"><button class="btn bo" onclick="closeModal('days-worked-modal')">Close</button></div>
 </div></div>
 
 <!-- EMPLOYEE MODAL — multi-role -->
@@ -2642,6 +2673,134 @@ function updatePiItemList(){
   const names=[...new Set(S.priceItems.map(it=>it.itemName))];
   dl.innerHTML=names.map(n=>`<option value="${escHtml(n)}">`).join('');
 }
+
+// ── DAYS WORKED ──
+// Staff to count (normalized) — exact output order
+const DW_ORDER = ['DD','Yom','Kim','Yang','Gu','Mike',null,'Lee'];
+// Excluded names (normalized) — service staff, CP, Aladin
+const DW_EXCLUDE = ['cp','aladin'];
+// Included sections only
+const DW_SECTIONS = ['SUSHI','KITCHEN','TEPPAN'];
+
+function normDWName(n){ return (n||'').trim().toLowerCase().replace(/[\s.]/g,''); }
+
+// Map a raw shift name to a canonical DW_ORDER name (or null if excluded/service)
+function mapDWName(rawName){
+  const n = normDWName(rawName);
+  if(!n) return null;
+  // Exclude list
+  if(DW_EXCLUDE.includes(n)) return null;
+  // Map to canonical
+  const checks = [
+    { canon:'DD',    tests:['dd','d.d','dd.','d.d.'] },
+    { canon:'Yom',   tests:['yom'] },
+    { canon:'Kim',   tests:['kim'] },
+    { canon:'Yang',  tests:['yang'] },
+    { canon:'Gu',    tests:['gu'] },
+    { canon:'Mike',  tests:['mike'] },
+    { canon:'Lee',   tests:['lee'] },
+  ];
+  for(const {canon,tests} of checks){
+    if(tests.some(t=>n===t||n.startsWith(t))) return canon;
+  }
+  return null; // unrecognized — skip
+}
+
+function getLastFullTwoWeekMondays(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  // Find most recent Sunday (end of last full week)
+  const dow = today.getDay(); // 0=Sun,1=Mon,...
+  // If today is Mon(1), last Sun was yesterday; Sun(0) = today; otherwise go back to last Sun
+  const daysToLastSun = dow === 0 ? 7 : dow;
+  const lastSun = new Date(today); lastSun.setDate(today.getDate() - daysToLastSun);
+  // week2 ends lastSun → week2 starts Mon before lastSun
+  const week2Mon = new Date(lastSun); week2Mon.setDate(lastSun.getDate() - 6);
+  // week1 starts the Monday before week2
+  const week1Mon = new Date(week2Mon); week1Mon.setDate(week2Mon.getDate() - 7);
+  return [week1Mon.toISOString().slice(0,10), week2Mon.toISOString().slice(0,10)];
+}
+
+function isoMonday(dateStr){
+  const d = new Date(dateStr+'T12:00:00');
+  return d.getDay() === 1; // 1 = Monday
+}
+
+window.autoDetectDWRange = function(){
+  const [w1,w2] = getLastFullTwoWeekMondays();
+  document.getElementById('dw-week1').value = w1;
+  document.getElementById('dw-week2').value = w2;
+  renderDaysWorked();
+};
+
+window.openDaysWorkedModal = function(){
+  // Auto-detect on open if fields are empty
+  if(!document.getElementById('dw-week1').value){
+    const [w1,w2] = getLastFullTwoWeekMondays();
+    document.getElementById('dw-week1').value = w1;
+    document.getElementById('dw-week2').value = w2;
+  }
+  renderDaysWorked();
+  openModal('days-worked-modal');
+};
+
+function renderDaysWorked(){
+  const w1 = document.getElementById('dw-week1').value;
+  const w2 = document.getElementById('dw-week2').value;
+  const rangeEl = document.getElementById('dw-range-label');
+  const breakEl = document.getElementById('dw-breakdown');
+  const outEl = document.getElementById('dw-output');
+
+  if(!w1||!w2){ rangeEl.textContent='Select both week start dates (Monday).'; breakEl.innerHTML=''; outEl.textContent=''; return; }
+
+  // Compute per-person totals
+  const totals = {}; // canonName → days (number)
+  DW_ORDER.forEach(n=>{ if(n) totals[n]=0; });
+
+  const weeks = [w1,w2];
+  weeks.forEach(wk=>{
+    // Gather all shifts for this week & allowed sections
+    const ws = S.shifts.filter(s=>s.week===wk && DW_SECTIONS.includes((s.section||'').toUpperCase()));
+    ws.forEach(sh=>{
+      const canon = mapDWName(sh.name);
+      if(!canon) return;
+      const t = (sh.time||'').trim().toLowerCase();
+      const val = (t==='1/2'||t==='half') ? 0.5 : 1;
+      if(totals[canon]===undefined) totals[canon]=0;
+      totals[canon] += val;
+    });
+  });
+
+  // Range label
+  const fmt = d => { try{ const o=new Date(d+'T12:00:00'); return o.toLocaleDateString('en-CA',{month:'short',day:'numeric'}); }catch(e){return d;} };
+  const w1end = new Date(w1+'T12:00:00'); w1end.setDate(w1end.getDate()+6);
+  const w2end = new Date(w2+'T12:00:00'); w2end.setDate(w2end.getDate()+6);
+  rangeEl.textContent = `${fmt(w1)} – ${w1end.toLocaleDateString('en-CA',{month:'short',day:'numeric'})}  ·  ${fmt(w2)} – ${w2end.toLocaleDateString('en-CA',{month:'short',day:'numeric'})}`;
+
+  // Build breakdown display
+  let bHtml = '';
+  DW_ORDER.forEach(name=>{
+    if(!name){ bHtml+=`<div style="height:1em"></div>`; return; }
+    const v = totals[name]||0;
+    const disp = v%1===0 ? v : v.toFixed(1);
+    bHtml+=`<div style="display:flex;justify-content:space-between;gap:24px;border-bottom:1px solid var(--border);padding:1px 0"><span style="color:var(--text)">${name}</span><span style="color:var(--amber);font-weight:700">${disp}</span></div>`;
+  });
+  breakEl.innerHTML = bHtml;
+
+  // Build output (numbers only, 8 lines)
+  const lines = DW_ORDER.map(name=>{
+    if(!name) return '';
+    const v = totals[name]||0;
+    return v%1===0 ? String(v) : v.toFixed(1);
+  });
+  outEl.textContent = lines.join('\n');
+}
+
+window.copyDaysWorked = function(){
+  const txt = document.getElementById('dw-output').textContent;
+  if(!txt){ showToast('Nothing to copy'); return; }
+  navigator.clipboard.writeText(txt);
+  showToast('Copied — paste into Google Sheets ✓');
+};
 
 window.confirmVendor=async function(){
   const name=document.getElementById('v-name').value.trim();
