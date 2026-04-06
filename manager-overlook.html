@@ -237,44 +237,36 @@ tr:hover td{background:rgba(232,160,32,.03)}
 .toggle-sw input:checked+.sl:before{transform:translateX(16px);background:var(--amber)}
 
 /* ── CHECKLIST STYLES ── */
-.cl-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:all .15s;position:relative;cursor:grab}
-.cl-item:active{cursor:grabbing}
-.cl-item.dragging{opacity:.4;border-style:dashed}
+.cl-item{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px 14px 14px 16px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;transition:border-color .15s,opacity .2s;position:relative;border-left:3px solid var(--border)}
+.cl-item.dragging{opacity:.35;border-style:dashed}
 .cl-item.drag-over{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber)}
-.cl-item.cl-done{opacity:.55}
+.cl-item.cl-done{opacity:.45;border-left-color:var(--green)}
 .cl-item.cl-done .cl-title{text-decoration:line-through;color:var(--text3)}
-.cl-drag-handle{color:var(--text3);font-size:.85rem;cursor:grab;flex-shrink:0;padding:0 4px;user-select:none}
+.cl-item.imp-border-urgent{border-left-color:var(--red)}
+.cl-item.imp-border-high{border-left-color:var(--amber)}
+.cl-item.imp-border-medium{border-left-color:var(--blue)}
+.cl-item.imp-border-low{border-left-color:var(--border2)}
+.cl-drag-handle{color:var(--border2);font-size:.85rem;cursor:grab;flex-shrink:0;padding:2px 2px 0;user-select:none;display:none}
+@media(min-width:600px){.cl-drag-handle{display:block}}
 .cl-drag-handle:hover{color:var(--amber)}
-.cl-title{font-size:.85rem;font-weight:600;flex:1;line-height:1.4}
-.cl-desc{font-size:.76rem;color:var(--text2);margin-top:2px;line-height:1.5}
-.cl-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex-shrink:0}
-/* Importance badges */
-.imp-urgent{background:rgba(208,72,40,.2);color:#e87858;border:1px solid rgba(208,72,40,.35)}
-.imp-high{background:rgba(232,160,32,.15);color:var(--amber);border:1px solid rgba(232,160,32,.3)}
-.imp-medium{background:rgba(58,154,184,.12);color:#7ab4cc;border:1px solid rgba(58,154,184,.25)}
-.imp-low{background:rgba(90,86,72,.2);color:var(--text2);border:1px solid var(--border)}
-/* Status badges */
-.stat-notstarted{background:rgba(42,41,37,.5);color:var(--text3);border:1px solid var(--border)}
-.stat-initiated{background:rgba(58,154,184,.1);color:#7ab4cc;border:1px solid rgba(58,154,184,.2)}
-.stat-waiting{background:rgba(232,160,32,.1);color:var(--amber);border:1px solid rgba(232,160,32,.2)}
-.stat-completed{background:rgba(74,138,74,.15);color:var(--green-l);border:1px solid rgba(74,138,74,.25)}
-/* Flag badges */
-.flag-later{background:rgba(138,90,184,.1);color:var(--service);border:1px solid rgba(138,90,184,.2)}
-.flag-wait{background:rgba(232,160,32,.08);color:var(--amber);border:1px solid rgba(232,160,32,.15)}
-.flag-active{background:rgba(58,154,184,.1);color:#7ab4cc;border:1px solid rgba(58,154,184,.2)}
-.flag-action{background:rgba(208,72,40,.15);color:#e87858;border:1px solid rgba(208,72,40,.25)}
-.flag-urgent{background:rgba(208,72,40,.25);color:#ff8060;border:1px solid rgba(208,72,40,.45)}
-.flag-done{background:rgba(74,138,74,.15);color:var(--green-l);border:1px solid rgba(74,138,74,.25)}
-.cl-actions{display:flex;gap:4px;flex-shrink:0}
-.cl-check-btn{width:22px;height:22px;border-radius:2px;border:1px solid var(--border);background:var(--s2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--text3);transition:all .12s;flex-shrink:0}
-.cl-check-btn:hover,.cl-check-btn.checked{background:rgba(74,138,74,.2);border-color:var(--green-l);color:var(--green-l)}
-.cl-check-btn.checked{background:rgba(74,138,74,.25);border-color:var(--green-l);color:var(--green-l)}
-.cl-del-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.7rem;padding:3px 5px;border-radius:2px;transition:all .1s}
+/* Big tap-to-complete button */
+.cl-check-btn{width:32px;height:32px;min-width:32px;border-radius:50%;border:2px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:transparent;transition:all .15s;flex-shrink:0;margin-top:1px}
+.cl-check-btn:hover{border-color:var(--green-l);color:var(--green-l)}
+.cl-check-btn.checked{background:rgba(74,138,74,.2);border-color:var(--green-l);color:var(--green-l)}
+.cl-body{flex:1;min-width:0}
+.cl-title{font-size:.88rem;font-weight:600;line-height:1.4;color:var(--text)}
+.cl-desc{font-size:.76rem;color:var(--text2);margin-top:3px;line-height:1.5}
+/* Inline tappable pills */
+.cl-pills{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.cl-pill{padding:3px 10px;border-radius:10px;font-family:var(--font-mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;border:1px solid transparent;transition:opacity .1s;user-select:none}
+.cl-pill:active{opacity:.7}
+.cl-actions{display:flex;gap:2px;flex-shrink:0;align-items:flex-start;margin-top:1px}
+.cl-del-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.8rem;padding:5px 7px;border-radius:4px;transition:all .1s;min-width:30px;min-height:30px;display:flex;align-items:center;justify-content:center}
 .cl-del-btn:hover{color:var(--red);background:var(--red-d)}
-.cl-edit-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.7rem;padding:3px 5px;border-radius:2px;transition:all .1s}
+.cl-edit-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.8rem;padding:5px 7px;border-radius:4px;transition:all .1s;min-width:30px;min-height:30px;display:flex;align-items:center;justify-content:center}
 .cl-edit-btn:hover{color:var(--amber);background:var(--amber-d)}
-.cl-filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
-.cl-filter-btn{padding:4px 12px;border-radius:12px;font-family:var(--font-mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text3);transition:all .12s}
+.cl-filter-bar{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.cl-filter-btn{padding:6px 14px;border-radius:14px;font-family:var(--font-mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text3);transition:all .12s;min-height:32px}
 .cl-filter-btn:hover{border-color:var(--amber);color:var(--amber)}
 .cl-filter-btn.active{background:var(--amber-d);border-color:var(--amber);color:var(--amber)}
 .cl-section-header{font-family:var(--font-head);font-size:.85rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);padding:12px 0 6px;border-bottom:1px solid var(--border);margin-bottom:8px;display:flex;align-items:center;gap:8px}
@@ -508,20 +500,28 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div class="stats">
   <div class="sc"><div class="lb">Due This Week</div><div class="vl" id="d-due">—</div><div class="sb">Within 7 days</div></div>
   <div class="sc">
-    <div class="lb">Today's Staff</div>
-    <div class="vl-split" id="d-staff-split">
-      <div><div class="vpart" id="d-cooks" style="color:var(--kitchen)">—</div><div class="vlabel">Kitchen</div></div>
+    <div class="lb">Today — Kitchen</div>
+    <div class="vl-split">
+      <div><div class="vpart" id="d-cooks" style="color:var(--kitchen)">—</div><div class="vlabel">BOH</div></div>
       <div style="color:var(--text3);font-family:var(--font-mono);font-size:1rem;align-self:center">/</div>
-      <div><div class="vpart" id="d-service" style="color:var(--service)">—</div><div class="vlabel">Service</div></div>
+      <div><div class="vpart" id="d-sushi" style="color:var(--sushi)">—</div><div class="vlabel">Sushi</div></div>
     </div>
     <div class="sb">Scheduled today</div>
   </div>
-  <div class="sc"><div class="lb">On Roster</div><div class="vl" id="d-roster">—</div><div class="sb">Total employees</div></div>
+  <div class="sc">
+    <div class="lb">Today — Service</div>
+    <div class="vl-split">
+      <div><div class="vpart" id="d-service-am" style="color:var(--service)">—</div><div class="vlabel">AM</div></div>
+      <div style="color:var(--text3);font-family:var(--font-mono);font-size:1rem;align-self:center">/</div>
+      <div><div class="vpart" id="d-service-pm" style="color:var(--service)">—</div><div class="vlabel">PM</div></div>
+    </div>
+    <div class="sb">AM · PM split today</div>
+  </div>
   <div class="sc"><div class="lb">Checklist Open</div><div class="vl" id="d-checklist">—</div><div class="sb">Action required</div></div>
   <div class="sc" style="cursor:pointer" onclick="openServingSummaryModal()">
     <div class="lb">Serving Summary</div>
     <div class="vl" style="font-size:1.1rem;color:var(--service)">View →</div>
-    <div class="sb">Days & hours · 2 weeks</div>
+    <div class="sb">Days & hours · this week</div>
   </div>
   <div class="sc">
     <div class="lb">Hibachi — Next 4 Days</div>
@@ -835,20 +835,17 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <!-- SERVING SUMMARY MODAL -->
 <div class="mb" id="serving-summary-modal"><div class="mo mo-wide">
 <h3>Serving Staff Summary</h3>
-<p style="font-family:var(--font-mono);font-size:.62rem;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.07em">Days worked · Projected hours — Serving section only</p>
+<p style="font-family:var(--font-mono);font-size:.62rem;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.07em">Total days & projected hours for serving staff — one week</p>
 <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
   <div class="fg" style="flex:none">
-    <label>Week 1 Start (Mon)</label>
+    <label>Week (Mon)</label>
     <input type="date" id="ss-week1" class="iline" style="width:150px" oninput="renderServingSummary()">
   </div>
-  <div class="fg" style="flex:none">
-    <label>Week 2 Start (Mon)</label>
-    <input type="date" id="ss-week2" class="iline" style="width:150px" oninput="renderServingSummary()">
-  </div>
-  <button class="btn bo bs" onclick="autoDetectSSRange()" style="margin-top:14px;font-size:.68rem;color:var(--service);border-color:rgba(138,90,184,.3)">↺ Auto-Detect Last 2 Weeks</button>
+  <button class="btn bo bs" onclick="autoDetectSSRange()" style="margin-top:14px;font-size:.68rem;color:var(--service);border-color:rgba(138,90,184,.3)">↺ This Week</button>
 </div>
 <div id="ss-range-label" style="font-family:var(--font-mono);font-size:.62rem;color:var(--text2);margin-bottom:12px"></div>
 <div id="ss-list" style="font-family:var(--font-mono);font-size:.82rem;color:var(--text2)"></div>
+<div id="ss-totals" style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:.75rem;color:var(--text3)"></div>
 <div class="mf" style="margin-top:14px"><button class="btn bo" onclick="closeModal('serving-summary-modal')">Close</button></div>
 </div></div>
 
@@ -1467,17 +1464,23 @@ function renderDash(){
   const mon=getMonday(now);const monStr=mon.toISOString().slice(0,10);
   const weekDates=Array.from({length:7},(_,i)=>{const d=new Date(mon);d.setDate(d.getDate()+i);return d.toISOString().slice(0,10);});
   const todayIdx=weekDates.indexOf(todayStr);
-  let cooksCount=0,serviceCount=0;
+  let cooksCount=0,sushiCount=0,serviceAmCount=0,servicePmCount=0;
   if(todayIdx>=0){
     const todayShifts=S.shifts.filter(s=>s.week===monStr&&s.dayIdx===todayIdx);
-    const cookNames=new Set(todayShifts.filter(s=>COOK_SECTIONS.includes((s.section||'').toUpperCase())).map(s=>s.name));
-    const svcNames=new Set(todayShifts.filter(s=>SERVICE_SECTIONS.includes((s.section||'').toUpperCase())).map(s=>s.name));
-    cooksCount=cookNames.size;serviceCount=svcNames.size;
+    const cookNames=new Set(todayShifts.filter(s=>['KITCHEN','TEPPAN'].includes((s.section||'').toUpperCase())).map(s=>s.name));
+    const sushiNames=new Set(todayShifts.filter(s=>(s.section||'').toUpperCase()==='SUSHI').map(s=>s.name));
+    const svcShifts=todayShifts.filter(s=>(s.section||'').toUpperCase()==='SERVING');
+    const amNames=new Set(svcShifts.filter(s=>!isPmServing(s.time)).map(s=>s.name));
+    const pmNames=new Set(svcShifts.filter(s=>isPmServing(s.time)).map(s=>s.name));
+    cooksCount=cookNames.size;sushiCount=sushiNames.size;
+    serviceAmCount=amNames.size;servicePmCount=pmNames.size;
   }
   document.getElementById('d-cooks').textContent=cooksCount||'—';
-  document.getElementById('d-service').textContent=serviceCount||'—';
-  const rosterCount=S.employees.length||new Set(S.shifts.map(s=>s.name)).size;
-  document.getElementById('d-roster').textContent=rosterCount||'—';
+  const sushiEl=document.getElementById('d-sushi');if(sushiEl)sushiEl.textContent=sushiCount||'—';
+  const amEl=document.getElementById('d-service-am');if(amEl)amEl.textContent=serviceAmCount||'—';
+  const pmEl=document.getElementById('d-service-pm');if(pmEl)pmEl.textContent=servicePmCount||'—';
+  // keep legacy d-service in sync (used elsewhere)
+  const svcEl=document.getElementById('d-service');if(svcEl)svcEl.textContent=(serviceAmCount+servicePmCount)||'—';
   // Checklist open count
   const openTasks=S.clTasks.filter(t=>t.status!=='completed'&&t.flag!=='done').length;
   document.getElementById('d-checklist').textContent=openTasks||'—';
@@ -2405,7 +2408,6 @@ function renderClTasks(){
   const container=document.getElementById('cl-task-list');
   if(!container)return;
   let list=[...S.clTasks];
-  // Filter
   if(clFilter==='urgent')list=list.filter(t=>t.importance==='urgent'||t.flag==='urgent');
   else if(clFilter==='action')list=list.filter(t=>t.flag==='action');
   else if(clFilter==='active')list=list.filter(t=>t.flag==='active');
@@ -2413,29 +2415,61 @@ function renderClTasks(){
   else if(clFilter==='later')list=list.filter(t=>t.flag==='later');
   else if(clFilter==='done')list=list.filter(t=>t.status==='completed'||t.flag==='done');
   else if(clFilter==='open')list=list.filter(t=>t.status!=='completed'&&t.flag!=='done');
-  // Sort
   if(clSort==='importance')list.sort((a,b)=>(IMP_ORDER[a.importance]||99)-(IMP_ORDER[b.importance]||99));
   else if(clSort==='status')list.sort((a,b)=>(STAT_ORDER[a.status]||99)-(STAT_ORDER[b.status]||99));
   else if(clSort==='flag')list.sort((a,b)=>(FLAG_ORDER[a.flag]||99)-(FLAG_ORDER[b.flag]||99));
   else if(clSort==='manual')list.sort((a,b)=>(a.order||0)-(b.order||0));
   if(!list.length){container.innerHTML=`<div class="cl-empty">// No tasks found</div>`;return;}
+
+  // Pill color map
+  const IMP_PILL={
+    urgent:'background:rgba(208,72,40,.2);color:#e87858;border-color:rgba(208,72,40,.35)',
+    high:'background:rgba(232,160,32,.15);color:var(--amber);border-color:rgba(232,160,32,.3)',
+    medium:'background:rgba(58,154,184,.12);color:#7ab4cc;border-color:rgba(58,154,184,.25)',
+    low:'background:rgba(90,86,72,.2);color:var(--text2);border-color:var(--border2)'
+  };
+  const FLAG_PILL={
+    urgent:'background:rgba(208,72,40,.25);color:#ff8060;border-color:rgba(208,72,40,.45)',
+    action:'background:rgba(208,72,40,.15);color:#e87858;border-color:rgba(208,72,40,.25)',
+    active:'background:rgba(58,154,184,.1);color:#7ab4cc;border-color:rgba(58,154,184,.2)',
+    wait:'background:rgba(232,160,32,.08);color:var(--amber);border-color:rgba(232,160,32,.15)',
+    later:'background:rgba(138,90,184,.1);color:var(--service);border-color:rgba(138,90,184,.2)',
+    done:'background:rgba(74,138,74,.15);color:var(--green-l);border-color:rgba(74,138,74,.25)'
+  };
+  const STAT_PILL={
+    notstarted:'background:rgba(42,41,37,.5);color:var(--text3);border-color:var(--border)',
+    initiated:'background:rgba(58,154,184,.1);color:#7ab4cc;border-color:rgba(58,154,184,.2)',
+    waiting:'background:rgba(232,160,32,.1);color:var(--amber);border-color:rgba(232,160,32,.2)',
+    completed:'background:rgba(74,138,74,.15);color:var(--green-l);border-color:rgba(74,138,74,.25)'
+  };
+  // Border color by importance
+  const IMP_BORDER={urgent:'var(--red)',high:'var(--amber)',medium:'var(--blue)',low:'var(--border2)'};
+
+  const IMP_CYCLE=['urgent','high','medium','low'];
+  const FLAG_CYCLE=['action','urgent','active','wait','later','done'];
+  const STAT_CYCLE=['notstarted','initiated','waiting','completed'];
+
   container.innerHTML=list.map(t=>{
     const isDone=t.status==='completed'||t.flag==='done';
-    return`<div class="cl-item${isDone?' cl-done':''}" id="clt-${t.id}" draggable="true"
+    const borderCol=isDone?'var(--green)':IMP_BORDER[t.importance||'medium']||'var(--border2)';
+    const imp=t.importance||'medium',flag=t.flag||'active',stat=t.status||'notstarted';
+    return`<div class="cl-item${isDone?' cl-done':''}" id="clt-${t.id}"
+      draggable="true"
       ondragstart="window.clDragStart(event,'${t.id}')"
       ondragover="window.clDragOver(event)"
       ondrop="window.clDrop(event,'${t.id}')"
-      ondragleave="window.clDragLeave(event)">
+      ondragleave="window.clDragLeave(event)"
+      style="border-left-color:${borderCol}">
       <div class="cl-drag-handle">⠿</div>
-      <button class="cl-check-btn${isDone?' checked':''}" onclick="window.toggleClDone('${t.id}')" title="Toggle complete">✓</button>
-      <div style="flex:1;min-width:0">
+      <button class="cl-check-btn${isDone?' checked':''}" onclick="window.toggleClDone('${t.id}')" title="Mark complete">✓</button>
+      <div class="cl-body">
         <div class="cl-title">${escHtml(t.title)}</div>
         ${t.desc?`<div class="cl-desc">${escHtml(t.desc)}</div>`:''}
-      </div>
-      <div class="cl-meta">
-        <span class="badge imp-${t.importance||'medium'}">${IMP_LABELS[t.importance]||'Medium'}</span>
-        <span class="badge flag-${t.flag||'active'}">${FLAG_LABELS[t.flag]||'Active'}</span>
-        <span class="badge stat-${t.status||'notstarted'}">${STAT_LABELS[t.status]||'Not Started'}</span>
+        <div class="cl-pills">
+          <span class="cl-pill" style="${IMP_PILL[imp]||''}" onclick="window.cycleClField('${t.id}','importance')" title="Tap to change importance">${IMP_LABELS[imp]||imp}</span>
+          <span class="cl-pill" style="${FLAG_PILL[flag]||''}" onclick="window.cycleClField('${t.id}','flag')" title="Tap to change flag">${FLAG_LABELS[flag]||flag}</span>
+          <span class="cl-pill" style="${STAT_PILL[stat]||''}" onclick="window.cycleClField('${t.id}','status')" title="Tap to change status">${STAT_LABELS[stat]||stat}</span>
+        </div>
       </div>
       <div class="cl-actions">
         <button class="cl-edit-btn" onclick="window.editClTask('${t.id}')" title="Edit">✎</button>
@@ -2443,12 +2477,23 @@ function renderClTasks(){
       </div>
     </div>`;
   }).join('');
-
-  // Drag-and-drop
   list.forEach((t,i)=>{const el=document.getElementById('clt-'+t.id);if(el)el.dataset.order=String(i);});
+
+  // Store cycles on window for use in cycleClField
+  window._CL_CYCLES={importance:IMP_CYCLE,flag:FLAG_CYCLE,status:STAT_CYCLE};
 }
 
-function escHtml(str){
+// Tap a pill to cycle to the next value
+window.cycleClField=async function(id,field){
+  const t=S.clTasks.find(x=>x.id===id);if(!t)return;
+  const cycles=window._CL_CYCLES||{importance:['urgent','high','medium','low'],flag:['action','urgent','active','wait','later','done'],status:['notstarted','initiated','waiting','completed']};
+  const arr=cycles[field]||[];
+  const cur=t[field]||arr[0];
+  const next=arr[(arr.indexOf(cur)+1)%arr.length];
+  t[field]=next;
+  await fsUp('clTasks',id,{[field]:next});
+  renderClTasks();
+};
   return(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
@@ -3026,85 +3071,70 @@ window.downloadSchedulePng = function(){
 // ── SERVING SUMMARY ──
 function parseSSStartHour(timeStr){
   const t=(timeStr||'').trim();
-  if(!t) return 11; // name only → 11am
+  if(!t) return 11;
   const n=parseFloat(t);
-  if(!isNaN(n)) return n;
+  if(!isNaN(n)&&n>=1&&n<=12) return n;
   return 11;
 }
 function ssCloseHour(weekKey,dayIdx){
-  // dayIdx: 0=Mon,1=Tue,2=Wed,3=Thu,4=Fri,5=Sat,6=Sun
-  // Fri=4, Sat=5 → 22, else 21
   if(dayIdx===4||dayIdx===5) return 22;
   return 21;
 }
-function computeServingSummary(weeks){
-  const staff={}; // name → {days:Set of "wk-dayIdx", hours:number}
-  weeks.forEach(wk=>{
-    const ws=S.shifts.filter(s=>s.week===wk&&(s.section||'').toUpperCase()==='SERVING');
-    ws.forEach(sh=>{
-      const name=(sh.name||'').trim();
-      if(!name) return;
-      if(!staff[name]) staff[name]={dayKeys:new Set(),hours:0};
-      const key=`${wk}-${sh.dayIdx}`;
-      // Days: count each unique day once per person
-      const isNewDay=!staff[name].dayKeys.has(key);
-      staff[name].dayKeys.add(key);
-      // Hours: only add on first entry per day (avoid double-counting same day)
-      if(isNewDay){
-        const start=parseSSStartHour(sh.time);
-        const close=ssCloseHour(wk,sh.dayIdx);
-        staff[name].hours+=Math.max(0,close-start);
-      }
-    });
-  });
-  return staff;
-}
 
 window.autoDetectSSRange=function(){
-  const [w1,w2]=getLastFullTwoWeekMondays();
-  document.getElementById('ss-week1').value=w1;
-  document.getElementById('ss-week2').value=w2;
+  const mon=getMonday(new Date());
+  const iso=`${mon.getFullYear()}-${String(mon.getMonth()+1).padStart(2,'0')}-${String(mon.getDate()).padStart(2,'0')}`;
+  document.getElementById('ss-week1').value=iso;
   renderServingSummary();
 };
 
 window.openServingSummaryModal=function(){
-  if(!document.getElementById('ss-week1').value){
-    const [w1,w2]=getLastFullTwoWeekMondays();
-    document.getElementById('ss-week1').value=w1;
-    document.getElementById('ss-week2').value=w2;
-  }
+  if(!document.getElementById('ss-week1').value) window.autoDetectSSRange();
   renderServingSummary();
   openModal('serving-summary-modal');
 };
 
 window.renderServingSummary=function(){
   const w1=document.getElementById('ss-week1').value;
-  const w2=document.getElementById('ss-week2').value;
   const rangeEl=document.getElementById('ss-range-label');
   const listEl=document.getElementById('ss-list');
-  if(!w1||!w2){rangeEl.textContent='Select both week start dates.';listEl.innerHTML='';return;}
+  const totalsEl=document.getElementById('ss-totals');
+  if(!w1){rangeEl.textContent='Select a week.';listEl.innerHTML='';if(totalsEl)totalsEl.innerHTML='';return;}
 
   const fmt=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('en-CA',{month:'short',day:'numeric'});}catch(e){return d;}};
-  const w1end=new Date(w1+'T12:00:00');w1end.setDate(w1end.getDate()+6);
-  const w2end=new Date(w2+'T12:00:00');w2end.setDate(w2end.getDate()+6);
-  rangeEl.textContent=`${fmt(w1)} – ${w1end.toLocaleDateString('en-CA',{month:'short',day:'numeric'})}  ·  ${fmt(w2)} – ${w2end.toLocaleDateString('en-CA',{month:'short',day:'numeric'})}`;
+  const wEnd=new Date(w1+'T12:00:00');wEnd.setDate(wEnd.getDate()+6);
+  rangeEl.textContent=`${fmt(w1)} – ${wEnd.toLocaleDateString('en-CA',{month:'short',day:'numeric'})}`;
 
-  const summary=computeServingSummary([w1,w2]);
-  const entries=Object.entries(summary).sort((a,b)=>b[1].dayKeys.size-a[1].dayKeys.size||a[0].localeCompare(b[0]));
+  const ws=S.shifts.filter(s=>s.week===w1&&(s.section||'').toUpperCase()==='SERVING');
+  const staff={};
+  ws.forEach(sh=>{
+    const name=(sh.name||'').trim();if(!name)return;
+    if(!staff[name]) staff[name]={dayKeys:new Set(),hours:0};
+    const isNewDay=!staff[name].dayKeys.has(sh.dayIdx);
+    staff[name].dayKeys.add(sh.dayIdx);
+    if(isNewDay){
+      staff[name].hours+=Math.max(0,ssCloseHour(w1,sh.dayIdx)-parseSSStartHour(sh.time));
+    }
+  });
 
-  if(!entries.length){listEl.innerHTML='<div style="color:var(--text3);font-size:.75rem">// No serving shifts found for this period</div>';return;}
+  const entries=Object.entries(staff).sort((a,b)=>b[1].dayKeys.size-a[1].dayKeys.size||a[0].localeCompare(b[0]));
+  if(!entries.length){listEl.innerHTML='<div style="color:var(--text3);font-size:.75rem">// No serving shifts found</div>';if(totalsEl)totalsEl.innerHTML='';return;}
 
   listEl.innerHTML=entries.map(([name,{dayKeys,hours}])=>{
     const days=dayKeys.size;
-    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">
+    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
       <span style="color:var(--text);font-weight:600">${name}</span>
-      <span style="color:var(--text2)">
-        <span style="color:var(--service);font-weight:700">${days}</span> day${days!==1?'s':''}
-        <span style="color:var(--text3);margin:0 6px">·</span>
-        <span style="color:var(--amber);font-weight:700">${hours}</span> hrs
+      <span>
+        <span style="color:var(--service);font-weight:700">${days}</span><span style="color:var(--text3)"> day${days!==1?'s':''}</span>
+        <span style="color:var(--text3);margin:0 8px">·</span>
+        <span style="color:var(--amber);font-weight:700">${hours}</span><span style="color:var(--text3)"> hrs</span>
       </span>
     </div>`;
   }).join('');
+
+  const totalDays=entries.reduce((s,[,v])=>s+v.dayKeys.size,0);
+  const totalHours=entries.reduce((s,[,v])=>s+v.hours,0);
+  if(totalsEl) totalsEl.innerHTML=`Total shift-days: <span style="color:var(--service);font-weight:700">${totalDays}</span> &nbsp;·&nbsp; Total projected hours: <span style="color:var(--amber);font-weight:700">${totalHours}</span>`;
 };
 
 // ── DAYS WORKED ──
