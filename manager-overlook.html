@@ -842,43 +842,24 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div class="mf" style="margin-top:14px"><button class="btn bo" onclick="closeModal('serving-summary-modal')">Close</button></div>
 </div></div>
 
-<!-- SEND SCHEDULE MODAL -->
+<!-- SCHEDULE PNG MODAL -->
 <div class="mb" id="send-schedule-modal"><div class="mo mo-wide">
-<h3>📱 Send Schedule</h3>
-<p style="font-family:var(--font-mono);font-size:.62rem;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.07em">Opens your SMS app — you hit send</p>
-
-<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-  <div class="fg" style="flex:none">
-    <label>What to send</label>
-    <select id="sms-which" class="iline" onchange="buildSmsPreview()" style="width:180px">
-      <option value="both">Both (Kitchen + Serving)</option>
-      <option value="kitchen">Kitchen + Sushi only</option>
-      <option value="serving">Serving only</option>
-    </select>
-  </div>
+<h3>📸 Schedule Image</h3>
+<p style="font-family:var(--font-mono);font-size:.62rem;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.07em">Generate a PNG — long-press on iPhone to save or share</p>
+<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+  <button class="btn bg" onclick="generateSchedulePng('kitchen')" style="flex:1;justify-content:center">🍳 Kitchen + Sushi</button>
+  <button class="btn bg" onclick="generateSchedulePng('serving')" style="flex:1;justify-content:center;background:var(--service)">🍽 Serving</button>
 </div>
-
-<div style="margin-bottom:14px">
-  <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:8px">// Phone Numbers</div>
-  <div id="sms-number-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px"></div>
-  <div style="display:flex;gap:6px">
-    <input id="sms-new-name" class="iline" placeholder="Name (e.g. Kim)" style="width:120px">
-    <input id="sms-new-number" class="iline" placeholder="+15065550100" style="width:160px" type="tel">
-    <button class="btn bo bs" onclick="addSmsContact()" style="color:var(--green-l);border-color:rgba(74,138,74,.3)">+ Add</button>
-  </div>
-</div>
-
-<div style="margin-bottom:14px">
-  <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:6px">// Message Preview</div>
-  <pre id="sms-preview" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px;font-family:var(--font-mono);font-size:.68rem;color:var(--text2);white-space:pre-wrap;max-height:220px;overflow-y:auto;line-height:1.6"></pre>
-</div>
-
-<div style="display:flex;gap:8px;flex-wrap:wrap">
-  <button class="btn bg" onclick="launchSms()" style="background:var(--green);color:#fff;flex:1;justify-content:center">📱 Open in SMS App</button>
-  <button class="btn bo" onclick="copySmsText()">Copy Text</button>
+<div id="png-status" style="font-family:var(--font-mono);font-size:.65rem;color:var(--text3);margin-bottom:8px;min-height:1em"></div>
+<div id="png-output" style="text-align:center"></div>
+<p id="png-hint" style="display:none;font-family:var(--font-mono);font-size:.62rem;color:var(--text3);margin-top:10px;text-align:center;line-height:1.7">
+  📱 iPhone: long-press image → <strong style="color:var(--text)">Save to Photos</strong> or <strong style="color:var(--text)">Share</strong><br>
+  💻 Desktop: right-click → Save Image As
+</p>
+<div class="mf" style="margin-top:14px">
+  <button id="png-dl-btn" style="display:none" class="btn bo" onclick="downloadSchedulePng()">⬇ Download PNG</button>
   <button class="btn bo" onclick="closeModal('send-schedule-modal')">Close</button>
 </div>
-<div id="sms-warn" style="display:none;font-family:var(--font-mono);font-size:.65rem;color:var(--text3);margin-top:8px;line-height:1.6"></div>
 </div></div>
 
 <!-- EMPLOYEE MODAL — multi-role -->
@@ -2735,114 +2716,291 @@ function updatePiItemList(){
   dl.innerHTML=names.map(n=>`<option value="${escHtml(n)}">`).join('');
 }
 
-// ── SEND SCHEDULE ──
-// Contacts stored in localStorage as [{name,number}]
-function getSmsContacts(){
-  try{return JSON.parse(localStorage.getItem('sms-contacts')||'[]');}catch(e){return[];}
-}
-function saveSmsContacts(list){
-  localStorage.setItem('sms-contacts',JSON.stringify(list));
-}
+// ── SCHEDULE PNG ──
+let _pngDataUrl = null;
 
-function buildScheduleText(which){
-  const wk=getWeekKey(),ws=S.shifts.filter(s=>s.week===wk);
-  const v=document.getElementById('sch-weekdate').value,mon=v?new Date(v+'T12:00:00'):new Date();
-  const wLabel=document.getElementById('sch-week-label').textContent||wk;
-  const DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
-  let lines=[`📅 SCHEDULE — ${wLabel}`,''];
-
-  function sectionBlock(sec){
-    const secShifts=ws.filter(s=>s.section===sec);
-    if(!secShifts.length)return;
-    lines.push(`[ ${sec} ]`);
-    DAYS.forEach((day,di)=>{
-      const dayS=secShifts.filter(s=>s.dayIdx===di).sort((a,b)=>shiftSortKey(a.time)-shiftSortKey(b.time));
-      if(!dayS.length)return;
-      const names=dayS.map(s=>s.time?`${s.name} ${s.time}`:s.name).join(', ');
-      lines.push(`  ${day}: ${names}`);
-    });
-    lines.push('');
-  }
-
-  if(which==='both'||which==='kitchen'){
-    ['SUSHI','KITCHEN','TEPPAN'].forEach(sec=>sectionBlock(sec));
-  }
-  if(which==='both'||which==='serving'){
-    sectionBlock('SERVING');
-  }
-  return lines.join('\n').trimEnd();
-}
-
-function renderSmsNumberList(){
-  const list=getSmsContacts();
-  const el=document.getElementById('sms-number-list');
-  if(!list.length){
-    el.innerHTML=`<span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">No contacts yet — add numbers below</span>`;
-    return;
-  }
-  el.innerHTML=list.map((c,i)=>`
-    <div style="display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:6px 10px">
-      <span style="font-family:var(--font-mono);font-size:.75rem;color:var(--text);flex:1"><strong>${c.name}</strong> <span style="color:var(--text3)">${c.number}</span></span>
-      <button onclick="removeSmsContact(${i})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:.7rem;padding:2px 5px" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--text3)'">✕</button>
-    </div>`).join('');
-}
-
-window.addSmsContact=function(){
-  const name=document.getElementById('sms-new-name').value.trim();
-  const number=document.getElementById('sms-new-number').value.trim();
-  if(!number){showToast('Enter a phone number');return;}
-  const list=getSmsContacts();
-  list.push({name:name||number,number});
-  saveSmsContacts(list);
-  document.getElementById('sms-new-name').value='';
-  document.getElementById('sms-new-number').value='';
-  renderSmsNumberList();
-  buildSmsPreview();
-};
-
-window.removeSmsContact=function(idx){
-  const list=getSmsContacts();
-  list.splice(idx,1);
-  saveSmsContacts(list);
-  renderSmsNumberList();
-  buildSmsPreview();
-};
-
-window.buildSmsPreview=function(){
-  const which=document.getElementById('sms-which').value;
-  const text=buildScheduleText(which);
-  document.getElementById('sms-preview').textContent=text;
-  // Warn if message is long
-  const warnEl=document.getElementById('sms-warn');
-  if(text.length>320){
-    warnEl.style.display='block';
-    warnEl.textContent=`⚠ Message is ${text.length} characters — most SMS apps will split this into ${Math.ceil(text.length/160)} messages. All content will still be sent.`;
-  }else{
-    warnEl.style.display='none';
-  }
-};
-
-window.openSendScheduleModal=function(){
-  renderSmsNumberList();
-  buildSmsPreview();
+window.openSendScheduleModal = function(){
+  document.getElementById('png-output').innerHTML = '';
+  document.getElementById('png-status').textContent = '';
+  document.getElementById('png-hint').style.display = 'none';
+  document.getElementById('png-dl-btn').style.display = 'none';
+  _pngDataUrl = null;
   openModal('send-schedule-modal');
 };
 
-window.launchSms=function(){
-  const contacts=getSmsContacts();
-  const text=document.getElementById('sms-preview').textContent;
-  if(!contacts.length){showToast('Add at least one phone number first');return;}
-  const numbers=contacts.map(c=>c.number).join(',');
-  const encoded=encodeURIComponent(text);
-  // sms: URI — works on iOS and Android; comma-separated numbers for group
-  window.location.href=`sms:${numbers}${/iPhone|iPad|iPod/.test(navigator.userAgent)?'&':'?'}body=${encoded}`;
+window.generateSchedulePng = function(which){
+  const statusEl = document.getElementById('png-status');
+  const outputEl = document.getElementById('png-output');
+  outputEl.innerHTML = '';
+  document.getElementById('png-hint').style.display = 'none';
+  document.getElementById('png-dl-btn').style.display = 'none';
+  statusEl.textContent = 'Generating…';
+
+  const wk = getWeekKey();
+  const ws = S.shifts.filter(s => s.week === wk);
+  const v = document.getElementById('sch-weekdate').value;
+  const mon = v ? new Date(v + 'T12:00:00') : new Date();
+  const wLabel = document.getElementById('sch-week-label').textContent || wk;
+  const DAYS = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+
+  // ── CONFIG ──
+  const SCALE  = 2;           // retina
+  const PAD    = 28;
+  const FONT   = 'Arial';
+  const COL_W  = 108;
+  const LABEL_W= 80;
+  const ROW_H  = 38;
+  const HDR_H  = 56;
+  const TITLE_H= 64;
+  const COLS   = 7;
+  const WIDTH  = (LABEL_W + COL_W * COLS + PAD * 2);
+
+  // ── SECTION COLORS ──
+  const SEC_STYLE = {
+    SUSHI:   { bg:'#1a3a5c', accent:'#3a9ab8', text:'#7dd4f0' },
+    KITCHEN: { bg:'#3a2a00', accent:'#c8a020', text:'#f5c842' },
+    TEPPAN:  { bg:'#3a1200', accent:'#e06020', text:'#f08050' },
+    SERVING: { bg:'#2a1a40', accent:'#8a5ab8', text:'#c090e8' },
+  };
+  const CELL_FILLED = '#1e1d1a';
+  const CELL_EMPTY  = '#131210';
+  const GRID_LINE   = '#2a2925';
+  const BG          = '#0f0e0c';
+
+  // ── BUILD ROW DATA ──
+  // Each entry: { section, label, shifts: [ [name,time], ... per day 0-6 ] }
+  const rowData = [];
+
+  function addSectionRows(sec){
+    const sStyle = SEC_STYLE[sec] || SEC_STYLE.KITCHEN;
+    const secShifts = ws.filter(s => (s.section||'').toUpperCase() === sec);
+
+    if(sec === 'SERVING'){
+      // AM rows
+      let maxAM = 1;
+      for(let di=0;di<7;di++){
+        const c = secShifts.filter(s=>s.dayIdx===di&&!isPmServing(s.time)).length;
+        if(c>maxAM) maxAM=c;
+      }
+      for(let row=0;row<maxAM;row++){
+        const shifts = [];
+        for(let di=0;di<7;di++){
+          const dayS = secShifts.filter(s=>s.dayIdx===di&&!isPmServing(s.time)).sort((a,b)=>servingTimeOrder(a.time)-servingTimeOrder(b.time));
+          shifts.push(dayS[row] ? [dayS[row].name, dayS[row].time||''] : null);
+        }
+        rowData.push({ section:sec, label: row===0?sec:'', isFirst:row===0, sStyle, shifts, isPmDiv:false });
+      }
+      // PM divider
+      rowData.push({ isPmDiv: true, section:sec, sStyle });
+      // PM rows
+      let maxPM = 1;
+      for(let di=0;di<7;di++){
+        const c = secShifts.filter(s=>s.dayIdx===di&&isPmServing(s.time)).length;
+        if(c>maxPM) maxPM=c;
+      }
+      for(let row=0;row<maxPM;row++){
+        const shifts = [];
+        for(let di=0;di<7;di++){
+          const dayS = secShifts.filter(s=>s.dayIdx===di&&isPmServing(s.time)).sort((a,b)=>servingTimeOrder(a.time)-servingTimeOrder(b.time));
+          shifts.push(dayS[row] ? [dayS[row].name, dayS[row].time||''] : null);
+        }
+        rowData.push({ section:sec, label:'', isFirst:false, sStyle, shifts, isPmDiv:false });
+      }
+    } else {
+      const NAMED = { SUSHI:['Kim','Lee','Gu','Aladin'], KITCHEN:['Kim','Yang','Mike'], TEPPAN:['D.D','YOM','C.P'] };
+      const norm = n=>(n||'').toLowerCase().replace(/[\s.]/g,'');
+      const named = NAMED[sec] || [];
+      const activeNamed = named.filter(rl => secShifts.some(s=>norm(s.name).includes(norm(rl))));
+      // fallback: any unmatched shifts
+      const matchedNames = new Set(activeNamed.flatMap(rl=>secShifts.filter(s=>norm(s.name).includes(norm(rl))).map(s=>s.id)));
+      const extraNames = [...new Set(secShifts.filter(s=>!matchedNames.has(s.id)).map(s=>s.name))];
+      const allRows = [...activeNamed, ...extraNames];
+      if(!allRows.length) return;
+      allRows.forEach((rl, ri)=>{
+        const shifts = [];
+        for(let di=0;di<7;di++){
+          const dayS = secShifts.filter(s=>s.dayIdx===di&&norm(s.name).includes(norm(rl.split('/')[0].trim()))).sort((a,b)=>shiftSortKey(a.time)-shiftSortKey(b.time));
+          shifts.push(dayS[0] ? [dayS[0].name, dayS[0].time||''] : null);
+        }
+        rowData.push({ section:sec, label: ri===0?sec:'', isFirst:ri===0, sStyle, shifts, isPmDiv:false });
+      });
+    }
+    // Gap row between sections
+    rowData.push({ isGap: true });
+  }
+
+  if(which === 'kitchen'){
+    ['SUSHI','KITCHEN','TEPPAN'].forEach(s=>addSectionRows(s));
+  } else {
+    addSectionRows('SERVING');
+  }
+
+  // ── CALC HEIGHT ──
+  const dataRows = rowData.filter(r=>!r.isGap);
+  const gapRows  = rowData.filter(r=>r.isGap).length;
+  const pmDivs   = rowData.filter(r=>r.isPmDiv).length;
+  const normalRows = rowData.filter(r=>!r.isGap&&!r.isPmDiv).length;
+  const HEIGHT = TITLE_H + HDR_H + normalRows * ROW_H + pmDivs * 22 + gapRows * 12 + PAD;
+
+  // ── CANVAS ──
+  const canvas = document.createElement('canvas');
+  canvas.width  = WIDTH  * SCALE;
+  canvas.height = HEIGHT * SCALE;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(SCALE, SCALE);
+
+  // background
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+  // ── TITLE BAR ──
+  ctx.fillStyle = '#141310';
+  ctx.fillRect(0, 0, WIDTH, TITLE_H);
+  // amber left stripe
+  ctx.fillStyle = '#e8a020';
+  ctx.fillRect(0, 0, 4, TITLE_H);
+  // title text
+  ctx.fillStyle = '#f0ead6';
+  ctx.font = `900 22px "${FONT} Black", ${FONT}, sans-serif`;
+  ctx.fillText('OVERLOOK', PAD, 28);
+  ctx.fillStyle = '#e8a020';
+  ctx.font = `700 13px ${FONT}, sans-serif`;
+  ctx.fillText(wLabel.toUpperCase(), PAD, 46);
+  // section label right
+  ctx.fillStyle = '#5a5648';
+  ctx.font = `600 11px ${FONT}, sans-serif`;
+  const sLabel = which === 'kitchen' ? 'KITCHEN + SUSHI + TEPPAN' : 'SERVING';
+  ctx.textAlign = 'right';
+  ctx.fillText(sLabel, WIDTH - PAD, 28);
+  ctx.fillStyle = '#3a3830';
+  ctx.fillText(new Date().toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'}).toUpperCase(), WIDTH - PAD, 46);
+  ctx.textAlign = 'left';
+
+  // ── DAY HEADERS ──
+  const tableX = PAD;
+  let y = TITLE_H;
+  // header bg
+  ctx.fillStyle = '#1a1916';
+  ctx.fillRect(tableX, y, LABEL_W + COL_W * 7, HDR_H);
+  // bottom border
+  ctx.fillStyle = '#e8a020';
+  ctx.fillRect(tableX, y + HDR_H - 2, LABEL_W + COL_W * 7, 2);
+
+  DAYS.forEach((day, di) => {
+    const d = new Date(mon); d.setDate(d.getDate() + di);
+    const dateStr = d.toLocaleDateString('en-CA',{month:'short',day:'numeric'});
+    const x = tableX + LABEL_W + di * COL_W + COL_W / 2;
+    ctx.fillStyle = '#e8a020';
+    ctx.font = `800 15px "${FONT} Black", ${FONT}, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText(day, x, y + 26);
+    ctx.fillStyle = '#5a5648';
+    ctx.font = `500 11px ${FONT}, sans-serif`;
+    ctx.fillText(dateStr, x, y + 44);
+  });
+  ctx.textAlign = 'left';
+  y += HDR_H;
+
+  // ── ROWS ──
+  rowData.forEach(row => {
+    if(row.isGap){
+      y += 12;
+      return;
+    }
+    if(row.isPmDiv){
+      // PM divider bar
+      ctx.fillStyle = '#1a1916';
+      ctx.fillRect(tableX + LABEL_W, y, COL_W * 7, 22);
+      ctx.fillStyle = row.sStyle.accent;
+      ctx.font = `700 10px ${FONT}, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('— PM —', tableX + LABEL_W + (COL_W * 7) / 2, y + 15);
+      ctx.textAlign = 'left';
+      y += 22;
+      return;
+    }
+
+    const { section, label, isFirst, sStyle, shifts } = row;
+
+    // section label cell
+    if(isFirst){
+      ctx.fillStyle = sStyle.bg;
+      // We'll span label cell for all rows of this section — just draw it per row for simplicity
+    }
+    ctx.fillStyle = label ? sStyle.bg : '#0f0e0c';
+    ctx.fillRect(tableX, y, LABEL_W, ROW_H);
+    if(label){
+      ctx.fillStyle = sStyle.text;
+      ctx.font = `800 12px "${FONT} Black", ${FONT}, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(label, tableX + LABEL_W / 2, y + ROW_H / 2 + 5);
+      ctx.textAlign = 'left';
+    }
+    // left accent line
+    ctx.fillStyle = sStyle.accent;
+    ctx.fillRect(tableX, y, 3, ROW_H);
+
+    // day cells
+    for(let di = 0; di < 7; di++){
+      const cx = tableX + LABEL_W + di * COL_W;
+      const cell = shifts[di];
+      ctx.fillStyle = cell ? CELL_FILLED : CELL_EMPTY;
+      ctx.fillRect(cx, y, COL_W, ROW_H);
+      // grid lines
+      ctx.fillStyle = GRID_LINE;
+      ctx.fillRect(cx, y, 1, ROW_H);           // left border
+      ctx.fillRect(cx, y + ROW_H - 1, COL_W, 1); // bottom border
+      if(cell){
+        const [name, time] = cell;
+        ctx.fillStyle = '#f0ead6';
+        ctx.font = `700 12px ${FONT}, sans-serif`;
+        ctx.textAlign = 'center';
+        const cellCx = cx + COL_W / 2;
+        if(time){
+          ctx.fillText(name, cellCx, y + 16);
+          ctx.fillStyle = sStyle.accent;
+          ctx.font = `500 10px ${FONT}, sans-serif`;
+          ctx.fillText(time, cellCx, y + 30);
+        } else {
+          ctx.fillText(name, cellCx, y + ROW_H / 2 + 5);
+        }
+        ctx.textAlign = 'left';
+      }
+    }
+    // right border
+    ctx.fillStyle = GRID_LINE;
+    ctx.fillRect(tableX + LABEL_W + COL_W * 7, y, 1, ROW_H);
+
+    y += ROW_H;
+  });
+
+  // outer border
+  ctx.strokeStyle = '#2a2925';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(tableX + 0.5, TITLE_H + 0.5, LABEL_W + COL_W * 7, y - TITLE_H);
+
+  // ── OUTPUT ──
+  _pngDataUrl = canvas.toDataURL('image/png');
+
+  const img = document.createElement('img');
+  img.src = _pngDataUrl;
+  img.style.cssText = 'max-width:100%;border-radius:6px;border:1px solid var(--border);display:block;margin:0 auto';
+  img.alt = 'Schedule';
+  outputEl.innerHTML = '';
+  outputEl.appendChild(img);
+
+  document.getElementById('png-hint').style.display = 'block';
+  document.getElementById('png-dl-btn').style.display = '';
+  statusEl.textContent = '✓ Image ready';
+  statusEl.style.color = 'var(--green-l)';
 };
 
-window.copySmsText=function(){
-  const text=document.getElementById('sms-preview').textContent;
-  if(!text){showToast('Nothing to copy');return;}
-  navigator.clipboard.writeText(text);
-  showToast('Schedule text copied ✓');
+window.downloadSchedulePng = function(){
+  if(!_pngDataUrl){ showToast('Generate an image first'); return; }
+  const a = document.createElement('a');
+  a.href = _pngDataUrl;
+  a.download = `schedule-${getWeekKey()}.png`;
+  a.click();
 };
 
 // ── SERVING SUMMARY ──
