@@ -2494,6 +2494,8 @@ window.cycleClField=async function(id,field){
   await fsUp('clTasks',id,{[field]:next});
   renderClTasks();
 };
+
+function escHtml(str){
   return(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
