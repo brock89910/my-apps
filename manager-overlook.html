@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>OVERLOOK — OPS</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -2755,17 +2758,17 @@ window.generateSchedulePng = function(which){
   const COLS   = 7;
   const WIDTH  = (LABEL_W + COL_W * COLS + PAD * 2);
 
-  // ── SECTION COLORS ──
+  // ── SECTION COLORS (light theme) ──
   const SEC_STYLE = {
-    SUSHI:   { bg:'#1a3a5c', accent:'#3a9ab8', text:'#7dd4f0' },
-    KITCHEN: { bg:'#3a2a00', accent:'#c8a020', text:'#f5c842' },
-    TEPPAN:  { bg:'#3a1200', accent:'#e06020', text:'#f08050' },
-    SERVING: { bg:'#2a1a40', accent:'#8a5ab8', text:'#c090e8' },
+    SUSHI:   { bg:'#1565a0', accent:'#1565a0', text:'#ffffff' },
+    KITCHEN: { bg:'#7a5800', accent:'#7a5800', text:'#ffffff' },
+    TEPPAN:  { bg:'#8a2800', accent:'#8a2800', text:'#ffffff' },
+    SERVING: { bg:'#5a2a9a', accent:'#5a2a9a', text:'#ffffff' },
   };
-  const CELL_FILLED = '#1e1d1a';
-  const CELL_EMPTY  = '#131210';
-  const GRID_LINE   = '#2a2925';
-  const BG          = '#0f0e0c';
+  const CELL_FILLED = '#ffffff';
+  const CELL_EMPTY  = '#f5f5f5';
+  const GRID_LINE   = '#cccccc';
+  const BG          = '#ffffff';
 
   // ── BUILD ROW DATA ──
   // Each entry: { section, label, shifts: [ [name,time], ... per day 0-6 ] }
@@ -2854,25 +2857,28 @@ window.generateSchedulePng = function(which){
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
   // ── TITLE BAR ──
-  ctx.fillStyle = '#141310';
+  ctx.fillStyle = '#f8f8f8';
   ctx.fillRect(0, 0, WIDTH, TITLE_H);
   // amber left stripe
   ctx.fillStyle = '#e8a020';
-  ctx.fillRect(0, 0, 4, TITLE_H);
+  ctx.fillRect(0, 0, 5, TITLE_H);
+  // bottom border
+  ctx.fillStyle = '#dddddd';
+  ctx.fillRect(0, TITLE_H - 1, WIDTH, 1);
   // title text
-  ctx.fillStyle = '#f0ead6';
+  ctx.fillStyle = '#111111';
   ctx.font = `900 22px "${FONT} Black", ${FONT}, sans-serif`;
   ctx.fillText('OVERLOOK', PAD, 28);
   ctx.fillStyle = '#e8a020';
   ctx.font = `700 13px ${FONT}, sans-serif`;
   ctx.fillText(wLabel.toUpperCase(), PAD, 46);
   // section label right
-  ctx.fillStyle = '#5a5648';
+  ctx.fillStyle = '#888888';
   ctx.font = `600 11px ${FONT}, sans-serif`;
   const sLabel = which === 'kitchen' ? 'KITCHEN + SUSHI + TEPPAN' : 'SERVING';
   ctx.textAlign = 'right';
   ctx.fillText(sLabel, WIDTH - PAD, 28);
-  ctx.fillStyle = '#3a3830';
+  ctx.fillStyle = '#aaaaaa';
   ctx.fillText(new Date().toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'}).toUpperCase(), WIDTH - PAD, 46);
   ctx.textAlign = 'left';
 
@@ -2880,22 +2886,22 @@ window.generateSchedulePng = function(which){
   const tableX = PAD;
   let y = TITLE_H;
   // header bg
-  ctx.fillStyle = '#1a1916';
+  ctx.fillStyle = '#eeeeee';
   ctx.fillRect(tableX, y, LABEL_W + COL_W * 7, HDR_H);
   // bottom border
-  ctx.fillStyle = '#e8a020';
+  ctx.fillStyle = '#111111';
   ctx.fillRect(tableX, y + HDR_H - 2, LABEL_W + COL_W * 7, 2);
 
   DAYS.forEach((day, di) => {
     const d = new Date(mon); d.setDate(d.getDate() + di);
     const dateStr = d.toLocaleDateString('en-CA',{month:'short',day:'numeric'});
     const x = tableX + LABEL_W + di * COL_W + COL_W / 2;
-    ctx.fillStyle = '#e8a020';
-    ctx.font = `800 15px "${FONT} Black", ${FONT}, sans-serif`;
+    ctx.fillStyle = '#111111';
+    ctx.font = `900 15px "${FONT} Black", ${FONT}, sans-serif`;
     ctx.textAlign = 'center';
     ctx.fillText(day, x, y + 26);
-    ctx.fillStyle = '#5a5648';
-    ctx.font = `500 11px ${FONT}, sans-serif`;
+    ctx.fillStyle = '#666666';
+    ctx.font = `600 11px ${FONT}, sans-serif`;
     ctx.fillText(dateStr, x, y + 44);
   });
   ctx.textAlign = 'left';
@@ -2909,9 +2915,9 @@ window.generateSchedulePng = function(which){
     }
     if(row.isPmDiv){
       // PM divider bar
-      ctx.fillStyle = '#1a1916';
+      ctx.fillStyle = '#eeeeee';
       ctx.fillRect(tableX + LABEL_W, y, COL_W * 7, 22);
-      ctx.fillStyle = row.sStyle.accent;
+      ctx.fillStyle = '#888888';
       ctx.font = `700 10px ${FONT}, sans-serif`;
       ctx.textAlign = 'center';
       ctx.fillText('— PM —', tableX + LABEL_W + (COL_W * 7) / 2, y + 15);
@@ -2923,11 +2929,7 @@ window.generateSchedulePng = function(which){
     const { section, label, isFirst, sStyle, shifts } = row;
 
     // section label cell
-    if(isFirst){
-      ctx.fillStyle = sStyle.bg;
-      // We'll span label cell for all rows of this section — just draw it per row for simplicity
-    }
-    ctx.fillStyle = label ? sStyle.bg : '#0f0e0c';
+    ctx.fillStyle = label ? sStyle.bg : '#f0f0f0';
     ctx.fillRect(tableX, y, LABEL_W, ROW_H);
     if(label){
       ctx.fillStyle = sStyle.text;
@@ -2938,7 +2940,7 @@ window.generateSchedulePng = function(which){
     }
     // left accent line
     ctx.fillStyle = sStyle.accent;
-    ctx.fillRect(tableX, y, 3, ROW_H);
+    ctx.fillRect(tableX, y, 4, ROW_H);
 
     // day cells
     for(let di = 0; di < 7; di++){
@@ -2948,18 +2950,18 @@ window.generateSchedulePng = function(which){
       ctx.fillRect(cx, y, COL_W, ROW_H);
       // grid lines
       ctx.fillStyle = GRID_LINE;
-      ctx.fillRect(cx, y, 1, ROW_H);           // left border
-      ctx.fillRect(cx, y + ROW_H - 1, COL_W, 1); // bottom border
+      ctx.fillRect(cx, y, 1, ROW_H);
+      ctx.fillRect(cx, y + ROW_H - 1, COL_W, 1);
       if(cell){
         const [name, time] = cell;
-        ctx.fillStyle = '#f0ead6';
-        ctx.font = `700 12px ${FONT}, sans-serif`;
+        ctx.fillStyle = '#000000';
+        ctx.font = `900 13px "${FONT} Black", ${FONT}, sans-serif`;
         ctx.textAlign = 'center';
         const cellCx = cx + COL_W / 2;
         if(time){
           ctx.fillText(name, cellCx, y + 16);
-          ctx.fillStyle = sStyle.accent;
-          ctx.font = `500 10px ${FONT}, sans-serif`;
+          ctx.fillStyle = '#333333';
+          ctx.font = `700 11px ${FONT}, sans-serif`;
           ctx.fillText(time, cellCx, y + 30);
         } else {
           ctx.fillText(name, cellCx, y + ROW_H / 2 + 5);
@@ -2975,7 +2977,7 @@ window.generateSchedulePng = function(which){
   });
 
   // outer border
-  ctx.strokeStyle = '#2a2925';
+  ctx.strokeStyle = '#aaaaaa';
   ctx.lineWidth = 1;
   ctx.strokeRect(tableX + 0.5, TITLE_H + 0.5, LABEL_W + COL_W * 7, y - TITLE_H);
 
