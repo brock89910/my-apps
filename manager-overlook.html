@@ -782,6 +782,7 @@ tr:hover td{background:rgba(232,160,32,.03)}
   <button class="btn bo" onclick="copySheetData('kitchen')">Copy Kitchen+Sushi</button>
   <button class="btn bo" onclick="copySheetData('serving')" style="border-color:var(--service);color:var(--service)">Copy Serving</button>
   <button class="btn bo" onclick="openDaysWorkedModal()" style="border-color:var(--amber);color:var(--amber)">📊 Days Worked</button>
+  <button class="btn bo" onclick="openServingSummaryModal()" style="border-color:var(--service);color:var(--service)">🍽 Serving Summary</button>
   <button class="btn bo" onclick="closeModal('sheet-modal')">Close</button>
 </div>
 <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">🍳 Kitchen + Sushi</div>
@@ -818,6 +819,26 @@ tr:hover td{background:rgba(232,160,32,.03)}
   </div>
 </div>
 <div class="mf" style="margin-top:14px"><button class="btn bo" onclick="closeModal('days-worked-modal')">Close</button></div>
+</div></div>
+
+<!-- SERVING SUMMARY MODAL -->
+<div class="mb" id="serving-summary-modal"><div class="mo mo-wide">
+<h3>Serving Staff Summary</h3>
+<p style="font-family:var(--font-mono);font-size:.62rem;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.07em">Days worked · Projected hours — Serving section only</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+  <div class="fg" style="flex:none">
+    <label>Week 1 Start (Mon)</label>
+    <input type="date" id="ss-week1" class="iline" style="width:150px" oninput="renderServingSummary()">
+  </div>
+  <div class="fg" style="flex:none">
+    <label>Week 2 Start (Mon)</label>
+    <input type="date" id="ss-week2" class="iline" style="width:150px" oninput="renderServingSummary()">
+  </div>
+  <button class="btn bo bs" onclick="autoDetectSSRange()" style="margin-top:14px;font-size:.68rem;color:var(--service);border-color:rgba(138,90,184,.3)">↺ Auto-Detect Last 2 Weeks</button>
+</div>
+<div id="ss-range-label" style="font-family:var(--font-mono);font-size:.62rem;color:var(--text2);margin-bottom:12px"></div>
+<div id="ss-list" style="font-family:var(--font-mono);font-size:.82rem;color:var(--text2)"></div>
+<div class="mf" style="margin-top:14px"><button class="btn bo" onclick="closeModal('serving-summary-modal')">Close</button></div>
 </div></div>
 
 <!-- EMPLOYEE MODAL — multi-role -->
@@ -2673,6 +2694,90 @@ function updatePiItemList(){
   const names=[...new Set(S.priceItems.map(it=>it.itemName))];
   dl.innerHTML=names.map(n=>`<option value="${escHtml(n)}">`).join('');
 }
+
+// ── SERVING SUMMARY ──
+function parseSSStartHour(timeStr){
+  const t=(timeStr||'').trim();
+  if(!t) return 11; // name only → 11am
+  const n=parseFloat(t);
+  if(!isNaN(n)) return n;
+  return 11;
+}
+function ssCloseHour(weekKey,dayIdx){
+  // dayIdx: 0=Mon,1=Tue,2=Wed,3=Thu,4=Fri,5=Sat,6=Sun
+  // Fri=4, Sat=5 → 22, else 21
+  if(dayIdx===4||dayIdx===5) return 22;
+  return 21;
+}
+function computeServingSummary(weeks){
+  const staff={}; // name → {days:Set of "wk-dayIdx", hours:number}
+  weeks.forEach(wk=>{
+    const ws=S.shifts.filter(s=>s.week===wk&&(s.section||'').toUpperCase()==='SERVING');
+    ws.forEach(sh=>{
+      const name=(sh.name||'').trim();
+      if(!name) return;
+      if(!staff[name]) staff[name]={dayKeys:new Set(),hours:0};
+      const key=`${wk}-${sh.dayIdx}`;
+      // Days: count each unique day once per person
+      const isNewDay=!staff[name].dayKeys.has(key);
+      staff[name].dayKeys.add(key);
+      // Hours: only add on first entry per day (avoid double-counting same day)
+      if(isNewDay){
+        const start=parseSSStartHour(sh.time);
+        const close=ssCloseHour(wk,sh.dayIdx);
+        staff[name].hours+=Math.max(0,close-start);
+      }
+    });
+  });
+  return staff;
+}
+
+window.autoDetectSSRange=function(){
+  const [w1,w2]=getLastFullTwoWeekMondays();
+  document.getElementById('ss-week1').value=w1;
+  document.getElementById('ss-week2').value=w2;
+  renderServingSummary();
+};
+
+window.openServingSummaryModal=function(){
+  if(!document.getElementById('ss-week1').value){
+    const [w1,w2]=getLastFullTwoWeekMondays();
+    document.getElementById('ss-week1').value=w1;
+    document.getElementById('ss-week2').value=w2;
+  }
+  renderServingSummary();
+  openModal('serving-summary-modal');
+};
+
+window.renderServingSummary=function(){
+  const w1=document.getElementById('ss-week1').value;
+  const w2=document.getElementById('ss-week2').value;
+  const rangeEl=document.getElementById('ss-range-label');
+  const listEl=document.getElementById('ss-list');
+  if(!w1||!w2){rangeEl.textContent='Select both week start dates.';listEl.innerHTML='';return;}
+
+  const fmt=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('en-CA',{month:'short',day:'numeric'});}catch(e){return d;}};
+  const w1end=new Date(w1+'T12:00:00');w1end.setDate(w1end.getDate()+6);
+  const w2end=new Date(w2+'T12:00:00');w2end.setDate(w2end.getDate()+6);
+  rangeEl.textContent=`${fmt(w1)} – ${w1end.toLocaleDateString('en-CA',{month:'short',day:'numeric'})}  ·  ${fmt(w2)} – ${w2end.toLocaleDateString('en-CA',{month:'short',day:'numeric'})}`;
+
+  const summary=computeServingSummary([w1,w2]);
+  const entries=Object.entries(summary).sort((a,b)=>b[1].dayKeys.size-a[1].dayKeys.size||a[0].localeCompare(b[0]));
+
+  if(!entries.length){listEl.innerHTML='<div style="color:var(--text3);font-size:.75rem">// No serving shifts found for this period</div>';return;}
+
+  listEl.innerHTML=entries.map(([name,{dayKeys,hours}])=>{
+    const days=dayKeys.size;
+    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)">
+      <span style="color:var(--text);font-weight:600">${name}</span>
+      <span style="color:var(--text2)">
+        <span style="color:var(--service);font-weight:700">${days}</span> day${days!==1?'s':''}
+        <span style="color:var(--text3);margin:0 6px">·</span>
+        <span style="color:var(--amber);font-weight:700">${hours}</span> hrs
+      </span>
+    </div>`;
+  }).join('');
+};
 
 // ── DAYS WORKED ──
 // Staff to count (normalized) — exact output order
