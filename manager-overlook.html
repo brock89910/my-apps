@@ -783,6 +783,7 @@ tr:hover td{background:rgba(232,160,32,.03)}
   <button class="btn bo" onclick="copySheetData('serving')" style="border-color:var(--service);color:var(--service)">Copy Serving</button>
   <button class="btn bo" onclick="openDaysWorkedModal()" style="border-color:var(--amber);color:var(--amber)">📊 Days Worked</button>
   <button class="btn bo" onclick="openServingSummaryModal()" style="border-color:var(--service);color:var(--service)">🍽 Serving Summary</button>
+  <button class="btn bo" onclick="openSendScheduleModal()" style="border-color:var(--green-l);color:var(--green-l)">📱 Send Schedule</button>
   <button class="btn bo" onclick="closeModal('sheet-modal')">Close</button>
 </div>
 <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">🍳 Kitchen + Sushi</div>
@@ -839,6 +840,45 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div id="ss-range-label" style="font-family:var(--font-mono);font-size:.62rem;color:var(--text2);margin-bottom:12px"></div>
 <div id="ss-list" style="font-family:var(--font-mono);font-size:.82rem;color:var(--text2)"></div>
 <div class="mf" style="margin-top:14px"><button class="btn bo" onclick="closeModal('serving-summary-modal')">Close</button></div>
+</div></div>
+
+<!-- SEND SCHEDULE MODAL -->
+<div class="mb" id="send-schedule-modal"><div class="mo mo-wide">
+<h3>📱 Send Schedule</h3>
+<p style="font-family:var(--font-mono);font-size:.62rem;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.07em">Opens your SMS app — you hit send</p>
+
+<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+  <div class="fg" style="flex:none">
+    <label>What to send</label>
+    <select id="sms-which" class="iline" onchange="buildSmsPreview()" style="width:180px">
+      <option value="both">Both (Kitchen + Serving)</option>
+      <option value="kitchen">Kitchen + Sushi only</option>
+      <option value="serving">Serving only</option>
+    </select>
+  </div>
+</div>
+
+<div style="margin-bottom:14px">
+  <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:8px">// Phone Numbers</div>
+  <div id="sms-number-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px"></div>
+  <div style="display:flex;gap:6px">
+    <input id="sms-new-name" class="iline" placeholder="Name (e.g. Kim)" style="width:120px">
+    <input id="sms-new-number" class="iline" placeholder="+15065550100" style="width:160px" type="tel">
+    <button class="btn bo bs" onclick="addSmsContact()" style="color:var(--green-l);border-color:rgba(74,138,74,.3)">+ Add</button>
+  </div>
+</div>
+
+<div style="margin-bottom:14px">
+  <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:6px">// Message Preview</div>
+  <pre id="sms-preview" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px;font-family:var(--font-mono);font-size:.68rem;color:var(--text2);white-space:pre-wrap;max-height:220px;overflow-y:auto;line-height:1.6"></pre>
+</div>
+
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+  <button class="btn bg" onclick="launchSms()" style="background:var(--green);color:#fff;flex:1;justify-content:center">📱 Open in SMS App</button>
+  <button class="btn bo" onclick="copySmsText()">Copy Text</button>
+  <button class="btn bo" onclick="closeModal('send-schedule-modal')">Close</button>
+</div>
+<div id="sms-warn" style="display:none;font-family:var(--font-mono);font-size:.65rem;color:var(--text3);margin-top:8px;line-height:1.6"></div>
 </div></div>
 
 <!-- EMPLOYEE MODAL — multi-role -->
@@ -2694,6 +2734,116 @@ function updatePiItemList(){
   const names=[...new Set(S.priceItems.map(it=>it.itemName))];
   dl.innerHTML=names.map(n=>`<option value="${escHtml(n)}">`).join('');
 }
+
+// ── SEND SCHEDULE ──
+// Contacts stored in localStorage as [{name,number}]
+function getSmsContacts(){
+  try{return JSON.parse(localStorage.getItem('sms-contacts')||'[]');}catch(e){return[];}
+}
+function saveSmsContacts(list){
+  localStorage.setItem('sms-contacts',JSON.stringify(list));
+}
+
+function buildScheduleText(which){
+  const wk=getWeekKey(),ws=S.shifts.filter(s=>s.week===wk);
+  const v=document.getElementById('sch-weekdate').value,mon=v?new Date(v+'T12:00:00'):new Date();
+  const wLabel=document.getElementById('sch-week-label').textContent||wk;
+  const DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  let lines=[`📅 SCHEDULE — ${wLabel}`,''];
+
+  function sectionBlock(sec){
+    const secShifts=ws.filter(s=>s.section===sec);
+    if(!secShifts.length)return;
+    lines.push(`[ ${sec} ]`);
+    DAYS.forEach((day,di)=>{
+      const dayS=secShifts.filter(s=>s.dayIdx===di).sort((a,b)=>shiftSortKey(a.time)-shiftSortKey(b.time));
+      if(!dayS.length)return;
+      const names=dayS.map(s=>s.time?`${s.name} ${s.time}`:s.name).join(', ');
+      lines.push(`  ${day}: ${names}`);
+    });
+    lines.push('');
+  }
+
+  if(which==='both'||which==='kitchen'){
+    ['SUSHI','KITCHEN','TEPPAN'].forEach(sec=>sectionBlock(sec));
+  }
+  if(which==='both'||which==='serving'){
+    sectionBlock('SERVING');
+  }
+  return lines.join('\n').trimEnd();
+}
+
+function renderSmsNumberList(){
+  const list=getSmsContacts();
+  const el=document.getElementById('sms-number-list');
+  if(!list.length){
+    el.innerHTML=`<span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">No contacts yet — add numbers below</span>`;
+    return;
+  }
+  el.innerHTML=list.map((c,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:6px 10px">
+      <span style="font-family:var(--font-mono);font-size:.75rem;color:var(--text);flex:1"><strong>${c.name}</strong> <span style="color:var(--text3)">${c.number}</span></span>
+      <button onclick="removeSmsContact(${i})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:.7rem;padding:2px 5px" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--text3)'">✕</button>
+    </div>`).join('');
+}
+
+window.addSmsContact=function(){
+  const name=document.getElementById('sms-new-name').value.trim();
+  const number=document.getElementById('sms-new-number').value.trim();
+  if(!number){showToast('Enter a phone number');return;}
+  const list=getSmsContacts();
+  list.push({name:name||number,number});
+  saveSmsContacts(list);
+  document.getElementById('sms-new-name').value='';
+  document.getElementById('sms-new-number').value='';
+  renderSmsNumberList();
+  buildSmsPreview();
+};
+
+window.removeSmsContact=function(idx){
+  const list=getSmsContacts();
+  list.splice(idx,1);
+  saveSmsContacts(list);
+  renderSmsNumberList();
+  buildSmsPreview();
+};
+
+window.buildSmsPreview=function(){
+  const which=document.getElementById('sms-which').value;
+  const text=buildScheduleText(which);
+  document.getElementById('sms-preview').textContent=text;
+  // Warn if message is long
+  const warnEl=document.getElementById('sms-warn');
+  if(text.length>320){
+    warnEl.style.display='block';
+    warnEl.textContent=`⚠ Message is ${text.length} characters — most SMS apps will split this into ${Math.ceil(text.length/160)} messages. All content will still be sent.`;
+  }else{
+    warnEl.style.display='none';
+  }
+};
+
+window.openSendScheduleModal=function(){
+  renderSmsNumberList();
+  buildSmsPreview();
+  openModal('send-schedule-modal');
+};
+
+window.launchSms=function(){
+  const contacts=getSmsContacts();
+  const text=document.getElementById('sms-preview').textContent;
+  if(!contacts.length){showToast('Add at least one phone number first');return;}
+  const numbers=contacts.map(c=>c.number).join(',');
+  const encoded=encodeURIComponent(text);
+  // sms: URI — works on iOS and Android; comma-separated numbers for group
+  window.location.href=`sms:${numbers}${/iPhone|iPad|iPod/.test(navigator.userAgent)?'&':'?'}body=${encoded}`;
+};
+
+window.copySmsText=function(){
+  const text=document.getElementById('sms-preview').textContent;
+  if(!text){showToast('Nothing to copy');return;}
+  navigator.clipboard.writeText(text);
+  showToast('Schedule text copied ✓');
+};
 
 // ── SERVING SUMMARY ──
 function parseSSStartHour(timeStr){
