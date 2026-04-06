@@ -518,6 +518,16 @@ tr:hover td{background:rgba(232,160,32,.03)}
   </div>
   <div class="sc"><div class="lb">On Roster</div><div class="vl" id="d-roster">—</div><div class="sb">Total employees</div></div>
   <div class="sc"><div class="lb">Checklist Open</div><div class="vl" id="d-checklist">—</div><div class="sb">Action required</div></div>
+  <div class="sc" style="cursor:pointer" onclick="openServingSummaryModal()">
+    <div class="lb">Serving Summary</div>
+    <div class="vl" style="font-size:1.1rem;color:var(--service)">View →</div>
+    <div class="sb">Days & hours · 2 weeks</div>
+  </div>
+  <div class="sc">
+    <div class="lb">Hibachi — Next 4 Days</div>
+    <div class="vl" id="d-hibachi-guests">—</div>
+    <div class="sb" id="d-hibachi-sub">Guests incoming</div>
+  </div>
 </div>
 <div class="pn" id="print-remind-pn" style="display:none"><div class="pnh"><h3>🖨 Print Reminders</h3></div><div id="print-remind-list"></div></div>
 <div class="pn"><div class="pnh"><h3>Upcoming Bills</h3></div><div class="tw"><table><thead><tr><th>Vendor</th><th>Amount</th><th>Due</th><th>Paid On</th><th>Type</th><th>Category</th></tr></thead><tbody id="d-bills"></tbody></table></div></div>
@@ -782,11 +792,8 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <h3>Schedule Sheet</h3>
 <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
   <button class="btn bg" onclick="printScheduleSheet()">🖨 Print Sheet</button>
-  <button class="btn bo" onclick="copySheetData('kitchen')">Copy Kitchen+Sushi</button>
-  <button class="btn bo" onclick="copySheetData('serving')" style="border-color:var(--service);color:var(--service)">Copy Serving</button>
   <button class="btn bo" onclick="openDaysWorkedModal()" style="border-color:var(--amber);color:var(--amber)">📊 Days Worked</button>
-  <button class="btn bo" onclick="openServingSummaryModal()" style="border-color:var(--service);color:var(--service)">🍽 Serving Summary</button>
-  <button class="btn bo" onclick="openSendScheduleModal()" style="border-color:var(--green-l);color:var(--green-l)">📱 Send Schedule</button>
+  <button class="btn bo" onclick="openSendScheduleModal()" style="border-color:var(--green-l);color:var(--green-l)">📸 Schedule Image</button>
   <button class="btn bo" onclick="closeModal('sheet-modal')">Close</button>
 </div>
 <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">🍳 Kitchen + Sushi</div>
@@ -1396,7 +1403,7 @@ window.loadReservations=async function(){
     S.reservations=byDate;
     const count=Object.keys(byDate).length;
     setStatus('✓ '+count+' days','var(--green-l)');
-    renderForecast();
+    renderForecast();renderDash();
   }catch(e){
     console.error('Hibachi read error:',e.code,e.message);
     if(e.code==='PERMISSION_DENIED'||e.message?.includes('Permission denied')){
@@ -1474,6 +1481,17 @@ function renderDash(){
   // Checklist open count
   const openTasks=S.clTasks.filter(t=>t.status!=='completed'&&t.flag!=='done').length;
   document.getElementById('d-checklist').textContent=openTasks||'—';
+  // Hibachi guests — today + next 3 days
+  const hibachiEl=document.getElementById('d-hibachi-guests');
+  const hibachiSub=document.getElementById('d-hibachi-sub');
+  if(hibachiEl){
+    const next4=Array.from({length:4},(_,i)=>{const d=new Date(now);d.setDate(now.getDate()+i);return d.toISOString().slice(0,10);});
+    const totalGuests=next4.reduce((sum,date)=>sum+(S.reservations[date]?.guests||0),0);
+    const totalBookings=next4.reduce((sum,date)=>sum+(S.reservations[date]?.bookings||0),0);
+    hibachiEl.textContent=totalGuests||'—';
+    hibachiEl.style.color=totalGuests>=80?'var(--red)':totalGuests>=40?'var(--amber)':'var(--green-l)';
+    if(hibachiSub)hibachiSub.textContent=totalBookings?`${totalBookings} bookings · today + 3 days`:'Today + next 3 days';
+  }
   const pn=document.getElementById('print-remind-pn');
   const pr=S.bills.filter(b=>b.paid==='Paid'&&b.needsPrint===true);
   if(pr.length){pn.style.display='block';document.getElementById('print-remind-list').innerHTML=pr.map(b=>`<div class="print-reminder"><span>Print receipt for <span class="prn">${b.vendor}</span></span><button class="bg-s" onclick="window.markPrintDone('${b.id}')">✓ Printed</button></div>`).join('');}
