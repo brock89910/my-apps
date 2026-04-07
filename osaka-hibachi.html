@@ -466,6 +466,7 @@ footer{
 <!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobileMenu">
   <a href="#about" onclick="closeMM()">About</a>
+  <a href="our-story.html">Our Story</a>
   <a href="menu.html">Menu</a>
   <a href="#hours" onclick="closeMM()">Hours</a>
   <a href="#reserve" class="mm-btn" onclick="closeMM()">Reserve a Table</a>
@@ -479,8 +480,9 @@ footer{
   </a>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
+    <li><a href="our-story.html">Our Story</a></li>
     <li><a href="menu.html">Menu</a></li>
-    <li><a href="#hours">Visit</a></li>
+    <li><a href="#hours">Hours</a></li>
   </ul>
   <a href="#reserve" class="nav-cta" id="navCta" style="display:none">Reserve</a>
   <button class="nav-ham" id="navHam" onclick="toggleMM()" aria-label="Menu">
@@ -519,30 +521,32 @@ footer{
 
 <div class="strip-divider"></div>
 
-<!-- ABOUT -->
+<!-- ABOUT TEASER — links to Our Story page -->
 <section class="section" id="about">
-  <div class="about-grid">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,7vw,88px);align-items:center">
     <div>
-      <div class="section-label reveal">Our Story</div>
+      <div class="section-label reveal">Moncton, NB · Est. 2010</div>
       <h2 class="section-title reveal reveal-d1">Where fire meets <em>craft</em></h2>
       <p class="section-body reveal reveal-d2">
-        Osaka Hibachi brings the theatre of teppanyaki to the heart of Moncton. Our chefs cook at your table on open iron grills — AAA steaks, fresh seafood, and vibrant vegetables prepared with skill and a touch of showmanship.<br><br>
-        Beyond the hibachi, our kitchen crafts traditional Japanese and Korean dishes: handmade sushi rolls, premium sashimi, and a curated sake selection. Every meal here is an occasion.
+        Osaka Hibachi brings the theatre of teppanyaki to the heart of Moncton. Four iron grills, fifteen years, one dining tradition.
       </p>
-      <div class="stats-row reveal reveal-d3">
-        <div class="stat-block"><div class="stat-n">4</div><div class="stat-t">Teppanyaki Grills</div></div>
-        <div class="stat-block"><div class="stat-n">15+</div><div class="stat-t">Years in Moncton</div></div>
-        <div class="stat-block"><div class="stat-n">Est.</div><div class="stat-t">2010</div></div>
-        <div class="stat-block"><div class="stat-n">2</div><div class="stat-t">Dining Rooms</div></div>
-      </div>
+      <a href="our-story.html" class="btn-paper reveal reveal-d3" style="display:inline-block;margin-top:36px">Read Our Story →</a>
     </div>
     <div class="reveal reveal-d2">
-      <div class="about-ornament">
-        <span class="about-jp">火</span>
-        <span class="about-quote-mark">"</span>
-        <p class="about-quote">A place where food and coziness complement each other.</p>
+      <div style="background:var(--paper2);border:1px solid var(--gold-line);padding:44px 36px;text-align:center;position:relative">
+        <div style="position:absolute;top:8px;left:8px;right:8px;bottom:8px;border:1px solid var(--gold-line);pointer-events:none"></div>
+        <span style="font-family:serif;font-size:3.8rem;color:var(--ink);opacity:0.14;display:block;margin-bottom:14px">火</span>
+        <span style="font-family:var(--serif);font-size:2.8rem;color:var(--rouge);opacity:0.4;line-height:0.5;display:block">"</span>
+        <p style="font-family:var(--body);font-size:1.05rem;font-style:italic;color:var(--ink2);line-height:1.75;margin-top:8px">A place where food and coziness complement each other.</p>
       </div>
     </div>
+  </div>
+  <!-- Mini stats -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);margin-top:52px;border-top:1px solid var(--gold-line)" class="reveal reveal-d3">
+    <div style="padding:24px 0;border-right:1px solid var(--gold-line)"><div style="font-family:var(--serif);font-size:2.8rem;font-style:italic;color:var(--rouge2);line-height:1;margin-bottom:5px">4</div><div style="font-family:var(--sans);font-size:0.82rem;font-weight:400;color:var(--ink3)">Teppanyaki Grills</div></div>
+    <div style="padding:24px 0;border-right:1px solid var(--gold-line)"><div style="font-family:var(--serif);font-size:2.8rem;font-style:italic;color:var(--rouge2);line-height:1;margin-bottom:5px">15+</div><div style="font-family:var(--sans);font-size:0.82rem;font-weight:400;color:var(--ink3)">Years in Moncton</div></div>
+    <div style="padding:24px 0;border-right:1px solid var(--gold-line)"><div style="font-family:var(--serif);font-size:2.8rem;font-style:italic;color:var(--rouge2);line-height:1;margin-bottom:5px">Est.</div><div style="font-family:var(--sans);font-size:0.82rem;font-weight:400;color:var(--ink3)">2010</div></div>
+    <div style="padding:24px 0"><div style="font-family:var(--serif);font-size:2.8rem;font-style:italic;color:var(--rouge2);line-height:1;margin-bottom:5px">2</div><div style="font-family:var(--sans);font-size:0.82rem;font-weight:400;color:var(--ink3)">Dining Rooms</div></div>
   </div>
 </section>
 
@@ -557,34 +561,6 @@ footer{
     <a href="menu.html" class="btn-view-menu reveal reveal-d3">View Full Menu &amp; Pricing →</a>
   </div>
 </div>
-
-<!-- EXPERIENCE -->
-<section class="section">
-  <div class="section-label reveal">The Experience</div>
-  <h2 class="section-title reveal reveal-d1">More than <em>dinner</em></h2>
-  <div class="exp-row">
-    <div class="exp-cell reveal">
-      <span class="exp-n">01 / Teppanyaki</span>
-      <div class="exp-h">Iron Grill Theatre</div>
-      <p class="exp-p">Sit around the open grill as our chefs perform — fire, knifework, and live cooking at your table. Ideal for groups and celebrations.</p>
-    </div>
-    <div class="exp-cell reveal reveal-d1">
-      <span class="exp-n">02 / Sushi</span>
-      <div class="exp-h">Handcrafted Rolls</div>
-      <p class="exp-p">Fresh rolls and premium sashimi from our dedicated sushi kitchen. Available dine-in and takeout.</p>
-    </div>
-    <div class="exp-cell reveal reveal-d2">
-      <span class="exp-n">03 / Bar</span>
-      <div class="exp-h">Sake &amp; Full Bar</div>
-      <p class="exp-p">Curated sake, Japanese whisky, Korean soju, and classic cocktails. Full licensed bar service.</p>
-    </div>
-    <div class="exp-cell reveal reveal-d3">
-      <span class="exp-n">04 / Events</span>
-      <div class="exp-h">Private Parties</div>
-      <p class="exp-p">Birthday dinners, anniversaries, and corporate groups. Private grill reservations and group menus available.</p>
-    </div>
-  </div>
-</section>
 
 <!-- HOURS & CONTACT -->
 <div class="hours-bg" id="hours">

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Our Story — Osaka Hibachi, Moncton</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --paper:#f8f3eb;
+  --paper2:#f2ead8;
+  --paper3:#e8dfc8;
+  --ink:#1a1208;
+  --ink2:#2e2010;
+  --ink3:#4a3820;
+  --ink4:#6a5438;
+  --rouge:#8c1c0a;
+  --rouge2:#a82510;
+  --rouge3:#c43018;
+  --sumi:#0a0a0a;
+  --gold:#8a6c18;
+  --gold2:#a88428;
+  --gold3:#c8a040;
+  --gold-line:rgba(138,108,24,0.18);
+  --serif:'Shippori Mincho','Libre Baskerville',Georgia,serif;
+  --body:'Libre Baskerville',Georgia,serif;
+  --sans:'Jost',system-ui,sans-serif;
+  --grain:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+html{scroll-behavior:smooth;font-size:18px;-webkit-text-size-adjust:100%}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:var(--sans);line-height:1.75;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:var(--grain);
+  pointer-events:none;z-index:9999;opacity:0.8;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:68px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 max(5vw,24px);
+  background:rgba(248,243,235,0.97);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--gold-line);
+  box-shadow:0 1px 20px rgba(26,18,8,0.07);
+}
+.nav-logo{
+  font-family:var(--serif);font-size:1.1rem;font-weight:700;
+  letter-spacing:0.08em;color:var(--ink);text-decoration:none;
+  display:flex;align-items:center;gap:10px;
+}
+.nav-logo-mark{
+  width:28px;height:28px;border:1.5px solid var(--rouge);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.85rem;color:var(--rouge);transition:background 0.2s;
+}
+.nav-logo:hover .nav-logo-mark{background:var(--rouge);color:#fff}
+.nav-links{display:flex;gap:32px;list-style:none}
+@media(max-width:768px){.nav-links{display:none}}
+.nav-links a{
+  font-family:var(--sans);font-size:0.88rem;font-weight:400;
+  letter-spacing:0.10em;text-transform:uppercase;
+  color:var(--ink3);text-decoration:none;transition:color 0.2s;position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;right:0;
+  height:1px;background:var(--rouge);transform:scaleX(0);transition:transform 0.25s;
+}
+.nav-links a:hover{color:var(--rouge)}
+.nav-links a:hover::after{transform:scaleX(1)}
+.nav-links a.active{color:var(--rouge)}
+.nav-links a.active::after{transform:scaleX(1)}
+.nav-cta{
+  font-family:var(--sans);font-size:0.84rem;font-weight:500;
+  letter-spacing:0.12em;text-transform:uppercase;
+  color:#fff;background:var(--sumi);padding:12px 26px;
+  border:none;text-decoration:none;transition:background 0.2s;
+}
+.nav-cta:hover{background:var(--rouge2)}
+.nav-ham{display:none;background:none;border:none;cursor:pointer;padding:6px;flex-direction:column;gap:4px}
+@media(max-width:768px){.nav-ham{display:flex}}
+.nav-ham span{width:22px;height:1px;background:var(--ink);display:block;transition:all 0.3s}
+.nav-ham.open span:nth-child(1){transform:rotate(45deg) translate(3.5px,3.5px)}
+.nav-ham.open span:nth-child(2){opacity:0}
+.nav-ham.open span:nth-child(3){transform:rotate(-45deg) translate(3.5px,-3.5px)}
+.mobile-menu{
+  position:fixed;inset:0;z-index:190;background:var(--paper);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:48px;
+  opacity:0;pointer-events:none;transition:opacity 0.3s;
+}
+.mobile-menu.open{opacity:1;pointer-events:all}
+.mobile-menu a{
+  font-family:var(--serif);font-size:2.2rem;font-weight:400;
+  color:var(--ink);text-decoration:none;letter-spacing:0.05em;transition:color 0.2s;
+}
+.mobile-menu a:hover{color:var(--rouge)}
+.mobile-menu .mm-btn{
+  font-family:var(--sans);font-size:0.78rem;letter-spacing:0.16em;
+  text-transform:uppercase;background:var(--sumi);color:#fff;padding:14px 40px;
+}
+
+/* ── PAGE HEADER ── */
+.page-header{
+  padding:clamp(100px,14vh,140px) max(5vw,32px) clamp(52px,7vh,80px);
+  max-width:1200px;margin:0 auto;
+  border-bottom:1px solid var(--gold-line);
+  position:relative;
+}
+.page-header::after{
+  content:'物語';
+  position:absolute;right:max(5vw,32px);top:50%;transform:translateY(-50%);
+  font-family:serif;font-size:clamp(80px,14vw,180px);font-weight:900;
+  color:rgba(26,18,8,0.05);line-height:1;pointer-events:none;
+}
+.breadcrumb{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--sans);font-size:0.75rem;font-weight:400;
+  letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--ink4);margin-bottom:24px;
+  opacity:0;animation:fadeSlideUp 0.7s 0.1s ease forwards;
+}
+.breadcrumb a{color:var(--ink4);text-decoration:none;transition:color 0.2s}
+.breadcrumb a:hover{color:var(--rouge)}
+.breadcrumb-sep{color:var(--gold);font-size:0.65rem}
+.page-label{
+  font-family:var(--sans);font-size:0.78rem;font-weight:400;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--rouge);margin-bottom:16px;
+  opacity:0;animation:fadeSlideUp 0.7s 0.2s ease forwards;
+}
+.page-title{
+  font-family:var(--serif);
+  font-size:clamp(2.8rem,6vw,5.5rem);
+  font-weight:700;line-height:0.95;letter-spacing:-0.02em;
+  color:var(--ink);
+  opacity:0;animation:fadeSlideUp 0.8s 0.3s ease forwards;
+}
+.page-title em{font-style:italic;font-weight:400;color:var(--rouge)}
+.page-tagline{
+  font-family:var(--body);font-size:clamp(1rem,1.6vw,1.2rem);
+  font-style:italic;color:var(--ink3);line-height:1.8;
+  max-width:520px;margin-top:24px;
+  opacity:0;animation:fadeSlideUp 0.8s 0.5s ease forwards;
+}
+
+/* ── SECTION BASE ── */
+.section{padding:clamp(64px,9vw,108px) max(5vw,32px);max-width:1200px;margin:0 auto}
+.section-label{
+  font-family:var(--sans);font-size:0.78rem;font-weight:400;
+  letter-spacing:0.22em;text-transform:uppercase;color:var(--rouge);margin-bottom:18px;
+}
+.section-title{
+  font-family:var(--serif);font-size:clamp(2rem,4vw,3.5rem);
+  font-weight:700;line-height:1.05;letter-spacing:-0.01em;color:var(--ink);margin-bottom:28px;
+}
+.section-title em{font-style:italic;font-weight:400;color:var(--gold)}
+.section-body{
+  font-family:var(--sans);font-size:clamp(1rem,1.4vw,1.1rem);
+  font-weight:400;color:var(--ink2);line-height:1.9;
+}
+
+/* ── STRIP DIVIDER ── */
+.strip-divider{
+  height:4px;
+  background:linear-gradient(to right,var(--rouge) 0%,var(--gold) 33%,var(--paper3) 66%,var(--paper2) 100%);
+}
+
+/* ── ABOUT GRID ── */
+.about-grid{display:grid;grid-template-columns:55% 1fr;gap:clamp(48px,8vw,96px);align-items:start}
+@media(max-width:760px){.about-grid{grid-template-columns:1fr}}
+
+.about-ornament{
+  position:relative;margin-top:16px;
+  background:var(--paper2);border:1px solid var(--gold-line);
+  padding:48px 36px;text-align:center;
+}
+.about-ornament::before{
+  content:'';position:absolute;
+  top:8px;left:8px;right:8px;bottom:8px;
+  border:1px solid var(--gold-line);pointer-events:none;
+}
+.about-jp{
+  font-family:serif;font-size:4rem;color:var(--ink);
+  opacity:0.15;margin-bottom:16px;display:block;
+}
+.about-quote{
+  font-family:var(--body);font-size:1.05rem;font-style:italic;
+  color:var(--ink2);line-height:1.75;
+}
+.about-quote-mark{
+  font-family:var(--serif);font-size:3rem;color:var(--rouge);
+  line-height:0.5;opacity:0.4;display:block;
+}
+
+/* ── STATS ── */
+.stats-row{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  margin-top:52px;border-top:1px solid var(--gold-line);
+}
+@media(max-width:600px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+.stat-block{padding:28px 0;border-right:1px solid var(--gold-line)}
+.stat-block:last-child{border-right:none}
+.stat-n{
+  font-family:var(--serif);font-size:3rem;font-style:italic;
+  font-weight:400;color:var(--rouge2);line-height:1;margin-bottom:6px;
+}
+.stat-t{font-family:var(--sans);font-size:0.82rem;font-weight:400;color:var(--ink3)}
+
+/* ── DIVIDER ORNAMENT ── */
+.section-divider{
+  display:flex;align-items:center;gap:20px;
+  padding:0 max(5vw,32px);max-width:1200px;margin:0 auto;
+}
+.section-divider::before,.section-divider::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(to right,transparent,var(--gold-line),transparent);
+}
+.section-divider-kanji{
+  font-family:var(--serif);font-size:1.2rem;color:var(--gold);
+  font-style:italic;white-space:nowrap;
+}
+
+/* ── EXPERIENCE ── */
+.exp-bg{background:var(--paper2);border-top:1px solid var(--gold-line);border-bottom:1px solid var(--gold-line)}
+.exp-inner{padding:clamp(64px,9vw,108px) max(5vw,32px);max-width:1200px;margin:0 auto}
+.exp-row{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:48px}
+@media(max-width:640px){.exp-row{grid-template-columns:1fr}}
+.exp-cell{
+  background:var(--paper);padding:44px 36px;
+  border:1px solid var(--gold-line);
+  position:relative;transition:background 0.2s;
+}
+.exp-cell:hover{background:var(--paper2)}
+.exp-cell::before{
+  content:'';position:absolute;top:0;left:0;width:3px;height:0;
+  background:var(--rouge);transition:height 0.4s ease;
+}
+.exp-cell:hover::before{height:100%}
+.exp-n{
+  font-family:var(--serif);font-size:0.75rem;letter-spacing:0.2em;
+  color:var(--gold);margin-bottom:18px;display:block;
+}
+.exp-h{font-family:var(--serif);font-size:1.3rem;font-weight:700;color:var(--ink);margin-bottom:14px}
+.exp-p{font-family:var(--sans);font-size:0.95rem;font-weight:400;color:var(--ink2);line-height:1.85}
+
+/* ── BACK CTA ── */
+.back-section{
+  background:var(--sumi);
+  padding:clamp(56px,8vw,80px) max(5vw,32px);
+  text-align:center;
+}
+.back-label{
+  font-family:var(--sans);font-size:0.75rem;font-weight:400;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:rgba(248,243,235,0.4);margin-bottom:20px;
+}
+.back-title{
+  font-family:var(--serif);font-size:clamp(1.4rem,3vw,2.2rem);
+  font-weight:700;color:#fff;margin-bottom:32px;
+  line-height:1.2;
+}
+.back-title em{font-style:italic;font-weight:400;color:var(--gold3)}
+.back-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn-sumi{
+  font-family:var(--sans);font-size:0.9rem;font-weight:500;letter-spacing:0.12em;
+  text-transform:uppercase;color:#fff;background:var(--rouge2);
+  padding:18px 40px;text-decoration:none;
+  transition:background 0.2s,transform 0.15s;
+}
+.btn-sumi:hover{background:var(--rouge);transform:translateY(-1px)}
+.btn-ghost{
+  font-family:var(--sans);font-size:0.9rem;font-weight:500;letter-spacing:0.12em;
+  text-transform:uppercase;color:rgba(248,243,235,0.8);background:transparent;
+  padding:18px 40px;border:1px solid rgba(248,243,235,0.25);text-decoration:none;
+  transition:border-color 0.2s,color 0.2s,transform 0.15s;
+}
+.btn-ghost:hover{border-color:var(--gold3);color:var(--gold3);transform:translateY(-1px)}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--sumi);
+  border-top:1px solid rgba(255,255,255,0.07);
+  padding:28px max(5vw,32px);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+}
+.foot-logo{font-family:var(--serif);font-size:0.9rem;font-weight:700;letter-spacing:0.08em;color:rgba(248,243,235,0.6)}
+.foot-copy{font-family:var(--sans);font-size:0.78rem;font-weight:300;color:rgba(248,243,235,0.35)}
+@media(max-width:768px){footer{flex-direction:column;text-align:center}}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity 0.65s ease,transform 0.65s ease}
+.reveal.in{opacity:1;transform:none}
+.reveal-d1{transition-delay:0.1s}
+.reveal-d2{transition-delay:0.2s}
+.reveal-d3{transition-delay:0.3s}
+</style>
+</head>
+<body>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" onclick="closeMM()">Home</a>
+  <a href="our-story.html" style="color:var(--rouge)">Our Story</a>
+  <a href="menu.html">Menu</a>
+  <a href="index.html#hours" onclick="closeMM()">Hours</a>
+  <a href="index.html#reserve" class="mm-btn" onclick="closeMM()">Reserve a Table</a>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">火</div>
+    Osaka Hibachi
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="our-story.html" class="active">Our Story</a></li>
+    <li><a href="menu.html">Menu</a></li>
+    <li><a href="index.html#hours">Hours</a></li>
+  </ul>
+  <a href="index.html#reserve" class="nav-cta">Reserve</a>
+  <button class="nav-ham" id="navHam" onclick="toggleMM()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span class="breadcrumb-sep">—</span>
+    <span>Our Story</span>
+  </div>
+  <div class="page-label">Est. 2010 · Moncton, New Brunswick</div>
+  <h1 class="page-title">Where fire meets <em>craft</em></h1>
+  <p class="page-tagline">Japanese & Korean cuisine, teppanyaki grills — where the iron meets craft.</p>
+</div>
+
+<div class="strip-divider"></div>
+
+<!-- ABOUT -->
+<section class="section" id="about">
+  <div class="about-grid">
+    <div>
+      <div class="section-label reveal">Our Story</div>
+      <h2 class="section-title reveal reveal-d1">Moncton's <em>teppanyaki</em> table</h2>
+      <p class="section-body reveal reveal-d2">
+        Osaka Hibachi brings the theatre of teppanyaki to the heart of Moncton. Our chefs cook at your table on open iron grills — AAA steaks, fresh seafood, and vibrant vegetables prepared with skill and a touch of showmanship.
+      </p>
+      <p class="section-body reveal reveal-d2" style="margin-top:24px">
+        Beyond the hibachi, our kitchen crafts traditional Japanese and Korean dishes: handmade sushi rolls, premium sashimi, and a curated sake selection. Every meal here is an occasion.
+      </p>
+      <div class="stats-row reveal reveal-d3">
+        <div class="stat-block"><div class="stat-n">4</div><div class="stat-t">Teppanyaki Grills</div></div>
+        <div class="stat-block"><div class="stat-n">15+</div><div class="stat-t">Years in Moncton</div></div>
+        <div class="stat-block"><div class="stat-n">Est.</div><div class="stat-t">2010</div></div>
+        <div class="stat-block"><div class="stat-n">2</div><div class="stat-t">Dining Rooms</div></div>
+      </div>
+    </div>
+    <div class="reveal reveal-d2">
+      <div class="about-ornament">
+        <span class="about-jp">火</span>
+        <span class="about-quote-mark">"</span>
+        <p class="about-quote">A place where food and coziness complement each other.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"><span class="section-divider-kanji">· 体験 ·</span></div>
+
+<!-- EXPERIENCE -->
+<div class="exp-bg">
+  <div class="exp-inner">
+    <div class="section-label reveal">The Experience</div>
+    <h2 class="section-title reveal reveal-d1">More than <em>dinner</em></h2>
+    <div class="exp-row">
+      <div class="exp-cell reveal">
+        <span class="exp-n">01 / Teppanyaki</span>
+        <div class="exp-h">Iron Grill Theatre</div>
+        <p class="exp-p">Sit around the open grill as our chefs perform — fire, knifework, and live cooking at your table. Ideal for groups and celebrations.</p>
+      </div>
+      <div class="exp-cell reveal reveal-d1">
+        <span class="exp-n">02 / Sushi</span>
+        <div class="exp-h">Handcrafted Rolls</div>
+        <p class="exp-p">Fresh rolls and premium sashimi from our dedicated sushi kitchen. Available dine-in and takeout.</p>
+      </div>
+      <div class="exp-cell reveal reveal-d2">
+        <span class="exp-n">03 / Bar</span>
+        <div class="exp-h">Sake &amp; Full Bar</div>
+        <p class="exp-p">Curated sake, Japanese whisky, Korean soju, and classic cocktails. Full licensed bar service.</p>
+      </div>
+      <div class="exp-cell reveal reveal-d3">
+        <span class="exp-n">04 / Events</span>
+        <div class="exp-h">Private Parties</div>
+        <p class="exp-p">Birthday dinners, anniversaries, and corporate groups. Private grill reservations and group menus available.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BACK CTA -->
+<div class="back-section">
+  <div class="back-label">Ready to visit?</div>
+  <div class="back-title">Reserve your table or <em>explore the menu</em></div>
+  <div class="back-actions">
+    <a href="index.html#reserve" class="btn-sumi">Reserve a Table</a>
+    <a href="menu.html" class="btn-ghost">View Menu</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">Osaka Hibachi</div>
+  <div class="foot-copy">© 2026 · 599 Main St, Moncton NB · (506) 853-8855</div>
+</footer>
+
+<script>
+function toggleMM(){
+  document.getElementById('mobileMenu').classList.toggle('open');
+  document.getElementById('navHam').classList.toggle('open');
+}
+function closeMM(){
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('navHam').classList.remove('open');
+}
+const ro=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');}),{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+</script>
+</body>
+</html>
