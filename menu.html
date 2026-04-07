@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Menu — Osaka Hibachi, Moncton</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --paper:#f8f3eb;--paper2:#f2ead8;--paper3:#e8dfc8;
+  --ink:#1a1208;--ink2:#2e2010;--ink3:#4a3820;--ink4:#6a5438;
+  --rouge:#8c1c0a;--rouge2:#a82510;--rouge3:#c43018;
+  --sumi:#0a0a0a;
+  --gold:#8a6c18;--gold2:#a88428;--gold3:#c8a040;
+  --gold-line:rgba(138,108,24,0.18);--gold-dim:rgba(138,108,24,0.08);
+  --serif:'Shippori Mincho','Libre Baskerville',Georgia,serif;
+  --body:'Libre Baskerville',Georgia,serif;
+  --sans:'Jost',system-ui,sans-serif;
+  --grain:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+}
+html{scroll-behavior:smooth;font-size:18px;-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.75;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:var(--grain);pointer-events:none;z-index:9999;opacity:0.8}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 max(5vw,24px);background:rgba(248,243,235,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--gold-line);box-shadow:0 1px 20px rgba(26,18,8,0.07)}
+.nav-logo{font-family:var(--serif);font-size:1.1rem;font-weight:700;letter-spacing:0.08em;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:10px}
+.nav-logo-mark{width:28px;height:28px;border:1.5px solid var(--rouge);display:flex;align-items:center;justify-content:center;font-size:0.85rem;color:var(--rouge);transition:background 0.2s}
+.nav-logo:hover .nav-logo-mark{background:var(--rouge);color:#fff}
+.nav-links{display:flex;gap:32px;list-style:none}
+@media(max-width:768px){.nav-links{display:none}}
+.nav-links a{font-family:var(--sans);font-size:0.88rem;font-weight:400;letter-spacing:0.10em;text-transform:uppercase;color:var(--ink3);text-decoration:none;transition:color 0.2s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:var(--rouge);transform:scaleX(0);transition:transform 0.25s}
+.nav-links a:hover{color:var(--rouge)}
+.nav-links a:hover::after,.nav-links a.active::after{transform:scaleX(1)}
+.nav-links a.active{color:var(--rouge)}
+.nav-right{display:flex;align-items:center;gap:14px}
+.nav-cta{font-family:var(--sans);font-size:0.84rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:var(--sumi);padding:12px 26px;border:none;text-decoration:none;transition:background 0.2s}
+.nav-cta:hover{background:var(--rouge2)}
+.mgr-btn-nav{font-family:var(--sans);font-size:0.72rem;font-weight:400;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink4);background:transparent;padding:10px 16px;border:1px solid var(--gold-line);cursor:pointer;transition:all 0.2s;display:none}
+@media(min-width:769px){.mgr-btn-nav{display:inline-block}}
+.mgr-btn-nav:hover{border-color:var(--rouge);color:var(--rouge)}
+.mgr-badge{display:none;font-family:var(--sans);font-size:0.62rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold2);background:var(--gold-dim);border:1px solid var(--gold-line);padding:3px 10px}
+.manager-active .mgr-badge{display:inline-block}
+.nav-ham{display:none;background:none;border:none;cursor:pointer;padding:6px;flex-direction:column;gap:4px}
+@media(max-width:768px){.nav-ham{display:flex}}
+.nav-ham span{width:22px;height:1px;background:var(--ink);display:block;transition:all 0.3s}
+.nav-ham.open span:nth-child(1){transform:rotate(45deg) translate(3.5px,3.5px)}
+.nav-ham.open span:nth-child(2){opacity:0}
+.nav-ham.open span:nth-child(3){transform:rotate(-45deg) translate(3.5px,-3.5px)}
+.mobile-menu{position:fixed;inset:0;z-index:190;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;opacity:0;pointer-events:none;transition:opacity 0.3s}
+.mobile-menu.open{opacity:1;pointer-events:all}
+.mobile-menu a{font-family:var(--serif);font-size:2rem;font-weight:400;color:var(--ink);text-decoration:none;letter-spacing:0.05em;transition:color 0.2s}
+.mobile-menu a:hover{color:var(--rouge)}
+.mobile-menu .mm-btn{font-family:var(--sans);font-size:0.78rem;letter-spacing:0.16em;text-transform:uppercase;background:var(--sumi);color:#fff;padding:14px 40px}
+
+/* ── PAGE HEADER ── */
+.page-header{padding:clamp(100px,14vh,140px) max(5vw,32px) 0;max-width:1320px;margin:0 auto}
+.breadcrumb{display:flex;align-items:center;gap:10px;font-family:var(--sans);font-size:0.75rem;font-weight:400;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink4);margin-bottom:20px}
+.breadcrumb a{color:var(--ink4);text-decoration:none;transition:color 0.2s}
+.breadcrumb a:hover{color:var(--rouge)}
+.breadcrumb-sep{color:var(--gold);font-size:0.65rem}
+.page-label{font-family:var(--sans);font-size:0.78rem;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;color:var(--rouge);margin-bottom:12px}
+.page-title{font-family:var(--serif);font-size:clamp(2.4rem,5vw,4.5rem);font-weight:700;line-height:0.95;letter-spacing:-0.02em;color:var(--ink)}
+.page-title em{font-style:italic;font-weight:400;color:var(--rouge)}
+.header-note{font-family:var(--sans);font-size:0.82rem;font-weight:300;color:var(--ink4);margin-top:12px;font-style:italic}
+
+/* ── MENU TABS ── */
+.menu-nav{
+  position:sticky;top:68px;z-index:100;
+  background:rgba(248,243,235,0.97);backdrop-filter:blur(12px);
+  border-bottom:2px solid var(--ink);
+  margin-top:36px;
+}
+.menu-tabs{
+  max-width:1320px;margin:0 auto;
+  padding:0 max(5vw,32px);
+  display:flex;gap:0;overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.menu-tabs::-webkit-scrollbar{display:none}
+.menu-tab{
+  font-family:var(--sans);font-size:0.82rem;font-weight:400;
+  letter-spacing:0.10em;text-transform:uppercase;
+  color:var(--ink3);background:transparent;border:none;
+  padding:18px 24px;cursor:pointer;white-space:nowrap;
+  position:relative;transition:color 0.2s;
+  border-bottom:3px solid transparent;margin-bottom:-2px;
+}
+.menu-tab:hover{color:var(--rouge)}
+.menu-tab.active{color:var(--ink);font-weight:500;border-bottom-color:var(--rouge)}
+@media(max-width:600px){.menu-tab{padding:14px 16px;font-size:0.75rem}}
+
+/* ── MENU CONTENT ── */
+.menu-content{max-width:1320px;margin:0 auto;padding:0 max(5vw,32px) clamp(72px,10vw,120px)}
+.menu-panel{display:none;padding-top:48px}
+.menu-panel.active{display:block}
+
+/* ── CATEGORY SECTIONS ── */
+.cat-section{margin-bottom:8px;border:1px solid var(--gold-line)}
+.cat-toggle{
+  width:100%;display:flex;justify-content:space-between;align-items:center;
+  padding:20px 28px;background:var(--paper2);border:none;cursor:pointer;
+  transition:background 0.2s;text-align:left;
+}
+.cat-toggle:hover{background:var(--paper3)}
+.cat-toggle-name{
+  font-family:var(--serif);font-size:1.2rem;font-weight:700;
+  color:var(--ink);letter-spacing:0.01em;
+}
+.cat-toggle-right{display:flex;align-items:center;gap:14px}
+.cat-count{font-family:var(--sans);font-size:0.75rem;font-weight:400;color:var(--ink4);letter-spacing:0.06em}
+.cat-arrow{font-size:1rem;color:var(--rouge);transition:transform 0.25s;display:inline-block}
+.cat-arrow.open{transform:rotate(180deg)}
+.cat-body{display:none;border-top:1px solid var(--gold-line)}
+.cat-body.open{display:block}
+
+/* ── SUB SECTIONS ── */
+.sub-section{border-bottom:1px solid var(--gold-line)}
+.sub-section:last-child{border-bottom:none}
+.sub-toggle{
+  width:100%;display:flex;justify-content:space-between;align-items:center;
+  padding:14px 28px 14px 36px;background:transparent;border:none;cursor:pointer;
+  transition:background 0.15s;text-align:left;
+}
+.sub-toggle:hover{background:rgba(138,108,24,0.04)}
+.sub-toggle span:first-child{font-family:var(--sans);font-size:0.82rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3)}
+.sub-arrow{font-size:0.8rem;color:var(--ink4);transition:transform 0.2s}
+.sub-arrow.open{transform:rotate(180deg)}
+.sub-body{display:none;border-top:1px solid rgba(138,108,24,0.08)}
+.sub-body.open{display:block}
+
+/* ── MENU ITEMS GRID ── */
+.menu-items-grid{display:flex;flex-direction:column}
+.menu-item{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:16px 28px 16px 36px;
+  border-bottom:1px solid rgba(138,108,24,0.08);
+  transition:background 0.12s;
+  gap:16px;
+}
+.menu-item:last-child{border-bottom:none}
+.menu-item:hover{background:rgba(248,243,235,0.8)}
+.menu-item-left{flex:1;min-width:0}
+.menu-item-name{
+  font-family:var(--sans);font-size:1rem;font-weight:500;
+  color:var(--ink);line-height:1.4;
+  display:flex;align-items:center;flex-wrap:wrap;gap:6px;
+}
+.menu-item-desc{
+  font-family:var(--sans);font-size:0.82rem;font-weight:300;
+  color:var(--ink3);margin-top:3px;line-height:1.5;
+}
+.menu-item-right{flex-shrink:0;text-align:right}
+.menu-item-price{
+  font-family:var(--serif);font-size:1rem;font-weight:600;
+  color:var(--rouge);font-style:italic;white-space:nowrap;
+}
+.menu-item-price.editing{
+  background:rgba(140,28,10,0.08);outline:2px solid var(--rouge);
+  padding:2px 6px;cursor:text;
+}
+
+/* Dual price rows (nigiri / sashimi) */
+.menu-item-dual .menu-item-right{min-width:160px}
+.dual-prices{display:flex;flex-direction:column;gap:4px}
+.dual-price-row{display:flex;align-items:center;justify-content:flex-end;gap:10px}
+.dual-label{font-family:var(--sans);font-size:0.72rem;font-weight:300;color:var(--ink4);white-space:nowrap}
+
+/* Badges */
+.item-badge{
+  font-family:var(--sans);font-size:0.62rem;font-weight:500;
+  letter-spacing:0.08em;text-transform:uppercase;
+  padding:2px 8px;border-radius:2px;white-space:nowrap;
+}
+.badge-spicy{background:rgba(200,56,10,0.12);color:var(--rouge2)}
+.badge-veg{background:rgba(74,138,74,0.12);color:#2d6b2d}
+.item-notes{
+  font-family:var(--sans);font-size:0.68rem;font-weight:300;
+  color:var(--ink4);font-style:italic;
+}
+
+/* ── MANAGER MODE ── */
+.mgr-add-btn{
+  display:block;width:calc(100% - 56px);margin:10px 28px;
+  font-family:var(--sans);font-size:0.75rem;font-weight:400;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--gold2);background:transparent;
+  border:1px dashed var(--gold-line);padding:10px;cursor:pointer;
+  transition:border-color 0.2s,color 0.2s;
+}
+.mgr-add-btn:hover{border-color:var(--gold2);color:var(--gold)}
+.mgr-item-controls{display:flex;gap:4px;margin-left:10px;flex-shrink:0}
+.mgr-ic-btn{
+  font-size:0.75rem;padding:3px 7px;background:none;
+  border:1px solid var(--gold-line);color:var(--ink4);cursor:pointer;
+  transition:all 0.15s;
+}
+.mgr-ic-btn:hover{border-color:var(--gold);color:var(--gold)}
+.mgr-ic-del:hover{border-color:var(--rouge)!important;color:var(--rouge)!important;background:rgba(140,28,10,0.06)}
+
+/* ── FOOTER NOTE ── */
+.menu-note{
+  max-width:1320px;margin:0 auto;
+  padding:0 max(5vw,32px) 12px;
+  font-family:var(--sans);font-size:0.78rem;font-weight:300;
+  color:var(--ink4);font-style:italic;line-height:1.7;
+  border-top:1px solid var(--gold-line);padding-top:20px;
+}
+
+/* ── RESERVE STRIP ── */
+.reserve-strip{
+  background:var(--sumi);
+  padding:clamp(48px,6vw,72px) max(5vw,32px);
+  text-align:center;
+}
+.reserve-strip-title{
+  font-family:var(--serif);font-size:clamp(1.3rem,2.5vw,2rem);
+  font-weight:700;color:#fff;margin-bottom:8px;
+}
+.reserve-strip-title em{font-style:italic;font-weight:400;color:var(--gold3)}
+.reserve-strip-sub{
+  font-family:var(--sans);font-size:0.9rem;font-weight:300;
+  color:rgba(248,243,235,0.55);margin-bottom:32px;
+}
+.btn-res{
+  font-family:var(--sans);font-size:0.95rem;font-weight:500;letter-spacing:0.12em;
+  text-transform:uppercase;color:#fff;background:var(--rouge2);
+  padding:18px 44px;text-decoration:none;display:inline-block;
+  transition:background 0.2s,transform 0.15s;
+  box-shadow:0 4px 20px rgba(140,28,10,0.3);
+}
+.btn-res:hover{background:var(--rouge);transform:translateY(-1px)}
+.btn-res-phone{
+  display:block;margin-top:16px;
+  font-family:var(--serif);font-size:clamp(1.5rem,3vw,2.2rem);
+  font-style:italic;color:rgba(248,243,235,0.9);text-decoration:none;
+  transition:color 0.2s;
+}
+.btn-res-phone:hover{color:var(--gold3)}
+
+/* ── FOOTER ── */
+footer{background:var(--sumi);border-top:1px solid rgba(255,255,255,0.07);padding:28px max(5vw,32px);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.foot-logo{font-family:var(--serif);font-size:0.9rem;font-weight:700;letter-spacing:0.08em;color:rgba(248,243,235,0.6)}
+.foot-copy{font-family:var(--sans);font-size:0.78rem;font-weight:300;color:rgba(248,243,235,0.35)}
+@media(max-width:768px){footer{flex-direction:column;text-align:center}}
+
+/* ── MANAGER MODAL ── */
+.mgr-overlay{display:none;position:fixed;inset:0;background:rgba(10,8,5,0.75);backdrop-filter:blur(6px);z-index:500;align-items:center;justify-content:center}
+.mgr-overlay.open{display:flex}
+.mgr-modal{background:var(--paper);border:1px solid var(--gold-line);border-top:3px solid var(--rouge);padding:36px;width:90%;max-width:420px;max-height:90vh;overflow-y:auto}
+.mgr-modal h3{font-family:var(--serif);font-size:1.5rem;font-weight:700;color:var(--ink);margin-bottom:8px}
+.mgr-modal p{font-family:var(--sans);font-size:0.88rem;color:var(--ink3);margin-bottom:20px;line-height:1.7}
+.mgr-input{width:100%;background:var(--paper2);border:1px solid var(--gold-line);color:var(--ink);padding:12px 14px;font-family:var(--sans);font-size:0.95rem;outline:none;margin-bottom:14px;transition:border-color 0.2s}
+.mgr-input:focus{border-color:var(--rouge)}
+select.mgr-input{cursor:pointer}
+.mgr-err{font-family:var(--sans);font-size:0.82rem;color:var(--rouge2);margin-bottom:12px;min-height:1.2em}
+.mgr-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:4px}
+.mgr-btn{font-family:var(--sans);font-size:0.82rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;background:var(--sumi);color:#fff;border:none;padding:12px 28px;cursor:pointer;transition:background 0.2s}
+.mgr-btn:hover{background:var(--rouge2)}
+.mgr-btn-cancel{font-family:var(--sans);font-size:0.82rem;font-weight:400;letter-spacing:0.1em;text-transform:uppercase;background:transparent;color:var(--ink4);border:1px solid var(--gold-line);padding:12px 24px;cursor:pointer;transition:all 0.2s}
+.mgr-btn-cancel:hover{border-color:var(--ink3);color:var(--ink)}
+.mgr-field-label{font-family:var(--sans);font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink4);display:block;margin-bottom:5px}
+
+/* ── SCROLL REVEAL ── */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity 0.6s ease,transform 0.6s ease}
+.reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body id="menuBody">
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" onclick="closeMM()">Home</a>
+  <a href="our-story.html" onclick="closeMM()">Our Story</a>
+  <a href="menu.html" style="color:var(--rouge)">Menu</a>
+  <a href="index.html#hours" onclick="closeMM()">Hours</a>
+  <a href="index.html#reserve" class="mm-btn" onclick="closeMM()">Reserve a Table</a>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">火</div>
+    Osaka Hibachi
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="our-story.html">Our Story</a></li>
+    <li><a href="menu.html" class="active">Menu</a></li>
+    <li><a href="index.html#hours">Hours</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="mgr-btn-nav" id="mgrNavBtn" onclick="openManagerModal()">🔒 Manage Prices</button>
+    <span class="mgr-badge" id="mgrBadge">Manager</span>
+    <a href="index.html#reserve" class="nav-cta">Reserve</a>
+    <button class="nav-ham" id="navHam" onclick="toggleMM()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="breadcrumb reveal">
+    <a href="index.html">Home</a>
+    <span class="breadcrumb-sep">—</span>
+    <span>Menu</span>
+  </div>
+  <div class="page-label reveal">Menu &amp; Pricing</div>
+  <h1 class="page-title reveal">Our <em>selections</em></h1>
+  <p class="header-note reveal">Prices may vary · HST not included · Ask your server about daily specials</p>
+</div>
+
+<!-- STICKY TAB NAV -->
+<div class="menu-nav" id="menuNav">
+  <div class="menu-tabs" id="menuTabs">
+    <button class="menu-tab active" onclick="switchTab('sushi',this)">Sushi &amp; Rolls</button>
+    <button class="menu-tab" onclick="switchTab('starters',this)">Starters</button>
+    <button class="menu-tab" onclick="switchTab('teppanyaki',this)">Teppanyaki</button>
+    <button class="menu-tab" onclick="switchTab('asian',this)">Asian Dining</button>
+    <button class="menu-tab" onclick="switchTab('lunch',this)">Lunch</button>
+    <button class="menu-tab" onclick="switchTab('desserts',this)">Desserts</button>
+  </div>
+</div>
+
+<!-- MENU CONTENT -->
+<div class="menu-content" id="menuContent">
+
+<!-- ══ SUSHI & ROLLS ══ -->
+<div class="menu-panel active" id="panel-sushi">
+
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('sashimi-maki')"><span class="cat-toggle-name">Sashimi · Sushi · Maki</span><span class="cat-toggle-right"><span class="cat-count">12 items</span><span class="cat-arrow" id="cat-arr-sashimi-maki">▾</span></span></button>
+<div class="cat-body" id="cat-sashimi-maki">
+<div class="menu-items-grid" id="sashimi-maki-main">
+<div class="menu-item" data-key="sashimi---vegetable-ma"><div class="menu-item-left"><div class="menu-item-name">Vegetable Maki Set<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Sweet yam · avo · kappa · veggie roll</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---vegetable-ma">—</span></div></div>
+<div class="menu-item" data-key="sashimi---maki-combo-s"><div class="menu-item-left"><div class="menu-item-name">Maki Combo Set</div><div class="menu-item-desc">Salmon · California · dynamite</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---maki-combo-s">—</span></div></div>
+<div class="menu-item" data-key="sashimi---spicy-maki-c"><div class="menu-item-left"><div class="menu-item-name">Spicy Maki Combo Set<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Spicy tuna · salmon · dynamite</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---spicy-maki-c">—</span></div></div>
+<div class="menu-item" data-key="sashimi---osaka-maki-c"><div class="menu-item-left"><div class="menu-item-name">Osaka Maki Combo</div><div class="menu-item-desc">Osaka hibachi · fire · California</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---osaka-maki-c">—</span></div></div>
+<div class="menu-item" data-key="sashimi---sushi---sash"><div class="menu-item-left"><div class="menu-item-name">Sushi &amp; Sashimi Dinner</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---sushi---sash">—</span></div></div>
+<div class="menu-item" data-key="sashimi---sashimi-dinn"><div class="menu-item-left"><div class="menu-item-name">Sashimi Dinner <span class="item-notes">20 pcs</span></div><div class="menu-item-desc">Fresh fish with rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---sashimi-dinn">—</span></div></div>
+<div class="menu-item" data-key="sashimi---sushi-osaka"><div class="menu-item-left"><div class="menu-item-name">Sushi Osaka</div><div class="menu-item-desc">Nigiri and California</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---sushi-osaka">—</span></div></div>
+<div class="menu-item" data-key="sashimi---salmon-holic1"><div class="menu-item-left"><div class="menu-item-name">Salmon-holic 1</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---salmon-holic1">—</span></div></div>
+<div class="menu-item" data-key="sashimi---salmon-holic2"><div class="menu-item-left"><div class="menu-item-name">Salmon-holic 2</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---salmon-holic2">—</span></div></div>
+<div class="menu-item" data-key="sashimi---salmon-holic3"><div class="menu-item-left"><div class="menu-item-name">Salmon-holic 3</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---salmon-holic3">—</span></div></div>
+<div class="menu-item" data-key="sashimi---tuna-holic-1"><div class="menu-item-left"><div class="menu-item-name">Tuna-holic 1</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---tuna-holic-1">—</span></div></div>
+<div class="menu-item" data-key="sashimi---tuna-holic-2"><div class="menu-item-left"><div class="menu-item-name">Tuna-holic 2</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---tuna-holic-2">—</span></div></div>
+</div></div></div>
+
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('special-rolls')"><span class="cat-toggle-name">Special Rolls</span><span class="cat-toggle-right"><span class="cat-count">24 items</span><span class="cat-arrow" id="cat-arr-special-rolls">▾</span></span></button>
+<div class="cat-body" id="cat-special-rolls">
+<div class="menu-items-grid" id="special-rolls-main">
+<div class="menu-item" data-key="special---fire-crunch-"><div class="menu-item-left"><div class="menu-item-name">Fire Crunch Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Salmon tempura · avocado · spicy sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---fire-crunch-">—</span></div></div>
+<div class="menu-item" data-key="special---summer-roll"><div class="menu-item-left"><div class="menu-item-name">Summer Roll</div><div class="menu-item-desc">Shrimp tempura · mango · cucumber · rice paper</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---summer-roll">—</span></div></div>
+<div class="menu-item" data-key="special---green-dragon"><div class="menu-item-left"><div class="menu-item-name">Green Dragon Roll</div><div class="menu-item-desc">Shrimp tempura · cucumber · avocado</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---green-dragon">—</span></div></div>
+<div class="menu-item" data-key="special---lovely-lady-"><div class="menu-item-left"><div class="menu-item-name">Lovely Lady Roll<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Beet · radish · avocado · yam tempura</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---lovely-lady-">—</span></div></div>
+<div class="menu-item" data-key="special---spider-roll"><div class="menu-item-left"><div class="menu-item-name">Spider Roll</div><div class="menu-item-desc">Soft shell crab · avocado · cucumber · roe</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---spider-roll">—</span></div></div>
+<div class="menu-item" data-key="special---sunshine-rol"><div class="menu-item-left"><div class="menu-item-name">Sunshine Roll<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Sweet yam · asparagus tempura · avocado</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---sunshine-rol">—</span></div></div>
+<div class="menu-item" data-key="special---red-dragon-r"><div class="menu-item-left"><div class="menu-item-name">Red Dragon Roll</div><div class="menu-item-desc">Shrimp tempura · crab · salmon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---red-dragon-r">—</span></div></div>
+<div class="menu-item" data-key="special---rainbow-roll"><div class="menu-item-left"><div class="menu-item-name">Rainbow Roll</div><div class="menu-item-desc">Avocado · crab · cucumber · assorted sashimi</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---rainbow-roll">—</span></div></div>
+<div class="menu-item" data-key="special---sean-roll"><div class="menu-item-left"><div class="menu-item-name">Sean Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Spicy crab · shrimp tempura</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---sean-roll">—</span></div></div>
+<div class="menu-item" data-key="special---crispy-valen"><div class="menu-item-left"><div class="menu-item-name">Crispy Valentine Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Avocado · crab · spicy tuna · fries</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---crispy-valen">—</span></div></div>
+<div class="menu-item" data-key="special---sunday-roll"><div class="menu-item-left"><div class="menu-item-name">Sunday Roll</div><div class="menu-item-desc">Salmon · avocado · crab · roe</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---sunday-roll">—</span></div></div>
+<div class="menu-item" data-key="special---sakura-roll"><div class="menu-item-left"><div class="menu-item-name">Sakura Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Spicy scallop · crab · avocado</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---sakura-roll">—</span></div></div>
+<div class="menu-item" data-key="special---shogun-roll"><div class="menu-item-left"><div class="menu-item-name">Shogun Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Spicy salmon · shrimp tempura</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---shogun-roll">—</span></div></div>
+<div class="menu-item" data-key="special---double-dynam"><div class="menu-item-left"><div class="menu-item-name">Double Dynamite Roll</div><div class="menu-item-desc">Shrimp tempura · crab · roe</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---double-dynam">—</span></div></div>
+<div class="menu-item" data-key="special---black-dragon"><div class="menu-item-left"><div class="menu-item-name">Black Dragon Roll</div><div class="menu-item-desc">Shrimp tempura · crab · BBQ eel</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---black-dragon">—</span></div></div>
+<div class="menu-item" data-key="special---volcano-roll"><div class="menu-item-left"><div class="menu-item-name">Volcano Roll</div><div class="menu-item-desc">Deep-fried shrimp tempura · crab</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---volcano-roll">—</span></div></div>
+<div class="menu-item" data-key="special---ocean-spicy-"><div class="menu-item-left"><div class="menu-item-name">Ocean Spicy Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Spicy crab · salmon · shrimp</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---ocean-spicy-">—</span></div></div>
+<div class="menu-item" data-key="special---pei-roll"><div class="menu-item-left"><div class="menu-item-name">PEI Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Shrimp tempura · crab · scallop</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---pei-roll">—</span></div></div>
+<div class="menu-item" data-key="special---nb-roll"><div class="menu-item-left"><div class="menu-item-name">NB Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Shrimp tempura · crab · salmon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---nb-roll">—</span></div></div>
+<div class="menu-item" data-key="special---nova-scotia-"><div class="menu-item-left"><div class="menu-item-name">Nova Scotia Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Shrimp tempura · crab · tuna</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---nova-scotia-">—</span></div></div>
+<div class="menu-item" data-key="special---lobster-fant"><div class="menu-item-left"><div class="menu-item-name">Lobster Fantasy Roll</div><div class="menu-item-desc">Lobster · avocado · cucumber</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---lobster-fant">—</span></div></div>
+<div class="menu-item" data-key="special---new-york-rol"><div class="menu-item-left"><div class="menu-item-name">New York Roll</div><div class="menu-item-desc">Shrimp tempura · beef tataki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---new-york-rol">—</span></div></div>
+<div class="menu-item" data-key="special---osaka-hibach"><div class="menu-item-left"><div class="menu-item-name">Osaka Hibachi Roll</div><div class="menu-item-desc">Shrimp tempura · red snapper</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---osaka-hibach">—</span></div></div>
+<div class="menu-item" data-key="special---osaka-fisher"><div class="menu-item-left"><div class="menu-item-name">Osaka Fisherman's Meli Molo</div><div class="menu-item-desc">Premium roll with vegetables and scallop</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---osaka-fisher">—</span></div></div>
+</div></div></div>
+
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('premium-rolls')"><span class="cat-toggle-name">Premium Rolls</span><span class="cat-toggle-right"><span class="cat-count">11 items</span><span class="cat-arrow" id="cat-arr-premium-rolls">▾</span></span></button>
+<div class="cat-body" id="cat-premium-rolls">
+<div class="menu-items-grid" id="premium-rolls-main">
+<div class="menu-item" data-key="premium---yammy-roll"><div class="menu-item-left"><div class="menu-item-name">Yammy Roll</div><div class="menu-item-desc">Avocado · onion · cilantro · yam tempura</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---yammy-roll">—</span></div></div>
+<div class="menu-item" data-key="premium---tempura-vegg"><div class="menu-item-left"><div class="menu-item-name">Tempura Veggie Roll<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Avocado · cucumber · yam · asparagus</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---tempura-vegg">—</span></div></div>
+<div class="menu-item" data-key="premium---kamikaze-rol"><div class="menu-item-left"><div class="menu-item-name">Kamikaze Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Spicy tuna · tempura bits</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---kamikaze-rol">—</span></div></div>
+<div class="menu-item" data-key="premium---philadelphia"><div class="menu-item-left"><div class="menu-item-name">Philadelphia Roll</div><div class="menu-item-desc">Salmon · cream cheese · cucumber</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---philadelphia">—</span></div></div>
+<div class="menu-item" data-key="premium---spring-queen"><div class="menu-item-left"><div class="menu-item-name">Spring Queen Roll<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Carrot · asparagus · wrapped rice paper</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---spring-queen">—</span></div></div>
+<div class="menu-item" data-key="premium---caterpillar-"><div class="menu-item-left"><div class="menu-item-name">Caterpillar Roll</div><div class="menu-item-desc">BBQ eel · cucumber · avocado</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---caterpillar-">—</span></div></div>
+<div class="menu-item" data-key="premium---dynamite-rol"><div class="menu-item-left"><div class="menu-item-name">Dynamite Roll</div><div class="menu-item-desc">Shrimp tempura · crab · cucumber</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---dynamite-rol">—</span></div></div>
+<div class="menu-item" data-key="premium---bulgogi-roll"><div class="menu-item-left"><div class="menu-item-name">Bulgogi Roll</div><div class="menu-item-desc">Marinated beef · cucumber · lettuce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---bulgogi-roll">—</span></div></div>
+<div class="menu-item" data-key="premium---tiger-roll"><div class="menu-item-left"><div class="menu-item-name">Tiger Roll</div><div class="menu-item-desc">Avocado · shrimp · crab · roe</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---tiger-roll">—</span></div></div>
+<div class="menu-item" data-key="premium---mango-roll"><div class="menu-item-left"><div class="menu-item-name">Mango Roll<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Mango · avocado · cucumber · asparagus</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---mango-roll">—</span></div></div>
+<div class="menu-item" data-key="premium---crunch-roll"><div class="menu-item-left"><div class="menu-item-name">Crunch Roll</div><div class="menu-item-desc">Shrimp tempura · crab · mayo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---crunch-roll">—</span></div></div>
+</div></div></div>
+
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('classic-maki')"><span class="cat-toggle-name">Classic Maki</span><span class="cat-toggle-right"><span class="cat-count">15 items</span><span class="cat-arrow" id="cat-arr-classic-maki">▾</span></span></button>
+<div class="cat-body" id="cat-classic-maki">
+<div class="menu-items-grid" id="classic-maki-main">
+<div class="menu-item" data-key="classic---kani-maki"><div class="menu-item-left"><div class="menu-item-name">Kani Maki</div><div class="menu-item-desc">Imitation crab</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---kani-maki">—</span></div></div>
+<div class="menu-item" data-key="classic---kappa-maki"><div class="menu-item-left"><div class="menu-item-name">Kappa Maki<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Cucumber</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---kappa-maki">—</span></div></div>
+<div class="menu-item" data-key="classic---avocado-maki"><div class="menu-item-left"><div class="menu-item-name">Avocado Maki<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---avocado-maki">—</span></div></div>
+<div class="menu-item" data-key="classic---asparagus-ma"><div class="menu-item-left"><div class="menu-item-name">Asparagus Maki<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---asparagus-ma">—</span></div></div>
+<div class="menu-item" data-key="classic---avocado---ka"><div class="menu-item-left"><div class="menu-item-name">Avocado &amp; Kappa Maki<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---avocado---ka">—</span></div></div>
+<div class="menu-item" data-key="classic---california-m"><div class="menu-item-left"><div class="menu-item-name">California Maki</div><div class="menu-item-desc">Crab · avocado · cucumber · roe</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---california-m">—</span></div></div>
+<div class="menu-item" data-key="classic---sweet-yam-ma"><div class="menu-item-left"><div class="menu-item-name">Sweet Yam Maki<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---sweet-yam-ma">—</span></div></div>
+<div class="menu-item" data-key="classic---salmon-maki"><div class="menu-item-left"><div class="menu-item-name">Salmon Maki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---salmon-maki">—</span></div></div>
+<div class="menu-item" data-key="classic---chicken-teri"><div class="menu-item-left"><div class="menu-item-name">Chicken Teriyaki Maki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---chicken-teri">—</span></div></div>
+<div class="menu-item" data-key="classic---avocado---sa"><div class="menu-item-left"><div class="menu-item-name">Avocado &amp; Salmon Maki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---avocado---sa">—</span></div></div>
+<div class="menu-item" data-key="classic---avocado---sh"><div class="menu-item-left"><div class="menu-item-name">Avocado &amp; Shrimp Tempura Maki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---avocado---sh">—</span></div></div>
+<div class="menu-item" data-key="classic---tuna-maki"><div class="menu-item-left"><div class="menu-item-name">Tuna Maki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---tuna-maki">—</span></div></div>
+<div class="menu-item" data-key="classic---unagi-maki"><div class="menu-item-left"><div class="menu-item-name">Unagi Maki</div><div class="menu-item-desc">BBQ eel</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---unagi-maki">—</span></div></div>
+<div class="menu-item" data-key="classic---fire-maki"><div class="menu-item-left"><div class="menu-item-name">Fire Maki</div><div class="menu-item-desc">Deep-fried · crab · shrimp · cream cheese</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---fire-maki">—</span></div></div>
+<div class="menu-item" data-key="classic---futo-maki"><div class="menu-item-left"><div class="menu-item-name">Futo Maki <span class="item-notes">8 pcs</span></div><div class="menu-item-desc">Crab · cucumber · tamago</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---futo-maki">—</span></div></div>
+</div></div></div>
+
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('spicy-rolls')"><span class="cat-toggle-name">Spicy Rolls</span><span class="cat-toggle-right"><span class="cat-count">4 items</span><span class="cat-arrow" id="cat-arr-spicy-rolls">▾</span></span></button>
+<div class="cat-body" id="cat-spicy-rolls">
+<div class="menu-items-grid" id="spicy-rolls-main">
+<div class="menu-item" data-key="spicy-ro--spicy-crab-r"><div class="menu-item-left"><div class="menu-item-name">Spicy Crab Roll<span class="item-badge badge-spicy">Spicy</span> <span class="item-notes">6 pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="spicy-ro--spicy-crab-r">—</span></div></div>
+<div class="menu-item" data-key="spicy-ro--spicy-salmon"><div class="menu-item-left"><div class="menu-item-name">Spicy Salmon Roll<span class="item-badge badge-spicy">Spicy</span> <span class="item-notes">6 pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="spicy-ro--spicy-salmon">—</span></div></div>
+<div class="menu-item" data-key="spicy-ro--spicy-tuna-r"><div class="menu-item-left"><div class="menu-item-name">Spicy Tuna Roll<span class="item-badge badge-spicy">Spicy</span> <span class="item-notes">6 pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="spicy-ro--spicy-tuna-r">—</span></div></div>
+<div class="menu-item" data-key="spicy-ro--spicy-scallo"><div class="menu-item-left"><div class="menu-item-name">Spicy Scallop Roll<span class="item-badge badge-spicy">Spicy</span> <span class="item-notes">6 pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="spicy-ro--spicy-scallo">—</span></div></div>
+</div></div></div>
+
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('baked-rolls')"><span class="cat-toggle-name">Baked Rolls</span><span class="cat-toggle-right"><span class="cat-count">4 items</span><span class="cat-arrow" id="cat-arr-baked-rolls">▾</span></span></button>
+<div class="cat-body" id="cat-baked-rolls">
+<div class="menu-items-grid" id="baked-rolls-main">
+<div class="menu-item" data-key="baked-ro--baked-cheese"><div class="menu-item-left"><div class="menu-item-name">Baked Cheese Roll</div><div class="menu-item-desc">Avocado · crab · cucumber · roe · melted cheese</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="baked-ro--baked-cheese">—</span></div></div>
+<div class="menu-item" data-key="baked-ro--baked-salmon"><div class="menu-item-left"><div class="menu-item-name">Baked Salmon Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Salmon · avocado · crab · cucumber · mayo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="baked-ro--baked-salmon">—</span></div></div>
+<div class="menu-item" data-key="baked-ro--baked-scallo"><div class="menu-item-left"><div class="menu-item-name">Baked Scallop Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Scallop · avocado · crab · cucumber · roe</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="baked-ro--baked-scallo">—</span></div></div>
+<div class="menu-item" data-key="baked-ro--baked-lobste"><div class="menu-item-left"><div class="menu-item-name">Baked Lobster Roll</div><div class="menu-item-desc">Lobster · avocado · crab · cucumber · cheese fries</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="baked-ro--baked-lobste">—</span></div></div>
+</div></div></div>
+
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('a-la-carte')"><span class="cat-toggle-name">À La Carte — Nigiri &amp; Sashimi</span><span class="cat-toggle-right"><span class="cat-count">23 items</span><span class="cat-arrow" id="cat-arr-a-la-carte">▾</span></span></button>
+<div class="cat-body" id="cat-a-la-carte">
+<div class="menu-items-grid" id="a-la-carte-main">
+<div class="menu-item menu-item-dual" data-key="alac-n-avocado"><div class="menu-item-left"><div class="menu-item-name">Avocado<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-avocado">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-avocado">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-sake"><div class="menu-item-left"><div class="menu-item-name">Sake</div><div class="menu-item-desc">Salmon</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-sake">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-sake">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-maguro"><div class="menu-item-left"><div class="menu-item-name">Maguro</div><div class="menu-item-desc">Yellowfin tuna</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-maguro">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-maguro">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-hamachi"><div class="menu-item-left"><div class="menu-item-name">Hamachi</div><div class="menu-item-desc">Yellowtail</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-hamachi">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-hamachi">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-hotategai"><div class="menu-item-left"><div class="menu-item-name">Hotategai</div><div class="menu-item-desc">Scallop</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-hotategai">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-hotategai">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-unagi"><div class="menu-item-left"><div class="menu-item-name">Unagi</div><div class="menu-item-desc">BBQ eel</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-unagi">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-unagi">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-ebi"><div class="menu-item-left"><div class="menu-item-name">Ebi</div><div class="menu-item-desc">Cooked shrimp</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-ebi">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-ebi">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-ama-ebi"><div class="menu-item-left"><div class="menu-item-name">Ama Ebi</div><div class="menu-item-desc">Raw shrimp</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-ama-ebi">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-ama-ebi">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-sake-harasu"><div class="menu-item-left"><div class="menu-item-name">Sake Harasu</div><div class="menu-item-desc">Salmon belly</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-sake-harasu">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-sake-harasu">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-shiro-maguro"><div class="menu-item-left"><div class="menu-item-name">Shiro Maguro</div><div class="menu-item-desc">Albacore tuna</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-shiro-maguro">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-shiro-maguro">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-ikura"><div class="menu-item-left"><div class="menu-item-name">Ikura</div><div class="menu-item-desc">Salmon roe</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-ikura">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-ikura">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-tobiko"><div class="menu-item-left"><div class="menu-item-name">Tobiko</div><div class="menu-item-desc">Flying fish roe</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-tobiko">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-tobiko">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-uni"><div class="menu-item-left"><div class="menu-item-name">Uni</div><div class="menu-item-desc">Sea urchin — seasonal</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-uni">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-uni">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-tako"><div class="menu-item-left"><div class="menu-item-name">Tako</div><div class="menu-item-desc">Octopus</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-tako">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-tako">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-ika"><div class="menu-item-left"><div class="menu-item-name">Ika</div><div class="menu-item-desc">Squid</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-ika">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-ika">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-kani"><div class="menu-item-left"><div class="menu-item-name">Kani</div><div class="menu-item-desc">Imitation crab</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-kani">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-kani">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-tamago"><div class="menu-item-left"><div class="menu-item-name">Tamago</div><div class="menu-item-desc">Egg omelette</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-tamago">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-tamago">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-inari"><div class="menu-item-left"><div class="menu-item-name">Inari</div><div class="menu-item-desc">Fried tofu skin</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-inari">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-inari">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-saba"><div class="menu-item-left"><div class="menu-item-name">Saba</div><div class="menu-item-desc">Mackerel</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-saba">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-saba">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-tai"><div class="menu-item-left"><div class="menu-item-name">Tai</div><div class="menu-item-desc">Sea tilapia</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-tai">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-tai">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-butter-fish"><div class="menu-item-left"><div class="menu-item-name">Butter Fish</div><div class="menu-item-desc">Escolar</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-butter-fish">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-butter-fish">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-hokkigai"><div class="menu-item-left"><div class="menu-item-name">Hokkigai</div><div class="menu-item-desc">Surf clam</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-hokkigai">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-hokkigai">—</span></div></div></div></div>
+<div class="menu-item menu-item-dual" data-key="alac-n-herring-roe"><div class="menu-item-left"><div class="menu-item-name">Herring Roe</div></div><div class="menu-item-right"><div class="dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-herring-roe">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-herring-roe">—</span></div></div></div></div>
+</div></div></div>
+
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('matsuri-boat')"><span class="cat-toggle-name">Matsuri Boat</span><span class="cat-toggle-right"><span class="cat-count">4 items</span><span class="cat-arrow" id="cat-arr-matsuri-boat">▾</span></span></button>
+<div class="cat-body" id="cat-matsuri-boat">
+<div class="menu-items-grid" id="matsuri-boat-main">
+<div class="menu-item" data-key="matsuri---sashimi-boat"><div class="menu-item-left"><div class="menu-item-name">Sashimi Boat <span class="item-notes">25 / 40 / 60 / 90 pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="matsuri---sashimi-boat">—</span></div></div>
+<div class="menu-item" data-key="matsuri---sushi---roll"><div class="menu-item-left"><div class="menu-item-name">Sushi &amp; Roll Boat <span class="item-notes">40 / 60 / 80 / 100 pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="matsuri---sushi---roll">—</span></div></div>
+<div class="menu-item" data-key="matsuri---sashimi-sush"><div class="menu-item-left"><div class="menu-item-name">Sashimi Sushi Roll Combo <span class="item-notes">40 / 70 / 90 / 120 pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="matsuri---sashimi-sush">—</span></div></div>
+<div class="menu-item" data-key="matsuri---maki-roll-bo"><div class="menu-item-left"><div class="menu-item-name">Maki Roll Boat <span class="item-notes">40 / 70 / 100 pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="matsuri---maki-roll-bo">—</span></div></div>
+</div></div></div>
+</div><!-- end panel-sushi -->
+
+<!-- ══ STARTERS ══ -->
+<div class="menu-panel" id="panel-starters">
+
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('appetizers')"><span class="cat-toggle-name">Appetizers</span><span class="cat-toggle-right"><span class="cat-count">23 items</span><span class="cat-arrow" id="cat-arr-appetizers">▾</span></span></button>
+<div class="cat-body" id="cat-appetizers">
+<div class="menu-items-grid" id="appetizers-main">
+<div class="menu-item" data-key="appetize--agedashi-tof"><div class="menu-item-left"><div class="menu-item-name">Agedashi Tofu</div><div class="menu-item-desc">Golden-fried tofu with tempura sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--agedashi-tof">—</span></div></div>
+<div class="menu-item" data-key="appetize--edamame"><div class="menu-item-left"><div class="menu-item-name">Edamame<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Boiled green beans lightly seasoned</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--edamame">—</span></div></div>
+<div class="menu-item" data-key="appetize--spring-rolls"><div class="menu-item-left"><div class="menu-item-name">Spring Rolls <span class="item-notes">6 pcs</span></div><div class="menu-item-desc">Deep-fried vegetable rolls</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--spring-rolls">—</span></div></div>
+<div class="menu-item" data-key="appetize--gyoza"><div class="menu-item-left"><div class="menu-item-name">Gyoza <span class="item-notes">6 pcs</span></div><div class="menu-item-desc">Deep-fried beef dumplings</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--gyoza">—</span></div></div>
+<div class="menu-item" data-key="appetize--sumai-gyoza"><div class="menu-item-left"><div class="menu-item-name">Sumai Gyoza <span class="item-notes">6 pcs</span></div><div class="menu-item-desc">Soft shrimp dumplings</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--sumai-gyoza">—</span></div></div>
+<div class="menu-item" data-key="appetize--osaka-spring"><div class="menu-item-left"><div class="menu-item-name">Osaka Spring Rolls <span class="item-notes">4 pcs</span></div><div class="menu-item-desc">Hand-made deep-fried crab meat and vegetable rolls</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--osaka-spring">—</span></div></div>
+<div class="menu-item" data-key="appetize--yakitori"><div class="menu-item-left"><div class="menu-item-name">Yakitori</div><div class="menu-item-desc">Chicken and vegetable skewers grilled with teriyaki and mayo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--yakitori">—</span></div></div>
+<div class="menu-item" data-key="appetize--angry-pepper"><div class="menu-item-left"><div class="menu-item-name">Angry Pepper<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Deep-fried bell pepper with cream cheese, spicy crab and sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--angry-pepper">—</span></div></div>
+<div class="menu-item" data-key="appetize--sushi-pizza"><div class="menu-item-left"><div class="menu-item-name">Sushi Pizza</div><div class="menu-item-desc">Golden-fried rice cake topped with salmon, avocado, roe and sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--sushi-pizza">—</span></div></div>
+<div class="menu-item" data-key="appetize--spicy-tuna-s"><div class="menu-item-left"><div class="menu-item-name">Spicy Tuna Sushi Pizza<span class="item-badge badge-spicy">Spicy</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--spicy-tuna-s">—</span></div></div>
+<div class="menu-item" data-key="appetize--fire-crab-su"><div class="menu-item-left"><div class="menu-item-name">Fire Crab Sushi Pizza<span class="item-badge badge-spicy">Spicy</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--fire-crab-su">—</span></div></div>
+<div class="menu-item" data-key="appetize--sushi"><div class="menu-item-left"><div class="menu-item-name">Sushi <span class="item-notes">5 pcs</span></div><div class="menu-item-desc">Chef's selection</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--sushi">—</span></div></div>
+<div class="menu-item" data-key="appetize--sashimi"><div class="menu-item-left"><div class="menu-item-name">Sashimi <span class="item-notes">8 pcs</span></div><div class="menu-item-desc">Chef's selection</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--sashimi">—</span></div></div>
+<div class="menu-item" data-key="appetize--beef-tataki"><div class="menu-item-left"><div class="menu-item-name">Beef Tataki</div><div class="menu-item-desc">Lightly seared beef with special sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--beef-tataki">—</span></div></div>
+<div class="menu-item" data-key="appetize--tuna-tataki"><div class="menu-item-left"><div class="menu-item-name">Tuna Tataki</div><div class="menu-item-desc">Lightly seared tuna with special sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--tuna-tataki">—</span></div></div>
+<div class="menu-item" data-key="appetize--dragon-tongu"><div class="menu-item-left"><div class="menu-item-name">Dragon Tongue</div><div class="menu-item-desc">Deep-fried asparagus &amp; cream cheese wrapped with smoked salmon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--dragon-tongu">—</span></div></div>
+<div class="menu-item" data-key="appetize--creamy-shrim"><div class="menu-item-left"><div class="menu-item-name">Creamy Shrimp</div><div class="menu-item-desc">Fried battered shrimp glazed in creamy sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--creamy-shrim">—</span></div></div>
+<div class="menu-item" data-key="appetize--fire-chicken"><div class="menu-item-left"><div class="menu-item-name">Fire Chicken<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Deep-fried chicken with Korean spicy sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--fire-chicken">—</span></div></div>
+<div class="menu-item" data-key="appetize--creamy-chick"><div class="menu-item-left"><div class="menu-item-name">Creamy Chicken</div><div class="menu-item-desc">Popcorn chicken glazed in creamy sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--creamy-chick">—</span></div></div>
+<div class="menu-item" data-key="appetize--pa-dak-chick"><div class="menu-item-left"><div class="menu-item-name">Pa-dak Chicken</div><div class="menu-item-desc">Deep-fried chicken with green onions and special sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--pa-dak-chick">—</span></div></div>
+<div class="menu-item" data-key="appetize--tacoyaki"><div class="menu-item-left"><div class="menu-item-name">Tacoyaki</div><div class="menu-item-desc">Japanese deep-fried octopus balls</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--tacoyaki">—</span></div></div>
+<div class="menu-item" data-key="appetize--tuna-lover"><div class="menu-item-left"><div class="menu-item-name">Tuna Lover</div><div class="menu-item-desc">Albacore tuna with garnishes and sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--tuna-lover">—</span></div></div>
+<div class="menu-item" data-key="appetize--monkey-brain"><div class="menu-item-left"><div class="menu-item-name">Monkey Brain<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Deep-fried avocado with spicy tuna and crab meat</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--monkey-brain">—</span></div></div>
+</div></div></div>
+
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('tempura')"><span class="cat-toggle-name">Tempura</span><span class="cat-toggle-right"><span class="cat-count">9 items</span><span class="cat-arrow" id="cat-arr-tempura">▾</span></span></button>
+<div class="cat-body" id="cat-tempura">
+<div class="menu-items-grid" id="tempura-main">
+<div class="menu-item" data-key="tempura--tornado-frie"><div class="menu-item-left"><div class="menu-item-name">Tornado Fries</div><div class="menu-item-desc">BBQ or cheese powder</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--tornado-frie">—</span></div></div>
+<div class="menu-item" data-key="tempura--vegetable-te"><div class="menu-item-left"><div class="menu-item-name">Vegetable Tempura<span class="item-badge badge-veg">V</span> <span class="item-notes">5 pcs</span></div><div class="menu-item-desc">Assorted vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--vegetable-te">—</span></div></div>
+<div class="menu-item" data-key="tempura--yam-tempura"><div class="menu-item-left"><div class="menu-item-name">Yam Tempura<span class="item-badge badge-veg">V</span> <span class="item-notes">5 pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--yam-tempura">—</span></div></div>
+<div class="menu-item" data-key="tempura--calamari-tem"><div class="menu-item-left"><div class="menu-item-name">Calamari Tempura <span class="item-notes">6 pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--calamari-tem">—</span></div></div>
+<div class="menu-item" data-key="tempura--shrimp-tempu"><div class="menu-item-left"><div class="menu-item-name">Shrimp Tempura <span class="item-notes">5 pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--shrimp-tempu">—</span></div></div>
+<div class="menu-item" data-key="tempura--kaki-tempura"><div class="menu-item-left"><div class="menu-item-name">Kaki Tempura <span class="item-notes">6 pcs</span></div><div class="menu-item-desc">Breaded oyster fries</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--kaki-tempura">—</span></div></div>
+<div class="menu-item" data-key="tempura--osaka-tempur"><div class="menu-item-left"><div class="menu-item-name">Osaka Tempura <span class="item-notes">3 shrimp + 5 veg</span></div><div class="menu-item-desc">Shrimp and vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--osaka-tempur">—</span></div></div>
+<div class="menu-item" data-key="tempura--soft-shell-c"><div class="menu-item-left"><div class="menu-item-name">Soft Shell Crab Tempura</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--soft-shell-c">—</span></div></div>
+<div class="menu-item" data-key="tempura--lobster-temp"><div class="menu-item-left"><div class="menu-item-name">Lobster Tempura</div><div class="menu-item-desc">Lobster tail and vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--lobster-temp">—</span></div></div>
+</div></div></div>
+
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('soup-salad')"><span class="cat-toggle-name">Soup &amp; Salad</span><span class="cat-toggle-right"><span class="cat-count">9 items</span><span class="cat-arrow" id="cat-arr-soup-salad">▾</span></span></button>
+<div class="cat-body" id="cat-soup-salad">
+<div class="menu-items-grid" id="soup-salad-main">
+<div class="menu-item" data-key="soup---s--miso-soup"><div class="menu-item-left"><div class="menu-item-name">Miso Soup</div><div class="menu-item-desc">Traditional soup with fish broth and bean paste</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--miso-soup">—</span></div></div>
+<div class="menu-item" data-key="soup---s--seafood-miso"><div class="menu-item-left"><div class="menu-item-name">Seafood Miso Soup</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--seafood-miso">—</span></div></div>
+<div class="menu-item" data-key="soup---s--osaka-green-"><div class="menu-item-left"><div class="menu-item-name">Osaka Green Salad<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">House dressing</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--osaka-green-">—</span></div></div>
+<div class="menu-item" data-key="soup---s--kimchi"><div class="menu-item-left"><div class="menu-item-name">Kimchi<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Traditional Korean fermented cabbage</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--kimchi">—</span></div></div>
+<div class="menu-item" data-key="soup---s--avocado-sala"><div class="menu-item-left"><div class="menu-item-name">Avocado Salad<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--avocado-sala">—</span></div></div>
+<div class="menu-item" data-key="soup---s--kaiso-salad"><div class="menu-item-left"><div class="menu-item-name">Kaiso Salad</div><div class="menu-item-desc">Seaweed salad</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--kaiso-salad">—</span></div></div>
+<div class="menu-item" data-key="soup---s--sunomono-sal"><div class="menu-item-left"><div class="menu-item-name">Sunomono Salad</div><div class="menu-item-desc">Seafood and seaweed with vinegar dressing</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--sunomono-sal">—</span></div></div>
+<div class="menu-item" data-key="soup---s--spicy-salmon"><div class="menu-item-left"><div class="menu-item-name">Spicy Salmon Salad<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Greens with salmon in spicy sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--spicy-salmon">—</span></div></div>
+<div class="menu-item" data-key="soup---s--osaka-lobste"><div class="menu-item-left"><div class="menu-item-name">Osaka Lobster Salad</div><div class="menu-item-desc">Lobster with ginger dressing</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--osaka-lobste">—</span></div></div>
+</div></div></div>
+</div><!-- end panel-starters -->
+
+<!-- ══ TEPPANYAKI ══ -->
+<div class="menu-panel" id="panel-teppanyaki">
+
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('teppanyaki-main')"><span class="cat-toggle-name">Teppanyaki</span><span class="cat-toggle-right"><span class="cat-count">Choice of protein</span><span class="cat-arrow" id="cat-arr-teppanyaki-main">▾</span></span></button>
+<div class="cat-body" id="cat-teppanyaki-main">
+<div class="sub-section">
+<button class="sub-toggle" onclick="toggleSub('tep-kids')"><span>Kid's Meal</span><span class="sub-arrow" id="arr-tep-kids">▾</span></button>
+<div class="sub-body" id="sub-tep-kids">
+<div class="menu-items-grid" id="tep-kids-grid">
+<div class="menu-item" data-key="teppanya-kid-s-me-vegetables"><div class="menu-item-left"><div class="menu-item-name">Vegetables<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Choice of deep-fried or grilled tofu</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-vegetables">—</span></div></div>
+<div class="menu-item" data-key="teppanya-kid-s-me-chicken"><div class="menu-item-left"><div class="menu-item-name">Chicken</div><div class="menu-item-desc">Fresh chicken breast</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-chicken">—</span></div></div>
+<div class="menu-item" data-key="teppanya-kid-s-me-salmon"><div class="menu-item-left"><div class="menu-item-name">Salmon</div><div class="menu-item-desc">Fresh Atlantic salmon filet</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-salmon">—</span></div></div>
+<div class="menu-item" data-key="teppanya-kid-s-me-sukiyaki"><div class="menu-item-left"><div class="menu-item-name">Sukiyaki</div><div class="menu-item-desc">Marinated beef rib eye</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-sukiyaki">—</span></div></div>
+<div class="menu-item" data-key="teppanya-kid-s-me-shrimp"><div class="menu-item-left"><div class="menu-item-name">Shrimp</div><div class="menu-item-desc">Black tiger shrimp</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-shrimp">—</span></div></div>
+<div class="menu-item" data-key="teppanya-kid-s-me-steak--4oz"><div class="menu-item-left"><div class="menu-item-name">Steak (4 oz)</div><div class="menu-item-desc">AAA strip-loin</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-steak--4oz">—</span></div></div>
+<div class="menu-item" data-key="teppanya-kid-s-me-scallops"><div class="menu-item-left"><div class="menu-item-name">Scallops</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-scallops">—</span></div></div>
+<div class="menu-item" data-key="teppanya-kid-s-me-filet-mignon"><div class="menu-item-left"><div class="menu-item-name">Filet Mignon (4 oz)</div><div class="menu-item-desc">AAA tenderloin</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-filet-mignon">—</span></div></div>
+<div class="menu-item" data-key="teppanya-kid-s-me-lobster"><div class="menu-item-left"><div class="menu-item-name">Lobster</div><div class="menu-item-desc">Atlantic lobster tail</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-lobster">—</span></div></div>
+</div></div></div>
+<div class="sub-section">
+<button class="sub-toggle" onclick="toggleSub('tep-additions')"><span>Additions</span><span class="sub-arrow" id="arr-tep-additions">▾</span></button>
+<div class="sub-body" id="sub-tep-additions">
+<div class="menu-items-grid" id="tep-additions-grid">
+<div class="menu-item" data-key="teppanya-addition-fried-rice"><div class="menu-item-left"><div class="menu-item-name">Fried Rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-fried-rice">—</span></div></div>
+<div class="menu-item" data-key="teppanya-addition-vegetables"><div class="menu-item-left"><div class="menu-item-name">Vegetables<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-vegetables">—</span></div></div>
+<div class="menu-item" data-key="teppanya-addition-mushrooms"><div class="menu-item-left"><div class="menu-item-name">Mushrooms<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-mushrooms">—</span></div></div>
+<div class="menu-item" data-key="teppanya-addition-fresh-tofu"><div class="menu-item-left"><div class="menu-item-name">Fresh Tofu<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-fresh-tofu">—</span></div></div>
+<div class="menu-item" data-key="teppanya-addition-chicken"><div class="menu-item-left"><div class="menu-item-name">Chicken</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-chicken">—</span></div></div>
+<div class="menu-item" data-key="teppanya-addition-shrimp"><div class="menu-item-left"><div class="menu-item-name">Shrimp</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-shrimp">—</span></div></div>
+<div class="menu-item" data-key="teppanya-addition-steak--4oz"><div class="menu-item-left"><div class="menu-item-name">Steak (4 oz)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-steak--4oz">—</span></div></div>
+<div class="menu-item" data-key="teppanya-addition-scallop"><div class="menu-item-left"><div class="menu-item-name">Scallop</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-scallop">—</span></div></div>
+<div class="menu-item" data-key="teppanya-addition-filet-mignon"><div class="menu-item-left"><div class="menu-item-name">Filet Mignon (4 oz)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-filet-mignon">—</span></div></div>
+<div class="menu-item" data-key="teppanya-addition-lobster-tail"><div class="menu-item-left"><div class="menu-item-name">Lobster Tail</div><div class="menu-item-desc">One tail</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-lobster-tail">—</span></div></div>
+</div></div></div>
+</div></div></div>
+
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('teppanyaki-specials')"><span class="cat-toggle-name">Teppanyaki Specials</span><span class="cat-toggle-right"><span class="cat-count">Choice of one, set menus &amp; chef specials</span><span class="cat-arrow" id="cat-arr-teppanyaki-specials">▾</span></span></button>
+<div class="cat-body" id="cat-teppanyaki-specials">
+<div class="sub-section">
+<button class="sub-toggle" onclick="toggleSub('tep-choice-one')"><span>Choice of One</span><span class="sub-arrow" id="arr-tep-choice-one">▾</span></button>
+<div class="sub-body" id="sub-tep-choice-one">
+<div class="menu-items-grid" id="tep-choice-one-grid">
+<div class="menu-item" data-key="teppanya-choice-o-vegetables"><div class="menu-item-left"><div class="menu-item-name">Vegetables<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Choice of tofu (deep-fried or grilled)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-vegetables">—</span></div></div>
+<div class="menu-item" data-key="teppanya-choice-o-chicken"><div class="menu-item-left"><div class="menu-item-name">Chicken</div><div class="menu-item-desc">Fresh chicken breast</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-chicken">—</span></div></div>
+<div class="menu-item" data-key="teppanya-choice-o-calamari"><div class="menu-item-left"><div class="menu-item-name">Calamari</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-calamari">—</span></div></div>
+<div class="menu-item" data-key="teppanya-choice-o-salmon"><div class="menu-item-left"><div class="menu-item-name">Salmon</div><div class="menu-item-desc">Fresh Atlantic salmon filet</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-salmon">—</span></div></div>
+<div class="menu-item" data-key="teppanya-choice-o-sukiyaki"><div class="menu-item-left"><div class="menu-item-name">Sukiyaki</div><div class="menu-item-desc">Marinated beef rib eye</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-sukiyaki">—</span></div></div>
+<div class="menu-item" data-key="teppanya-choice-o-shrimp"><div class="menu-item-left"><div class="menu-item-name">Shrimp</div><div class="menu-item-desc">Black tiger shrimp</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-shrimp">—</span></div></div>
+<div class="menu-item" data-key="teppanya-choice-o-steak"><div class="menu-item-left"><div class="menu-item-name">Steak</div><div class="menu-item-desc">AAA New York strip-loin</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-steak">—</span></div></div>
+<div class="menu-item" data-key="teppanya-choice-o-scallops"><div class="menu-item-left"><div class="menu-item-name">Scallops</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-scallops">—</span></div></div>
+<div class="menu-item" data-key="teppanya-choice-o-filet-mignon"><div class="menu-item-left"><div class="menu-item-name">Filet Mignon</div><div class="menu-item-desc">AAA tenderloin</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-filet-mignon">—</span></div></div>
+<div class="menu-item" data-key="teppanya-choice-o-lobster"><div class="menu-item-left"><div class="menu-item-name">Lobster</div><div class="menu-item-desc">Atlantic lobster (two tails)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-lobster">—</span></div></div>
+</div></div></div>
+<div class="sub-section">
+<button class="sub-toggle" onclick="toggleSub('tep-set-menu')"><span>Set Menu</span><span class="sub-arrow" id="arr-tep-set-menu">▾</span></button>
+<div class="sub-body" id="sub-tep-set-menu">
+<div class="menu-items-grid" id="tep-set-menu-grid">
+<div class="menu-item" data-key="teppanya-set-menu-choice-of-tw"><div class="menu-item-left"><div class="menu-item-name">Choice of Two</div><div class="menu-item-desc">Chicken · Calamari · Salmon · Shrimp · Steak · Scallop</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-set-menu-choice-of-tw">—</span></div></div>
+<div class="menu-item" data-key="teppanya-set-menu-filet-mignon"><div class="menu-item-left"><div class="menu-item-name">Filet Mignon &amp; Choice of One</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-set-menu-filet-mignon">—</span></div></div>
+<div class="menu-item" data-key="teppanya-set-menu-lobster---fi"><div class="menu-item-left"><div class="menu-item-name">Lobster &amp; Filet Mignon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-set-menu-lobster---fi">—</span></div></div>
+<div class="menu-item" data-key="teppanya-set-menu-lobster-file"><div class="menu-item-left"><div class="menu-item-name">Lobster · Filet Mignon &amp; Choice of One</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-set-menu-lobster-file">—</span></div></div>
+</div></div></div>
+<div class="sub-section">
+<button class="sub-toggle" onclick="toggleSub('tep-chef-specials')"><span>Chef Specials</span><span class="sub-arrow" id="arr-tep-chef-specials">▾</span></button>
+<div class="sub-body" id="sub-tep-chef-specials">
+<div class="menu-items-grid" id="tep-chef-specials-grid">
+<div class="menu-item" data-key="teppanya-chef-spe-moncton-umi"><div class="menu-item-left"><div class="menu-item-name">Moncton Umi</div><div class="menu-item-desc">Scallop · steak · salmon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-chef-spe-moncton-umi">—</span></div></div>
+<div class="menu-item" data-key="teppanya-chef-spe-moncton-samu"><div class="menu-item-left"><div class="menu-item-name">Moncton Samurai</div><div class="menu-item-desc">Filet mignon · shrimp · chicken</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-chef-spe-moncton-samu">—</span></div></div>
+<div class="menu-item" data-key="teppanya-chef-spe-seafood-impe"><div class="menu-item-left"><div class="menu-item-name">Seafood Imperial</div><div class="menu-item-desc">Lobster · shrimp · calamari · scallop</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-chef-spe-seafood-impe">—</span></div></div>
+</div></div></div>
+</div></div></div>
+</div><!-- end panel-teppanyaki -->
+
+<!-- ══ ASIAN DINING ══ -->
+<div class="menu-panel" id="panel-asian">
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('asian-dining')"><span class="cat-toggle-name">Asian Dining</span><span class="cat-toggle-right"><span class="cat-count">37 items</span><span class="cat-arrow" id="cat-arr-asian-dining">▾</span></span></button>
+<div class="cat-body" id="cat-asian-dining">
+<div class="sub-section"><button class="sub-toggle" onclick="toggleSub('asian-broth')"><span>Special Broth Soup</span><span class="sub-arrow" id="arr-asian-broth">▾</span></button><div class="sub-body" id="sub-asian-broth"><div class="menu-items-grid" id="asian-broth-grid">
+<div class="menu-item" data-key="asian-di-special--bulgogi-brot"><div class="menu-item-left"><div class="menu-item-name">Bulgogi Broth Soup</div><div class="menu-item-desc">Korean beef broth with vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-special--bulgogi-brot">—</span></div></div>
+<div class="menu-item" data-key="asian-di-special--king-s-spicy"><div class="menu-item-left"><div class="menu-item-name">King's Spicy Soup<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Yuk-gaejang — spicy beef broth</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-special--king-s-spicy">—</span></div></div>
+<div class="menu-item" data-key="asian-di-special--tofu---seafo"><div class="menu-item-left"><div class="menu-item-name">Tofu &amp; Seafood Soup<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Soon-dubu jjigae with tofu, seafood and egg</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-special--tofu---seafo">—</span></div></div>
+</div></div></div>
+<div class="sub-section"><button class="sub-toggle" onclick="toggleSub('asian-katsu')"><span>Katsu</span><span class="sub-arrow" id="arr-asian-katsu">▾</span></button><div class="sub-body" id="sub-asian-katsu"><div class="menu-items-grid" id="asian-katsu-grid">
+<div class="menu-item" data-key="asian-di-katsu-donkatsu"><div class="menu-item-left"><div class="menu-item-name">Donkatsu</div><div class="menu-item-desc">Deep-fried pork with katsu sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-katsu-donkatsu">—</span></div></div>
+<div class="menu-item" data-key="asian-di-katsu-chicken-kats"><div class="menu-item-left"><div class="menu-item-name">Chicken Katsu</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-katsu-chicken-kats">—</span></div></div>
+<div class="menu-item" data-key="asian-di-katsu-fish-katsu"><div class="menu-item-left"><div class="menu-item-name">Fish Katsu</div><div class="menu-item-desc">With tartar sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-katsu-fish-katsu">—</span></div></div>
+</div></div></div>
+<div class="sub-section"><button class="sub-toggle" onclick="toggleSub('asian-fried-rice')"><span>Fried Rice</span><span class="sub-arrow" id="arr-asian-fried-rice">▾</span></button><div class="sub-body" id="sub-asian-fried-rice"><div class="menu-items-grid" id="asian-fried-rice-grid">
+<div class="menu-item" data-key="asian-di-fried-ri-vegetable-fr"><div class="menu-item-left"><div class="menu-item-name">Vegetable Fried Rice<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-fried-ri-vegetable-fr">—</span></div></div>
+<div class="menu-item" data-key="asian-di-fried-ri-fried-rice-c"><div class="menu-item-left"><div class="menu-item-name">Fried Rice Choice</div><div class="menu-item-desc">Beef / Chicken / Shrimp · 2 meats add $3</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-fried-ri-fried-rice-c">—</span></div></div>
+</div></div></div>
+<div class="sub-section"><button class="sub-toggle" onclick="toggleSub('asian-bibimbap')"><span>Bibimbap</span><span class="sub-arrow" id="arr-asian-bibimbap">▾</span></button><div class="sub-body" id="sub-asian-bibimbap"><div class="menu-items-grid" id="asian-bibimbap-grid">
+<div class="menu-item" data-key="asian-di-bibimbap-spicy-sashim"><div class="menu-item-left"><div class="menu-item-name">Spicy Sashimi Bibimbap<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">With sashimi and Korean hot sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-bibimbap-spicy-sashim">—</span></div></div>
+<div class="menu-item" data-key="asian-di-bibimbap-vegetable-bi"><div class="menu-item-left"><div class="menu-item-name">Vegetable Bibimbap<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">With fried egg and gochujang</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-bibimbap-vegetable-bi">—</span></div></div>
+<div class="menu-item" data-key="asian-di-bibimbap-bibimbap-wit"><div class="menu-item-left"><div class="menu-item-name">Bibimbap with Beef or Chicken</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-bibimbap-bibimbap-wit">—</span></div></div>
+</div></div></div>
+<div class="sub-section"><button class="sub-toggle" onclick="toggleSub('asian-hot-stone')"><span>Hot Stone</span><span class="sub-arrow" id="arr-asian-hot-stone">▾</span></button><div class="sub-body" id="sub-asian-hot-stone"><div class="menu-items-grid" id="asian-hot-stone-grid">
+<div class="menu-item" data-key="asian-di-hot-ston-tofu---veget"><div class="menu-item-left"><div class="menu-item-name">Tofu &amp; Vegetables<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Deep-fried tofu</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-tofu---veget">—</span></div></div>
+<div class="menu-item" data-key="asian-di-hot-ston-mushrooms---"><div class="menu-item-left"><div class="menu-item-name">Mushrooms &amp; Vegetables<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-mushrooms---">—</span></div></div>
+<div class="menu-item" data-key="asian-di-hot-ston-bulgogi"><div class="menu-item-left"><div class="menu-item-name">Bulgogi</div><div class="menu-item-desc">Marinated beef rib eye</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-bulgogi">—</span></div></div>
+<div class="menu-item" data-key="asian-di-hot-ston-spicy-bulgog"><div class="menu-item-left"><div class="menu-item-name">Spicy Bulgogi<span class="item-badge badge-spicy">Spicy</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-spicy-bulgog">—</span></div></div>
+<div class="menu-item" data-key="asian-di-hot-ston-chicken---ve"><div class="menu-item-left"><div class="menu-item-name">Chicken &amp; Vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-chicken---ve">—</span></div></div>
+<div class="menu-item" data-key="asian-di-hot-ston-spicy-chicke"><div class="menu-item-left"><div class="menu-item-name">Spicy Chicken<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Korean hot sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-spicy-chicke">—</span></div></div>
+<div class="menu-item" data-key="asian-di-hot-ston-spicy-pork"><div class="menu-item-left"><div class="menu-item-name">Spicy Pork<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Marinated pork</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-spicy-pork">—</span></div></div>
+<div class="menu-item" data-key="asian-di-hot-ston-spicy-squid"><div class="menu-item-left"><div class="menu-item-name">Spicy Squid<span class="item-badge badge-spicy">Spicy</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-spicy-squid">—</span></div></div>
+<div class="menu-item" data-key="asian-di-hot-ston-seafood---ve"><div class="menu-item-left"><div class="menu-item-name">Seafood &amp; Vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-seafood---ve">—</span></div></div>
+<div class="menu-item" data-key="asian-di-hot-ston-bbq-galbi"><div class="menu-item-left"><div class="menu-item-name">BBQ Galbi</div><div class="menu-item-desc">Beef short ribs</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-bbq-galbi">—</span></div></div>
+</div></div></div>
+<div class="sub-section"><button class="sub-toggle" onclick="toggleSub('asian-donburi')"><span>Donburi</span><span class="sub-arrow" id="arr-asian-donburi">▾</span></button><div class="sub-body" id="sub-asian-donburi"><div class="menu-items-grid" id="asian-donburi-grid">
+<div class="menu-item" data-key="asian-di-donburi-oyako-don"><div class="menu-item-left"><div class="menu-item-name">Oyako Don</div><div class="menu-item-desc">Chicken egg rice bowl</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-donburi-oyako-don">—</span></div></div>
+<div class="menu-item" data-key="asian-di-donburi-gyudon"><div class="menu-item-left"><div class="menu-item-name">Gyudon</div><div class="menu-item-desc">Beef rice bowl</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-donburi-gyudon">—</span></div></div>
+<div class="menu-item" data-key="asian-di-donburi-katsudon"><div class="menu-item-left"><div class="menu-item-name">Katsudon</div><div class="menu-item-desc">Pork rice bowl</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-donburi-katsudon">—</span></div></div>
+<div class="menu-item" data-key="asian-di-donburi-ebidon"><div class="menu-item-left"><div class="menu-item-name">Ebidon</div><div class="menu-item-desc">Shrimp rice bowl</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-donburi-ebidon">—</span></div></div>
+<div class="menu-item" data-key="asian-di-donburi-unadon"><div class="menu-item-left"><div class="menu-item-name">Unadon</div><div class="menu-item-desc">Eel rice bowl</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-donburi-unadon">—</span></div></div>
+</div></div></div>
+<div class="sub-section"><button class="sub-toggle" onclick="toggleSub('asian-noodles')"><span>Noodles</span><span class="sub-arrow" id="arr-asian-noodles">▾</span></button><div class="sub-body" id="sub-asian-noodles"><div class="menu-items-grid" id="asian-noodles-grid">
+<div class="menu-item" data-key="asian-di-noodles-osaka-udon"><div class="menu-item-left"><div class="menu-item-name">Osaka Udon</div><div class="menu-item-desc">With fish broth and oden</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-noodles-osaka-udon">—</span></div></div>
+<div class="menu-item" data-key="asian-di-noodles-tempura-udon"><div class="menu-item-left"><div class="menu-item-name">Tempura Udon</div><div class="menu-item-desc">With shrimp and vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-noodles-tempura-udon">—</span></div></div>
+<div class="menu-item" data-key="asian-di-noodles-spicy-seafoo"><div class="menu-item-left"><div class="menu-item-name">Spicy Seafood Udon<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Korean-style spicy broth</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-noodles-spicy-seafoo">—</span></div></div>
+<div class="menu-item" data-key="asian-di-noodles-yaki-udon-so"><div class="menu-item-left"><div class="menu-item-name">Yaki Udon / Soba</div><div class="menu-item-desc">Stir-fried noodles</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-noodles-yaki-udon-so">—</span></div></div>
+<div class="menu-item" data-key="asian-di-noodles-avo-green-oo"><div class="menu-item-left"><div class="menu-item-name">Avo Green-oodle<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Cold udon with avocado</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-noodles-avo-green-oo">—</span></div></div>
+<div class="menu-item" data-key="asian-di-noodles-chapchae"><div class="menu-item-left"><div class="menu-item-name">Chapchae</div><div class="menu-item-desc">Glass noodle stir fry</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-noodles-chapchae">—</span></div></div>
+</div></div></div>
+<div class="sub-section"><button class="sub-toggle" onclick="toggleSub('asian-ramen')"><span>Ramen</span><span class="sub-arrow" id="arr-asian-ramen">▾</span></button><div class="sub-body" id="sub-asian-ramen"><div class="menu-items-grid" id="asian-ramen-grid">
+<div class="menu-item" data-key="asian-di-ramen-korean-ramyu"><div class="menu-item-left"><div class="menu-item-name">Korean Ramyun<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">With vegetables and egg</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-ramen-korean-ramyu">—</span></div></div>
+<div class="menu-item" data-key="asian-di-ramen-miso-ramen"><div class="menu-item-left"><div class="menu-item-name">Miso Ramen</div><div class="menu-item-desc">With chashu</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-ramen-miso-ramen">—</span></div></div>
+<div class="menu-item" data-key="asian-di-ramen-donkotsu-ram"><div class="menu-item-left"><div class="menu-item-name">Tonkotsu Ramen</div><div class="menu-item-desc">Pork bone broth</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-ramen-donkotsu-ram">—</span></div></div>
+<div class="menu-item" data-key="asian-di-ramen-nagasaki-ram"><div class="menu-item-left"><div class="menu-item-name">Nagasaki Ramen<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Seafood broth</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-ramen-nagasaki-ram">—</span></div></div>
+<div class="menu-item" data-key="asian-di-ramen-imperial-ram"><div class="menu-item-left"><div class="menu-item-name">Imperial Ramen<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Seafood deluxe ramen</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-ramen-imperial-ram">—</span></div></div>
+</div></div></div>
+</div></div></div>
+
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('osaka-signatures')"><span class="cat-toggle-name">Osaka Signatures</span><span class="cat-toggle-right"><span class="cat-count">5 items</span><span class="cat-arrow" id="cat-arr-osaka-signatures">▾</span></span></button>
+<div class="cat-body" id="cat-osaka-signatures">
+<div class="menu-items-grid" id="osaka-signatures-main">
+<div class="menu-item" data-key="osaka-si--osaka-curry"><div class="menu-item-left"><div class="menu-item-name">Osaka Curry</div><div class="menu-item-desc">Japanese curry with rice or udon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="osaka-si--osaka-curry">—</span></div></div>
+<div class="menu-item" data-key="osaka-si--kanpoongki"><div class="menu-item-left"><div class="menu-item-name">Kanpoongki<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Fried chicken · sweet spicy sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="osaka-si--kanpoongki">—</span></div></div>
+<div class="menu-item" data-key="osaka-si--kanpoong-shr"><div class="menu-item-left"><div class="menu-item-name">Kanpoong Shrimp<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Fried shrimp · sweet chili sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="osaka-si--kanpoong-shr">—</span></div></div>
+<div class="menu-item" data-key="osaka-si--sweet---sour"><div class="menu-item-left"><div class="menu-item-name">Sweet &amp; Sour Beef</div><div class="menu-item-desc">Tangsuyuk style</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="osaka-si--sweet---sour">—</span></div></div>
+<div class="menu-item" data-key="osaka-si--osaka-pork-r"><div class="menu-item-left"><div class="menu-item-name">Osaka Pork Ribs<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Spicy glazed ribs with cheese</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="osaka-si--osaka-pork-r">—</span></div></div>
+</div></div></div>
+
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('main-dishes')"><span class="cat-toggle-name">Main Dishes</span><span class="cat-toggle-right"><span class="cat-count">Teriyaki &amp; Steak</span><span class="cat-arrow" id="cat-arr-main-dishes">▾</span></span></button>
+<div class="cat-body" id="cat-main-dishes">
+<div class="sub-section"><button class="sub-toggle" onclick="toggleSub('main-teriyaki')"><span>Teriyaki</span><span class="sub-arrow" id="arr-main-teriyaki">▾</span></button><div class="sub-body" id="sub-main-teriyaki"><div class="menu-items-grid" id="main-teriyaki-grid">
+<div class="menu-item" data-key="main-dis-teriyaki-chicken-teri"><div class="menu-item-left"><div class="menu-item-name">Chicken Teriyaki</div><div class="menu-item-desc">With vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="main-dis-teriyaki-chicken-teri">—</span></div></div>
+<div class="menu-item" data-key="main-dis-teriyaki-shrimp-teriy"><div class="menu-item-left"><div class="menu-item-name">Shrimp Teriyaki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="main-dis-teriyaki-shrimp-teriy">—</span></div></div>
+<div class="menu-item" data-key="main-dis-teriyaki-salmon-teriy"><div class="menu-item-left"><div class="menu-item-name">Salmon Teriyaki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="main-dis-teriyaki-salmon-teriy">—</span></div></div>
+<div class="menu-item" data-key="main-dis-teriyaki-beef-teriyak"><div class="menu-item-left"><div class="menu-item-name">Beef Teriyaki</div><div class="menu-item-desc">AAA strip-loin</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="main-dis-teriyaki-beef-teriyak">—</span></div></div>
+</div></div></div>
+<div class="sub-section"><button class="sub-toggle" onclick="toggleSub('main-steak')"><span>Steak</span><span class="sub-arrow" id="arr-main-steak">▾</span></button><div class="sub-body" id="sub-main-steak"><div class="menu-items-grid" id="main-steak-grid">
+<div class="menu-item" data-key="main-dis-steak-osaka-steak-"><div class="menu-item-left"><div class="menu-item-name">Osaka Steak (8 oz)</div><div class="menu-item-desc">AAA New York strip-loin</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="main-dis-steak-osaka-steak-">—</span></div></div>
+<div class="menu-item" data-key="main-dis-steak-hibachi-stea"><div class="menu-item-left"><div class="menu-item-name">Hibachi Steak (8 oz)</div><div class="menu-item-desc">AAA tenderloin</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="main-dis-steak-hibachi-stea">—</span></div></div>
+</div></div></div>
+</div></div></div>
+</div><!-- end panel-asian -->
+
+<!-- ══ LUNCH ══ -->
+<div class="menu-panel" id="panel-lunch">
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('lunch-bento')"><span class="cat-toggle-name">Lunch Bento — Oh Bento</span><span class="cat-toggle-right"><span class="cat-count">10 items</span><span class="cat-arrow" id="cat-arr-lunch-bento">▾</span></span></button>
+<div class="cat-body" id="cat-lunch-bento">
+<div class="menu-items-grid" id="lunch-bento-grid">
+<div class="menu-item" data-key="lunch-be-oh-bento-oben1"><div class="menu-item-left"><div class="menu-item-name">OBen 1<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">AvoKappa maki &amp; vegetable tempura</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben1">—</span></div></div>
+<div class="menu-item" data-key="lunch-be-oh-bento-oben2"><div class="menu-item-left"><div class="menu-item-name">OBen 2<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">AvoKappa maki &amp; tofu teriyaki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben2">—</span></div></div>
+<div class="menu-item" data-key="lunch-be-oh-bento-oben3"><div class="menu-item-left"><div class="menu-item-name">OBen 3</div><div class="menu-item-desc">Dynamite roll &amp; tempura shrimp / veg</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben3">—</span></div></div>
+<div class="menu-item" data-key="lunch-be-oh-bento-oben4"><div class="menu-item-left"><div class="menu-item-name">OBen 4</div><div class="menu-item-desc">California maki &amp; teriyaki (chicken / beef / salmon)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben4">—</span></div></div>
+<div class="menu-item" data-key="lunch-be-oh-bento-oben5"><div class="menu-item-left"><div class="menu-item-name">OBen 5</div><div class="menu-item-desc">Dynamite roll · sushi · tempura combo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben5">—</span></div></div>
+<div class="menu-item" data-key="lunch-be-oh-bento-oben6"><div class="menu-item-left"><div class="menu-item-name">OBen 6</div><div class="menu-item-desc">California maki · sushi · teriyaki combo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben6">—</span></div></div>
+<div class="menu-item" data-key="lunch-be-oh-bento-oben7"><div class="menu-item-left"><div class="menu-item-name">OBen 7<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Spicy salmon · tuna · crab · sushi combo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben7">—</span></div></div>
+<div class="menu-item" data-key="lunch-be-oh-bento-oben8"><div class="menu-item-left"><div class="menu-item-name">OBen 8</div><div class="menu-item-desc">Sashimi &amp; tempura combo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben8">—</span></div></div>
+<div class="menu-item" data-key="lunch-be-oh-bento-oben9"><div class="menu-item-left"><div class="menu-item-name">OBen 9</div><div class="menu-item-desc">Sashimi &amp; teriyaki combo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben9">—</span></div></div>
+<div class="menu-item" data-key="lunch-be-oh-bento-oben10"><div class="menu-item-left"><div class="menu-item-name">OBen 10</div><div class="menu-item-desc">Sashimi · sushi · California combo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben10">—</span></div></div>
+</div></div></div>
+
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('lunch-specials')"><span class="cat-toggle-name">Lunch Specials</span><span class="cat-toggle-right"><span class="cat-count">2 items</span><span class="cat-arrow" id="cat-arr-lunch-specials">▾</span></span></button>
+<div class="cat-body" id="cat-lunch-specials">
+<div class="menu-items-grid" id="lunch-specials-main">
+<div class="menu-item" data-key="lunch-sp--yammy-roll"><div class="menu-item-left"><div class="menu-item-name">Yammy Roll<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Vegetable tempura roll with sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-sp--yammy-roll">—</span></div></div>
+<div class="menu-item" data-key="lunch-sp--deluxe-maki-"><div class="menu-item-left"><div class="menu-item-name">Deluxe Maki Set</div><div class="menu-item-desc">Dynamite · California · spicy salmon maki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-sp--deluxe-maki-">—</span></div></div>
+</div></div></div>
+</div><!-- end panel-lunch -->
+
+<!-- ══ DESSERTS ══ -->
+<div class="menu-panel" id="panel-desserts">
+<div class="cat-section reveal">
+<button class="cat-toggle" onclick="toggleCat('desserts')"><span class="cat-toggle-name">Desserts</span><span class="cat-toggle-right"><span class="cat-count">8 items</span><span class="cat-arrow" id="cat-arr-desserts">▾</span></span></button>
+<div class="cat-body" id="cat-desserts">
+<div class="menu-items-grid" id="desserts-main">
+<div class="menu-item" data-key="desserts--ice-cream"><div class="menu-item-left"><div class="menu-item-name">Ice Cream</div><div class="menu-item-desc">One scoop — Green tea / Mango / Vanilla</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="desserts--ice-cream">—</span></div></div>
+<div class="menu-item" data-key="desserts--mochi"><div class="menu-item-left"><div class="menu-item-name">Mochi <span class="item-notes">2 pcs</span></div><div class="menu-item-desc">Japanese rice cake ice cream — Strawberry / Green tea / Mango / Vanilla / Chocolate</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="desserts--mochi">—</span></div></div>
+<div class="menu-item" data-key="desserts--cheese-cake"><div class="menu-item-left"><div class="menu-item-name">Cheese Cake</div><div class="menu-item-desc">Plain / Chocolate / Caramel / Blueberry / Lemon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="desserts--cheese-cake">—</span></div></div>
+<div class="menu-item" data-key="desserts--green-volcan"><div class="menu-item-left"><div class="menu-item-name">Green Volcano Cake</div><div class="menu-item-desc">Green tea cake with green tea ice cream</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="desserts--green-volcan">—</span></div></div>
+<div class="menu-item" data-key="desserts--chocolate-fu"><div class="menu-item-left"><div class="menu-item-name">Chocolate Fudge Cake</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="desserts--chocolate-fu">—</span></div></div>
+<div class="menu-item" data-key="desserts--ho-tteok"><div class="menu-item-left"><div class="menu-item-name">Ho-Tteok</div><div class="menu-item-desc">Korean sweet pancake with vanilla ice cream</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="desserts--ho-tteok">—</span></div></div>
+<div class="menu-item" data-key="desserts--ice-cream-te"><div class="menu-item-left"><div class="menu-item-name">Ice Cream Tempura</div><div class="menu-item-desc">Fried ice cream — Green tea / Mango / Vanilla</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="desserts--ice-cream-te">—</span></div></div>
+<div class="menu-item" data-key="desserts--fbi"><div class="menu-item-left"><div class="menu-item-name">FBI</div><div class="menu-item-desc">Fried banana with ice cream — Green tea / Mango / Vanilla</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="desserts--fbi">—</span></div></div>
+</div></div></div>
+</div><!-- end panel-desserts -->
+
+</div><!-- end menu-content -->
+
+<div class="menu-note reveal">
+  Prices may vary &nbsp;·&nbsp; HST not included &nbsp;·&nbsp; Items subject to availability &nbsp;·&nbsp; Ask your server about daily specials
+</div>
+
+<!-- RESERVE STRIP -->
+<div class="reserve-strip">
+  <div class="reserve-strip-title">Ready to <em>join us?</em></div>
+  <div class="reserve-strip-sub">Reservations by phone only · Teppanyaki grills recommended for groups of 4+</div>
+  <a href="tel:+15068538855" class="btn-res">Call to Reserve</a>
+  <a href="tel:+15068538855" class="btn-res-phone">(506) 853-8855</a>
+</div>
+
+<footer>
+  <div class="foot-logo">Osaka Hibachi</div>
+  <div class="foot-copy">© 2026 · 599 Main St, Moncton NB · (506) 853-8855</div>
+</footer>
+
+<!-- MANAGER MODAL -->
+<div class="mgr-overlay" id="mgrOverlay" onclick="if(event.target===this)closeManagerModal()">
+  <div class="mgr-modal">
+    <h3>Manager Access</h3>
+    <p>Enter the manager password to edit prices, add or remove items.</p>
+    <input class="mgr-input" id="mgrPwd" type="password" placeholder="Password" autocomplete="off" onkeydown="if(event.key==='Enter')submitMgrPwd()">
+    <div class="mgr-err" id="mgrErr"></div>
+    <div class="mgr-actions">
+      <button class="mgr-btn-cancel" onclick="closeManagerModal()">Cancel</button>
+      <button class="mgr-btn" onclick="submitMgrPwd()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD ITEM MODAL -->
+<div class="mgr-overlay" id="addItemOverlay" onclick="if(event.target===this)closeAddItem()">
+  <div class="mgr-modal">
+    <h3>Add Menu Item</h3>
+    <p id="addItemSub">New item for this section.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+      <div><label class="mgr-field-label">Item Name *</label><input class="mgr-input" id="aiName" type="text" placeholder="e.g. Dragon Roll" style="margin-bottom:0"></div>
+      <div><label class="mgr-field-label">Description</label><input class="mgr-input" id="aiDesc" type="text" placeholder="Optional description" style="margin-bottom:0"></div>
+      <div><label class="mgr-field-label">Price *</label><input class="mgr-input" id="aiPrice" type="text" placeholder="e.g. $18" style="margin-bottom:0" onkeydown="if(event.key==='Enter')submitAddItem()"></div>
+      <div><label class="mgr-field-label">Tag</label>
+        <select class="mgr-input" id="aiTag" style="margin-bottom:0;cursor:pointer">
+          <option value="">— None —</option><option value="spicy">Spicy</option><option value="veg">Vegetarian</option>
+        </select>
+      </div>
+    </div>
+    <div class="mgr-err" id="aiErr"></div>
+    <div class="mgr-actions">
+      <button class="mgr-btn-cancel" onclick="closeAddItem()">Cancel</button>
+      <button class="mgr-btn" onclick="submitAddItem()">Add Item</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Storage ──
+const SP='osakaPrices',SI='osakaMenuItems',SD='osakaMenuDeleted',SO='osakaMenuOrder';
+function gj(k){try{return JSON.parse(localStorage.getItem(k)||'{}')}catch(e){return{}}}
+function sj(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+// ── Init ──
+function loadPrices(){const p=gj(SP);document.querySelectorAll('.menu-item-price').forEach(el=>{if(el.dataset.key&&p[el.dataset.key])el.textContent=p[el.dataset.key];})}
+function loadDeletions(){const d=gj(SD);document.querySelectorAll('.menu-item[data-key]').forEach(el=>{if(d[el.dataset.key])el.style.display='none';})}
+function loadNewItems(){const saved=gj(SI);Object.entries(saved).forEach(([gridId,items])=>{const grid=document.getElementById(gridId);if(!grid)return;items.forEach(item=>{if(!grid.querySelector(`.menu-item[data-key="${item.key}"]`)){const el=buildItemEl(item);const btn=grid.querySelector('.mgr-add-btn');grid.insertBefore(el,btn||null);}});})}
+function loadOrder(){const orders=gj(SO);Object.entries(orders).forEach(([gridId,keys])=>{const grid=document.getElementById(gridId);if(!grid)return;keys.forEach(key=>{const el=grid.querySelector(`.menu-item[data-key="${key}"]`);if(el){const btn=grid.querySelector('.mgr-add-btn');grid.insertBefore(el,btn||null);}});})}
+loadPrices();loadDeletions();loadNewItems();loadOrder();
+
+// ── Tabs ──
+function switchTab(id,btn){
+  document.querySelectorAll('.menu-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.menu-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(managerUnlocked)applyManagerToPanel(document.getElementById('panel-'+id));
+  window.scrollTo({top:document.getElementById('menuNav').offsetTop-68,behavior:'smooth'});
+}
+
+// ── Category / sub toggles ──
+function toggleCat(id){
+  const body=document.getElementById('cat-'+id),arr=document.getElementById('cat-arr-'+id);
+  if(!body)return;
+  body.classList.toggle('open');
+  if(arr)arr.classList.toggle('open');
+  if(body.classList.contains('open')&&managerUnlocked)applyManagerToPanel(body);
+}
+function toggleSub(id){
+  const body=document.getElementById('sub-'+id),arr=document.getElementById('arr-'+id);
+  if(!body)return;
+  body.classList.toggle('open');
+  if(arr)arr.classList.toggle('open');
+}
+
+// ── Manager ──
+let managerUnlocked=false;
+const MGR_HASH='8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'; // 'admin'
+
+async function hashStr(str){const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+
+function openManagerModal(){
+  if(managerUnlocked){lockManager();return;}
+  document.getElementById('mgrOverlay').classList.add('open');
+  document.getElementById('mgrErr').textContent='';
+  document.getElementById('mgrPwd').value='';
+  setTimeout(()=>document.getElementById('mgrPwd').focus(),80);
+}
+function closeManagerModal(){document.getElementById('mgrOverlay').classList.remove('open')}
+
+async function submitMgrPwd(){
+  const pwd=document.getElementById('mgrPwd').value;
+  const h=await hashStr(pwd);
+  if(h!==MGR_HASH){document.getElementById('mgrErr').textContent='✕ Incorrect password';document.getElementById('mgrPwd').value='';document.getElementById('mgrPwd').focus();return;}
+  managerUnlocked=true;closeManagerModal();enableManagerMode();
+}
+
+function enableManagerMode(){
+  document.getElementById('menuBody').classList.add('manager-active');
+  document.getElementById('mgrNavBtn').textContent='🔓 Lock Prices';
+  document.getElementById('mgrBadge').style.display='inline-block';
+  document.querySelectorAll('.menu-panel').forEach(p=>applyManagerToPanel(p));
+}
+
+function applyManagerToPanel(panel){
+  panel.querySelectorAll('.menu-item-price').forEach(el=>{el.title='Click to edit';el.style.cursor='pointer';el.onclick=(e)=>{e.stopPropagation();startEditPrice(el);};});
+  panel.querySelectorAll('.menu-item').forEach(el=>applyItemControls(el));
+  panel.querySelectorAll('.menu-items-grid').forEach(grid=>{if(!grid.querySelector('.mgr-add-btn')){const btn=document.createElement('button');btn.className='mgr-add-btn';btn.textContent='+ Add Item';btn.onclick=()=>openAddItem(grid.id);grid.appendChild(btn);}});
+}
+
+function applyItemControls(itemEl){
+  if(itemEl.querySelector('.mgr-item-controls'))return;
+  const ctrl=document.createElement('div');ctrl.className='mgr-item-controls';
+  ctrl.innerHTML='<button class="mgr-ic-btn" title="Move up" onclick="moveItem(this,\'up\')">↑</button><button class="mgr-ic-btn" title="Move down" onclick="moveItem(this,\'dn\')">↓</button><button class="mgr-ic-btn mgr-ic-del" title="Delete" onclick="deleteItem(this)">✕</button>';
+  itemEl.appendChild(ctrl);
+}
+
+function lockManager(){
+  managerUnlocked=false;
+  document.getElementById('menuBody').classList.remove('manager-active');
+  document.getElementById('mgrNavBtn').textContent='🔒 Manage Prices';
+  document.getElementById('mgrBadge').style.display='none';
+  document.querySelectorAll('.mgr-item-controls').forEach(e=>e.remove());
+  document.querySelectorAll('.mgr-add-btn').forEach(e=>e.remove());
+  document.querySelectorAll('.menu-item-price').forEach(el=>{el.onclick=null;el.title='';el.style.cursor='';if(el.classList.contains('editing'))cancelEditPrice(el);});
+}
+
+// ── Price editing ──
+function startEditPrice(el){
+  if(el.classList.contains('editing'))return;
+  el.classList.add('editing');el.contentEditable='true';el.focus();
+  const r=document.createRange();r.selectNodeContents(el);window.getSelection().removeAllRanges();window.getSelection().addRange(r);
+  el.onblur=()=>commitEditPrice(el);
+  el.onkeydown=(e)=>{if(e.key==='Enter'){e.preventDefault();el.blur();}if(e.key==='Escape'){e.preventDefault();cancelEditPrice(el);}};
+}
+function commitEditPrice(el){
+  const raw=el.textContent.trim(),num=raw.replace(/[^0-9.]/g,'');
+  const fmt=num?'$'+parseFloat(num).toFixed(2).replace(/\.00$/,''):(el.dataset.original||raw||'—');
+  el.textContent=fmt;el.classList.remove('editing');el.contentEditable='false';el.onblur=null;el.onkeydown=null;
+  if(el.dataset.key){const p=gj(SP);p[el.dataset.key]=fmt;sj(SP,p);}
+  if(managerUnlocked)el.onclick=(e)=>{e.stopPropagation();startEditPrice(el);};
+}
+function cancelEditPrice(el){el.classList.remove('editing');el.contentEditable='false';el.onblur=null;el.onkeydown=null;loadPrices();}
+
+// ── Delete / move ──
+function deleteItem(btn){
+  const item=btn.closest('.menu-item');if(!item)return;
+  const name=item.querySelector('.menu-item-name')?.textContent?.trim()||'this item';
+  if(!confirm('Remove "'+name+'" from the menu?'))return;
+  const key=item.dataset.key;if(key){const d=gj(SD);d[key]=true;sj(SD,d);}
+  item.remove();
+}
+function moveItem(btn,dir){
+  const item=btn.closest('.menu-item'),grid=item?.parentElement;if(!item||!grid)return;
+  const items=Array.from(grid.querySelectorAll('.menu-item'));const idx=items.indexOf(item);
+  if(dir==='up'&&idx>0)grid.insertBefore(item,items[idx-1]);
+  else if(dir==='dn'&&idx<items.length-1)grid.insertBefore(items[idx+1],item);
+  const orders=gj(SO);orders[grid.id]=Array.from(grid.querySelectorAll('.menu-item[data-key]')).map(e=>e.dataset.key);sj(SO,orders);
+}
+
+// ── Add item ──
+let _addGrid=null;
+function openAddItem(gridId){
+  _addGrid=gridId;
+  const grid=document.getElementById(gridId);
+  const cat=grid?.closest('.cat-section')?.querySelector('.cat-toggle-name')?.textContent||'';
+  document.getElementById('addItemSub').textContent=cat?'Adding to: '+cat:'New item for this section.';
+  ['aiName','aiDesc','aiPrice'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('aiTag').value='';document.getElementById('aiErr').textContent='';
+  document.getElementById('addItemOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('aiName').focus(),80);
+}
+function closeAddItem(){document.getElementById('addItemOverlay').classList.remove('open');_addGrid=null;}
+function buildItemEl(item){
+  const div=document.createElement('div');div.className='menu-item';div.dataset.key=item.key;
+  const badges=(item.spicy?'<span class="item-badge badge-spicy">Spicy</span>':'')+(item.veg?'<span class="item-badge badge-veg">V</span>':'');
+  div.innerHTML='<div class="menu-item-left"><div class="menu-item-name">'+esc(item.name)+badges+'</div>'+(item.desc?'<div class="menu-item-desc">'+esc(item.desc)+'</div>':'')+'</div><div class="menu-item-right"><span class="menu-item-price" data-key="'+item.key+'">'+esc(item.price)+'</span></div>';
+  return div;
+}
+function submitAddItem(){
+  const name=document.getElementById('aiName').value.trim();
+  const desc=document.getElementById('aiDesc').value.trim();
+  const priceRaw=document.getElementById('aiPrice').value.trim();
+  const tag=document.getElementById('aiTag').value;
+  const errEl=document.getElementById('aiErr');
+  if(!name){errEl.textContent='Item name required.';return;}
+  if(!priceRaw){errEl.textContent='Price required.';return;}
+  const num=priceRaw.replace(/[^0-9.]/g,'');
+  if(!num){errEl.textContent='Enter a valid price (e.g. $14).';return;}
+  const price='$'+parseFloat(num).toFixed(2).replace(/\.00$/,'');
+  const key='custom-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
+  const item={name,desc,price,key,spicy:tag==='spicy',veg:tag==='veg'};
+  const saved=gj(SI);if(!saved[_addGrid])saved[_addGrid]=[];saved[_addGrid].push(item);sj(SI,saved);
+  const p=gj(SP);p[key]=price;sj(SP,p);
+  const grid=document.getElementById(_addGrid);const el=buildItemEl(item);
+  grid.insertBefore(el,grid.querySelector('.mgr-add-btn')||null);
+  applyItemControls(el);
+  const priceEl=el.querySelector('.menu-item-price');if(priceEl)priceEl.onclick=(e)=>{e.stopPropagation();startEditPrice(priceEl);};
+  closeAddItem();
+}
+
+// ── Nav / mobile ──
+function toggleMM(){document.getElementById('mobileMenu').classList.toggle('open');document.getElementById('navHam').classList.toggle('open');}
+function closeMM(){document.getElementById('mobileMenu').classList.remove('open');document.getElementById('navHam').classList.remove('open');}
+
+// ── Scroll reveal ──
+const ro=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');}),{threshold:0.08});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+</script>
+</body>
+</html>
