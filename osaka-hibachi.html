@@ -2,1406 +2,715 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Osaka Hibachi — Moncton, NB</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Osaka Hibachi — Concept 2: WASHI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
-/* ══════════════════════════════════════════════════════
-   OSAKA HIBACHI — Warm, Upscale, Senior-Friendly Design
-   Large text · High contrast · Generous spacing
-   Palette: Rich cream · Deep walnut · Ember red · Antique gold
-   ══════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Source+Sans+3:wght@400;500;600&display=swap');
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  /* Colours */
-  --cream:    #faf6ee;
-  --cream2:   #f2ebe0;
-  --cream3:   #e8dece;
-  --walnut:   #1e140a;
-  --walnut2:  #3d2b1a;
-  --walnut3:  #6b5040;
-  --ember:    #b83a12;
-  --ember2:   #d44e22;
-  --gold:     #9a7020;
-  --gold2:    #c49438;
-  --gold3:    rgba(154,112,32,0.12);
-  --line:     rgba(61,43,26,0.14);
-  --line2:    rgba(61,43,26,0.07);
-  --shadow:   rgba(30,20,10,0.10);
-
-  /* Type */
-  --serif:  'Playfair Display', Georgia, serif;
-  --sans:   'Source Sans 3', system-ui, sans-serif;
-
-  /* Size scale — generous for readability */
-  --text-xs:   0.875rem;   /* 14px */
-  --text-sm:   1rem;       /* 16px */
-  --text-base: 1.125rem;   /* 18px */
-  --text-lg:   1.25rem;    /* 20px */
-  --text-xl:   1.5rem;     /* 24px */
-  --text-2xl:  1.875rem;   /* 30px */
-  --text-3xl:  2.5rem;     /* 40px */
-  --text-4xl:  3.5rem;     /* 56px */
+:root{
+  --paper:#f8f3eb;
+  --paper2:#f2ead8;
+  --paper3:#e8dfc8;
+  --ink:#1a1208;
+  --ink2:#2e2010;
+  --ink3:#4a3820;
+  --ink4:#6a5438;
+  --rouge:#8c1c0a;
+  --rouge2:#a82510;
+  --rouge3:#c43018;
+  --sumi:#0a0a0a;
+  --gold:#8a6c18;
+  --gold2:#a88428;
+  --gold3:#c8a040;
+  --gold-line:rgba(138,108,24,0.18);
+  --gold-dim:rgba(138,108,24,0.08);
+  --shadow:rgba(26,18,8,0.10);
+  --shadow2:rgba(26,18,8,0.06);
+  --serif:'Shippori Mincho','Libre Baskerville',Georgia,serif;
+  --body:'Libre Baskerville',Georgia,serif;
+  --sans:'Jost',system-ui,sans-serif;
+  --grain:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
 }
 
-html { scroll-behavior: smooth; font-size: 16px; }
+html{scroll-behavior:smooth;font-size:18px;-webkit-text-size-adjust:100%}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  line-height:1.75;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
 
-body {
-  background: var(--cream);
-  color: var(--walnut);
-  font-family: var(--sans);
-  font-size: var(--text-base);
-  line-height: 1.75;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
+/* grain overlay */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:var(--grain);
+  pointer-events:none;z-index:9999;opacity:0.8;
 }
 
 /* ── NAV ── */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  background: rgba(250,246,238,0.97);
-  backdrop-filter: blur(16px);
-  border-bottom: 2px solid var(--line);
-  padding: 0 40px;
-  display: flex; align-items: center; justify-content: space-between;
-  height: 72px;
-  box-shadow: 0 2px 20px var(--shadow);
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:68px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 max(5vw,24px);
+  transition:background 0.3s,border 0.3s;
 }
-
-.nav-logo {
-  font-family: var(--serif);
-  font-size: var(--text-xl);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--walnut);
-  text-decoration: none;
+nav.scrolled{
+  background:rgba(248,243,235,0.97);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--gold-line);
+  box-shadow:0 1px 20px rgba(26,18,8,0.07);
 }
-
-.nav-links {
-  display: flex; gap: 40px; list-style: none;
+.nav-logo{
+  font-family:var(--serif);font-size:1.1rem;font-weight:700;
+  letter-spacing:0.08em;color:var(--ink);text-decoration:none;
+  display:flex;align-items:center;gap:10px;
 }
-
-.nav-links a {
-  font-family: var(--sans);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  color: var(--walnut2);
-  text-decoration: none;
-  transition: color 0.2s;
-  padding: 4px 0;
-  border-bottom: 2px solid transparent;
+.nav-logo-mark{
+  width:28px;height:28px;border:1.5px solid var(--rouge);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.85rem;color:var(--rouge);
+  transition:background 0.2s;
 }
-
-.nav-links a:hover { color: var(--ember); border-bottom-color: var(--ember); }
-
-.nav-reserve {
-  font-family: var(--sans);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  background: var(--ember);
-  color: #fff;
-  padding: 12px 28px;
-  border: none; border-radius: 3px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background 0.2s;
-  box-shadow: 0 2px 8px rgba(184,58,18,0.25);
+.nav-logo:hover .nav-logo-mark{background:var(--rouge);color:#fff}
+.nav-links{display:flex;gap:32px;list-style:none}
+@media(max-width:768px){.nav-links{display:none}}
+.nav-links a{
+  font-family:var(--sans);font-size:0.88rem;font-weight:400;
+  letter-spacing:0.10em;text-transform:uppercase;
+  color:var(--ink3);text-decoration:none;transition:color 0.2s;
+  position:relative;
 }
-.nav-reserve:hover { background: var(--ember2); }
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;right:0;
+  height:1px;background:var(--rouge);
+  transform:scaleX(0);transition:transform 0.25s;
+}
+.nav-links a:hover{color:var(--rouge)}
+.nav-links a:hover::after{transform:scaleX(1)}
+
+.nav-cta{
+  font-family:var(--sans);font-size:0.84rem;font-weight:500;
+  letter-spacing:0.12em;text-transform:uppercase;
+  color:#fff;background:var(--sumi);
+  padding:12px 26px;border:none;text-decoration:none;
+  transition:background 0.2s;
+}
+.nav-cta:hover{background:var(--rouge2)}
+
+.nav-ham{display:none;background:none;border:none;cursor:pointer;padding:6px;flex-direction:column;gap:4px}
+@media(max-width:768px){.nav-ham{display:flex}}
+.nav-ham span{width:22px;height:1px;background:var(--ink);display:block;transition:all 0.3s}
+.nav-ham.open span:nth-child(1){transform:rotate(45deg) translate(3.5px,3.5px)}
+.nav-ham.open span:nth-child(2){opacity:0}
+.nav-ham.open span:nth-child(3){transform:rotate(-45deg) translate(3.5px,-3.5px)}
+
+.mobile-menu{
+  position:fixed;inset:0;z-index:190;
+  background:var(--paper);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:48px;
+  opacity:0;pointer-events:none;transition:opacity 0.3s;
+}
+.mobile-menu.open{opacity:1;pointer-events:all}
+.mobile-menu a{
+  font-family:var(--serif);font-size:2.2rem;font-weight:400;
+  color:var(--ink);text-decoration:none;letter-spacing:0.05em;
+  transition:color 0.2s;
+}
+.mobile-menu a:hover{color:var(--rouge)}
+.mobile-menu .mm-btn{
+  font-family:var(--sans);font-size:0.78rem;letter-spacing:0.16em;
+  text-transform:uppercase;background:var(--sumi);color:#fff;
+  padding:14px 40px;
+}
 
 /* ── HERO ── */
-.hero {
-  min-height: 100vh;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  text-align: center;
-  padding: 140px 32px 100px;
-  position: relative;
-  overflow: hidden;
-  background: var(--cream);
+.hero{
+  min-height:100dvh;
+  display:grid;grid-template-columns:1fr 1fr;
+  position:relative;overflow:hidden;
+}
+@media(max-width:768px){
+  .hero{grid-template-columns:1fr;min-height:auto}
 }
 
-.hero::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse 80% 60% at 50% 50%,
-    rgba(184,58,18,0.04) 0%, transparent 70%);
-  pointer-events: none;
+.hero-left{
+  padding:clamp(100px,12vh,140px) max(5vw,32px) clamp(60px,8vh,100px);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  position:relative;z-index:1;
+  background:var(--paper);
+}
+.hero-eyebrow{
+  font-family:var(--serif);font-size:1.05rem;font-weight:700;
+  letter-spacing:0.14em;
+  color:var(--rouge);
+  margin-bottom:32px;
+  opacity:0;animation:fadeSlideUp 0.8s 0.3s ease forwards;
+}
+.hero-title{
+  font-family:var(--serif);
+  font-size:clamp(3.8rem,7vw,7rem);
+  font-weight:700;line-height:0.92;letter-spacing:-0.02em;
+  color:var(--ink);margin-bottom:0;
+  opacity:0;animation:fadeSlideUp 0.9s 0.45s ease forwards;
+}
+.hero-title span{display:block;font-size:0.75em;font-weight:400;font-style:italic;color:var(--rouge);margin-top:4px}
+.hero-divider{
+  width:48px;height:2px;margin:36px 0;
+  background:linear-gradient(to right,var(--gold),var(--gold-line));
+  opacity:0;animation:fadeIn 0.8s 0.75s ease forwards;
+}
+.hero-tagline{
+  font-family:var(--body);font-size:clamp(1.05rem,1.8vw,1.25rem);
+  font-style:italic;color:var(--ink2);line-height:1.8;
+  max-width:360px;margin-bottom:48px;
+  opacity:0;animation:fadeSlideUp 0.8s 0.9s ease forwards;
+}
+.hero-cta{
+  display:flex;gap:16px;flex-wrap:wrap;
+  opacity:0;animation:fadeSlideUp 0.8s 1.05s ease forwards;
+}
+.btn-sumi{
+  font-family:var(--sans);font-size:0.9rem;font-weight:500;letter-spacing:0.12em;
+  text-transform:uppercase;color:#fff;background:var(--sumi);
+  padding:20px 44px;text-decoration:none;
+  transition:background 0.2s,transform 0.15s;
+  box-shadow:0 4px 20px rgba(10,10,10,0.18);
+}
+.btn-sumi:hover{background:var(--rouge2);transform:translateY(-1px)}
+.btn-paper{
+  font-family:var(--sans);font-size:0.9rem;font-weight:500;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--ink);background:transparent;
+  padding:20px 44px;border:2px solid var(--ink);text-decoration:none;
+  transition:border-color 0.2s,color 0.2s,transform 0.15s;
+}
+.btn-paper:hover{border-color:var(--rouge);color:var(--rouge);transform:translateY(-1px)}
+
+.hero-meta-strip{
+  display:flex;gap:28px;flex-wrap:wrap;
+  margin-top:40px;padding-top:32px;
+  border-top:1px solid var(--gold-line);
+  opacity:0;animation:fadeSlideUp 0.8s 1.2s ease forwards;
+}
+.hero-meta-item{font-family:var(--sans);font-size:0.88rem;font-weight:400;color:var(--ink2);letter-spacing:0.06em}
+
+/* Hero right panel */
+.hero-right{
+  position:relative;overflow:hidden;
+  background:var(--paper2);
+  display:flex;align-items:center;justify-content:center;
+  min-height:300px;
+}
+@media(max-width:768px){.hero-right{display:none}}
+.hero-right-inner{
+  position:relative;z-index:1;text-align:center;padding:40px;
+}
+.hero-kanji-stack{
+  display:flex;flex-direction:column;
+  font-family:serif;font-weight:900;
+  color:rgba(26,18,8,0.08);
+  line-height:0.85;
+  font-size:clamp(80px,12vw,160px);
+  pointer-events:none;user-select:none;
+  animation:fadeIn 1.2s 0.8s ease both;
+}
+.hero-right::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 80% at 50% 30%,rgba(140,28,10,0.06) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 60% at 80% 80%,rgba(138,108,24,0.06) 0%,transparent 50%);
+}
+/* vertical text decoration */
+.hero-right::after{
+  content:'大阪 焼き 日本料理';
+  position:absolute;left:20px;top:0;bottom:0;
+  writing-mode:vertical-rl;text-orientation:upright;
+  font-family:serif;font-size:0.8rem;letter-spacing:0.3em;
+  color:rgba(26,18,8,0.07);pointer-events:none;
+  display:flex;align-items:center;
 }
 
-/* subtle Japanese wave pattern overlay */
-.hero::after {
-  content: '';
-  position: absolute; inset: 0;
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 79px, var(--line2) 79px, var(--line2) 80px),
-    repeating-linear-gradient(90deg, transparent, transparent 79px, var(--line2) 79px, var(--line2) 80px);
-  pointer-events: none; opacity: 0.5;
+/* Fine line ornament */
+.hero-ornament-lines{
+  position:absolute;top:30px;right:30px;
+  width:80px;height:80px;
+  border-top:1px solid var(--gold-line);
+  border-right:1px solid var(--gold-line);
+  opacity:0;animation:fadeIn 0.8s 1.4s ease forwards;
+}
+.hero-ornament-lines::after{
+  content:'';position:absolute;
+  bottom:-30px;left:-30px;
+  width:80px;height:80px;
+  border-bottom:1px solid var(--gold-line);
+  border-left:1px solid var(--gold-line);
 }
 
-.hero-eyebrow {
-  font-family: var(--sans);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--ember);
-  margin-bottom: 28px;
-  opacity: 0;
-  animation: fadeUp 0.8s 0.2s ease forwards;
-  position: relative; z-index: 1;
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ── SECTION BASE ── */
+.section{padding:clamp(72px,10vw,120px) max(5vw,32px);max-width:1200px;margin:0 auto}
+.section-label{
+  font-family:var(--sans);font-size:0.78rem;font-weight:400;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--rouge);margin-bottom:18px;
+}
+.section-title{
+  font-family:var(--serif);
+  font-size:clamp(2.2rem,4.5vw,4rem);
+  font-weight:700;line-height:1.05;letter-spacing:-0.01em;
+  color:var(--ink);margin-bottom:24px;
+}
+.section-title em{font-style:italic;font-weight:400;color:var(--gold)}
+.section-body{
+  font-family:var(--sans);font-size:clamp(1rem,1.4vw,1.1rem);
+  font-weight:400;color:var(--ink2);line-height:1.9;
 }
 
-.hero-title {
-  font-family: var(--serif);
-  font-size: clamp(3.5rem, 10vw, 7.5rem);
-  font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: -0.02em;
-  color: var(--walnut);
-  margin-bottom: 12px;
-  opacity: 0;
-  animation: fadeUp 0.8s 0.35s ease forwards;
-  position: relative; z-index: 1;
-}
-
-.hero-title em {
-  font-style: italic;
-  color: var(--ember);
-  font-weight: 400;
-}
-
-.hero-sub {
-  font-family: var(--serif);
-  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
-  font-weight: 400;
-  font-style: italic;
-  color: var(--walnut3);
-  margin-bottom: 52px;
-  opacity: 0;
-  animation: fadeUp 0.8s 0.5s ease forwards;
-  position: relative; z-index: 1;
-}
-
-.hero-divider {
-  width: 60px; height: 3px;
-  background: linear-gradient(to right, transparent, var(--gold), transparent);
-  margin: 0 auto 52px;
-  opacity: 0;
-  animation: fadeIn 1s 0.7s ease forwards;
-  position: relative; z-index: 1;
-}
-
-.hero-meta {
-  display: flex; gap: 48px; justify-content: center; flex-wrap: wrap;
-  font-family: var(--sans);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  color: var(--walnut3);
-  opacity: 0;
-  animation: fadeUp 0.8s 0.85s ease forwards;
-  position: relative; z-index: 1;
-}
-
-.hero-meta span { display: flex; align-items: center; gap: 10px; }
-.hero-meta span::before {
-  content: '';
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--gold); display: block; flex-shrink: 0;
-}
-
-.hero-cta {
-  margin-top: 48px;
-  display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
-  opacity: 0;
-  animation: fadeUp 0.8s 1s ease forwards;
-  position: relative; z-index: 1;
-}
-
-.btn-primary {
-  font-family: var(--sans);
-  font-size: var(--text-base);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  background: var(--ember);
-  color: #fff;
-  padding: 18px 44px;
-  border: 2px solid var(--ember);
-  border-radius: 3px;
-  text-decoration: none;
-  transition: all 0.2s;
-  cursor: pointer;
-  box-shadow: 0 3px 14px rgba(184,58,18,0.28);
-}
-.btn-primary:hover { background: var(--ember2); border-color: var(--ember2); transform: translateY(-1px); }
-
-.btn-outline {
-  font-family: var(--sans);
-  font-size: var(--text-base);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  background: transparent;
-  color: var(--walnut);
-  padding: 18px 44px;
-  border: 2px solid var(--walnut2);
-  border-radius: 3px;
-  text-decoration: none;
-  transition: all 0.2s;
-  cursor: pointer;
-}
-.btn-outline:hover { border-color: var(--ember); color: var(--ember); }
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-/* ── SECTIONS ── */
-section { padding: 104px 32px; max-width: 1160px; margin: 0 auto; }
-
-.section-divider {
-  width: 100%; height: 2px;
-  background: linear-gradient(to right, transparent, var(--line), transparent);
-  max-width: 1160px; margin: 0 auto;
-}
-
-.section-label {
-  font-family: var(--sans);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--ember);
-  margin-bottom: 14px;
-  display: flex; align-items: center; gap: 12px;
-}
-.section-label::before {
-  content: '';
-  width: 24px; height: 2px;
-  background: var(--ember); display: block; flex-shrink: 0;
-}
-
-.section-title {
-  font-family: var(--serif);
-  font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
-  font-weight: 700;
-  line-height: 1.12;
-  color: var(--walnut);
-  margin-bottom: 24px;
-}
-.section-title em { font-style: italic; color: var(--gold); font-weight: 400; }
-
-.section-body {
-  font-family: var(--sans);
-  font-size: var(--text-lg);
-  font-weight: 400;
-  color: var(--walnut2);
-  line-height: 1.85;
-  max-width: 600px;
+/* ── STRIP DIVIDER ── */
+.strip-divider{
+  height:4px;
+  background:linear-gradient(to right,var(--rouge) 0%,var(--gold) 33%,var(--paper3) 66%,var(--paper2) 100%);
 }
 
 /* ── ABOUT ── */
-.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 88px; align-items: center; }
+.about-grid{display:grid;grid-template-columns:55% 1fr;gap:clamp(48px,8vw,96px);align-items:start}
+@media(max-width:760px){.about-grid{grid-template-columns:1fr}}
 
-.about-stats {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
-  background: var(--line); border: 2px solid var(--line);
-  margin-top: 52px;
+.about-ornament{
+  position:relative;margin-top:16px;
+  background:var(--paper2);
+  border:1px solid var(--gold-line);
+  padding:48px 36px;
+  text-align:center;
 }
-.stat { background: var(--cream); padding: 28px 24px; }
-.stat-num {
-  font-family: var(--serif); font-size: 3.2rem; font-weight: 400;
-  font-style: italic; color: var(--ember); line-height: 1; margin-bottom: 6px;
+.about-ornament::before{
+  content:'';position:absolute;
+  top:8px;left:8px;right:8px;bottom:8px;
+  border:1px solid var(--gold-line);pointer-events:none;
 }
-.stat-lbl {
-  font-family: var(--sans); font-size: var(--text-sm); font-weight: 500;
-  color: var(--walnut3); letter-spacing: 0.02em;
+.about-jp{
+  font-family:serif;font-size:4rem;color:var(--ink);
+  opacity:0.15;margin-bottom:16px;display:block;
 }
-
-.about-visual { position: relative; }
-.about-ornament {
-  width: 100%; aspect-ratio: 4/5;
-  background: var(--cream2); border: 2px solid var(--line);
-  display: flex; align-items: center; justify-content: center;
-  position: relative; overflow: hidden;
+.about-quote{
+  font-family:var(--body);font-size:1.05rem;font-style:italic;
+  color:var(--ink2);line-height:1.75;
 }
-.about-ornament::before {
-  content: '大阪'; font-size: 10rem; color: rgba(61,43,26,0.06);
-  font-weight: 900; position: absolute; right: -16px; bottom: -24px;
-  line-height: 1; pointer-events: none; font-family: serif;
-}
-.about-ornament-inner { text-align: center; padding: 48px; position: relative; z-index: 1; }
-.flame-icon {
-  font-size: 4.5rem; display: block; margin-bottom: 20px;
-  filter: drop-shadow(0 6px 20px rgba(184,58,18,0.35));
-}
-.about-ornament-inner p {
-  font-family: var(--serif); font-size: var(--text-xl);
-  font-style: italic; font-weight: 400;
-  color: var(--walnut2); line-height: 1.6;
+.about-quote-mark{
+  font-family:var(--serif);font-size:3rem;color:var(--rouge);
+  line-height:0.5;opacity:0.4;display:block;
 }
 
-/* ── MENU SECTION ── */
-.pricing-wrap { background: var(--cream2); padding: 104px 32px; }
-.pricing-inner { max-width: 1160px; margin: 0 auto; }
+.stats-row{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  margin-top:52px;border-top:1px solid var(--gold-line);
+}
+@media(max-width:600px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+.stat-block{padding:28px 0 28px 0;border-right:1px solid var(--gold-line)}
+.stat-block:last-child{border-right:none}
+.stat-n{
+  font-family:var(--serif);font-size:3rem;font-style:italic;
+  font-weight:400;color:var(--rouge2);line-height:1;margin-bottom:6px;
+}
+.stat-t{font-family:var(--sans);font-size:0.78rem;font-weight:300;color:var(--ink4)}
 
-.pricing-header {
-  display: flex; align-items: flex-end; justify-content: space-between;
-  margin-bottom: 52px; flex-wrap: wrap; gap: 20px;
-  padding-bottom: 24px;
-  border-bottom: 2px solid var(--line);
+/* ── MENU CTA BUTTON ── */
+.btn-view-menu{
+  display:inline-block;
+  font-family:var(--sans);font-size:1.1rem;font-weight:500;letter-spacing:0.10em;
+  text-transform:uppercase;text-decoration:none;
+  color:#fff;background:var(--rouge);
+  padding:22px 56px;
+  border:2px solid var(--rouge);
+  transition:background 0.2s,transform 0.15s,box-shadow 0.2s;
+  box-shadow:0 6px 28px rgba(140,28,10,0.22);
 }
+.btn-view-menu:hover{background:var(--rouge2);border-color:var(--rouge2);transform:translateY(-2px);box-shadow:0 10px 36px rgba(140,28,10,0.32)}
 
-.manager-gate-btn {
-  font-family: var(--sans); font-size: var(--text-xs); font-weight: 600;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--walnut3); background: none;
-  border: 2px solid var(--line); border-radius: 3px;
-  padding: 10px 20px; cursor: pointer; transition: all 0.2s;
-  display: flex; align-items: center; gap: 8px;
-}
-.manager-gate-btn:hover { border-color: var(--ember); color: var(--ember); }
+/* ── MENU ── */
+.menu-bg{background:var(--paper2);border-top:1px solid var(--gold-line);border-bottom:1px solid var(--gold-line)}
+.menu-inner{padding:clamp(72px,10vw,120px) max(5vw,32px);max-width:1200px;margin:0 auto}
 
-.manager-badge {
-  display: none; font-family: var(--sans); font-size: var(--text-xs);
-  font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--gold); background: var(--gold3);
-  border: 1px solid rgba(154,112,32,0.3); border-radius: 2px;
-  padding: 4px 12px; margin-left: 14px;
+/* ── EXPERIENCE ── */
+.exp-row{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:48px}
+@media(max-width:640px){.exp-row{grid-template-columns:1fr}}
+.exp-cell{
+  background:var(--paper2);padding:40px 32px;
+  border:1px solid var(--gold-line);
+  position:relative;transition:background 0.2s;
 }
-.manager-active .manager-badge { display: inline; }
-
-/* ── MENU TABS ── */
-.menu-tabs {
-  display: flex; gap: 4px; flex-wrap: wrap;
-  margin-bottom: 40px;
+.exp-cell:hover{background:var(--paper)}
+.exp-n{
+  font-family:var(--serif);font-size:0.75rem;letter-spacing:0.2em;
+  color:var(--gold);margin-bottom:18px;display:block;
 }
-.menu-tab {
-  font-family: var(--sans); font-size: var(--text-base); font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--walnut3);
-  background: var(--cream); border: 2px solid var(--line);
-  border-radius: 4px; padding: 12px 24px;
-  cursor: pointer; transition: all 0.18s; white-space: nowrap;
-}
-.menu-tab:hover { color: var(--ember); border-color: var(--ember); background: var(--cream); }
-.menu-tab.active {
-  color: #fff; background: var(--ember);
-  border-color: var(--ember);
-  box-shadow: 0 2px 10px rgba(184,58,18,0.2);
-}
-
-.menu-panel { display: none; }
-.menu-panel.active { display: block; }
-
-/* ── CATEGORY ACCORDION ── */
-.cat-section {
-  border: 2px solid var(--line);
-  border-radius: 6px;
-  margin-bottom: 12px;
-  background: var(--cream);
-  overflow: hidden;
-  box-shadow: 0 1px 6px var(--shadow);
-}
-.cat-toggle {
-  width: 100%; display: flex; align-items: center; justify-content: space-between;
-  padding: 22px 28px; background: var(--cream);
-  border: none; cursor: pointer;
-  text-align: left; transition: background 0.15s; gap: 16px;
-}
-.cat-toggle:hover { background: var(--cream2); }
-.cat-toggle-name {
-  font-family: var(--serif); font-size: var(--text-2xl); font-weight: 700;
-  color: var(--walnut); flex: 1; line-height: 1.2;
-}
-.cat-toggle-right { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
-.cat-count {
-  font-family: var(--sans); font-size: var(--text-sm); font-weight: 500;
-  color: var(--walnut3); letter-spacing: 0.02em;
-}
-.cat-arrow {
-  font-size: 1.1rem; color: var(--gold); transition: transform 0.25s ease;
-  display: inline-block; font-weight: 700;
-}
-.cat-arrow.open { transform: rotate(180deg); }
-.cat-body { display: none; border-top: 2px solid var(--line); }
-.cat-body.open { display: block; }
-
-/* ── SUB-SECTION ── */
-.sub-section { border-bottom: 1px solid var(--line); }
-.sub-section:last-child { border-bottom: none; }
-.sub-toggle {
-  width: 100%; display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 28px; background: var(--cream2);
-  border: none; cursor: pointer;
-  text-align: left; transition: background 0.15s; gap: 10px;
-}
-.sub-toggle:hover { background: var(--cream3); }
-.sub-toggle span:first-child {
-  font-family: var(--sans); font-size: var(--text-lg); font-weight: 600;
-  color: var(--ember); letter-spacing: 0.01em;
-}
-.sub-arrow { font-size: 0.85rem; color: var(--gold); transition: transform 0.2s; font-weight: 700; }
-.sub-arrow.open { transform: rotate(180deg); }
-.sub-body { display: none; }
-.sub-body.open { display: block; }
-
-/* ── MENU ITEMS ── */
-.menu-items-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-}
-.menu-item {
-  background: var(--cream);
-  padding: 18px 28px;
-  display: flex; justify-content: space-between; align-items: flex-start;
-  gap: 20px; border-bottom: 1px solid var(--line);
-  border-right: 1px solid var(--line2);
-  transition: background 0.12s;
-  position: relative;
-}
-.menu-item:hover { background: #fdf9f2; }
-.menu-item-left { flex: 1; min-width: 0; }
-.menu-item-name {
-  font-family: var(--sans); font-size: var(--text-lg); font-weight: 600;
-  color: var(--walnut); line-height: 1.35; margin-bottom: 4px;
-  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
-}
-.menu-item-desc {
-  font-family: var(--sans); font-size: var(--text-sm); font-weight: 400;
-  color: var(--walnut3); line-height: 1.55;
-}
-.item-notes {
-  font-family: var(--sans); font-size: var(--text-xs); font-weight: 500;
-  color: var(--gold); background: var(--gold3);
-  padding: 1px 6px; border-radius: 2px; white-space: nowrap;
-}
-.menu-item-right { flex-shrink: 0; text-align: right; padding-top: 2px; }
-.menu-item-price {
-  font-family: var(--serif); font-size: var(--text-xl); font-weight: 700;
-  color: var(--walnut); white-space: nowrap; display: inline-block;
-  transition: all 0.2s; cursor: default; line-height: 1;
-}
-.manager-active .menu-item-price {
-  cursor: pointer; border-bottom: 2px dashed var(--gold);
-  color: var(--gold);
-}
-.menu-item-price.editing {
-  background: #fff8e8; border: 2px solid var(--gold) !important;
-  padding: 2px 10px; outline: none; border-radius: 4px;
-  min-width: 70px; text-align: right; color: var(--walnut);
-}
-
-/* ── DUAL PRICES (A La Carte) ── */
-.dual-prices { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
-.dual-price-row { display: flex; align-items: baseline; gap: 10px; }
-.dual-label {
-  font-family: var(--sans); font-size: var(--text-sm); font-weight: 500;
-  color: var(--walnut3); white-space: nowrap;
-}
-
-/* ── BADGES ── */
-.item-badge {
-  font-family: var(--sans); font-size: 0.72rem; font-weight: 700;
-  letter-spacing: 0.06em; text-transform: uppercase;
-  padding: 2px 8px; border-radius: 3px; white-space: nowrap;
-  vertical-align: middle;
-}
-.badge-spicy { background: rgba(184,58,18,0.1); color: var(--ember); border: 1px solid rgba(184,58,18,0.3); }
-.badge-veg   { background: rgba(44,120,44,0.1); color: #2c782c; border: 1px solid rgba(44,120,44,0.3); }
-
-/* ── MANAGER CONTROLS ── */
-.mgr-item-controls { display: none; align-items: center; gap: 4px; flex-shrink: 0; margin-left: 6px; }
-.manager-active .menu-item .mgr-item-controls { display: flex; }
-.mgr-ic-btn {
-  width: 28px; height: 28px; font-size: 0.75rem;
-  background: var(--cream2); border: 1px solid var(--line);
-  color: var(--walnut3); cursor: pointer; padding: 0; line-height: 1;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.12s; font-family: var(--sans); border-radius: 3px;
-}
-.mgr-ic-btn:hover { background: var(--cream3); color: var(--walnut); }
-.mgr-ic-del:hover { background: rgba(184,58,18,0.08); color: var(--ember); border-color: var(--ember); }
-
-.mgr-add-btn {
-  display: none; grid-column: 1/-1; padding: 16px 28px;
-  background: transparent; border: 2px dashed rgba(154,112,32,0.4);
-  color: var(--gold); font-family: var(--sans); font-size: var(--text-sm);
-  font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
-  cursor: pointer; transition: all 0.2s; text-align: center; width: 100%;
-}
-.mgr-add-btn:hover { background: var(--gold3); }
-.manager-active .mgr-add-btn { display: block; }
-
-/* ── MANAGER MODALS ── */
-.mgr-overlay {
-  position: fixed; inset: 0; z-index: 500;
-  background: rgba(30,20,10,0.65);
-  backdrop-filter: blur(8px);
-  display: none; align-items: center; justify-content: center; padding: 24px;
-}
-.mgr-overlay.open { display: flex; }
-
-.mgr-modal {
-  background: var(--cream); border: 2px solid var(--line);
-  border-radius: 8px; padding: 44px; max-width: 420px; width: 100%;
-  animation: fadeUp 0.25s ease;
-  box-shadow: 0 8px 40px rgba(30,20,10,0.2);
-}
-.mgr-modal h3 {
-  font-family: var(--serif); font-size: var(--text-2xl); font-weight: 700;
-  margin-bottom: 8px; color: var(--walnut);
-}
-.mgr-modal p {
-  font-family: var(--sans); font-size: var(--text-sm); font-weight: 400;
-  color: var(--walnut3); margin-bottom: 28px; line-height: 1.6;
-}
-.mgr-field-label {
-  font-family: var(--sans); font-size: var(--text-xs); font-weight: 600;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--walnut3); display: block; margin-bottom: 6px;
-}
-.mgr-input {
-  width: 100%; background: #fff; border: 2px solid var(--line);
-  border-radius: 4px; padding: 14px 16px;
-  font-family: var(--sans); font-size: var(--text-base);
-  color: var(--walnut); outline: none; margin-bottom: 10px;
-  transition: border-color 0.2s;
-}
-.mgr-input:focus { border-color: var(--gold); }
-.mgr-err {
-  font-family: var(--sans); font-size: var(--text-sm); font-weight: 500;
-  color: var(--ember); min-height: 20px; margin-bottom: 18px;
-}
-.mgr-actions { display: flex; gap: 12px; }
-.mgr-btn {
-  flex: 1; padding: 14px; font-family: var(--sans); font-size: var(--text-sm);
-  font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
-  border: 2px solid var(--ember); background: var(--ember);
-  color: #fff; border-radius: 3px; cursor: pointer; transition: all 0.2s;
-}
-.mgr-btn:hover { background: var(--ember2); border-color: var(--ember2); }
-.mgr-btn-cancel {
-  flex: 1; padding: 14px; font-family: var(--sans); font-size: var(--text-sm);
-  font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
-  background: transparent; color: var(--walnut2);
-  border: 2px solid var(--line); border-radius: 3px; cursor: pointer; transition: all 0.2s;
-}
-.mgr-btn-cancel:hover { border-color: var(--walnut2); }
+.exp-h{font-family:var(--serif);font-size:1.3rem;font-weight:700;color:var(--ink);margin-bottom:14px}
+.exp-p{font-family:var(--sans);font-size:0.95rem;font-weight:400;color:var(--ink2);line-height:1.85}
 
 /* ── HOURS ── */
-.hours-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+.hours-bg{background:var(--paper2);border-top:1px solid var(--gold-line)}
+.hours-inner{padding:clamp(72px,10vw,120px) max(5vw,32px);max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,8vw,80px)}
+@media(max-width:760px){.hours-inner{grid-template-columns:1fr}}
 
-.hours-table { width: 100%; border-collapse: collapse; }
-.hours-table tr { border-bottom: 1px solid var(--line); }
-.hours-table tr:last-child { border-bottom: none; }
-.hours-table td {
-  padding: 16px 0; font-family: var(--sans); font-size: var(--text-lg);
-  font-weight: 400; color: var(--walnut2);
-}
-.hours-table td:last-child {
-  text-align: right; font-weight: 600; font-size: var(--text-base);
-  color: var(--walnut); letter-spacing: 0.02em;
-}
-.hours-table tr.today td {
-  color: var(--ember); font-weight: 700;
-  background: rgba(184,58,18,0.04);
-}
-.hours-table tr.today td:first-child { padding-left: 10px; border-left: 3px solid var(--ember); }
-.hours-table tr.closed td { color: var(--walnut3); }
+.hours-tbl{width:100%;border-collapse:collapse;margin-top:32px}
+.hours-tbl tr{transition:background 0.15s}
+.hours-tbl tr:hover{background:var(--paper)}
+.hours-tbl td{padding:15px 0;border-bottom:1px solid var(--gold-line);font-family:var(--sans);font-size:1.05rem;font-weight:400}
+.hours-tbl tr:last-child td{border-bottom:none}
+.hours-tbl td:first-child{color:var(--ink2);letter-spacing:0.04em}
+.hours-tbl td:last-child{text-align:right;color:var(--ink);font-weight:500}
+.hours-tbl tr.today td{background:rgba(140,28,10,0.04)}
+.hours-tbl tr.today td:first-child{color:var(--rouge);font-weight:600}
+.hours-tbl tr.today td:last-child{color:var(--rouge2);font-weight:600}
+.closed{color:var(--ink4)!important;font-style:italic;font-size:0.95rem}
 
-.contact-block { display: flex; flex-direction: column; gap: 28px; }
-.contact-item { display: flex; flex-direction: column; gap: 6px; }
-.contact-label {
-  font-family: var(--sans); font-size: var(--text-xs); font-weight: 600;
-  letter-spacing: 0.16em; text-transform: uppercase; color: var(--ember);
+.contact-list{margin-top:32px;display:flex;flex-direction:column;gap:0}
+.contact-pair{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:14px 0;border-bottom:1px solid var(--gold-line);
 }
-.contact-value {
-  font-family: var(--sans); font-size: var(--text-xl); font-weight: 400;
-  color: var(--walnut); line-height: 1.5;
-}
-.contact-value a { color: inherit; text-decoration: none; }
-.contact-value a:hover { color: var(--ember); text-decoration: underline; }
+.contact-pair:last-child{border-bottom:none}
+.c-key{font-family:var(--sans);font-size:0.78rem;font-weight:400;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink3)}
+.c-val{font-family:var(--sans);font-size:1rem;font-weight:400;color:var(--ink);text-align:right;line-height:1.7}
+.c-val a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--gold-line);transition:color 0.2s,border-color 0.2s}
+.c-val a:hover{color:var(--rouge);border-color:var(--rouge)}
 
 /* ── MAP ── */
-.map-wrap { background: var(--cream2); padding: 104px 32px; }
-.map-inner { max-width: 1160px; margin: 0 auto; }
-.map-header { margin-bottom: 36px; }
-.map-container {
-  position: relative; border: 2px solid var(--line);
-  border-radius: 6px; overflow: hidden;
-  background: #e8e0d0; height: 360px;
-  box-shadow: 0 4px 20px var(--shadow);
+.map-wrap{padding:0 max(5vw,32px) clamp(72px,10vw,120px);max-width:1200px;margin:0 auto}
+.map-box{
+  border:1px solid var(--gold-line);overflow:hidden;
+  position:relative;
 }
-.map-svg { width: 100%; height: 100%; }
-.map-overlay {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: linear-gradient(to top, rgba(250,246,238,0.97) 0%, transparent 100%);
-  padding: 24px 28px 28px;
-  display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 14px;
+.map-foot{
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:12px;
+  padding:20px 24px;border-top:1px solid var(--gold-line);
+  background:var(--paper2);
 }
-.map-address {
-  font-family: var(--sans); font-size: var(--text-base); font-weight: 500;
-  color: var(--walnut2); line-height: 1.6;
+.map-foot-addr{font-family:var(--sans);font-size:0.82rem;font-weight:300;color:var(--ink3)}
+.map-foot-link{
+  font-family:var(--sans);font-size:0.72rem;font-weight:400;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--rouge);text-decoration:none;
+  transition:color 0.2s;
 }
-.map-directions {
-  font-family: var(--sans); font-size: var(--text-sm); font-weight: 600;
-  letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--ember); text-decoration: none;
-  border-bottom: 2px solid currentColor; transition: opacity 0.2s; padding-bottom: 1px;
-}
-.map-directions:hover { opacity: 0.7; }
+.map-foot-link:hover{color:var(--rouge2)}
 
-/* ── RESERVATION ── */
-.reservation-wrap { background: var(--walnut); padding: 104px 32px; color: var(--cream); }
-.reservation-inner { max-width: 760px; margin: 0 auto; text-align: center; }
-.reservation-inner .section-label { color: #e8876a; }
-.reservation-inner .section-label::before { background: #e8876a; }
-.reservation-inner .section-title { color: var(--cream); }
-.reservation-inner .section-title em { color: var(--gold2); }
-.reservation-inner .section-body { color: rgba(250,246,238,0.72); max-width: none; font-size: var(--text-lg); }
+/* ── RESERVE ── */
+.reserve-section{
+  background:var(--sumi);
+  padding:clamp(72px,10vw,120px) max(5vw,32px);
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.reserve-section::before{
+  content:'予約';position:absolute;
+  font-family:serif;font-size:clamp(200px,40vw,400px);font-weight:900;
+  color:rgba(255,255,255,0.025);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.reserve-inner{max-width:600px;margin:0 auto;position:relative;z-index:1}
+.reserve-inner .section-label{color:var(--rouge3);justify-content:center;display:flex}
+.reserve-inner .section-title{color:#fff}
+.reserve-inner .section-body{color:rgba(248,243,235,0.7)}
 
-.reservation-contact { margin-top: 52px; display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; }
-.res-contact-card {
-  flex: 1; min-width: 220px; max-width: 280px;
-  border: 2px solid rgba(250,246,238,0.15);
-  border-radius: 6px; padding: 32px 28px; text-align: center;
-  background: rgba(250,246,238,0.05);
-  transition: background 0.2s;
+.res-phone-block{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.12);
+  padding:36px 48px;
+  display:inline-block;
 }
-.res-contact-card:hover { background: rgba(250,246,238,0.08); }
-.res-contact-icon { font-size: 2rem; margin-bottom: 14px; display: block; }
-.res-contact-label {
-  font-family: var(--sans); font-size: var(--text-xs); font-weight: 600;
-  letter-spacing: 0.15em; text-transform: uppercase;
-  color: rgba(250,246,238,0.45); margin-bottom: 8px;
+.res-phone-label{
+  font-family:var(--sans);font-size:0.72rem;font-weight:400;letter-spacing:0.22em;
+  text-transform:uppercase;color:rgba(248,243,235,0.45);margin-bottom:14px;
 }
-.res-contact-value { font-family: var(--sans); font-size: var(--text-lg); font-weight: 400; color: var(--cream); }
-.res-contact-value a { color: inherit; text-decoration: none; }
-.res-contact-value a:hover { color: var(--gold2); text-decoration: underline; }
+.res-phone-number{
+  display:block;
+  font-family:var(--serif);font-size:clamp(2rem,5vw,3.2rem);font-weight:700;
+  color:#fff;text-decoration:none;letter-spacing:0.03em;
+  transition:color 0.2s;
+}
+.res-phone-number:hover{color:var(--gold3)}
 
 /* ── FOOTER ── */
-footer {
-  background: var(--walnut);
-  border-top: 1px solid rgba(250,246,238,0.1);
-  padding: 36px 32px;
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 16px;
-  color: rgba(250,246,238,0.4);
-  font-family: var(--sans); font-size: var(--text-sm); font-weight: 400;
+footer{
+  background:var(--sumi);
+  border-top:1px solid rgba(255,255,255,0.07);
+  padding:28px max(5vw,32px);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
 }
-footer a { color: inherit; text-decoration: none; }
-footer a:hover { color: rgba(250,246,238,0.75); }
+.foot-logo{font-family:var(--serif);font-size:0.9rem;font-weight:700;letter-spacing:0.08em;color:rgba(248,243,235,0.6)}
+.foot-copy{font-family:var(--sans);font-size:0.75rem;font-weight:300;color:rgba(248,243,235,0.35)}
 
-/* ── MOBILE ── */
-@media (max-width: 860px) {
-  nav { padding: 0 20px; height: 64px; }
-  .nav-links { display: none; }
-  .nav-logo { font-size: var(--text-lg); }
-  .about-grid { grid-template-columns: 1fr; gap: 48px; }
-  .hours-grid { grid-template-columns: 1fr; gap: 48px; }
-  .about-ornament { aspect-ratio: 3/2; }
-  section { padding: 72px 20px; }
-  .pricing-wrap, .map-wrap, .reservation-wrap { padding: 72px 20px; }
-  .menu-tabs { gap: 6px; }
-  .menu-tab { padding: 11px 18px; font-size: var(--text-sm); }
-}
-@media (max-width: 580px) {
-  .hero-meta { gap: 24px; }
-  .menu-items-grid { grid-template-columns: 1fr; }
-  .cat-toggle-name { font-size: var(--text-xl); }
-  .menu-tabs { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
-  .menu-tab { white-space: nowrap; }
-  .hero-cta { flex-direction: column; align-items: center; }
-  .btn-primary, .btn-outline { width: 100%; max-width: 320px; text-align: center; }
+/* ── SCROLL REVEAL ── */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity 0.65s ease,transform 0.65s ease}
+.reveal.in{opacity:1;transform:none}
+.reveal-d1{transition-delay:0.1s}
+.reveal-d2{transition-delay:0.2s}
+.reveal-d3{transition-delay:0.3s}
+
+@media(max-width:768px){
+  footer{flex-direction:column;text-align:center}
+  .strip-divider{display:none}
 }
 </style>
 </head>
 <body>
 
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" onclick="closeMM()">About</a>
+  <a href="menu.html">Menu</a>
+  <a href="#hours" onclick="closeMM()">Hours</a>
+  <a href="#reserve" class="mm-btn" onclick="closeMM()">Reserve a Table</a>
+</div>
+
 <!-- NAV -->
-<nav>
-  <a href="#" class="nav-logo">Osaka Hibachi</a>
+<nav id="nav">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-mark">火</div>
+    Osaka Hibachi
+  </a>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
-    <li><a href="#menu">Menu</a></li>
+    <li><a href="menu.html">Menu</a></li>
     <li><a href="#hours">Visit</a></li>
   </ul>
-  <a href="#reserve" class="nav-reserve">Reserve</a>
+  <a href="#reserve" class="nav-cta" id="navCta" style="display:none">Reserve</a>
+  <button class="nav-ham" id="navHam" onclick="toggleMM()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
 <!-- HERO -->
-<section class="hero" style="max-width:none;">
-  <div class="hero-eyebrow">Moncton, New Brunswick · Est. 2010</div>
-  <h1 class="hero-title">Osaka<br><em>Hibachi</em></h1>
-  <p class="hero-sub">Japanese &amp; Korean cuisine, teppanyaki grills</p>
-  <div class="hero-divider"></div>
-  <div class="hero-meta">
-    <span>599 Main St, Moncton</span>
-    <span>(506) 853-8855</span>
-    <span>Teppanyaki · Sushi · Sake Bar</span>
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Moncton, New Brunswick &nbsp;·&nbsp; Est. 2010</div>
+    <h1 class="hero-title">Osaka<span>Hibachi</span></h1>
+    <div class="hero-divider"></div>
+    <p class="hero-tagline">Japanese & Korean cuisine, teppanyaki grills — where the iron meets craft.</p>
+    <div class="hero-cta">
+      <a href="#reserve" class="btn-sumi">Reserve a Table</a>
+      <a href="menu.html" class="btn-paper">View Menu</a>
+    </div>
+    <div class="hero-meta-strip">
+      <span class="hero-meta-item">599 Main St, Moncton</span>
+      <span class="hero-meta-item">(506) 853-8855</span>
+      <span class="hero-meta-item">Teppanyaki · Sushi · Bar</span>
+    </div>
   </div>
-  <div class="hero-cta">
-    <a href="#reserve" class="btn-primary">Make a Reservation</a>
-    <a href="#menu" class="btn-outline">View Menu & Pricing</a>
+  <div class="hero-right">
+    <div class="hero-ornament-lines"></div>
+    <div class="hero-right-inner">
+      <div class="hero-kanji-stack">
+        <span>大</span>
+        <span>阪</span>
+        <span>火</span>
+      </div>
+    </div>
   </div>
-</section>
+</div>
 
-<div class="section-divider"></div>
+<div class="strip-divider"></div>
 
 <!-- ABOUT -->
-<section id="about">
+<section class="section" id="about">
   <div class="about-grid">
     <div>
-      <div class="section-label">Our Story</div>
-      <h2 class="section-title">Where fire meets <em>craft</em></h2>
-      <p class="section-body">
+      <div class="section-label reveal">Our Story</div>
+      <h2 class="section-title reveal reveal-d1">Where fire meets <em>craft</em></h2>
+      <p class="section-body reveal reveal-d2">
         Osaka Hibachi brings the theatre of teppanyaki to the heart of Moncton. Our chefs cook at your table on open iron grills — AAA steaks, fresh seafood, and vibrant vegetables prepared with skill and a touch of showmanship.<br><br>
-        Beyond the hibachi, our kitchen crafts traditional Japanese and Korean dishes: handmade sushi rolls, premium sashimi, bento boxes, and a curated sake selection. Every meal here is an occasion.
+        Beyond the hibachi, our kitchen crafts traditional Japanese and Korean dishes: handmade sushi rolls, premium sashimi, and a curated sake selection. Every meal here is an occasion.
       </p>
-      <div class="about-stats">
-        <div class="stat">
-          <div class="stat-num">4</div>
-          <div class="stat-lbl">Teppanyaki Grills</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num">15+</div>
-          <div class="stat-lbl">Years in Moncton</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num">100+</div>
-          <div class="stat-lbl">Menu Items</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num">2</div>
-          <div class="stat-lbl">Phone Lines</div>
-        </div>
+      <div class="stats-row reveal reveal-d3">
+        <div class="stat-block"><div class="stat-n">4</div><div class="stat-t">Teppanyaki Grills</div></div>
+        <div class="stat-block"><div class="stat-n">15+</div><div class="stat-t">Years in Moncton</div></div>
+        <div class="stat-block"><div class="stat-n">Est.</div><div class="stat-t">2010</div></div>
+        <div class="stat-block"><div class="stat-n">2</div><div class="stat-t">Dining Rooms</div></div>
       </div>
     </div>
-    <div class="about-visual">
+    <div class="reveal reveal-d2">
       <div class="about-ornament">
-        <div class="about-ornament-inner">
-          <span class="flame-icon">🔥</span>
-          <p>"A place where food and coziness complement each other."</p>
-        </div>
+        <span class="about-jp">火</span>
+        <span class="about-quote-mark">"</span>
+        <p class="about-quote">A place where food and coziness complement each other.</p>
       </div>
     </div>
   </div>
 </section>
 
-<div class="section-divider"></div>
-
-<!-- MENU / PRICING -->
-<div class="pricing-wrap" id="menu">
-  <div class="pricing-inner">
-    <div class="pricing-header">
-      <div>
-        <div class="section-label">Menu &amp; Pricing</div>
-        <h2 class="section-title" style="margin-bottom:0">Our <em>selections</em>
-          <span class="manager-badge" id="managerBadge">Manager Mode</span>
-        </h2>
-      </div>
-      <button class="manager-gate-btn" id="managerGateBtn" onclick="openManagerModal()">
-        🔒 Manage Prices
-      </button>
-    </div>
-
-    <div class="menu-tabs" id="menuTabs">
-<button class="menu-tab active" onclick="switchMenuTab('sushi---rolls',this)">Sushi &amp; Rolls</button>
-<button class="menu-tab" onclick="switchMenuTab('starters',this)">Starters</button>
-<button class="menu-tab" onclick="switchMenuTab('teppanyaki',this)">Teppanyaki</button>
-<button class="menu-tab" onclick="switchMenuTab('asian-dining',this)">Asian Dining</button>
-<button class="menu-tab" onclick="switchMenuTab('lunch',this)">Lunch</button>
-<button class="menu-tab" onclick="switchMenuTab('desserts',this)">Desserts</button>
-    </div>
-
-    <div id="pricingGrid">
-<div class="menu-panel active" id="panel-sushi---rolls">
-<div class="cat-section"><button class="cat-toggle" onclick="toggleCat('sashimi-sushi-maki')"><span class="cat-toggle-name">Sashimi Sushi Maki</span><span class="cat-toggle-right"><span class="cat-count">12 items</span><span class="cat-arrow" id="cat-arr-sashimi-sushi-maki">▾</span></span></button><div class="cat-body" id="cat-sashimi-sushi-maki"><div class="menu-items-grid" id="sashimi-sushi-maki-main"><div class="menu-item" data-key="sashimi---vegetable-ma"><div class="menu-item-left"><div class="menu-item-name">Vegetable Maki Set<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Sweet yam avo kappa veggie roll</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---vegetable-ma">—</span></div></div><div class="menu-item" data-key="sashimi---maki-combo-s"><div class="menu-item-left"><div class="menu-item-name">Maki Combo Set</div><div class="menu-item-desc">Salmon California dynamite</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---maki-combo-s">—</span></div></div><div class="menu-item" data-key="sashimi---spicy-maki-c"><div class="menu-item-left"><div class="menu-item-name">Spicy Maki Combo Set<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Spicy tuna salmon dynamite</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---spicy-maki-c">—</span></div></div><div class="menu-item" data-key="sashimi---osaka-maki-c"><div class="menu-item-left"><div class="menu-item-name">Osaka Maki Combo</div><div class="menu-item-desc">Osaka hibachi fire California</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---osaka-maki-c">—</span></div></div><div class="menu-item" data-key="sashimi---sushi---sash"><div class="menu-item-left"><div class="menu-item-name">Sushi &amp; Sashimi Dinner</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---sushi---sash">—</span></div></div><div class="menu-item" data-key="sashimi---sashimi-dinn"><div class="menu-item-left"><div class="menu-item-name">Sashimi Dinner<span class="item-notes">20pcs</span></div><div class="menu-item-desc">Fresh fish with rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---sashimi-dinn">—</span></div></div><div class="menu-item" data-key="sashimi---sushi-osaka"><div class="menu-item-left"><div class="menu-item-name">Sushi Osaka</div><div class="menu-item-desc">Nigiri and California</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---sushi-osaka">—</span></div></div><div class="menu-item" data-key="sashimi---salmon-holic"><div class="menu-item-left"><div class="menu-item-name">Salmon-holic 1</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---salmon-holic">—</span></div></div><div class="menu-item" data-key="sashimi---salmon-holic"><div class="menu-item-left"><div class="menu-item-name">Salmon-holic 2</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---salmon-holic">—</span></div></div><div class="menu-item" data-key="sashimi---salmon-holic"><div class="menu-item-left"><div class="menu-item-name">Salmon-holic 3</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---salmon-holic">—</span></div></div><div class="menu-item" data-key="sashimi---tuna-holic-1"><div class="menu-item-left"><div class="menu-item-name">Tuna-holic 1</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---tuna-holic-1">—</span></div></div><div class="menu-item" data-key="sashimi---tuna-holic-2"><div class="menu-item-left"><div class="menu-item-name">Tuna-holic 2</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="sashimi---tuna-holic-2">—</span></div></div></div></div></div><div class="cat-section"><button class="cat-toggle" onclick="toggleCat('special-rolls')"><span class="cat-toggle-name">Special Rolls</span><span class="cat-toggle-right"><span class="cat-count">24 items</span><span class="cat-arrow" id="cat-arr-special-rolls">▾</span></span></button><div class="cat-body" id="cat-special-rolls"><div class="menu-items-grid" id="special-rolls-main"><div class="menu-item" data-key="special---fire-crunch-"><div class="menu-item-left"><div class="menu-item-name">Fire Crunch Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Salmon tempura avocado spicy sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---fire-crunch-">—</span></div></div><div class="menu-item" data-key="special---summer-roll"><div class="menu-item-left"><div class="menu-item-name">Summer Roll</div><div class="menu-item-desc">Shrimp tempura mango cucumber rice paper</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---summer-roll">—</span></div></div><div class="menu-item" data-key="special---green-dragon"><div class="menu-item-left"><div class="menu-item-name">Green Dragon Roll</div><div class="menu-item-desc">Shrimp tempura cucumber avocado</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---green-dragon">—</span></div></div><div class="menu-item" data-key="special---lovely-lady-"><div class="menu-item-left"><div class="menu-item-name">Lovely Lady Roll<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Beet radish avocado yam tempura</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---lovely-lady-">—</span></div></div><div class="menu-item" data-key="special---spider-roll"><div class="menu-item-left"><div class="menu-item-name">Spider Roll</div><div class="menu-item-desc">Soft shell crab avocado cucumber roe</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---spider-roll">—</span></div></div><div class="menu-item" data-key="special---sunshine-rol"><div class="menu-item-left"><div class="menu-item-name">Sunshine Roll<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Sweet yam asparagus tempura avocado</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---sunshine-rol">—</span></div></div><div class="menu-item" data-key="special---red-dragon-r"><div class="menu-item-left"><div class="menu-item-name">Red Dragon Roll</div><div class="menu-item-desc">Shrimp tempura crab salmon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---red-dragon-r">—</span></div></div><div class="menu-item" data-key="special---rainbow-roll"><div class="menu-item-left"><div class="menu-item-name">Rainbow Roll</div><div class="menu-item-desc">Avocado crab cucumber assorted sashimi</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---rainbow-roll">—</span></div></div><div class="menu-item" data-key="special---sean-roll"><div class="menu-item-left"><div class="menu-item-name">Sean Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Spicy crab shrimp tempura</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---sean-roll">—</span></div></div><div class="menu-item" data-key="special---crispy-valen"><div class="menu-item-left"><div class="menu-item-name">Crispy Valentine Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Avocado crab spicy tuna fries</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---crispy-valen">—</span></div></div><div class="menu-item" data-key="special---sunday-roll"><div class="menu-item-left"><div class="menu-item-name">Sunday Roll</div><div class="menu-item-desc">Salmon avocado crab roe</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---sunday-roll">—</span></div></div><div class="menu-item" data-key="special---sakura-roll"><div class="menu-item-left"><div class="menu-item-name">Sakura Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Spicy scallop crab avocado</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---sakura-roll">—</span></div></div><div class="menu-item" data-key="special---shogun-roll"><div class="menu-item-left"><div class="menu-item-name">Shogun Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Spicy salmon shrimp tempura</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---shogun-roll">—</span></div></div><div class="menu-item" data-key="special---double-dynam"><div class="menu-item-left"><div class="menu-item-name">Double Dynamite Roll</div><div class="menu-item-desc">Shrimp tempura crab roe</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---double-dynam">—</span></div></div><div class="menu-item" data-key="special---black-dragon"><div class="menu-item-left"><div class="menu-item-name">Black Dragon Roll</div><div class="menu-item-desc">Shrimp tempura crab BBQ eel</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---black-dragon">—</span></div></div><div class="menu-item" data-key="special---volcano-roll"><div class="menu-item-left"><div class="menu-item-name">Volcano Roll</div><div class="menu-item-desc">Deep-fried shrimp tempura crab</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---volcano-roll">—</span></div></div><div class="menu-item" data-key="special---ocean-spicy-"><div class="menu-item-left"><div class="menu-item-name">Ocean Spicy Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Spicy crab salmon shrimp</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---ocean-spicy-">—</span></div></div><div class="menu-item" data-key="special---pei-roll"><div class="menu-item-left"><div class="menu-item-name">PEI Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Shrimp tempura crab scallop</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---pei-roll">—</span></div></div><div class="menu-item" data-key="special---nb-roll"><div class="menu-item-left"><div class="menu-item-name">NB Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Shrimp tempura crab salmon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---nb-roll">—</span></div></div><div class="menu-item" data-key="special---nova-scotia-"><div class="menu-item-left"><div class="menu-item-name">Nova Scotia Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Shrimp tempura crab tuna</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---nova-scotia-">—</span></div></div><div class="menu-item" data-key="special---lobster-fant"><div class="menu-item-left"><div class="menu-item-name">Lobster Fantasy Roll</div><div class="menu-item-desc">Lobster avocado cucumber</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---lobster-fant">—</span></div></div><div class="menu-item" data-key="special---new-york-rol"><div class="menu-item-left"><div class="menu-item-name">New York Roll</div><div class="menu-item-desc">Shrimp tempura beef tataki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---new-york-rol">—</span></div></div><div class="menu-item" data-key="special---osaka-hibach"><div class="menu-item-left"><div class="menu-item-name">Osaka Hibachi Roll</div><div class="menu-item-desc">Shrimp tempura red snapper</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---osaka-hibach">—</span></div></div><div class="menu-item" data-key="special---osaka-fisher"><div class="menu-item-left"><div class="menu-item-name">Osaka Fisherman’s Meli Molo</div><div class="menu-item-desc">Premium roll with vegetables and scallop</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="special---osaka-fisher">—</span></div></div></div></div></div><div class="cat-section"><button class="cat-toggle" onclick="toggleCat('premium-rolls')"><span class="cat-toggle-name">Premium Rolls</span><span class="cat-toggle-right"><span class="cat-count">11 items</span><span class="cat-arrow" id="cat-arr-premium-rolls">▾</span></span></button><div class="cat-body" id="cat-premium-rolls"><div class="menu-items-grid" id="premium-rolls-main"><div class="menu-item" data-key="premium---yammy-roll"><div class="menu-item-left"><div class="menu-item-name">Yammy Roll</div><div class="menu-item-desc">Avocado onion cilantro yam tempura</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---yammy-roll">—</span></div></div><div class="menu-item" data-key="premium---tempura-vegg"><div class="menu-item-left"><div class="menu-item-name">Tempura Veggie Roll<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Avocado cucumber yam asparagus</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---tempura-vegg">—</span></div></div><div class="menu-item" data-key="premium---kamikaze-rol"><div class="menu-item-left"><div class="menu-item-name">Kamikaze Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Spicy tuna tempura bits</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---kamikaze-rol">—</span></div></div><div class="menu-item" data-key="premium---philadelphia"><div class="menu-item-left"><div class="menu-item-name">Philadelphia Roll</div><div class="menu-item-desc">Salmon cream cheese cucumber</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---philadelphia">—</span></div></div><div class="menu-item" data-key="premium---spring-queen"><div class="menu-item-left"><div class="menu-item-name">Spring Queen Roll<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Carrot asparagus wrapped rice paper</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---spring-queen">—</span></div></div><div class="menu-item" data-key="premium---caterpillar-"><div class="menu-item-left"><div class="menu-item-name">Caterpillar Roll</div><div class="menu-item-desc">BBQ eel cucumber avocado</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---caterpillar-">—</span></div></div><div class="menu-item" data-key="premium---dynamite-rol"><div class="menu-item-left"><div class="menu-item-name">Dynamite Roll</div><div class="menu-item-desc">Shrimp tempura crab cucumber</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---dynamite-rol">—</span></div></div><div class="menu-item" data-key="premium---bulgogi-roll"><div class="menu-item-left"><div class="menu-item-name">Bulgogi Roll</div><div class="menu-item-desc">Marinated beef cucumber lettuce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---bulgogi-roll">—</span></div></div><div class="menu-item" data-key="premium---tiger-roll"><div class="menu-item-left"><div class="menu-item-name">Tiger Roll</div><div class="menu-item-desc">Avocado shrimp crab roe</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---tiger-roll">—</span></div></div><div class="menu-item" data-key="premium---mango-roll"><div class="menu-item-left"><div class="menu-item-name">Mango Roll<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Mango avocado cucumber asparagus</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---mango-roll">—</span></div></div><div class="menu-item" data-key="premium---crunch-roll"><div class="menu-item-left"><div class="menu-item-name">Crunch Roll</div><div class="menu-item-desc">Shrimp tempura crab mayo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="premium---crunch-roll">—</span></div></div></div></div></div><div class="cat-section"><button class="cat-toggle" onclick="toggleCat('classic-maki')"><span class="cat-toggle-name">Classic Maki</span><span class="cat-toggle-right"><span class="cat-count">15 items</span><span class="cat-arrow" id="cat-arr-classic-maki">▾</span></span></button><div class="cat-body" id="cat-classic-maki"><div class="menu-items-grid" id="classic-maki-main"><div class="menu-item" data-key="classic---kani-maki"><div class="menu-item-left"><div class="menu-item-name">Kani Maki</div><div class="menu-item-desc">Imitation crab</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---kani-maki">—</span></div></div><div class="menu-item" data-key="classic---kappa-maki"><div class="menu-item-left"><div class="menu-item-name">Kappa Maki<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Cucumber</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---kappa-maki">—</span></div></div><div class="menu-item" data-key="classic---avocado-maki"><div class="menu-item-left"><div class="menu-item-name">Avocado Maki<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---avocado-maki">—</span></div></div><div class="menu-item" data-key="classic---asparagus-ma"><div class="menu-item-left"><div class="menu-item-name">Asparagus Maki<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---asparagus-ma">—</span></div></div><div class="menu-item" data-key="classic---avocado---ka"><div class="menu-item-left"><div class="menu-item-name">Avocado &amp; Kappa Maki<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---avocado---ka">—</span></div></div><div class="menu-item" data-key="classic---california-m"><div class="menu-item-left"><div class="menu-item-name">California Maki</div><div class="menu-item-desc">Crab avocado cucumber roe</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---california-m">—</span></div></div><div class="menu-item" data-key="classic---sweet-yam-ma"><div class="menu-item-left"><div class="menu-item-name">Sweet Yam Maki<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---sweet-yam-ma">—</span></div></div><div class="menu-item" data-key="classic---salmon-maki"><div class="menu-item-left"><div class="menu-item-name">Salmon Maki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---salmon-maki">—</span></div></div><div class="menu-item" data-key="classic---chicken-teri"><div class="menu-item-left"><div class="menu-item-name">Chicken Teriyaki Maki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---chicken-teri">—</span></div></div><div class="menu-item" data-key="classic---avocado---sa"><div class="menu-item-left"><div class="menu-item-name">Avocado &amp; Salmon Maki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---avocado---sa">—</span></div></div><div class="menu-item" data-key="classic---avocado---sh"><div class="menu-item-left"><div class="menu-item-name">Avocado &amp; Shrimp Tempura Maki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---avocado---sh">—</span></div></div><div class="menu-item" data-key="classic---tuna-maki"><div class="menu-item-left"><div class="menu-item-name">Tuna Maki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---tuna-maki">—</span></div></div><div class="menu-item" data-key="classic---unagi-maki"><div class="menu-item-left"><div class="menu-item-name">Unagi Maki</div><div class="menu-item-desc">BBQ eel</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---unagi-maki">—</span></div></div><div class="menu-item" data-key="classic---fire-maki"><div class="menu-item-left"><div class="menu-item-name">Fire Maki</div><div class="menu-item-desc">Deep-fried crab shrimp cream cheese</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---fire-maki">—</span></div></div><div class="menu-item" data-key="classic---futo-maki"><div class="menu-item-left"><div class="menu-item-name">Futo Maki<span class="item-notes">8pcs</span></div><div class="menu-item-desc">Crab cucumber tamago</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="classic---futo-maki">—</span></div></div></div></div></div><div class="cat-section"><button class="cat-toggle" onclick="toggleCat('spicy-rolls')"><span class="cat-toggle-name">Spicy Rolls</span><span class="cat-toggle-right"><span class="cat-count">4 items</span><span class="cat-arrow" id="cat-arr-spicy-rolls">▾</span></span></button><div class="cat-body" id="cat-spicy-rolls"><div class="menu-items-grid" id="spicy-rolls-main"><div class="menu-item" data-key="spicy-ro--spicy-crab-r"><div class="menu-item-left"><div class="menu-item-name">Spicy Crab Roll<span class="item-badge badge-spicy">Spicy</span><span class="item-notes">6pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="spicy-ro--spicy-crab-r">—</span></div></div><div class="menu-item" data-key="spicy-ro--spicy-salmon"><div class="menu-item-left"><div class="menu-item-name">Spicy Salmon Roll<span class="item-badge badge-spicy">Spicy</span><span class="item-notes">6pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="spicy-ro--spicy-salmon">—</span></div></div><div class="menu-item" data-key="spicy-ro--spicy-tuna-r"><div class="menu-item-left"><div class="menu-item-name">Spicy Tuna Roll<span class="item-badge badge-spicy">Spicy</span><span class="item-notes">6pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="spicy-ro--spicy-tuna-r">—</span></div></div><div class="menu-item" data-key="spicy-ro--spicy-scallo"><div class="menu-item-left"><div class="menu-item-name">Spicy Scallop Roll<span class="item-badge badge-spicy">Spicy</span><span class="item-notes">6pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="spicy-ro--spicy-scallo">—</span></div></div></div></div></div><div class="cat-section"><button class="cat-toggle" onclick="toggleCat('baked-rolls')"><span class="cat-toggle-name">Baked Rolls</span><span class="cat-toggle-right"><span class="cat-count">4 items</span><span class="cat-arrow" id="cat-arr-baked-rolls">▾</span></span></button><div class="cat-body" id="cat-baked-rolls"><div class="menu-items-grid" id="baked-rolls-main"><div class="menu-item" data-key="baked-ro--baked-cheese"><div class="menu-item-left"><div class="menu-item-name">Baked Cheese Roll</div><div class="menu-item-desc">Avocado crab cucumber roe melted cheese</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="baked-ro--baked-cheese">—</span></div></div><div class="menu-item" data-key="baked-ro--baked-salmon"><div class="menu-item-left"><div class="menu-item-name">Baked Salmon Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Salmon avocado crab cucumber mayo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="baked-ro--baked-salmon">—</span></div></div><div class="menu-item" data-key="baked-ro--baked-scallo"><div class="menu-item-left"><div class="menu-item-name">Baked Scallop Roll<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Scallop avocado crab cucumber roe</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="baked-ro--baked-scallo">—</span></div></div><div class="menu-item" data-key="baked-ro--baked-lobste"><div class="menu-item-left"><div class="menu-item-name">Baked Lobster Roll</div><div class="menu-item-desc">Lobster avocado crab cucumber cheese fries</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="baked-ro--baked-lobste">—</span></div></div></div></div></div><div class="cat-section"><button class="cat-toggle" onclick="toggleCat('a-la-carte')"><span class="cat-toggle-name">A La Carte</span><span class="cat-toggle-right"><span class="cat-count">23 items</span><span class="cat-arrow" id="cat-arr-a-la-carte">▾</span></span></button><div class="cat-body" id="cat-a-la-carte"><div class="menu-items-grid" id="a-la-carte-main"><div class="menu-item menu-item-dual" data-key="alac-n-avocado"><div class="menu-item-left"><div class="menu-item-name">Avocado<span class="item-badge badge-veg">V</span><span class="item-notes">2 sushi / 3 sashimi</span></div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-avocado">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-avocado">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-inari"><div class="menu-item-left"><div class="menu-item-name">Inari</div><div class="menu-item-desc">Fried tofu skin</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-inari">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-inari">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-kani"><div class="menu-item-left"><div class="menu-item-name">Kani</div><div class="menu-item-desc">Imitation crab</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-kani">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-kani">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-tamago"><div class="menu-item-left"><div class="menu-item-name">Tamago</div><div class="menu-item-desc">Egg omelette</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-tamago">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-tamago">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-tai"><div class="menu-item-left"><div class="menu-item-name">Tai</div><div class="menu-item-desc">Sea tilapia</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-tai">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-tai">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-butter-fish"><div class="menu-item-left"><div class="menu-item-name">Butter Fish</div><div class="menu-item-desc">Escolar</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-butter-fish">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-butter-fish">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-ebi"><div class="menu-item-left"><div class="menu-item-name">Ebi</div><div class="menu-item-desc">Cooked shrimp</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-ebi">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-ebi">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-hokkigai"><div class="menu-item-left"><div class="menu-item-name">Hokkigai</div><div class="menu-item-desc">Surf clam</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-hokkigai">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-hokkigai">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-saba"><div class="menu-item-left"><div class="menu-item-name">Saba</div><div class="menu-item-desc">Mackerel</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-saba">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-saba">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-sake"><div class="menu-item-left"><div class="menu-item-name">Sake</div><div class="menu-item-desc">Salmon</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-sake">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-sake">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-tako"><div class="menu-item-left"><div class="menu-item-name">Tako</div><div class="menu-item-desc">Octopus</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-tako">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-tako">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-tobiko"><div class="menu-item-left"><div class="menu-item-name">Tobiko</div><div class="menu-item-desc">Flying fish roe</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-tobiko">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-tobiko">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-ika"><div class="menu-item-left"><div class="menu-item-name">Ika</div><div class="menu-item-desc">Squid</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-ika">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-ika">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-ikura"><div class="menu-item-left"><div class="menu-item-name">Ikura</div><div class="menu-item-desc">Salmon roe</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-ikura">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-ikura">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-maguro"><div class="menu-item-left"><div class="menu-item-name">Maguro</div><div class="menu-item-desc">Yellowfin tuna</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-maguro">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-maguro">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-shiro-maguro"><div class="menu-item-left"><div class="menu-item-name">Shiro Maguro</div><div class="menu-item-desc">Albacore tuna</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-shiro-maguro">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-shiro-maguro">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-sake-harasu"><div class="menu-item-left"><div class="menu-item-name">Sake Harasu</div><div class="menu-item-desc">Salmon belly</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-sake-harasu">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-sake-harasu">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-hotategai"><div class="menu-item-left"><div class="menu-item-name">Hotategai</div><div class="menu-item-desc">Scallop</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-hotategai">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-hotategai">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-unagi"><div class="menu-item-left"><div class="menu-item-name">Unagi</div><div class="menu-item-desc">BBQ eel</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-unagi">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-unagi">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-ama-ebi"><div class="menu-item-left"><div class="menu-item-name">Ama Ebi</div><div class="menu-item-desc">Raw shrimp</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-ama-ebi">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-ama-ebi">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-hamachi"><div class="menu-item-left"><div class="menu-item-name">Hamachi</div><div class="menu-item-desc">Yellowtail</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-hamachi">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-hamachi">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-herring-roe"><div class="menu-item-left"><div class="menu-item-name">Herring Roe</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-herring-roe">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-herring-roe">—</span></div></div></div><div class="menu-item menu-item-dual" data-key="alac-n-uni"><div class="menu-item-left"><div class="menu-item-name">Uni</div><div class="menu-item-desc">Sea urchin seasonal</div></div><div class="menu-item-right dual-prices"><div class="dual-price-row"><span class="dual-label">Nigiri · 2 pcs</span><span class="menu-item-price" data-key="alac-n-uni">—</span></div><div class="dual-price-row"><span class="dual-label">Sashimi · 3 pcs</span><span class="menu-item-price" data-key="alac-s-uni">—</span></div></div></div></div></div></div><div class="cat-section"><button class="cat-toggle" onclick="toggleCat('matsuri-boat')"><span class="cat-toggle-name">Matsuri Boat</span><span class="cat-toggle-right"><span class="cat-count">4 items</span><span class="cat-arrow" id="cat-arr-matsuri-boat">▾</span></span></button><div class="cat-body" id="cat-matsuri-boat"><div class="menu-items-grid" id="matsuri-boat-main"><div class="menu-item" data-key="matsuri---sashimi-boat"><div class="menu-item-left"><div class="menu-item-name">Sashimi Boat<span class="item-notes">25/40/60/90pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="matsuri---sashimi-boat">—</span></div></div><div class="menu-item" data-key="matsuri---sushi---roll"><div class="menu-item-left"><div class="menu-item-name">Sushi &amp; Roll Boat<span class="item-notes">40/60/80/100pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="matsuri---sushi---roll">—</span></div></div><div class="menu-item" data-key="matsuri---sashimi-sush"><div class="menu-item-left"><div class="menu-item-name">Sashimi Sushi Roll Combo<span class="item-notes">40/70/90/120pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="matsuri---sashimi-sush">—</span></div></div><div class="menu-item" data-key="matsuri---maki-roll-bo"><div class="menu-item-left"><div class="menu-item-name">Maki Roll Boat<span class="item-notes">40/70/100pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="matsuri---maki-roll-bo">—</span></div></div></div></div></div>
-</div>
-<div class="menu-panel" id="panel-starters">
-<div class="cat-section"><button class="cat-toggle" onclick="toggleCat('appetizers')"><span class="cat-toggle-name">Appetizers</span><span class="cat-toggle-right"><span class="cat-count">23 items</span><span class="cat-arrow" id="cat-arr-appetizers">▾</span></span></button><div class="cat-body" id="cat-appetizers"><div class="menu-items-grid" id="appetizers-main"><div class="menu-item" data-key="appetize--agedashi-tof"><div class="menu-item-left"><div class="menu-item-name">Agedashi Tofu</div><div class="menu-item-desc">Golden-fried tofu served with tempura sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--agedashi-tof">—</span></div></div><div class="menu-item" data-key="appetize--edamame"><div class="menu-item-left"><div class="menu-item-name">Edamame<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Boiled green beans lightly seasoned with salt</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--edamame">—</span></div></div><div class="menu-item" data-key="appetize--spring-rolls"><div class="menu-item-left"><div class="menu-item-name">Spring Rolls<span class="item-notes">6pcs</span></div><div class="menu-item-desc">Deep-fried vegetable rolls</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--spring-rolls">—</span></div></div><div class="menu-item" data-key="appetize--gyoza"><div class="menu-item-left"><div class="menu-item-name">Gyoza<span class="item-notes">6pcs</span></div><div class="menu-item-desc">Deep-fried beef dumplings</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--gyoza">—</span></div></div><div class="menu-item" data-key="appetize--sumai-gyoza"><div class="menu-item-left"><div class="menu-item-name">Sumai Gyoza<span class="item-notes">6pcs</span></div><div class="menu-item-desc">Soft shrimp dumplings</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--sumai-gyoza">—</span></div></div><div class="menu-item" data-key="appetize--osaka-spring"><div class="menu-item-left"><div class="menu-item-name">Osaka Spring Rolls<span class="item-notes">4pcs</span></div><div class="menu-item-desc">Hand-made deep-fried crab meat and vegetable rolls</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--osaka-spring">—</span></div></div><div class="menu-item" data-key="appetize--yakitori"><div class="menu-item-left"><div class="menu-item-name">Yakitori</div><div class="menu-item-desc">Chicken and vegetable skewers grilled with teriyaki and mayo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--yakitori">—</span></div></div><div class="menu-item" data-key="appetize--angry-pepper"><div class="menu-item-left"><div class="menu-item-name">Angry Pepper<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Deep-fried bell pepper with cream cheese spicy crab and sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--angry-pepper">—</span></div></div><div class="menu-item" data-key="appetize--sushi-pizza"><div class="menu-item-left"><div class="menu-item-name">Sushi Pizza</div><div class="menu-item-desc">Golden-fried rice cake topped with salmon avocado roe and sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--sushi-pizza">—</span></div></div><div class="menu-item" data-key="appetize--spicy-tuna-s"><div class="menu-item-left"><div class="menu-item-name">Spicy Tuna Sushi Pizza<span class="item-badge badge-spicy">Spicy</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--spicy-tuna-s">—</span></div></div><div class="menu-item" data-key="appetize--fire-crab-su"><div class="menu-item-left"><div class="menu-item-name">Fire Crab Sushi Pizza<span class="item-badge badge-spicy">Spicy</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--fire-crab-su">—</span></div></div><div class="menu-item" data-key="appetize--sushi"><div class="menu-item-left"><div class="menu-item-name">Sushi<span class="item-notes">5pcs</span></div><div class="menu-item-desc">Chef’s selection</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--sushi">—</span></div></div><div class="menu-item" data-key="appetize--sashimi"><div class="menu-item-left"><div class="menu-item-name">Sashimi<span class="item-notes">8pcs</span></div><div class="menu-item-desc">Chef’s selection</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--sashimi">—</span></div></div><div class="menu-item" data-key="appetize--beef-tataki"><div class="menu-item-left"><div class="menu-item-name">Beef Tataki</div><div class="menu-item-desc">Lightly seared beef with special sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--beef-tataki">—</span></div></div><div class="menu-item" data-key="appetize--tuna-tataki"><div class="menu-item-left"><div class="menu-item-name">Tuna Tataki</div><div class="menu-item-desc">Lightly seared tuna with special sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--tuna-tataki">—</span></div></div><div class="menu-item" data-key="appetize--dragon-tongu"><div class="menu-item-left"><div class="menu-item-name">Dragon Tongue</div><div class="menu-item-desc">Deep-fried asparagus &amp; cream cheese wrapped with smoked salmon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--dragon-tongu">—</span></div></div><div class="menu-item" data-key="appetize--creamy-shrim"><div class="menu-item-left"><div class="menu-item-name">Creamy Shrimp</div><div class="menu-item-desc">Fried battered shrimp glazed in creamy sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--creamy-shrim">—</span></div></div><div class="menu-item" data-key="appetize--fire-chicken"><div class="menu-item-left"><div class="menu-item-name">Fire Chicken<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Deep-fried chicken with Korean spicy sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--fire-chicken">—</span></div></div><div class="menu-item" data-key="appetize--creamy-chick"><div class="menu-item-left"><div class="menu-item-name">Creamy Chicken</div><div class="menu-item-desc">Popcorn chicken glazed in creamy sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--creamy-chick">—</span></div></div><div class="menu-item" data-key="appetize--pa-dak-chick"><div class="menu-item-left"><div class="menu-item-name">Pa-dak Chicken</div><div class="menu-item-desc">Deep-fried chicken with green onions and special sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--pa-dak-chick">—</span></div></div><div class="menu-item" data-key="appetize--tacoyaki"><div class="menu-item-left"><div class="menu-item-name">Tacoyaki</div><div class="menu-item-desc">Japanese deep-fried octopus balls</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--tacoyaki">—</span></div></div><div class="menu-item" data-key="appetize--tuna-lover"><div class="menu-item-left"><div class="menu-item-name">Tuna Lover</div><div class="menu-item-desc">Albacore tuna with garnishes and sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--tuna-lover">—</span></div></div><div class="menu-item" data-key="appetize--monkey-brain"><div class="menu-item-left"><div class="menu-item-name">Monkey Brain<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Deep-fried avocado with spicy tuna and crab meat</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="appetize--monkey-brain">—</span></div></div></div></div></div><div class="cat-section"><button class="cat-toggle" onclick="toggleCat('tempura')"><span class="cat-toggle-name">Tempura</span><span class="cat-toggle-right"><span class="cat-count">9 items</span><span class="cat-arrow" id="cat-arr-tempura">▾</span></span></button><div class="cat-body" id="cat-tempura"><div class="menu-items-grid" id="tempura-main"><div class="menu-item" data-key="tempura--tornado-frie"><div class="menu-item-left"><div class="menu-item-name">Tornado Fries</div><div class="menu-item-desc">BBQ or cheese powder</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--tornado-frie">—</span></div></div><div class="menu-item" data-key="tempura--vegetable-te"><div class="menu-item-left"><div class="menu-item-name">Vegetable Tempura<span class="item-badge badge-veg">V</span><span class="item-notes">5pcs</span></div><div class="menu-item-desc">Assorted vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--vegetable-te">—</span></div></div><div class="menu-item" data-key="tempura--yam-tempura"><div class="menu-item-left"><div class="menu-item-name">Yam Tempura<span class="item-badge badge-veg">V</span><span class="item-notes">5pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--yam-tempura">—</span></div></div><div class="menu-item" data-key="tempura--calamari-tem"><div class="menu-item-left"><div class="menu-item-name">Calamari Tempura<span class="item-notes">6pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--calamari-tem">—</span></div></div><div class="menu-item" data-key="tempura--shrimp-tempu"><div class="menu-item-left"><div class="menu-item-name">Shrimp Tempura<span class="item-notes">5pcs</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--shrimp-tempu">—</span></div></div><div class="menu-item" data-key="tempura--kaki-tempura"><div class="menu-item-left"><div class="menu-item-name">Kaki Tempura<span class="item-notes">6pcs</span></div><div class="menu-item-desc">Breaded oyster fries</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--kaki-tempura">—</span></div></div><div class="menu-item" data-key="tempura--osaka-tempur"><div class="menu-item-left"><div class="menu-item-name">Osaka Tempura<span class="item-notes">3 shrimp + 5 veg</span></div><div class="menu-item-desc">Shrimp and vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--osaka-tempur">—</span></div></div><div class="menu-item" data-key="tempura--soft-shell-c"><div class="menu-item-left"><div class="menu-item-name">Soft Shell Crab Tempura</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--soft-shell-c">—</span></div></div><div class="menu-item" data-key="tempura--lobster-temp"><div class="menu-item-left"><div class="menu-item-name">Lobster Tempura</div><div class="menu-item-desc">Lobster tail and vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="tempura--lobster-temp">—</span></div></div></div></div></div><div class="cat-section"><button class="cat-toggle" onclick="toggleCat('soup---salad')"><span class="cat-toggle-name">Soup &amp; Salad</span><span class="cat-toggle-right"><span class="cat-count">9 items</span><span class="cat-arrow" id="cat-arr-soup---salad">▾</span></span></button><div class="cat-body" id="cat-soup---salad"><div class="menu-items-grid" id="soup---salad-main"><div class="menu-item" data-key="soup---s--miso-soup"><div class="menu-item-left"><div class="menu-item-name">Miso Soup</div><div class="menu-item-desc">Traditional soup with fish broth and bean paste</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--miso-soup">—</span></div></div><div class="menu-item" data-key="soup---s--seafood-miso"><div class="menu-item-left"><div class="menu-item-name">Seafood Miso Soup</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--seafood-miso">—</span></div></div><div class="menu-item" data-key="soup---s--osaka-green-"><div class="menu-item-left"><div class="menu-item-name">Osaka Green Salad<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">House dressing</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--osaka-green-">—</span></div></div><div class="menu-item" data-key="soup---s--kimchi"><div class="menu-item-left"><div class="menu-item-name">Kimchi<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Traditional Korean fermented cabbage</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--kimchi">—</span></div></div><div class="menu-item" data-key="soup---s--avocado-sala"><div class="menu-item-left"><div class="menu-item-name">Avocado Salad<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--avocado-sala">—</span></div></div><div class="menu-item" data-key="soup---s--kaiso-salad"><div class="menu-item-left"><div class="menu-item-name">Kaiso Salad</div><div class="menu-item-desc">Seaweed salad</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--kaiso-salad">—</span></div></div><div class="menu-item" data-key="soup---s--sunomono-sal"><div class="menu-item-left"><div class="menu-item-name">Sunomono Salad</div><div class="menu-item-desc">Seafood and seaweed with vinegar dressing</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--sunomono-sal">—</span></div></div><div class="menu-item" data-key="soup---s--spicy-salmon"><div class="menu-item-left"><div class="menu-item-name">Spicy Salmon Salad<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Greens with salmon in spicy sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--spicy-salmon">—</span></div></div><div class="menu-item" data-key="soup---s--osaka-lobste"><div class="menu-item-left"><div class="menu-item-name">Osaka Lobster Salad</div><div class="menu-item-desc">Lobster with ginger dressing</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="soup---s--osaka-lobste">—</span></div></div></div></div></div>
-</div>
-<div class="menu-panel" id="panel-teppanyaki">
-<div class="cat-section"><button class="cat-toggle" onclick="toggleCat('teppanyaki')"><span class="cat-toggle-name">Teppanyaki</span><span class="cat-toggle-right"><span class="cat-count">19 items</span><span class="cat-arrow" id="cat-arr-teppanyaki">▾</span></span></button><div class="cat-body" id="cat-teppanyaki"><div class="sub-section"><button class="sub-toggle" onclick="toggleSub('teppanyakikid-s-meal')"><span>Kid's Meal</span><span class="sub-arrow" id="arr-teppanyakikid-s-meal">▾</span></button><div class="sub-body" id="sub-teppanyakikid-s-meal"><div class="menu-items-grid" id="teppanyaki-kid-s-meal"><div class="menu-item" data-key="teppanya-kid-s-me-vegetables"><div class="menu-item-left"><div class="menu-item-name">Vegetables<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Choice of deep-fried or grilled tofu</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-vegetables">—</span></div></div><div class="menu-item" data-key="teppanya-kid-s-me-chicken"><div class="menu-item-left"><div class="menu-item-name">Chicken</div><div class="menu-item-desc">Fresh chicken breast</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-chicken">—</span></div></div><div class="menu-item" data-key="teppanya-kid-s-me-salmon"><div class="menu-item-left"><div class="menu-item-name">Salmon</div><div class="menu-item-desc">Fresh Atlantic salmon filet</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-salmon">—</span></div></div><div class="menu-item" data-key="teppanya-kid-s-me-sukiyaki"><div class="menu-item-left"><div class="menu-item-name">Sukiyaki</div><div class="menu-item-desc">Marinated beef rib eye</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-sukiyaki">—</span></div></div><div class="menu-item" data-key="teppanya-kid-s-me-shrimp"><div class="menu-item-left"><div class="menu-item-name">Shrimp</div><div class="menu-item-desc">Black tiger shrimp</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-shrimp">—</span></div></div><div class="menu-item" data-key="teppanya-kid-s-me-steak--4oz"><div class="menu-item-left"><div class="menu-item-name">Steak (4oz)</div><div class="menu-item-desc">AAA strip-loin</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-steak--4oz">—</span></div></div><div class="menu-item" data-key="teppanya-kid-s-me-scallops"><div class="menu-item-left"><div class="menu-item-name">Scallops</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-scallops">—</span></div></div><div class="menu-item" data-key="teppanya-kid-s-me-filet-mignon"><div class="menu-item-left"><div class="menu-item-name">Filet Mignon (4oz)</div><div class="menu-item-desc">AAA tenderloin</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-filet-mignon">—</span></div></div><div class="menu-item" data-key="teppanya-kid-s-me-lobster"><div class="menu-item-left"><div class="menu-item-name">Lobster</div><div class="menu-item-desc">Atlantic lobster tail</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-kid-s-me-lobster">—</span></div></div></div></div></div><div class="sub-section"><button class="sub-toggle" onclick="toggleSub('teppanyakiadditions')"><span>Additions</span><span class="sub-arrow" id="arr-teppanyakiadditions">▾</span></button><div class="sub-body" id="sub-teppanyakiadditions"><div class="menu-items-grid" id="teppanyaki-additions"><div class="menu-item" data-key="teppanya-addition-fried-rice"><div class="menu-item-left"><div class="menu-item-name">Fried Rice</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-fried-rice">—</span></div></div><div class="menu-item" data-key="teppanya-addition-vegetables"><div class="menu-item-left"><div class="menu-item-name">Vegetables<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-vegetables">—</span></div></div><div class="menu-item" data-key="teppanya-addition-mushrooms"><div class="menu-item-left"><div class="menu-item-name">Mushrooms<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-mushrooms">—</span></div></div><div class="menu-item" data-key="teppanya-addition-fresh-tofu"><div class="menu-item-left"><div class="menu-item-name">Fresh Tofu<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-fresh-tofu">—</span></div></div><div class="menu-item" data-key="teppanya-addition-chicken"><div class="menu-item-left"><div class="menu-item-name">Chicken</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-chicken">—</span></div></div><div class="menu-item" data-key="teppanya-addition-shrimp"><div class="menu-item-left"><div class="menu-item-name">Shrimp</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-shrimp">—</span></div></div><div class="menu-item" data-key="teppanya-addition-steak--4oz"><div class="menu-item-left"><div class="menu-item-name">Steak (4oz)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-steak--4oz">—</span></div></div><div class="menu-item" data-key="teppanya-addition-scallop"><div class="menu-item-left"><div class="menu-item-name">Scallop</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-scallop">—</span></div></div><div class="menu-item" data-key="teppanya-addition-filet-mignon"><div class="menu-item-left"><div class="menu-item-name">Filet Mignon (4oz)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-filet-mignon">—</span></div></div><div class="menu-item" data-key="teppanya-addition-lobster-tail"><div class="menu-item-left"><div class="menu-item-name">Lobster Tail</div><div class="menu-item-desc">One tail</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-addition-lobster-tail">—</span></div></div></div></div></div></div></div><div class="cat-section"><button class="cat-toggle" onclick="toggleCat('teppanyaki-specials')"><span class="cat-toggle-name">Teppanyaki Specials</span><span class="cat-toggle-right"><span class="cat-count">17 items</span><span class="cat-arrow" id="cat-arr-teppanyaki-specials">▾</span></span></button><div class="cat-body" id="cat-teppanyaki-specials"><div class="sub-section"><button class="sub-toggle" onclick="toggleSub('teppanyaki-specialschoice-of-one')"><span>Choice of One</span><span class="sub-arrow" id="arr-teppanyaki-specialschoice-of-one">▾</span></button><div class="sub-body" id="sub-teppanyaki-specialschoice-of-one"><div class="menu-items-grid" id="teppanyaki-specials-choice-of-one"><div class="menu-item" data-key="teppanya-choice-o-vegetables"><div class="menu-item-left"><div class="menu-item-name">Vegetables<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Choice of tofu (deep-fried or grilled)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-vegetables">—</span></div></div><div class="menu-item" data-key="teppanya-choice-o-chicken"><div class="menu-item-left"><div class="menu-item-name">Chicken</div><div class="menu-item-desc">Fresh chicken breast</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-chicken">—</span></div></div><div class="menu-item" data-key="teppanya-choice-o-calamari"><div class="menu-item-left"><div class="menu-item-name">Calamari</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-calamari">—</span></div></div><div class="menu-item" data-key="teppanya-choice-o-salmon"><div class="menu-item-left"><div class="menu-item-name">Salmon</div><div class="menu-item-desc">Fresh Atlantic salmon filet</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-salmon">—</span></div></div><div class="menu-item" data-key="teppanya-choice-o-sukiyaki"><div class="menu-item-left"><div class="menu-item-name">Sukiyaki</div><div class="menu-item-desc">Marinated beef rib eye</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-sukiyaki">—</span></div></div><div class="menu-item" data-key="teppanya-choice-o-shrimp"><div class="menu-item-left"><div class="menu-item-name">Shrimp</div><div class="menu-item-desc">Black tiger shrimp</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-shrimp">—</span></div></div><div class="menu-item" data-key="teppanya-choice-o-steak"><div class="menu-item-left"><div class="menu-item-name">Steak</div><div class="menu-item-desc">AAA New York strip-loin</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-steak">—</span></div></div><div class="menu-item" data-key="teppanya-choice-o-scallops"><div class="menu-item-left"><div class="menu-item-name">Scallops</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-scallops">—</span></div></div><div class="menu-item" data-key="teppanya-choice-o-filet-mignon"><div class="menu-item-left"><div class="menu-item-name">Filet Mignon</div><div class="menu-item-desc">AAA tenderloin</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-filet-mignon">—</span></div></div><div class="menu-item" data-key="teppanya-choice-o-lobster"><div class="menu-item-left"><div class="menu-item-name">Lobster</div><div class="menu-item-desc">Atlantic lobster (two tails)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-choice-o-lobster">—</span></div></div></div></div></div><div class="sub-section"><button class="sub-toggle" onclick="toggleSub('teppanyaki-specialsset-menu')"><span>Set Menu</span><span class="sub-arrow" id="arr-teppanyaki-specialsset-menu">▾</span></button><div class="sub-body" id="sub-teppanyaki-specialsset-menu"><div class="menu-items-grid" id="teppanyaki-specials-set-menu"><div class="menu-item" data-key="teppanya-set-menu-choice-of-tw"><div class="menu-item-left"><div class="menu-item-name">Choice of Two</div><div class="menu-item-desc">Chicken/Calamari/Salmon/Shrimp/Steak/Scallop</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-set-menu-choice-of-tw">—</span></div></div><div class="menu-item" data-key="teppanya-set-menu-filet-mignon"><div class="menu-item-left"><div class="menu-item-name">Filet Mignon &amp; Choice of One</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-set-menu-filet-mignon">—</span></div></div><div class="menu-item" data-key="teppanya-set-menu-lobster---fi"><div class="menu-item-left"><div class="menu-item-name">Lobster &amp; Filet Mignon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-set-menu-lobster---fi">—</span></div></div><div class="menu-item" data-key="teppanya-set-menu-lobster-file"><div class="menu-item-left"><div class="menu-item-name">Lobster Filet Mignon &amp; Choice of One</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-set-menu-lobster-file">—</span></div></div></div></div></div><div class="sub-section"><button class="sub-toggle" onclick="toggleSub('teppanyaki-specialschef-specials')"><span>Chef Specials</span><span class="sub-arrow" id="arr-teppanyaki-specialschef-specials">▾</span></button><div class="sub-body" id="sub-teppanyaki-specialschef-specials"><div class="menu-items-grid" id="teppanyaki-specials-chef-specials"><div class="menu-item" data-key="teppanya-chef-spe-moncton-umi"><div class="menu-item-left"><div class="menu-item-name">Moncton Umi</div><div class="menu-item-desc">Scallop steak salmon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-chef-spe-moncton-umi">—</span></div></div><div class="menu-item" data-key="teppanya-chef-spe-moncton-samu"><div class="menu-item-left"><div class="menu-item-name">Moncton Samurai</div><div class="menu-item-desc">Filet mignon shrimp chicken</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-chef-spe-moncton-samu">—</span></div></div><div class="menu-item" data-key="teppanya-chef-spe-seafood-impe"><div class="menu-item-left"><div class="menu-item-name">Seafood Imperial</div><div class="menu-item-desc">Lobster shrimp calamari scallop</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="teppanya-chef-spe-seafood-impe">—</span></div></div></div></div></div></div></div>
-</div>
-<div class="menu-panel" id="panel-asian-dining">
-<div class="cat-section"><button class="cat-toggle" onclick="toggleCat('asian-dining')"><span class="cat-toggle-name">Asian Dining</span><span class="cat-toggle-right"><span class="cat-count">37 items</span><span class="cat-arrow" id="cat-arr-asian-dining">▾</span></span></button><div class="cat-body" id="cat-asian-dining"><div class="sub-section"><button class="sub-toggle" onclick="toggleSub('asian-diningspecial-broth-soup')"><span>Special Broth Soup</span><span class="sub-arrow" id="arr-asian-diningspecial-broth-soup">▾</span></button><div class="sub-body" id="sub-asian-diningspecial-broth-soup"><div class="menu-items-grid" id="asian-dining-special-broth-soup"><div class="menu-item" data-key="asian-di-special--bulgogi-brot"><div class="menu-item-left"><div class="menu-item-name">Bulgogi Broth Soup</div><div class="menu-item-desc">Korean beef broth with vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-special--bulgogi-brot">—</span></div></div><div class="menu-item" data-key="asian-di-special--king-s-spicy"><div class="menu-item-left"><div class="menu-item-name">King’s Spicy Soup<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Yuk-gaejang spicy beef broth</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-special--king-s-spicy">—</span></div></div><div class="menu-item" data-key="asian-di-special--tofu---seafo"><div class="menu-item-left"><div class="menu-item-name">Tofu &amp; Seafood Soup<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Soon-dubu jjigae with tofu seafood egg</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-special--tofu---seafo">—</span></div></div></div></div></div><div class="sub-section"><button class="sub-toggle" onclick="toggleSub('asian-diningkatsu')"><span>Katsu</span><span class="sub-arrow" id="arr-asian-diningkatsu">▾</span></button><div class="sub-body" id="sub-asian-diningkatsu"><div class="menu-items-grid" id="asian-dining-katsu"><div class="menu-item" data-key="asian-di-katsu-donkatsu"><div class="menu-item-left"><div class="menu-item-name">Donkatsu</div><div class="menu-item-desc">Deep-fried pork with katsu sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-katsu-donkatsu">—</span></div></div><div class="menu-item" data-key="asian-di-katsu-chicken-kats"><div class="menu-item-left"><div class="menu-item-name">Chicken Katsu</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-katsu-chicken-kats">—</span></div></div><div class="menu-item" data-key="asian-di-katsu-fish-katsu"><div class="menu-item-left"><div class="menu-item-name">Fish Katsu</div><div class="menu-item-desc">With tartar sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-katsu-fish-katsu">—</span></div></div></div></div></div><div class="sub-section"><button class="sub-toggle" onclick="toggleSub('asian-diningfried-rice')"><span>Fried Rice</span><span class="sub-arrow" id="arr-asian-diningfried-rice">▾</span></button><div class="sub-body" id="sub-asian-diningfried-rice"><div class="menu-items-grid" id="asian-dining-fried-rice"><div class="menu-item" data-key="asian-di-fried-ri-vegetable-fr"><div class="menu-item-left"><div class="menu-item-name">Vegetable Fried Rice<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-fried-ri-vegetable-fr">—</span></div></div><div class="menu-item" data-key="asian-di-fried-ri-fried-rice-c"><div class="menu-item-left"><div class="menu-item-name">Fried Rice Choice</div><div class="menu-item-desc">Beef/Chicken/Shrimp (2 meats extra $3)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-fried-ri-fried-rice-c">—</span></div></div></div></div></div><div class="sub-section"><button class="sub-toggle" onclick="toggleSub('asian-diningbibimbap')"><span>Bibimbap</span><span class="sub-arrow" id="arr-asian-diningbibimbap">▾</span></button><div class="sub-body" id="sub-asian-diningbibimbap"><div class="menu-items-grid" id="asian-dining-bibimbap"><div class="menu-item" data-key="asian-di-bibimbap-spicy-sashim"><div class="menu-item-left"><div class="menu-item-name">Spicy Sashimi Bibimbap<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">With sashimi and Korean hot sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-bibimbap-spicy-sashim">—</span></div></div><div class="menu-item" data-key="asian-di-bibimbap-vegetable-bi"><div class="menu-item-left"><div class="menu-item-name">Vegetable Bibimbap<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">With fried egg and gochujang</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-bibimbap-vegetable-bi">—</span></div></div><div class="menu-item" data-key="asian-di-bibimbap-bibimbap-wit"><div class="menu-item-left"><div class="menu-item-name">Bibimbap with Beef or Chicken</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-bibimbap-bibimbap-wit">—</span></div></div></div></div></div><div class="sub-section"><button class="sub-toggle" onclick="toggleSub('asian-dininghot-stone')"><span>Hot Stone</span><span class="sub-arrow" id="arr-asian-dininghot-stone">▾</span></button><div class="sub-body" id="sub-asian-dininghot-stone"><div class="menu-items-grid" id="asian-dining-hot-stone"><div class="menu-item" data-key="asian-di-hot-ston-tofu---veget"><div class="menu-item-left"><div class="menu-item-name">Tofu &amp; Vegetables<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Deep-fried tofu</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-tofu---veget">—</span></div></div><div class="menu-item" data-key="asian-di-hot-ston-mushrooms---"><div class="menu-item-left"><div class="menu-item-name">Mushrooms &amp; Vegetables<span class="item-badge badge-veg">V</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-mushrooms---">—</span></div></div><div class="menu-item" data-key="asian-di-hot-ston-bulgogi"><div class="menu-item-left"><div class="menu-item-name">Bulgogi</div><div class="menu-item-desc">Marinated beef rib eye</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-bulgogi">—</span></div></div><div class="menu-item" data-key="asian-di-hot-ston-spicy-bulgog"><div class="menu-item-left"><div class="menu-item-name">Spicy Bulgogi<span class="item-badge badge-spicy">Spicy</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-spicy-bulgog">—</span></div></div><div class="menu-item" data-key="asian-di-hot-ston-chicken---ve"><div class="menu-item-left"><div class="menu-item-name">Chicken &amp; Vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-chicken---ve">—</span></div></div><div class="menu-item" data-key="asian-di-hot-ston-spicy-chicke"><div class="menu-item-left"><div class="menu-item-name">Spicy Chicken<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Korean hot sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-spicy-chicke">—</span></div></div><div class="menu-item" data-key="asian-di-hot-ston-spicy-pork"><div class="menu-item-left"><div class="menu-item-name">Spicy Pork<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Marinated pork</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-spicy-pork">—</span></div></div><div class="menu-item" data-key="asian-di-hot-ston-spicy-squid"><div class="menu-item-left"><div class="menu-item-name">Spicy Squid<span class="item-badge badge-spicy">Spicy</span></div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-spicy-squid">—</span></div></div><div class="menu-item" data-key="asian-di-hot-ston-seafood---ve"><div class="menu-item-left"><div class="menu-item-name">Seafood &amp; Vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-seafood---ve">—</span></div></div><div class="menu-item" data-key="asian-di-hot-ston-bbq-galbi"><div class="menu-item-left"><div class="menu-item-name">BBQ Galbi</div><div class="menu-item-desc">Beef short ribs</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-hot-ston-bbq-galbi">—</span></div></div></div></div></div><div class="sub-section"><button class="sub-toggle" onclick="toggleSub('asian-diningdonburi')"><span>Donburi</span><span class="sub-arrow" id="arr-asian-diningdonburi">▾</span></button><div class="sub-body" id="sub-asian-diningdonburi"><div class="menu-items-grid" id="asian-dining-donburi"><div class="menu-item" data-key="asian-di-donburi-oyako-don"><div class="menu-item-left"><div class="menu-item-name">Oyako Don</div><div class="menu-item-desc">Chicken egg rice bowl</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-donburi-oyako-don">—</span></div></div><div class="menu-item" data-key="asian-di-donburi-gyudon"><div class="menu-item-left"><div class="menu-item-name">Gyudon</div><div class="menu-item-desc">Beef rice bowl</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-donburi-gyudon">—</span></div></div><div class="menu-item" data-key="asian-di-donburi-katsudon"><div class="menu-item-left"><div class="menu-item-name">Katsudon</div><div class="menu-item-desc">Pork rice bowl</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-donburi-katsudon">—</span></div></div><div class="menu-item" data-key="asian-di-donburi-ebidon"><div class="menu-item-left"><div class="menu-item-name">Ebidon</div><div class="menu-item-desc">Shrimp rice bowl</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-donburi-ebidon">—</span></div></div><div class="menu-item" data-key="asian-di-donburi-unadon"><div class="menu-item-left"><div class="menu-item-name">Unadon</div><div class="menu-item-desc">Eel rice bowl</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-donburi-unadon">—</span></div></div></div></div></div><div class="sub-section"><button class="sub-toggle" onclick="toggleSub('asian-diningnoodles')"><span>Noodles</span><span class="sub-arrow" id="arr-asian-diningnoodles">▾</span></button><div class="sub-body" id="sub-asian-diningnoodles"><div class="menu-items-grid" id="asian-dining-noodles"><div class="menu-item" data-key="asian-di-noodles-osaka-udon"><div class="menu-item-left"><div class="menu-item-name">Osaka Udon</div><div class="menu-item-desc">With fish broth and oden</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-noodles-osaka-udon">—</span></div></div><div class="menu-item" data-key="asian-di-noodles-tempura-udon"><div class="menu-item-left"><div class="menu-item-name">Tempura Udon</div><div class="menu-item-desc">With shrimp and vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-noodles-tempura-udon">—</span></div></div><div class="menu-item" data-key="asian-di-noodles-spicy-seafoo"><div class="menu-item-left"><div class="menu-item-name">Spicy Seafood Udon<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Korean-style spicy broth</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-noodles-spicy-seafoo">—</span></div></div><div class="menu-item" data-key="asian-di-noodles-yaki-udon-so"><div class="menu-item-left"><div class="menu-item-name">Yaki Udon/Soba</div><div class="menu-item-desc">Stir-fried noodles</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-noodles-yaki-udon-so">—</span></div></div><div class="menu-item" data-key="asian-di-noodles-avo-green-oo"><div class="menu-item-left"><div class="menu-item-name">Avo Green-oodle<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Cold udon with avocado</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-noodles-avo-green-oo">—</span></div></div><div class="menu-item" data-key="asian-di-noodles-chapchae"><div class="menu-item-left"><div class="menu-item-name">Chapchae</div><div class="menu-item-desc">Glass noodle stir fry</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-noodles-chapchae">—</span></div></div></div></div></div><div class="sub-section"><button class="sub-toggle" onclick="toggleSub('asian-diningramen')"><span>Ramen</span><span class="sub-arrow" id="arr-asian-diningramen">▾</span></button><div class="sub-body" id="sub-asian-diningramen"><div class="menu-items-grid" id="asian-dining-ramen"><div class="menu-item" data-key="asian-di-ramen-korean-ramyu"><div class="menu-item-left"><div class="menu-item-name">Korean Ramyun<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">With vegetables and egg</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-ramen-korean-ramyu">—</span></div></div><div class="menu-item" data-key="asian-di-ramen-miso-ramen"><div class="menu-item-left"><div class="menu-item-name">Miso Ramen</div><div class="menu-item-desc">With chashu</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-ramen-miso-ramen">—</span></div></div><div class="menu-item" data-key="asian-di-ramen-donkotsu-ram"><div class="menu-item-left"><div class="menu-item-name">Donkotsu Ramen</div><div class="menu-item-desc">Pork bone broth</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-ramen-donkotsu-ram">—</span></div></div><div class="menu-item" data-key="asian-di-ramen-nagasaki-ram"><div class="menu-item-left"><div class="menu-item-name">Nagasaki Ramen<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Seafood broth</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-ramen-nagasaki-ram">—</span></div></div><div class="menu-item" data-key="asian-di-ramen-imperial-ram"><div class="menu-item-left"><div class="menu-item-name">Imperial Ramen<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Seafood deluxe ramen</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="asian-di-ramen-imperial-ram">—</span></div></div></div></div></div></div></div><div class="cat-section"><button class="cat-toggle" onclick="toggleCat('osaka-signatures')"><span class="cat-toggle-name">Osaka Signatures</span><span class="cat-toggle-right"><span class="cat-count">5 items</span><span class="cat-arrow" id="cat-arr-osaka-signatures">▾</span></span></button><div class="cat-body" id="cat-osaka-signatures"><div class="menu-items-grid" id="osaka-signatures-main"><div class="menu-item" data-key="osaka-si--osaka-curry"><div class="menu-item-left"><div class="menu-item-name">Osaka Curry</div><div class="menu-item-desc">Japanese curry with rice or udon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="osaka-si--osaka-curry">—</span></div></div><div class="menu-item" data-key="osaka-si--kanpoongki"><div class="menu-item-left"><div class="menu-item-name">Kanpoongki<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Fried chicken sweet spicy sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="osaka-si--kanpoongki">—</span></div></div><div class="menu-item" data-key="osaka-si--kanpoong-shr"><div class="menu-item-left"><div class="menu-item-name">Kanpoong Shrimp<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Fried shrimp sweet chili sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="osaka-si--kanpoong-shr">—</span></div></div><div class="menu-item" data-key="osaka-si--sweet---sour"><div class="menu-item-left"><div class="menu-item-name">Sweet &amp; Sour Beef</div><div class="menu-item-desc">Tangsuyuk style</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="osaka-si--sweet---sour">—</span></div></div><div class="menu-item" data-key="osaka-si--osaka-pork-r"><div class="menu-item-left"><div class="menu-item-name">Osaka Pork Ribs<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Spicy glazed ribs with cheese</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="osaka-si--osaka-pork-r">—</span></div></div></div></div></div><div class="cat-section"><button class="cat-toggle" onclick="toggleCat('main-dishes')"><span class="cat-toggle-name">Main Dishes</span><span class="cat-toggle-right"><span class="cat-count">6 items</span><span class="cat-arrow" id="cat-arr-main-dishes">▾</span></span></button><div class="cat-body" id="cat-main-dishes"><div class="sub-section"><button class="sub-toggle" onclick="toggleSub('main-dishesteriyaki')"><span>Teriyaki</span><span class="sub-arrow" id="arr-main-dishesteriyaki">▾</span></button><div class="sub-body" id="sub-main-dishesteriyaki"><div class="menu-items-grid" id="main-dishes-teriyaki"><div class="menu-item" data-key="main-dis-teriyaki-chicken-teri"><div class="menu-item-left"><div class="menu-item-name">Chicken Teriyaki</div><div class="menu-item-desc">With vegetables</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="main-dis-teriyaki-chicken-teri">—</span></div></div><div class="menu-item" data-key="main-dis-teriyaki-shrimp-teriy"><div class="menu-item-left"><div class="menu-item-name">Shrimp Teriyaki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="main-dis-teriyaki-shrimp-teriy">—</span></div></div><div class="menu-item" data-key="main-dis-teriyaki-salmon-teriy"><div class="menu-item-left"><div class="menu-item-name">Salmon Teriyaki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="main-dis-teriyaki-salmon-teriy">—</span></div></div><div class="menu-item" data-key="main-dis-teriyaki-beef-teriyak"><div class="menu-item-left"><div class="menu-item-name">Beef Teriyaki</div><div class="menu-item-desc">AAA strip-loin</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="main-dis-teriyaki-beef-teriyak">—</span></div></div></div></div></div><div class="sub-section"><button class="sub-toggle" onclick="toggleSub('main-dishessteak')"><span>Steak</span><span class="sub-arrow" id="arr-main-dishessteak">▾</span></button><div class="sub-body" id="sub-main-dishessteak"><div class="menu-items-grid" id="main-dishes-steak"><div class="menu-item" data-key="main-dis-steak-osaka-steak-"><div class="menu-item-left"><div class="menu-item-name">Osaka Steak (8oz)</div><div class="menu-item-desc">AAA New York strip-loin</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="main-dis-steak-osaka-steak-">—</span></div></div><div class="menu-item" data-key="main-dis-steak-hibachi-stea"><div class="menu-item-left"><div class="menu-item-name">Hibachi Steak (8oz)</div><div class="menu-item-desc">AAA tenderloin</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="main-dis-steak-hibachi-stea">—</span></div></div></div></div></div></div></div>
-</div>
-<div class="menu-panel" id="panel-lunch">
-<div class="cat-section"><button class="cat-toggle" onclick="toggleCat('lunch-bento')"><span class="cat-toggle-name">Lunch Bento</span><span class="cat-toggle-right"><span class="cat-count">10 items</span><span class="cat-arrow" id="cat-arr-lunch-bento">▾</span></span></button><div class="cat-body" id="cat-lunch-bento"><div class="sub-section"><button class="sub-toggle" onclick="toggleSub('lunch-bentooh-bento')"><span>Oh Bento</span><span class="sub-arrow" id="arr-lunch-bentooh-bento">▾</span></button><div class="sub-body" id="sub-lunch-bentooh-bento"><div class="menu-items-grid" id="lunch-bento-oh-bento"><div class="menu-item" data-key="lunch-be-oh-bento-oben1"><div class="menu-item-left"><div class="menu-item-name">OBen1<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">AvoKappa maki &amp; vegetable tempura</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben1">—</span></div></div><div class="menu-item" data-key="lunch-be-oh-bento-oben2"><div class="menu-item-left"><div class="menu-item-name">OBen2<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">AvoKappa maki &amp; tofu teriyaki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben2">—</span></div></div><div class="menu-item" data-key="lunch-be-oh-bento-oben3"><div class="menu-item-left"><div class="menu-item-name">OBen3</div><div class="menu-item-desc">Dynamite roll &amp; tempura shrimp/veg</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben3">—</span></div></div><div class="menu-item" data-key="lunch-be-oh-bento-oben4"><div class="menu-item-left"><div class="menu-item-name">OBen4</div><div class="menu-item-desc">California maki &amp; teriyaki (chicken/beef/salmon)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben4">—</span></div></div><div class="menu-item" data-key="lunch-be-oh-bento-oben5"><div class="menu-item-left"><div class="menu-item-name">OBen5</div><div class="menu-item-desc">Dynamite roll sushi tempura combo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben5">—</span></div></div><div class="menu-item" data-key="lunch-be-oh-bento-oben6"><div class="menu-item-left"><div class="menu-item-name">OBen6</div><div class="menu-item-desc">California maki sushi teriyaki combo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben6">—</span></div></div><div class="menu-item" data-key="lunch-be-oh-bento-oben7"><div class="menu-item-left"><div class="menu-item-name">OBen7<span class="item-badge badge-spicy">Spicy</span></div><div class="menu-item-desc">Spicy salmon tuna crab sushi combo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben7">—</span></div></div><div class="menu-item" data-key="lunch-be-oh-bento-oben8"><div class="menu-item-left"><div class="menu-item-name">OBen8</div><div class="menu-item-desc">Sashimi &amp; tempura combo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben8">—</span></div></div><div class="menu-item" data-key="lunch-be-oh-bento-oben9"><div class="menu-item-left"><div class="menu-item-name">OBen9</div><div class="menu-item-desc">Sashimi &amp; teriyaki combo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben9">—</span></div></div><div class="menu-item" data-key="lunch-be-oh-bento-oben10"><div class="menu-item-left"><div class="menu-item-name">OBen10</div><div class="menu-item-desc">Sashimi sushi california combo</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-be-oh-bento-oben10">—</span></div></div></div></div></div></div></div><div class="cat-section"><button class="cat-toggle" onclick="toggleCat('lunch-specials')"><span class="cat-toggle-name">Lunch Specials</span><span class="cat-toggle-right"><span class="cat-count">2 items</span><span class="cat-arrow" id="cat-arr-lunch-specials">▾</span></span></button><div class="cat-body" id="cat-lunch-specials"><div class="menu-items-grid" id="lunch-specials-main"><div class="menu-item" data-key="lunch-sp--yammy-roll"><div class="menu-item-left"><div class="menu-item-name">Yammy Roll<span class="item-badge badge-veg">V</span></div><div class="menu-item-desc">Vegetable tempura roll with sauce</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-sp--yammy-roll">—</span></div></div><div class="menu-item" data-key="lunch-sp--deluxe-maki-"><div class="menu-item-left"><div class="menu-item-name">Deluxe Maki Set</div><div class="menu-item-desc">Dynamite California spicy salmon maki</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="lunch-sp--deluxe-maki-">—</span></div></div></div></div></div>
-</div>
-<div class="menu-panel" id="panel-desserts">
-<div class="cat-section"><button class="cat-toggle" onclick="toggleCat('desserts')"><span class="cat-toggle-name">Desserts</span><span class="cat-toggle-right"><span class="cat-count">8 items</span><span class="cat-arrow" id="cat-arr-desserts">▾</span></span></button><div class="cat-body" id="cat-desserts"><div class="menu-items-grid" id="desserts-main"><div class="menu-item" data-key="desserts--ice-cream"><div class="menu-item-left"><div class="menu-item-name">Ice cream</div><div class="menu-item-desc">One scoop (Green tea/Mango/Vanilla)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="desserts--ice-cream">—</span></div></div><div class="menu-item" data-key="desserts--mochi"><div class="menu-item-left"><div class="menu-item-name">Mochi<span class="item-notes">2pcs</span></div><div class="menu-item-desc">Japanese rice cake ice cream (Strawberry/Green tea/Mango/Vanilla/Chocolate)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="desserts--mochi">—</span></div></div><div class="menu-item" data-key="desserts--cheese-cake"><div class="menu-item-left"><div class="menu-item-name">Cheese Cake</div><div class="menu-item-desc">Choice of Plain/Chocolate/Caramel/Blueberry/Lemon</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="desserts--cheese-cake">—</span></div></div><div class="menu-item" data-key="desserts--green-volcan"><div class="menu-item-left"><div class="menu-item-name">Green Volcano Cake</div><div class="menu-item-desc">Green tea cake with green tea ice cream</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="desserts--green-volcan">—</span></div></div><div class="menu-item" data-key="desserts--chocolate-fu"><div class="menu-item-left"><div class="menu-item-name">Chocolate Fudge Cake</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="desserts--chocolate-fu">—</span></div></div><div class="menu-item" data-key="desserts--ho-tteok"><div class="menu-item-left"><div class="menu-item-name">Ho-Tteok</div><div class="menu-item-desc">Korean sweet pancake with vanilla ice cream</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="desserts--ho-tteok">—</span></div></div><div class="menu-item" data-key="desserts--ice-cream-te"><div class="menu-item-left"><div class="menu-item-name">Ice Cream Tempura</div><div class="menu-item-desc">Fried ice cream (Green tea/Mango/Vanilla)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="desserts--ice-cream-te">—</span></div></div><div class="menu-item" data-key="desserts--fbi"><div class="menu-item-left"><div class="menu-item-name">FBI</div><div class="menu-item-desc">Fried banana with ice cream (Green tea/Mango/Vanilla)</div></div><div class="menu-item-right"><span class="menu-item-price" data-key="desserts--fbi">—</span></div></div></div></div></div>
-</div>
-    </div>
-
-    <p style="margin-top:24px;font-family:var(--mono);font-size:0.6rem;color:var(--ink3);letter-spacing:0.06em;line-height:1.7">
-      Prices may vary · HST not included · Items subject to availability · Ask your server about daily specials
+<!-- MENU CTA — single prominent entry point -->
+<div class="menu-bg" id="menu">
+  <div class="menu-inner" style="text-align:center;max-width:720px">
+    <div class="section-label reveal" style="justify-content:center">Menu &amp; Pricing</div>
+    <h2 class="section-title reveal reveal-d1">Our <em>full menu</em></h2>
+    <p class="section-body reveal reveal-d2" style="max-width:480px;margin:0 auto 48px">
+      Sushi &amp; Rolls, Starters, Teppanyaki, Asian Dining, Lunch, and Desserts — browse the complete menu on its own page.
     </p>
+    <a href="menu.html" class="btn-view-menu reveal reveal-d3">View Full Menu &amp; Pricing →</a>
   </div>
 </div>
 
+<!-- EXPERIENCE -->
+<section class="section">
+  <div class="section-label reveal">The Experience</div>
+  <h2 class="section-title reveal reveal-d1">More than <em>dinner</em></h2>
+  <div class="exp-row">
+    <div class="exp-cell reveal">
+      <span class="exp-n">01 / Teppanyaki</span>
+      <div class="exp-h">Iron Grill Theatre</div>
+      <p class="exp-p">Sit around the open grill as our chefs perform — fire, knifework, and live cooking at your table. Ideal for groups and celebrations.</p>
+    </div>
+    <div class="exp-cell reveal reveal-d1">
+      <span class="exp-n">02 / Sushi</span>
+      <div class="exp-h">Handcrafted Rolls</div>
+      <p class="exp-p">Fresh rolls and premium sashimi from our dedicated sushi kitchen. Available dine-in and takeout.</p>
+    </div>
+    <div class="exp-cell reveal reveal-d2">
+      <span class="exp-n">03 / Bar</span>
+      <div class="exp-h">Sake &amp; Full Bar</div>
+      <p class="exp-p">Curated sake, Japanese whisky, Korean soju, and classic cocktails. Full licensed bar service.</p>
+    </div>
+    <div class="exp-cell reveal reveal-d3">
+      <span class="exp-n">04 / Events</span>
+      <div class="exp-h">Private Parties</div>
+      <p class="exp-p">Birthday dinners, anniversaries, and corporate groups. Private grill reservations and group menus available.</p>
+    </div>
+  </div>
+</section>
 
-<!-- HOURS + CONTACT -->
-<section id="hours">
-  <div class="hours-grid">
+<!-- HOURS & CONTACT -->
+<div class="hours-bg" id="hours">
+  <div class="hours-inner">
     <div>
-      <div class="section-label">Hours</div>
-      <h2 class="section-title">When to <em>visit</em></h2>
-      <table class="hours-table" id="hoursTable">
-        <tr><td>Sunday</td><td>12:00 PM – 9:00 PM</td></tr>
-        <tr><td>Monday</td><td>12:00 PM – 9:00 PM</td></tr>
-        <tr><td>Tuesday</td><td>12:00 PM – 9:00 PM</td></tr>
-        <tr><td>Wednesday</td><td>12:00 PM – 9:00 PM</td></tr>
-        <tr><td>Thursday</td><td>12:00 PM – 9:00 PM</td></tr>
-        <tr><td>Friday</td><td>12:00 PM – 10:00 PM</td></tr>
-        <tr><td>Saturday</td><td>12:00 PM – 10:00 PM</td></tr>
+      <div class="section-label reveal">Hours</div>
+      <h2 class="section-title reveal reveal-d1">When to <em>visit</em></h2>
+      <table class="hours-tbl reveal reveal-d2" id="hoursTable">
+        <tr><td>Monday</td><td>11:30 am – 9 pm</td></tr>
+        <tr><td>Tuesday</td><td>11:30 am – 9 pm</td></tr>
+        <tr><td>Wednesday</td><td>11:30 am – 9 pm</td></tr>
+        <tr><td>Thursday</td><td>11:30 am – 9 pm</td></tr>
+        <tr><td>Friday</td><td>11:30 am – 10 pm</td></tr>
+        <tr><td>Saturday</td><td>11:30 am – 10 pm</td></tr>
+        <tr><td>Sunday</td><td>11:30 am – 9 pm</td></tr>
       </table>
     </div>
-    <div class="contact-block">
-      <div class="section-label">Contact &amp; Find Us</div>
-      <div class="contact-item">
-        <div class="contact-label">Address</div>
-        <div class="contact-value">599 Main St<br>Moncton, NB E1C 1C8</div>
-      </div>
-      <div class="contact-item">
-        <div class="contact-label">Phone</div>
-        <div class="contact-value">
-          <a href="tel:+15068538855">(506) 853-8855</a><br>
-          <a href="tel:+15062048856">(506) 204-8856</a>
-        </div>
-      </div>
-      <div class="contact-item">
-        <div class="contact-label">Email</div>
-        <div class="contact-value"><a href="/cdn-cgi/l/email-protection#5f30373d3c6a66661f38323e3633713c3032"><span class="__cf_email__" data-cfemail="80efe8e2e3b5b9b9c0e7ede1e9ecaee3efed">[email&#160;protected]</span></a></div>
-      </div>
-      <div class="contact-item">
-        <div class="contact-label">Social</div>
-        <div class="contact-value"><a href="https://www.instagram.com/osakahibachimoncton/" target="_blank">@osakahibachimoncton</a></div>
+    <div>
+      <div class="section-label reveal">Find Us</div>
+      <h2 class="section-title reveal reveal-d1">Contact &amp; <em>directions</em></h2>
+      <div class="contact-list reveal reveal-d2">
+        <div class="contact-pair"><span class="c-key">Address</span><span class="c-val">599 Main St, Moncton NB E1C 1C8</span></div>
+        <div class="contact-pair"><span class="c-key">Phone</span><span class="c-val"><a href="tel:+15068538855">(506) 853-8855</a></span></div>
+        <div class="contact-pair"><span class="c-key">Email</span><span class="c-val"><a href="mailto:ohbc599@gmail.com">ohbc599@gmail.com</a></span></div>
+        <div class="contact-pair"><span class="c-key">Instagram</span><span class="c-val"><a href="https://www.instagram.com/osakahibachimoncton/" target="_blank">@osakahibachimoncton</a></span></div>
+        <div class="contact-pair"><span class="c-key">Nearby</span><span class="c-val">Across from Residence Inn by Marriott</span></div>
       </div>
     </div>
   </div>
-</section>
-
-<div class="section-divider"></div>
-
-<!-- MAP — Static SVG approximating 100m radius around 599 Main St Moncton -->
-<div class="map-wrap">
-  <div class="map-inner">
-    <div class="map-header">
-      <div class="section-label">Location</div>
-      <h2 class="section-title">Find <em>us</em></h2>
-    </div>
-    <div class="map-container">
-      <svg class="map-svg" viewBox="0 0 800 340" xmlns="http://www.w3.org/2000/svg" style="display:block">
-        <!-- Background -->
-        <rect width="800" height="340" fill="#e8e0d0"/>
-
-        <!-- City blocks / parcels background -->
-        <rect x="0" y="0" width="800" height="340" fill="#ede8de"/>
-
-        <!-- Main St (runs roughly horizontal through center) -->
-        <rect x="0" y="152" width="800" height="28" fill="#d4cbbf"/>
-        <!-- Main St label -->
-        <text x="400" y="170" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#9a8f80" letter-spacing="2">MAIN STREET</text>
-
-        <!-- Crossroads: Botsford St (vertical, left) -->
-        <rect x="118" y="0" width="22" height="340" fill="#d4cbbf"/>
-        <text x="129" y="80" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#9a8f80" letter-spacing="1" transform="rotate(-90 129 80)">BOTSFORD ST</text>
-
-        <!-- Crossroads: Lutz St (vertical, right) ~100m right -->
-        <rect x="650" y="0" width="22" height="340" fill="#d4cbbf"/>
-        <text x="661" y="80" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#9a8f80" letter-spacing="1" transform="rotate(-90 661 80)">LUTZ ST</text>
-
-        <!-- Cross street above (Highfield) -->
-        <rect x="0" y="58" width="800" height="18" fill="#d4cbbf" opacity="0.6"/>
-        <text x="60" y="70" font-family="IBM Plex Mono,monospace" font-size="8" fill="#9a8f80" letter-spacing="1">HIGHFIELD ST</text>
-
-        <!-- Cross street below (Robinson) -->
-        <rect x="0" y="258" width="800" height="18" fill="#d4cbbf" opacity="0.6"/>
-        <text x="60" y="270" font-family="IBM Plex Mono,monospace" font-size="8" fill="#9a8f80" letter-spacing="1">ROBINSON ST</text>
-
-        <!-- Building blocks — north side of Main -->
-        <rect x="140" y="76" width="160" height="70" rx="2" fill="#d8d0c0" stroke="#c8bfaf" stroke-width="1"/>
-        <rect x="308" y="76" width="100" height="70" rx="2" fill="#d8d0c0" stroke="#c8bfaf" stroke-width="1"/>
-        <rect x="416" y="76" width="80" height="70" rx="2" fill="#d8d0c0" stroke="#c8bfaf" stroke-width="1"/>
-        <rect x="504" y="76" width="140" height="70" rx="2" fill="#d8d0c0" stroke="#c8bfaf" stroke-width="1"/>
-
-        <!-- Building blocks — south side of Main -->
-        <rect x="140" y="186" width="100" height="64" rx="2" fill="#d8d0c0" stroke="#c8bfaf" stroke-width="1"/>
-        <rect x="248" y="186" width="120" height="64" rx="2" fill="#d8d0c0" stroke="#c8bfaf" stroke-width="1"/>
-        <rect x="376" y="186" width="100" height="64" rx="2" fill="#d8d0c0" stroke="#c8bfaf" stroke-width="1"/>
-        <rect x="484" y="186" width="160" height="64" rx="2" fill="#d8d0c0" stroke="#c8bfaf" stroke-width="1"/>
-
-        <!-- PARKING LOT 1 — north, beside Botsford -->
-        <rect x="140" y="76" width="60" height="70" rx="2" fill="#cfc8b8" stroke="#bbb3a3" stroke-width="1" stroke-dasharray="4,2"/>
-        <text x="170" y="108" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7.5" fill="#9a8f80">P</text>
-        <text x="170" y="120" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6" fill="#9a8f80">PUBLIC</text>
-
-        <!-- PARKING LOT 2 — south, large lot -->
-        <rect x="248" y="186" width="120" height="64" rx="2" fill="#cfc8b8" stroke="#bbb3a3" stroke-width="1" stroke-dasharray="4,2"/>
-        <text x="308" y="216" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7.5" fill="#9a8f80">P</text>
-        <text x="308" y="228" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6" fill="#9a8f80">PARKING LOT</text>
-
-        <!-- PARKING LOT 3 — north far right -->
-        <rect x="504" y="76" width="80" height="70" rx="2" fill="#cfc8b8" stroke="#bbb3a3" stroke-width="1" stroke-dasharray="4,2"/>
-        <text x="544" y="108" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7.5" fill="#9a8f80">P</text>
-        <text x="544" y="120" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6" fill="#9a8f80">METERED</text>
-
-        <!-- 100m radius circle (dashed) — centered on restaurant -->
-        <circle cx="340" cy="166" r="110" fill="none" stroke="#c84b1a" stroke-width="1" stroke-dasharray="5,4" opacity="0.4"/>
-
-        <!-- RESTAURANT MARKER — 599 Main St -->
-        <rect x="308" y="76" width="100" height="70" rx="2" fill="#c84b1a" stroke="#a03012" stroke-width="1.5"/>
-        <text x="358" y="107" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="rgba(245,240,232,0.9)" letter-spacing="0.5">OSAKA</text>
-        <text x="358" y="118" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="rgba(245,240,232,0.9)" letter-spacing="0.5">HIBACHI</text>
-        <text x="358" y="130" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6.5" fill="rgba(245,240,232,0.7)">599 MAIN ST</text>
-
-        <!-- Pin marker on Main St -->
-        <circle cx="358" cy="155" r="6" fill="#c84b1a" stroke="#fff" stroke-width="1.5"/>
-        <circle cx="358" cy="155" r="2.5" fill="#fff"/>
-
-        <!-- Scale bar -->
-        <line x1="620" y1="310" x2="720" y2="310" stroke="#9a8f80" stroke-width="1.5"/>
-        <line x1="620" y1="305" x2="620" y2="315" stroke="#9a8f80" stroke-width="1.5"/>
-        <line x1="720" y1="305" x2="720" y2="315" stroke="#9a8f80" stroke-width="1.5"/>
-        <text x="670" y="326" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7.5" fill="#9a8f80">~100 m</text>
-
-        <!-- North arrow -->
-        <text x="756" y="52" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#9a8f80">N</text>
-        <line x1="756" y1="58" x2="756" y2="42" stroke="#9a8f80" stroke-width="1.5"/>
-        <polygon points="756,40 752,48 760,48" fill="#9a8f80"/>
-
-        <!-- Keg restaurant nearby (reference landmark) -->
-        <rect x="484" y="186" width="80" height="64" rx="2" fill="#d2c8b4" stroke="#c0b8a8" stroke-width="1"/>
-        <text x="524" y="216" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#9a8f80">THE KEG</text>
-        <text x="524" y="228" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6" fill="#9a8f80">ACROSS ST</text>
+  <div class="map-wrap reveal">
+    <div class="map-box">
+      <svg viewBox="0 0 800 280" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%">
+        <rect width="800" height="280" fill="#f0ead6"/>
+        <rect x="0" y="128" width="800" height="24" fill="#ddd4be"/>
+        <text x="400" y="144" text-anchor="middle" font-family="monospace" font-size="7.5" fill="#a09070" letter-spacing="2">MAIN STREET</text>
+        <rect x="118" y="0" width="18" height="280" fill="#ddd4be"/>
+        <text x="127" y="70" text-anchor="middle" font-family="monospace" font-size="7" fill="#a09070" letter-spacing="1" transform="rotate(-90 127 70)">BOTSFORD ST</text>
+        <rect x="646" y="0" width="18" height="280" fill="#ddd4be"/>
+        <text x="655" y="70" text-anchor="middle" font-family="monospace" font-size="7" fill="#a09070" letter-spacing="1" transform="rotate(-90 655 70)">LUTZ ST</text>
+        <rect x="0" y="46" width="800" height="14" fill="#ddd4be" opacity="0.7"/>
+        <text x="60" y="56" font-family="monospace" font-size="7" fill="#a09070" letter-spacing="1">HIGHFIELD ST</text>
+        <rect x="0" y="218" width="800" height="14" fill="#ddd4be" opacity="0.7"/>
+        <text x="60" y="228" font-family="monospace" font-size="7" fill="#a09070" letter-spacing="1">ROBINSON ST</text>
+        <rect x="140" y="62" width="160" height="60" rx="2" fill="#e4dcc8" stroke="#d4cbb4" stroke-width="1"/>
+        <rect x="416" y="62" width="80" height="60" rx="2" fill="#e4dcc8" stroke="#d4cbb4" stroke-width="1"/>
+        <rect x="504" y="62" width="140" height="60" rx="2" fill="#e4dcc8" stroke="#d4cbb4" stroke-width="1"/>
+        <rect x="140" y="158" width="100" height="52" rx="2" fill="#e4dcc8" stroke="#d4cbb4" stroke-width="1"/>
+        <rect x="376" y="158" width="100" height="52" rx="2" fill="#e4dcc8" stroke="#d4cbb4" stroke-width="1"/>
+        <rect x="248" y="158" width="120" height="52" rx="2" fill="#ddd4be" stroke="#ccc4ae" stroke-width="1" stroke-dasharray="4,2"/>
+        <text x="308" y="183" text-anchor="middle" font-family="monospace" font-size="7" fill="#a09070">P PARKING</text>
+        <rect x="484" y="158" width="160" height="52" rx="2" fill="#e4dcc8" stroke="#a8840a" stroke-width="0.5"/>
+        <text x="564" y="181" text-anchor="middle" font-family="monospace" font-size="6.5" fill="#887020">RESIDENCE INN</text>
+        <text x="564" y="193" text-anchor="middle" font-family="monospace" font-size="6" fill="#a09070">BY MARRIOTT</text>
+        <circle cx="340" cy="140" r="100" fill="none" stroke="#8c1c0a" stroke-width="1" stroke-dasharray="4,4" opacity="0.25"/>
+        <rect x="308" y="62" width="100" height="60" rx="2" fill="#8c1c0a" stroke="#6a1408" stroke-width="1.5"/>
+        <text x="358" y="87" text-anchor="middle" font-family="monospace" font-size="7" fill="rgba(248,243,235,0.9)" letter-spacing="0.5">OSAKA</text>
+        <text x="358" y="99" text-anchor="middle" font-family="monospace" font-size="7" fill="rgba(248,243,235,0.9)" letter-spacing="0.5">HIBACHI</text>
+        <text x="358" y="111" text-anchor="middle" font-family="monospace" font-size="6" fill="rgba(248,243,235,0.6)">599 MAIN ST</text>
+        <circle cx="358" cy="130" r="5" fill="#8c1c0a" stroke="#fff" stroke-width="1.5"/>
+        <circle cx="358" cy="130" r="2" fill="#fff"/>
+        <line x1="620" y1="258" x2="720" y2="258" stroke="#a09070" stroke-width="1.5"/>
+        <line x1="620" y1="253" x2="620" y2="263" stroke="#a09070" stroke-width="1.5"/>
+        <line x1="720" y1="253" x2="720" y2="263" stroke="#a09070" stroke-width="1.5"/>
+        <text x="670" y="272" text-anchor="middle" font-family="monospace" font-size="7" fill="#a09070">~100 m</text>
+        <text x="752" y="40" text-anchor="middle" font-family="monospace" font-size="8" fill="#a09070">N</text>
+        <line x1="752" y1="46" x2="752" y2="30" stroke="#a09070" stroke-width="1.5"/>
+        <polygon points="752,28 748,38 756,38" fill="#a09070"/>
       </svg>
-      <div class="map-overlay">
-        <div class="map-address">
-          599 Main St, Moncton NB E1C 1C8<br>
-          Across from The Keg · Street parking + public lots nearby
-        </div>
-        <a href="https://maps.google.com/?q=599+Main+St+Moncton+NB" target="_blank" class="map-directions">Get Directions ↗</a>
+      <div class="map-foot">
+        <div class="map-foot-addr">599 Main St, Moncton NB E1C 1C8 · Across from Residence Inn by Marriott</div>
+        <a href="https://maps.google.com/?q=599+Main+St+Moncton+NB" target="_blank" class="map-foot-link">Get Directions ↗</a>
       </div>
     </div>
   </div>
 </div>
 
 <!-- RESERVE -->
-<div class="reservation-wrap" id="reserve">
-  <div class="reservation-inner">
-    <div class="section-label">Reservations</div>
-    <h2 class="section-title">Book your <em>table</em></h2>
-    <p class="section-body">
-      Teppanyaki reservations are strongly recommended, especially for groups of 4 or more. Call or email us directly — we'll confirm your time slot and grill assignment same day.
+<div class="reserve-section" id="reserve">
+  <div class="reserve-inner">
+    <div class="section-label reveal">Reservations</div>
+    <h2 class="section-title reveal reveal-d1">Book your <em>table</em></h2>
+    <p class="section-body reveal reveal-d2" style="max-width:460px;margin:0 auto 48px">
+      Reservations are made by phone only. Teppanyaki grills are strongly recommended for groups of 4 or more — we confirm your grill and time same day.
     </p>
-    <div class="reservation-contact">
-      <div class="res-contact-card">
-        <span class="res-contact-icon">📞</span>
-        <div class="res-contact-label">Call Us</div>
-        <div class="res-contact-value">
-          <a href="tel:+15068538855">(506) 853-8855</a><br>
-          <a href="tel:+15062048856">(506) 204-8856</a>
-        </div>
-      </div>
-      <div class="res-contact-card">
-        <span class="res-contact-icon">✉</span>
-        <div class="res-contact-label">Email</div>
-        <div class="res-contact-value"><a href="/cdn-cgi/l/email-protection#89e6e1ebeabcb0b0c9eee4e8e0e5a7eae6e4"><span class="__cf_email__" data-cfemail="6c03040e0f5955552c0b010d0500420f0301">[email&#160;protected]</span></a></div>
-      </div>
-      <div class="res-contact-card">
-        <span class="res-contact-icon">📸</span>
-        <div class="res-contact-label">Instagram</div>
-        <div class="res-contact-value"><a href="https://www.instagram.com/osakahibachimoncton/" target="_blank">@osakahibachimoncton</a></div>
-      </div>
+    <div class="res-phone-block reveal reveal-d2">
+      <div class="res-phone-label">Call to Reserve</div>
+      <a href="tel:+15068538855" class="res-phone-number">(506) 853-8855</a>
     </div>
+    <a href="tel:+15068538855" class="btn-sumi reveal reveal-d3" style="display:inline-block;margin-top:40px">Call Now</a>
   </div>
 </div>
 
 <!-- FOOTER -->
 <footer>
-  <span>© 2026 Osaka Hibachi — Moncton, NB</span>
-  <span>599 Main St · (506) 853-8855</span>
-  <a href="/cdn-cgi/l/email-protection#f39c9b9190c6cacab3949e929a9fdd909c9e"><span class="__cf_email__" data-cfemail="4a252228297f73730a2d272b232664292527">[email&#160;protected]</span></a>
+  <div class="foot-logo">Osaka Hibachi</div>
+  <div class="foot-copy">© 2026 · 599 Main St, Moncton NB · (506) 853-8855</div>
 </footer>
 
-<!-- MANAGER MODAL -->
-<div class="mgr-overlay" id="mgrOverlay" onclick="closeMgrOverlayIfOutside(event)">
-  <div class="mgr-modal">
-    <h3>Manager Access</h3>
-    <p>Enter the manager password to edit prices, add or remove items, and reorder.</p>
-    <input class="mgr-input" id="mgrPwd" type="password" placeholder="Password" autocomplete="off"
-      onkeydown="if(event.key==='Enter')submitManagerPwd()">
-    <div class="mgr-err" id="mgrErr"></div>
-    <div class="mgr-actions">
-      <button class="mgr-btn-cancel" onclick="closeManagerModal()">Cancel</button>
-      <button class="mgr-btn" onclick="submitManagerPwd()">Unlock</button>
-    </div>
-  </div>
-</div>
-
-<!-- ADD ITEM MODAL -->
-<div class="mgr-overlay" id="addItemOverlay" onclick="if(event.target===this)closeAddItemModal()">
-  <div class="mgr-modal" style="max-width:460px">
-    <h3>Add Menu Item</h3>
-    <p id="addItemSubtitle">New item will appear at the bottom of this section.</p>
-    <div style="display:flex;flex-direction:column;gap:11px;margin-bottom:14px">
-      <div><label class="mgr-field-label">Item Name *</label>
-        <input class="mgr-input" id="aiName" type="text" placeholder="e.g. Dragon Roll" style="margin-bottom:0"></div>
-      <div><label class="mgr-field-label">Description</label>
-        <input class="mgr-input" id="aiDesc" type="text" placeholder="Optional short description" style="margin-bottom:0"></div>
-      <div><label class="mgr-field-label">Price *</label>
-        <input class="mgr-input" id="aiPrice" type="text" placeholder="e.g. $18" style="margin-bottom:0"
-          onkeydown="if(event.key==='Enter')submitAddItem()"></div>
-      <div><label class="mgr-field-label">Tag</label>
-        <select class="mgr-input" id="aiTag" style="margin-bottom:0;cursor:pointer">
-          <option value="">— None —</option>
-          <option value="spicy">Spicy</option>
-          <option value="veg">Vegetarian</option>
-        </select></div>
-    </div>
-    <div class="mgr-err" id="aiErr"></div>
-    <div class="mgr-actions">
-      <button class="mgr-btn-cancel" onclick="closeAddItemModal()">Cancel</button>
-      <button class="mgr-btn" onclick="submitAddItem()">Add Item</button>
-    </div>
-  </div>
-</div>
-
-<style>
-.mgr-field-label {
-  font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--ink3); display: block; margin-bottom: 4px;
-}
-</style>
-
 <script>
-// ══════════════════════════════════════
-//  OSAKA HIBACHI — Menu JS
-// ══════════════════════════════════════
+// Nav scroll
+const nav=document.getElementById('nav'),cta=document.getElementById('navCta');
+window.addEventListener('scroll',()=>{
+  if(window.scrollY>80){nav.classList.add('scrolled');cta.style.display='inline-block';}
+  else{nav.classList.remove('scrolled');cta.style.display='none';}
+});
 
-// Highlight today
-(function(){
-  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const today=days[new Date().getDay()];
-  document.querySelectorAll('#hoursTable tr').forEach(r=>{
-    if(r.cells[0]&&r.cells[0].textContent.trim()===today) r.classList.add('today');
-  });
-})();
-
-// ── Storage ──
-const S_PRICES  = 'osakaPrices';
-const S_ITEMS   = 'osakaMenuItems';
-const S_DELETED = 'osakaMenuDeleted';
-const S_ORDER   = 'osakaMenuOrder';
-const S_OPEN    = 'osakaMenuOpen'; // which cats/subs are open
-
-function gj(k){ try{return JSON.parse(localStorage.getItem(k)||'{}')}catch(e){return{}} }
-function sj(k,v){ try{localStorage.setItem(k,JSON.stringify(v))}catch(e){} }
-
-function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-// ── Load saved state ──
-function loadPrices(){
-  const p=gj(S_PRICES);
-  document.querySelectorAll('.menu-item-price').forEach(el=>{
-    if(el.dataset.key&&p[el.dataset.key]) el.textContent=p[el.dataset.key];
-  });
+// Mobile menu
+function toggleMM(){
+  document.getElementById('mobileMenu').classList.toggle('open');
+  document.getElementById('navHam').classList.toggle('open');
+}
+function closeMM(){
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('navHam').classList.remove('open');
 }
 
-function loadDeletions(){
-  const d=gj(S_DELETED);
-  document.querySelectorAll('.menu-item[data-key]').forEach(el=>{
-    if(d[el.dataset.key]) el.style.display='none';
-  });
-}
+// Scroll reveal
+const ro=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');}),{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
 
-function loadNewItems(){
-  const saved=gj(S_ITEMS);
-  Object.entries(saved).forEach(([gridId,items])=>{
-    const grid=document.getElementById(gridId);
-    if(!grid) return;
-    items.forEach(item=>{
-      if(!grid.querySelector(`.menu-item[data-key="${item.key}"]`)){
-        const el=buildItemEl(item);
-        const addBtn=grid.querySelector('.mgr-add-btn');
-        grid.insertBefore(el, addBtn||null);
-      }
-    });
-  });
-}
-
-function loadOrder(){
-  const orders=gj(S_ORDER);
-  Object.entries(orders).forEach(([gridId,keys])=>{
-    const grid=document.getElementById(gridId);
-    if(!grid) return;
-    keys.forEach(key=>{
-      const el=grid.querySelector(`.menu-item[data-key="${key}"]`);
-      if(el){ const btn=grid.querySelector('.mgr-add-btn'); grid.insertBefore(el,btn||null); }
-    });
-  });
-}
-
-function loadOpenState(){
-  const open=gj(S_OPEN);
-  Object.entries(open).forEach(([id,isOpen])=>{
-    if(!isOpen) return;
-    const body=document.getElementById(id);
-    const arr=document.getElementById('cat-arr-'+id.replace('cat-',''));
-    if(body){ body.classList.add('open'); if(arr) arr.classList.add('open'); }
-  });
-}
-
-loadPrices(); loadDeletions(); loadNewItems(); loadOrder();
-// Don't auto-open — start collapsed
-
-// ── Tab switching ──
-function switchMenuTab(panelId,btn){
-  document.querySelectorAll('.menu-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.menu-tab').forEach(b=>b.classList.remove('active'));
-  document.getElementById('panel-'+panelId).classList.add('active');
-  btn.classList.add('active');
-  if(managerUnlocked) applyManagerToPanel(document.getElementById('panel-'+panelId));
-}
-
-// ── Category toggle ──
-function toggleCat(catId){
-  const body=document.getElementById('cat-'+catId);
-  const arr=document.getElementById('cat-arr-'+catId);
-  if(!body) return;
-  const opening=!body.classList.contains('open');
-  body.classList.toggle('open');
-  if(arr) arr.classList.toggle('open');
-  // Save state
-  const open=gj(S_OPEN);
-  open['cat-'+catId]=opening;
-  sj(S_OPEN,open);
-  if(opening && managerUnlocked) applyManagerToPanel(body);
-}
-
-// ── Sub-section toggle ──
-function toggleSub(subId){
-  const body=document.getElementById('sub-'+subId);
-  const arr=document.getElementById('arr-'+subId);
-  if(!body) return;
-  const opening=!body.classList.contains('open');
-  body.classList.toggle('open');
-  if(arr) arr.classList.toggle('open');
-  const open=gj(S_OPEN);
-  open['sub-'+subId]=opening;
-  sj(S_OPEN,open);
-  if(opening && managerUnlocked) applyManagerToPanel(body);
-}
-
-// ── Manager password ──
-const MGR_HASH='25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117';
-let managerUnlocked=false;
-
-async function hashStr(str){
-  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-
-function openManagerModal(){
-  if(managerUnlocked){lockManager();return;}
-  document.getElementById('mgrOverlay').classList.add('open');
-  document.getElementById('mgrErr').textContent='';
-  document.getElementById('mgrPwd').value='';
-  setTimeout(()=>document.getElementById('mgrPwd').focus(),80);
-}
-function closeManagerModal(){ document.getElementById('mgrOverlay').classList.remove('open'); }
-function closeMgrOverlayIfOutside(e){ if(e.target===document.getElementById('mgrOverlay')) closeManagerModal(); }
-
-async function submitManagerPwd(){
-  const pwd=document.getElementById('mgrPwd').value;
-  const h=await hashStr(pwd);
-  if(h!==MGR_HASH){
-    document.getElementById('mgrErr').textContent='✕ Incorrect password';
-    document.getElementById('mgrPwd').value='';
-    document.getElementById('mgrPwd').focus();
-    return;
-  }
-  managerUnlocked=true;
-  closeManagerModal();
-  enableManagerMode();
-}
-
-function enableManagerMode(){
-  document.getElementById('pricingGrid').classList.add('manager-active');
-  document.getElementById('managerBadge').style.display='inline';
-  document.getElementById('managerGateBtn').textContent='🔓 Lock Prices';
-  document.querySelectorAll('.menu-panel').forEach(p=>applyManagerToPanel(p));
-}
-
-function applyManagerToPanel(panel){
-  panel.querySelectorAll('.menu-item-price').forEach(el=>{
-    el.title='Click to edit price';
-    el.onclick=(e)=>{e.stopPropagation();startEditPrice(el);};
-  });
-  panel.querySelectorAll('.menu-item').forEach(el=>applyItemControls(el));
-  panel.querySelectorAll('.menu-items-grid').forEach(grid=>{
-    if(!grid.querySelector('.mgr-add-btn')){
-      const btn=document.createElement('button');
-      btn.className='mgr-add-btn';
-      btn.textContent='+ Add Item';
-      btn.onclick=()=>openAddItemModal(grid.id);
-      grid.appendChild(btn);
-    }
-  });
-}
-
-function applyItemControls(itemEl){
-  if(itemEl.querySelector('.mgr-item-controls')) return;
-  const ctrl=document.createElement('div');
-  ctrl.className='mgr-item-controls';
-  ctrl.innerHTML=
-    '<button class="mgr-ic-btn" title="Move up" onclick="moveItem(this,&quot;up&quot;)">↑</button>'+
-    '<button class="mgr-ic-btn" title="Move down" onclick="moveItem(this,&quot;dn&quot;)">↓</button>'+
-    '<button class="mgr-ic-btn mgr-ic-del" title="Delete" onclick="deleteItem(this)">✕</button>';
-  itemEl.appendChild(ctrl);
-}
-
-function lockManager(){
-  managerUnlocked=false;
-  document.getElementById('pricingGrid').classList.remove('manager-active');
-  document.getElementById('managerBadge').style.display='none';
-  document.getElementById('managerGateBtn').textContent='🔒 Manage Prices';
-  document.querySelectorAll('.mgr-item-controls').forEach(e=>e.remove());
-  document.querySelectorAll('.mgr-add-btn').forEach(e=>e.remove());
-  document.querySelectorAll('.menu-item-price').forEach(el=>{
-    el.onclick=null; el.title='';
-    if(el.classList.contains('editing')) cancelEditPrice(el);
-  });
-}
-
-// ── Price editing ──
-function startEditPrice(el){
-  if(el.classList.contains('editing')) return;
-  el.classList.add('editing');
-  el.contentEditable='true';
-  el.focus();
-  const r=document.createRange(); r.selectNodeContents(el);
-  window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
-  el.onblur=()=>commitEditPrice(el);
-  el.onkeydown=(e)=>{
-    if(e.key==='Enter'){e.preventDefault();el.blur();}
-    if(e.key==='Escape'){e.preventDefault();cancelEditPrice(el);}
-  };
-}
-function commitEditPrice(el){
-  const raw=el.textContent.trim();
-  const num=raw.replace(/[^0-9.]/g,'');
-  const fmt=num?'$'+parseFloat(num).toFixed(2).replace(/\.00$/,''):(el.dataset.original||raw||'—');
-  el.textContent=fmt;
-  el.classList.remove('editing'); el.contentEditable='false';
-  el.onblur=null; el.onkeydown=null;
-  if(el.dataset.key){ const p=gj(S_PRICES); p[el.dataset.key]=fmt; sj(S_PRICES,p); }
-  if(managerUnlocked) el.onclick=(e)=>{e.stopPropagation();startEditPrice(el);};
-}
-function cancelEditPrice(el){
-  el.classList.remove('editing'); el.contentEditable='false';
-  el.onblur=null; el.onkeydown=null;
-  loadPrices();
-}
-
-// ── Delete item ──
-function deleteItem(btn){
-  const item=btn.closest('.menu-item');
-  if(!item) return;
-  const name=item.querySelector('.menu-item-name')?.textContent?.trim()||'this item';
-  if(!confirm('Remove "'+name+'" from the menu?')) return;
-  const key=item.dataset.key;
-  if(key){ const d=gj(S_DELETED); d[key]=true; sj(S_DELETED,d); }
-  item.remove();
-}
-
-// ── Move item ──
-function moveItem(btn,dir){
-  const item=btn.closest('.menu-item');
-  const grid=item?.parentElement;
-  if(!item||!grid) return;
-  const items=Array.from(grid.querySelectorAll('.menu-item'));
-  const idx=items.indexOf(item);
-  if(dir==='up'&&idx>0) grid.insertBefore(item,items[idx-1]);
-  else if(dir==='dn'&&idx<items.length-1) grid.insertBefore(items[idx+1],item);
-  const orders=gj(S_ORDER);
-  orders[grid.id]=Array.from(grid.querySelectorAll('.menu-item[data-key]')).map(e=>e.dataset.key);
-  sj(S_ORDER,orders);
-}
-
-// ── Build item element ──
-function buildItemEl(item){
-  const div=document.createElement('div');
-  div.className='menu-item'; div.dataset.key=item.key;
-  const badges=(item.spicy?'<span class="item-badge badge-spicy">Spicy</span>':'')+
-               (item.veg  ?'<span class="item-badge badge-veg">V</span>':'');
-  div.innerHTML=
-    '<div class="menu-item-left">'+
-      '<div class="menu-item-name">'+esc(item.name)+badges+'</div>'+
-      (item.desc?'<div class="menu-item-desc">'+esc(item.desc)+'</div>':'')+
-    '</div>'+
-    '<div class="menu-item-right"><span class="menu-item-price" data-key="'+item.key+'">'+esc(item.price)+'</span></div>';
-  return div;
-}
-
-// ── Add item modal ──
-let _addTargetGridId=null;
-function openAddItemModal(gridId){
-  _addTargetGridId=gridId;
-  const grid=document.getElementById(gridId);
-  const catName=grid?.closest('.cat-section')?.querySelector('.cat-toggle-name')?.textContent||'';
-  const subName=grid?.closest('.sub-section')?.querySelector('.sub-toggle span')?.textContent||'';
-  const where=[catName,subName].filter(Boolean).join(' → ');
-  document.getElementById('addItemSubtitle').textContent=where?'Adding to: '+where:'New item for this section.';
-  ['aiName','aiDesc','aiPrice'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('aiTag').value='';
-  document.getElementById('aiErr').textContent='';
-  document.getElementById('addItemOverlay').classList.add('open');
-  setTimeout(()=>document.getElementById('aiName').focus(),80);
-}
-function closeAddItemModal(){ document.getElementById('addItemOverlay').classList.remove('open'); _addTargetGridId=null; }
-
-function submitAddItem(){
-  const name=document.getElementById('aiName').value.trim();
-  const desc=document.getElementById('aiDesc').value.trim();
-  const priceRaw=document.getElementById('aiPrice').value.trim();
-  const tag=document.getElementById('aiTag').value;
-  const errEl=document.getElementById('aiErr');
-  if(!name){errEl.textContent='Item name is required.';return;}
-  if(!priceRaw){errEl.textContent='Price is required.';return;}
-  const num=priceRaw.replace(/[^0-9.]/g,'');
-  if(!num){errEl.textContent='Enter a valid price (e.g. $14).';return;}
-  const price='$'+parseFloat(num).toFixed(2).replace(/\.00$/,'');
-  const key='custom-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
-  const item={name,desc,price,key,spicy:tag==='spicy',veg:tag==='veg'};
-  // Save
-  const saved=gj(S_ITEMS);
-  if(!saved[_addTargetGridId]) saved[_addTargetGridId]=[];
-  saved[_addTargetGridId].push(item);
-  sj(S_ITEMS,saved);
-  const p=gj(S_PRICES); p[key]=price; sj(S_PRICES,p);
-  // DOM
-  const grid=document.getElementById(_addTargetGridId);
-  const el=buildItemEl(item);
-  grid.insertBefore(el, grid.querySelector('.mgr-add-btn')||null);
-  applyItemControls(el);
-  const priceEl=el.querySelector('.menu-item-price');
-  if(priceEl) priceEl.onclick=(e)=>{e.stopPropagation();startEditPrice(priceEl);};
-  closeAddItemModal();
-}
+// Today hours
+const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const today=days[new Date().getDay()];
+document.querySelectorAll('#hoursTable tr').forEach(r=>{
+  if(r.cells[0]&&r.cells[0].textContent.trim()===today)r.classList.add('today');
+});
 </script>
 </body>
 </html>
