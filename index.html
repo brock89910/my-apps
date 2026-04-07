@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Osaka Hibachi — Concept 2: WASHI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --paper:#f8f3eb;
+  --paper2:#f2ead8;
+  --paper3:#e8dfc8;
+  --ink:#1a1208;
+  --ink2:#2e2010;
+  --ink3:#4a3820;
+  --ink4:#6a5438;
+  --rouge:#8c1c0a;
+  --rouge2:#a82510;
+  --rouge3:#c43018;
+  --sumi:#0a0a0a;
+  --gold:#8a6c18;
+  --gold2:#a88428;
+  --gold3:#c8a040;
+  --gold-line:rgba(138,108,24,0.18);
+  --gold-dim:rgba(138,108,24,0.08);
+  --shadow:rgba(26,18,8,0.10);
+  --shadow2:rgba(26,18,8,0.06);
+  --serif:'Shippori Mincho','Libre Baskerville',Georgia,serif;
+  --body:'Libre Baskerville',Georgia,serif;
+  --sans:'Jost',system-ui,sans-serif;
+  --grain:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+html{scroll-behavior:smooth;font-size:18px;-webkit-text-size-adjust:100%}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  line-height:1.75;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* grain overlay */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:var(--grain);
+  pointer-events:none;z-index:9999;opacity:0.8;
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:68px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 max(5vw,24px);
+  transition:background 0.3s,border 0.3s;
+}
+nav.scrolled{
+  background:rgba(248,243,235,0.97);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--gold-line);
+  box-shadow:0 1px 20px rgba(26,18,8,0.07);
+}
+.nav-logo{
+  font-family:var(--serif);font-size:1.1rem;font-weight:700;
+  letter-spacing:0.08em;color:var(--ink);text-decoration:none;
+  display:flex;align-items:center;gap:10px;
+}
+.nav-logo-mark{
+  width:28px;height:28px;border:1.5px solid var(--rouge);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.85rem;color:var(--rouge);
+  transition:background 0.2s;
+}
+.nav-logo:hover .nav-logo-mark{background:var(--rouge);color:#fff}
+.nav-links{display:flex;gap:32px;list-style:none}
+@media(max-width:768px){.nav-links{display:none}}
+.nav-links a{
+  font-family:var(--sans);font-size:0.88rem;font-weight:400;
+  letter-spacing:0.10em;text-transform:uppercase;
+  color:var(--ink3);text-decoration:none;transition:color 0.2s;
+  position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;right:0;
+  height:1px;background:var(--rouge);
+  transform:scaleX(0);transition:transform 0.25s;
+}
+.nav-links a:hover{color:var(--rouge)}
+.nav-links a:hover::after{transform:scaleX(1)}
+
+.nav-cta{
+  font-family:var(--sans);font-size:0.84rem;font-weight:500;
+  letter-spacing:0.12em;text-transform:uppercase;
+  color:#fff;background:var(--sumi);
+  padding:12px 26px;border:none;text-decoration:none;
+  transition:background 0.2s;
+}
+.nav-cta:hover{background:var(--rouge2)}
+
+.nav-ham{display:none;background:none;border:none;cursor:pointer;padding:6px;flex-direction:column;gap:4px}
+@media(max-width:768px){.nav-ham{display:flex}}
+.nav-ham span{width:22px;height:1px;background:var(--ink);display:block;transition:all 0.3s}
+.nav-ham.open span:nth-child(1){transform:rotate(45deg) translate(3.5px,3.5px)}
+.nav-ham.open span:nth-child(2){opacity:0}
+.nav-ham.open span:nth-child(3){transform:rotate(-45deg) translate(3.5px,-3.5px)}
+
+.mobile-menu{
+  position:fixed;inset:0;z-index:190;
+  background:var(--paper);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:48px;
+  opacity:0;pointer-events:none;transition:opacity 0.3s;
+}
+.mobile-menu.open{opacity:1;pointer-events:all}
+.mobile-menu a{
+  font-family:var(--serif);font-size:2.2rem;font-weight:400;
+  color:var(--ink);text-decoration:none;letter-spacing:0.05em;
+  transition:color 0.2s;
+}
+.mobile-menu a:hover{color:var(--rouge)}
+.mobile-menu .mm-btn{
+  font-family:var(--sans);font-size:0.78rem;letter-spacing:0.16em;
+  text-transform:uppercase;background:var(--sumi);color:#fff;
+  padding:14px 40px;
+}
+
+/* ── HERO ── */
+.hero{
+  min-height:100dvh;
+  display:grid;grid-template-columns:1fr 1fr;
+  position:relative;overflow:hidden;
+}
+@media(max-width:768px){
+  .hero{grid-template-columns:1fr;min-height:auto}
+}
+
+.hero-left{
+  padding:clamp(100px,12vh,140px) max(5vw,32px) clamp(60px,8vh,100px);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  position:relative;z-index:1;
+  background:var(--paper);
+}
+.hero-eyebrow{
+  font-family:var(--serif);font-size:1.05rem;font-weight:700;
+  letter-spacing:0.14em;
+  color:var(--rouge);
+  margin-bottom:32px;
+  opacity:0;animation:fadeSlideUp 0.8s 0.3s ease forwards;
+}
+.hero-title{
+  font-family:var(--serif);
+  font-size:clamp(3.8rem,7vw,7rem);
+  font-weight:700;line-height:0.92;letter-spacing:-0.02em;
+  color:var(--ink);margin-bottom:0;
+  opacity:0;animation:fadeSlideUp 0.9s 0.45s ease forwards;
+}
+.hero-title span{display:block;font-size:0.75em;font-weight:400;font-style:italic;color:var(--rouge);margin-top:4px}
+.hero-divider{
+  width:48px;height:2px;margin:36px 0;
+  background:linear-gradient(to right,var(--gold),var(--gold-line));
+  opacity:0;animation:fadeIn 0.8s 0.75s ease forwards;
+}
+.hero-tagline{
+  font-family:var(--body);font-size:clamp(1.05rem,1.8vw,1.25rem);
+  font-style:italic;color:var(--ink2);line-height:1.8;
+  max-width:360px;margin-bottom:48px;
+  opacity:0;animation:fadeSlideUp 0.8s 0.9s ease forwards;
+}
+.hero-cta{
+  display:flex;gap:16px;flex-wrap:wrap;
+  opacity:0;animation:fadeSlideUp 0.8s 1.05s ease forwards;
+}
+.btn-sumi{
+  font-family:var(--sans);font-size:0.9rem;font-weight:500;letter-spacing:0.12em;
+  text-transform:uppercase;color:#fff;background:var(--sumi);
+  padding:20px 44px;text-decoration:none;
+  transition:background 0.2s,transform 0.15s;
+  box-shadow:0 4px 20px rgba(10,10,10,0.18);
+}
+.btn-sumi:hover{background:var(--rouge2);transform:translateY(-1px)}
+.btn-paper{
+  font-family:var(--sans);font-size:0.9rem;font-weight:500;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--ink);background:transparent;
+  padding:20px 44px;border:2px solid var(--ink);text-decoration:none;
+  transition:border-color 0.2s,color 0.2s,transform 0.15s;
+}
+.btn-paper:hover{border-color:var(--rouge);color:var(--rouge);transform:translateY(-1px)}
+
+.hero-meta-strip{
+  display:flex;gap:28px;flex-wrap:wrap;
+  margin-top:40px;padding-top:32px;
+  border-top:1px solid var(--gold-line);
+  opacity:0;animation:fadeSlideUp 0.8s 1.2s ease forwards;
+}
+.hero-meta-item{font-family:var(--sans);font-size:0.88rem;font-weight:400;color:var(--ink2);letter-spacing:0.06em}
+
+/* Hero right panel */
+.hero-right{
+  position:relative;overflow:hidden;
+  background:var(--paper2);
+  display:flex;align-items:center;justify-content:center;
+  min-height:300px;
+}
+@media(max-width:768px){.hero-right{display:none}}
+.hero-right-inner{
+  position:relative;z-index:1;text-align:center;padding:40px;
+}
+.hero-kanji-stack{
+  display:flex;flex-direction:column;
+  font-family:serif;font-weight:900;
+  color:rgba(26,18,8,0.08);
+  line-height:0.85;
+  font-size:clamp(80px,12vw,160px);
+  pointer-events:none;user-select:none;
+  animation:fadeIn 1.2s 0.8s ease both;
+}
+.hero-right::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 80% at 50% 30%,rgba(140,28,10,0.06) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 60% at 80% 80%,rgba(138,108,24,0.06) 0%,transparent 50%);
+}
+/* vertical text decoration */
+.hero-right::after{
+  content:'大阪 焼き 日本料理';
+  position:absolute;left:20px;top:0;bottom:0;
+  writing-mode:vertical-rl;text-orientation:upright;
+  font-family:serif;font-size:0.8rem;letter-spacing:0.3em;
+  color:rgba(26,18,8,0.07);pointer-events:none;
+  display:flex;align-items:center;
+}
+
+/* Fine line ornament */
+.hero-ornament-lines{
+  position:absolute;top:30px;right:30px;
+  width:80px;height:80px;
+  border-top:1px solid var(--gold-line);
+  border-right:1px solid var(--gold-line);
+  opacity:0;animation:fadeIn 0.8s 1.4s ease forwards;
+}
+.hero-ornament-lines::after{
+  content:'';position:absolute;
+  bottom:-30px;left:-30px;
+  width:80px;height:80px;
+  border-bottom:1px solid var(--gold-line);
+  border-left:1px solid var(--gold-line);
+}
+
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ── SECTION BASE ── */
+.section{padding:clamp(72px,10vw,120px) max(5vw,32px);max-width:1200px;margin:0 auto}
+.section-label{
+  font-family:var(--sans);font-size:0.78rem;font-weight:400;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--rouge);margin-bottom:18px;
+}
+.section-title{
+  font-family:var(--serif);
+  font-size:clamp(2.2rem,4.5vw,4rem);
+  font-weight:700;line-height:1.05;letter-spacing:-0.01em;
+  color:var(--ink);margin-bottom:24px;
+}
+.section-title em{font-style:italic;font-weight:400;color:var(--gold)}
+.section-body{
+  font-family:var(--sans);font-size:clamp(1rem,1.4vw,1.1rem);
+  font-weight:400;color:var(--ink2);line-height:1.9;
+}
+
+/* ── STRIP DIVIDER ── */
+.strip-divider{
+  height:4px;
+  background:linear-gradient(to right,var(--rouge) 0%,var(--gold) 33%,var(--paper3) 66%,var(--paper2) 100%);
+}
+
+/* ── ABOUT ── */
+.about-grid{display:grid;grid-template-columns:55% 1fr;gap:clamp(48px,8vw,96px);align-items:start}
+@media(max-width:760px){.about-grid{grid-template-columns:1fr}}
+
+.about-ornament{
+  position:relative;margin-top:16px;
+  background:var(--paper2);
+  border:1px solid var(--gold-line);
+  padding:48px 36px;
+  text-align:center;
+}
+.about-ornament::before{
+  content:'';position:absolute;
+  top:8px;left:8px;right:8px;bottom:8px;
+  border:1px solid var(--gold-line);pointer-events:none;
+}
+.about-jp{
+  font-family:serif;font-size:4rem;color:var(--ink);
+  opacity:0.15;margin-bottom:16px;display:block;
+}
+.about-quote{
+  font-family:var(--body);font-size:1.05rem;font-style:italic;
+  color:var(--ink2);line-height:1.75;
+}
+.about-quote-mark{
+  font-family:var(--serif);font-size:3rem;color:var(--rouge);
+  line-height:0.5;opacity:0.4;display:block;
+}
+
+.stats-row{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  margin-top:52px;border-top:1px solid var(--gold-line);
+}
+@media(max-width:600px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+.stat-block{padding:28px 0 28px 0;border-right:1px solid var(--gold-line)}
+.stat-block:last-child{border-right:none}
+.stat-n{
+  font-family:var(--serif);font-size:3rem;font-style:italic;
+  font-weight:400;color:var(--rouge2);line-height:1;margin-bottom:6px;
+}
+.stat-t{font-family:var(--sans);font-size:0.78rem;font-weight:300;color:var(--ink4)}
+
+/* ── MENU CTA BUTTON ── */
+.btn-view-menu{
+  display:inline-block;
+  font-family:var(--sans);font-size:1.1rem;font-weight:500;letter-spacing:0.10em;
+  text-transform:uppercase;text-decoration:none;
+  color:#fff;background:var(--rouge);
+  padding:22px 56px;
+  border:2px solid var(--rouge);
+  transition:background 0.2s,transform 0.15s,box-shadow 0.2s;
+  box-shadow:0 6px 28px rgba(140,28,10,0.22);
+}
+.btn-view-menu:hover{background:var(--rouge2);border-color:var(--rouge2);transform:translateY(-2px);box-shadow:0 10px 36px rgba(140,28,10,0.32)}
+
+/* ── MENU ── */
+.menu-bg{background:var(--paper2);border-top:1px solid var(--gold-line);border-bottom:1px solid var(--gold-line)}
+.menu-inner{padding:clamp(72px,10vw,120px) max(5vw,32px);max-width:1200px;margin:0 auto}
+
+/* ── EXPERIENCE ── */
+.exp-row{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:48px}
+@media(max-width:640px){.exp-row{grid-template-columns:1fr}}
+.exp-cell{
+  background:var(--paper2);padding:40px 32px;
+  border:1px solid var(--gold-line);
+  position:relative;transition:background 0.2s;
+}
+.exp-cell:hover{background:var(--paper)}
+.exp-n{
+  font-family:var(--serif);font-size:0.75rem;letter-spacing:0.2em;
+  color:var(--gold);margin-bottom:18px;display:block;
+}
+.exp-h{font-family:var(--serif);font-size:1.3rem;font-weight:700;color:var(--ink);margin-bottom:14px}
+.exp-p{font-family:var(--sans);font-size:0.95rem;font-weight:400;color:var(--ink2);line-height:1.85}
+
+/* ── HOURS ── */
+.hours-bg{background:var(--paper2);border-top:1px solid var(--gold-line)}
+.hours-inner{padding:clamp(72px,10vw,120px) max(5vw,32px);max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,8vw,80px)}
+@media(max-width:760px){.hours-inner{grid-template-columns:1fr}}
+
+.hours-tbl{width:100%;border-collapse:collapse;margin-top:32px}
+.hours-tbl tr{transition:background 0.15s}
+.hours-tbl tr:hover{background:var(--paper)}
+.hours-tbl td{padding:15px 0;border-bottom:1px solid var(--gold-line);font-family:var(--sans);font-size:1.05rem;font-weight:400}
+.hours-tbl tr:last-child td{border-bottom:none}
+.hours-tbl td:first-child{color:var(--ink2);letter-spacing:0.04em}
+.hours-tbl td:last-child{text-align:right;color:var(--ink);font-weight:500}
+.hours-tbl tr.today td{background:rgba(140,28,10,0.04)}
+.hours-tbl tr.today td:first-child{color:var(--rouge);font-weight:600}
+.hours-tbl tr.today td:last-child{color:var(--rouge2);font-weight:600}
+.closed{color:var(--ink4)!important;font-style:italic;font-size:0.95rem}
+
+.contact-list{margin-top:32px;display:flex;flex-direction:column;gap:0}
+.contact-pair{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:14px 0;border-bottom:1px solid var(--gold-line);
+}
+.contact-pair:last-child{border-bottom:none}
+.c-key{font-family:var(--sans);font-size:0.78rem;font-weight:400;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink3)}
+.c-val{font-family:var(--sans);font-size:1rem;font-weight:400;color:var(--ink);text-align:right;line-height:1.7}
+.c-val a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--gold-line);transition:color 0.2s,border-color 0.2s}
+.c-val a:hover{color:var(--rouge);border-color:var(--rouge)}
+
+/* ── MAP ── */
+.map-wrap{padding:0 max(5vw,32px) clamp(72px,10vw,120px);max-width:1200px;margin:0 auto}
+.map-box{
+  border:1px solid var(--gold-line);overflow:hidden;
+  position:relative;
+}
+.map-foot{
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:12px;
+  padding:20px 24px;border-top:1px solid var(--gold-line);
+  background:var(--paper2);
+}
+.map-foot-addr{font-family:var(--sans);font-size:0.82rem;font-weight:300;color:var(--ink3)}
+.map-foot-link{
+  font-family:var(--sans);font-size:0.72rem;font-weight:400;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--rouge);text-decoration:none;
+  transition:color 0.2s;
+}
+.map-foot-link:hover{color:var(--rouge2)}
+
+/* ── RESERVE ── */
+.reserve-section{
+  background:var(--sumi);
+  padding:clamp(72px,10vw,120px) max(5vw,32px);
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.reserve-section::before{
+  content:'予約';position:absolute;
+  font-family:serif;font-size:clamp(200px,40vw,400px);font-weight:900;
+  color:rgba(255,255,255,0.025);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.reserve-inner{max-width:600px;margin:0 auto;position:relative;z-index:1}
+.reserve-inner .section-label{color:var(--rouge3);justify-content:center;display:flex}
+.reserve-inner .section-title{color:#fff}
+.reserve-inner .section-body{color:rgba(248,243,235,0.7)}
+
+.res-phone-block{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.12);
+  padding:36px 48px;
+  display:inline-block;
+}
+.res-phone-label{
+  font-family:var(--sans);font-size:0.72rem;font-weight:400;letter-spacing:0.22em;
+  text-transform:uppercase;color:rgba(248,243,235,0.45);margin-bottom:14px;
+}
+.res-phone-number{
+  display:block;
+  font-family:var(--serif);font-size:clamp(2rem,5vw,3.2rem);font-weight:700;
+  color:#fff;text-decoration:none;letter-spacing:0.03em;
+  transition:color 0.2s;
+}
+.res-phone-number:hover{color:var(--gold3)}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--sumi);
+  border-top:1px solid rgba(255,255,255,0.07);
+  padding:28px max(5vw,32px);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+}
+.foot-logo{font-family:var(--serif);font-size:0.9rem;font-weight:700;letter-spacing:0.08em;color:rgba(248,243,235,0.6)}
+.foot-copy{font-family:var(--sans);font-size:0.75rem;font-weight:300;color:rgba(248,243,235,0.35)}
+
+/* ── SCROLL REVEAL ── */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity 0.65s ease,transform 0.65s ease}
+.reveal.in{opacity:1;transform:none}
+.reveal-d1{transition-delay:0.1s}
+.reveal-d2{transition-delay:0.2s}
+.reveal-d3{transition-delay:0.3s}
+
+@media(max-width:768px){
+  footer{flex-direction:column;text-align:center}
+  .strip-divider{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" onclick="closeMM()">About</a>
+  <a href="our-story.html">Our Story</a>
+  <a href="menu.html">Menu</a>
+  <a href="#hours" onclick="closeMM()">Hours</a>
+  <a href="#reserve" class="mm-btn" onclick="closeMM()">Reserve a Table</a>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">火</div>
+    Osaka Hibachi
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="our-story.html">Our Story</a></li>
+    <li><a href="menu.html">Menu</a></li>
+    <li><a href="#hours">Hours</a></li>
+  </ul>
+  <a href="#reserve" class="nav-cta" id="navCta" style="display:none">Reserve</a>
+  <button class="nav-ham" id="navHam" onclick="toggleMM()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Moncton, New Brunswick &nbsp;·&nbsp; Est. 2010</div>
+    <h1 class="hero-title">Osaka<span>Hibachi</span></h1>
+    <div class="hero-divider"></div>
+    <p class="hero-tagline">Japanese & Korean cuisine, teppanyaki grills — where the iron meets craft.</p>
+    <div class="hero-cta">
+      <a href="#reserve" class="btn-sumi">Reserve a Table</a>
+      <a href="menu.html" class="btn-paper">View Menu</a>
+    </div>
+    <div class="hero-meta-strip">
+      <span class="hero-meta-item">599 Main St, Moncton</span>
+      <span class="hero-meta-item">(506) 853-8855</span>
+      <span class="hero-meta-item">Teppanyaki · Sushi · Bar</span>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-ornament-lines"></div>
+    <div class="hero-right-inner">
+      <div class="hero-kanji-stack">
+        <span>大</span>
+        <span>阪</span>
+        <span>火</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="strip-divider"></div>
+
+<!-- ABOUT TEASER — links to Our Story page -->
+<section class="section" id="about">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,7vw,88px);align-items:center">
+    <div>
+      <div class="section-label reveal">Moncton, NB · Est. 2010</div>
+      <h2 class="section-title reveal reveal-d1">Where fire meets <em>craft</em></h2>
+      <p class="section-body reveal reveal-d2">
+        Osaka Hibachi brings the theatre of teppanyaki to the heart of Moncton. Four iron grills, fifteen years, one dining tradition.
+      </p>
+      <a href="our-story.html" class="btn-paper reveal reveal-d3" style="display:inline-block;margin-top:36px">Read Our Story →</a>
+    </div>
+    <div class="reveal reveal-d2">
+      <div style="background:var(--paper2);border:1px solid var(--gold-line);padding:44px 36px;text-align:center;position:relative">
+        <div style="position:absolute;top:8px;left:8px;right:8px;bottom:8px;border:1px solid var(--gold-line);pointer-events:none"></div>
+        <span style="font-family:serif;font-size:3.8rem;color:var(--ink);opacity:0.14;display:block;margin-bottom:14px">火</span>
+        <span style="font-family:var(--serif);font-size:2.8rem;color:var(--rouge);opacity:0.4;line-height:0.5;display:block">"</span>
+        <p style="font-family:var(--body);font-size:1.05rem;font-style:italic;color:var(--ink2);line-height:1.75;margin-top:8px">A place where food and coziness complement each other.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Mini stats -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);margin-top:52px;border-top:1px solid var(--gold-line)" class="reveal reveal-d3">
+    <div style="padding:24px 0;border-right:1px solid var(--gold-line)"><div style="font-family:var(--serif);font-size:2.8rem;font-style:italic;color:var(--rouge2);line-height:1;margin-bottom:5px">4</div><div style="font-family:var(--sans);font-size:0.82rem;font-weight:400;color:var(--ink3)">Teppanyaki Grills</div></div>
+    <div style="padding:24px 0;border-right:1px solid var(--gold-line)"><div style="font-family:var(--serif);font-size:2.8rem;font-style:italic;color:var(--rouge2);line-height:1;margin-bottom:5px">15+</div><div style="font-family:var(--sans);font-size:0.82rem;font-weight:400;color:var(--ink3)">Years in Moncton</div></div>
+    <div style="padding:24px 0;border-right:1px solid var(--gold-line)"><div style="font-family:var(--serif);font-size:2.8rem;font-style:italic;color:var(--rouge2);line-height:1;margin-bottom:5px">Est.</div><div style="font-family:var(--sans);font-size:0.82rem;font-weight:400;color:var(--ink3)">2010</div></div>
+    <div style="padding:24px 0"><div style="font-family:var(--serif);font-size:2.8rem;font-style:italic;color:var(--rouge2);line-height:1;margin-bottom:5px">2</div><div style="font-family:var(--sans);font-size:0.82rem;font-weight:400;color:var(--ink3)">Dining Rooms</div></div>
+  </div>
+</section>
+
+<!-- MENU CTA — single prominent entry point -->
+<div class="menu-bg" id="menu">
+  <div class="menu-inner" style="text-align:center;max-width:720px">
+    <div class="section-label reveal" style="justify-content:center">Menu &amp; Pricing</div>
+    <h2 class="section-title reveal reveal-d1">Our <em>full menu</em></h2>
+    <p class="section-body reveal reveal-d2" style="max-width:480px;margin:0 auto 48px">
+      Sushi &amp; Rolls, Starters, Teppanyaki, Asian Dining, Lunch, and Desserts — browse the complete menu on its own page.
+    </p>
+    <a href="menu.html" class="btn-view-menu reveal reveal-d3">View Full Menu &amp; Pricing →</a>
+  </div>
+</div>
+
+<!-- HOURS & CONTACT -->
+<div class="hours-bg" id="hours">
+  <div class="hours-inner">
+    <div>
+      <div class="section-label reveal">Hours</div>
+      <h2 class="section-title reveal reveal-d1">When to <em>visit</em></h2>
+      <table class="hours-tbl reveal reveal-d2" id="hoursTable">
+        <tr><td>Monday</td><td>11:30 am – 9 pm</td></tr>
+        <tr><td>Tuesday</td><td>11:30 am – 9 pm</td></tr>
+        <tr><td>Wednesday</td><td>11:30 am – 9 pm</td></tr>
+        <tr><td>Thursday</td><td>11:30 am – 9 pm</td></tr>
+        <tr><td>Friday</td><td>11:30 am – 10 pm</td></tr>
+        <tr><td>Saturday</td><td>11:30 am – 10 pm</td></tr>
+        <tr><td>Sunday</td><td>11:30 am – 9 pm</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="section-label reveal">Find Us</div>
+      <h2 class="section-title reveal reveal-d1">Contact &amp; <em>directions</em></h2>
+      <div class="contact-list reveal reveal-d2">
+        <div class="contact-pair"><span class="c-key">Address</span><span class="c-val">599 Main St, Moncton NB E1C 1C8</span></div>
+        <div class="contact-pair"><span class="c-key">Phone</span><span class="c-val"><a href="tel:+15068538855">(506) 853-8855</a></span></div>
+        <div class="contact-pair"><span class="c-key">Email</span><span class="c-val"><a href="mailto:ohbc599@gmail.com">ohbc599@gmail.com</a></span></div>
+        <div class="contact-pair"><span class="c-key">Instagram</span><span class="c-val"><a href="https://www.instagram.com/osakahibachimoncton/" target="_blank">@osakahibachimoncton</a></span></div>
+        <div class="contact-pair"><span class="c-key">Nearby</span><span class="c-val">Across from Residence Inn by Marriott</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="map-wrap reveal">
+    <div class="map-box">
+      <svg viewBox="0 0 800 280" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%">
+        <rect width="800" height="280" fill="#f0ead6"/>
+        <rect x="0" y="128" width="800" height="24" fill="#ddd4be"/>
+        <text x="400" y="144" text-anchor="middle" font-family="monospace" font-size="7.5" fill="#a09070" letter-spacing="2">MAIN STREET</text>
+        <rect x="118" y="0" width="18" height="280" fill="#ddd4be"/>
+        <text x="127" y="70" text-anchor="middle" font-family="monospace" font-size="7" fill="#a09070" letter-spacing="1" transform="rotate(-90 127 70)">BOTSFORD ST</text>
+        <rect x="646" y="0" width="18" height="280" fill="#ddd4be"/>
+        <text x="655" y="70" text-anchor="middle" font-family="monospace" font-size="7" fill="#a09070" letter-spacing="1" transform="rotate(-90 655 70)">LUTZ ST</text>
+        <rect x="0" y="46" width="800" height="14" fill="#ddd4be" opacity="0.7"/>
+        <text x="60" y="56" font-family="monospace" font-size="7" fill="#a09070" letter-spacing="1">HIGHFIELD ST</text>
+        <rect x="0" y="218" width="800" height="14" fill="#ddd4be" opacity="0.7"/>
+        <text x="60" y="228" font-family="monospace" font-size="7" fill="#a09070" letter-spacing="1">ROBINSON ST</text>
+        <rect x="140" y="62" width="160" height="60" rx="2" fill="#e4dcc8" stroke="#d4cbb4" stroke-width="1"/>
+        <rect x="416" y="62" width="80" height="60" rx="2" fill="#e4dcc8" stroke="#d4cbb4" stroke-width="1"/>
+        <rect x="504" y="62" width="140" height="60" rx="2" fill="#e4dcc8" stroke="#d4cbb4" stroke-width="1"/>
+        <rect x="140" y="158" width="100" height="52" rx="2" fill="#e4dcc8" stroke="#d4cbb4" stroke-width="1"/>
+        <rect x="376" y="158" width="100" height="52" rx="2" fill="#e4dcc8" stroke="#d4cbb4" stroke-width="1"/>
+        <rect x="248" y="158" width="120" height="52" rx="2" fill="#ddd4be" stroke="#ccc4ae" stroke-width="1" stroke-dasharray="4,2"/>
+        <text x="308" y="183" text-anchor="middle" font-family="monospace" font-size="7" fill="#a09070">P PARKING</text>
+        <rect x="484" y="158" width="160" height="52" rx="2" fill="#e4dcc8" stroke="#a8840a" stroke-width="0.5"/>
+        <text x="564" y="181" text-anchor="middle" font-family="monospace" font-size="6.5" fill="#887020">RESIDENCE INN</text>
+        <text x="564" y="193" text-anchor="middle" font-family="monospace" font-size="6" fill="#a09070">BY MARRIOTT</text>
+        <circle cx="340" cy="140" r="100" fill="none" stroke="#8c1c0a" stroke-width="1" stroke-dasharray="4,4" opacity="0.25"/>
+        <rect x="308" y="62" width="100" height="60" rx="2" fill="#8c1c0a" stroke="#6a1408" stroke-width="1.5"/>
+        <text x="358" y="87" text-anchor="middle" font-family="monospace" font-size="7" fill="rgba(248,243,235,0.9)" letter-spacing="0.5">OSAKA</text>
+        <text x="358" y="99" text-anchor="middle" font-family="monospace" font-size="7" fill="rgba(248,243,235,0.9)" letter-spacing="0.5">HIBACHI</text>
+        <text x="358" y="111" text-anchor="middle" font-family="monospace" font-size="6" fill="rgba(248,243,235,0.6)">599 MAIN ST</text>
+        <circle cx="358" cy="130" r="5" fill="#8c1c0a" stroke="#fff" stroke-width="1.5"/>
+        <circle cx="358" cy="130" r="2" fill="#fff"/>
+        <line x1="620" y1="258" x2="720" y2="258" stroke="#a09070" stroke-width="1.5"/>
+        <line x1="620" y1="253" x2="620" y2="263" stroke="#a09070" stroke-width="1.5"/>
+        <line x1="720" y1="253" x2="720" y2="263" stroke="#a09070" stroke-width="1.5"/>
+        <text x="670" y="272" text-anchor="middle" font-family="monospace" font-size="7" fill="#a09070">~100 m</text>
+        <text x="752" y="40" text-anchor="middle" font-family="monospace" font-size="8" fill="#a09070">N</text>
+        <line x1="752" y1="46" x2="752" y2="30" stroke="#a09070" stroke-width="1.5"/>
+        <polygon points="752,28 748,38 756,38" fill="#a09070"/>
+      </svg>
+      <div class="map-foot">
+        <div class="map-foot-addr">599 Main St, Moncton NB E1C 1C8 · Across from Residence Inn by Marriott</div>
+        <a href="https://maps.google.com/?q=599+Main+St+Moncton+NB" target="_blank" class="map-foot-link">Get Directions ↗</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESERVE -->
+<div class="reserve-section" id="reserve">
+  <div class="reserve-inner">
+    <div class="section-label reveal">Reservations</div>
+    <h2 class="section-title reveal reveal-d1">Book your <em>table</em></h2>
+    <p class="section-body reveal reveal-d2" style="max-width:460px;margin:0 auto 48px">
+      Reservations are made by phone only. Teppanyaki grills are strongly recommended for groups of 4 or more — we confirm your grill and time same day.
+    </p>
+    <div class="res-phone-block reveal reveal-d2">
+      <div class="res-phone-label">Call to Reserve</div>
+      <a href="tel:+15068538855" class="res-phone-number">(506) 853-8855</a>
+    </div>
+    <a href="tel:+15068538855" class="btn-sumi reveal reveal-d3" style="display:inline-block;margin-top:40px">Call Now</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">Osaka Hibachi</div>
+  <div class="foot-copy">© 2026 · 599 Main St, Moncton NB · (506) 853-8855</div>
+</footer>
+
+<script>
+// Nav scroll
+const nav=document.getElementById('nav'),cta=document.getElementById('navCta');
+window.addEventListener('scroll',()=>{
+  if(window.scrollY>80){nav.classList.add('scrolled');cta.style.display='inline-block';}
+  else{nav.classList.remove('scrolled');cta.style.display='none';}
+});
+
+// Mobile menu
+function toggleMM(){
+  document.getElementById('mobileMenu').classList.toggle('open');
+  document.getElementById('navHam').classList.toggle('open');
+}
+function closeMM(){
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('navHam').classList.remove('open');
+}
+
+// Scroll reveal
+const ro=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');}),{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+// Today hours
+const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const today=days[new Date().getDay()];
+document.querySelectorAll('#hoursTable tr').forEach(r=>{
+  if(r.cells[0]&&r.cells[0].textContent.trim()===today)r.classList.add('today');
+});
+</script>
+</body>
+</html>
