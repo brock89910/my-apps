@@ -3071,16 +3071,30 @@ window.downloadSchedulePng = function(){
 };
 
 // ── SERVING SUMMARY ──
-function parseSSStartHour(timeStr){
-  const t=(timeStr||'').trim();
-  if(!t) return 11;
+// ── SERVING SUMMARY HOURS ──
+// Maps each schedule slot label to its realistic projected hours.
+// "11" and "12" = full AM server (open to ~9pm close) ≈ 9 hrs weekday / 10 Fri-Sat
+// "11-2" = AM split, leaves at 2pm = ~3 hrs
+// "5","5:30","6" = PM server, works to close (~9pm weekday / 10pm Fri-Sat)
+// empty/name-only = treated as a standard PM dinner shift ≈ 4 hrs
+function ssShiftHours(timeStr, dayIdx){
+  const t=(timeStr||'').trim().toLowerCase();
+  const isFriSat=(dayIdx===4||dayIdx===5);
+  if(!t) return isFriSat?5:4;              // name-only: PM dinner shift
+  if(t==='11'||t==='12') return isFriSat?10:9;   // full AM open-to-close server
+  if(t==='11-2'||t.startsWith('11-2')) return 3; // AM split, out at 2pm
+  if(t==='5')   return isFriSat?5:4;       // PM: ~17:00–22:00 or 17:00–21:00
+  if(t==='5:30'||t==='5.30') return isFriSat?4.5:3.5; // PM: 17:30 start
+  if(t==='6')   return isFriSat?4:3;       // PM: 18:00 start
+  // Any other custom numeric entry: treat as start hour, calc to close
   const n=parseFloat(t);
-  if(!isNaN(n)&&n>=1&&n<=12) return n;
-  return 11;
-}
-function ssCloseHour(weekKey,dayIdx){
-  if(dayIdx===4||dayIdx===5) return 22;
-  return 21;
+  if(!isNaN(n)&&n>=1&&n<=23){
+    const closeHour=isFriSat?22:21;
+    // If it looks like a PM time (1–9), assume 17:xx range — add 12 for PM slots 1–6
+    const startHour=(n>=1&&n<=6)?n+12:n;
+    return Math.max(0.5,closeHour-startHour);
+  }
+  return isFriSat?5:4; // fallback
 }
 
 window.autoDetectSSRange=function(){
@@ -3111,32 +3125,33 @@ window.renderServingSummary=function(){
   const staff={};
   ws.forEach(sh=>{
     const name=(sh.name||'').trim();if(!name)return;
-    if(!staff[name]) staff[name]={dayKeys:new Set(),hours:0};
-    const isNewDay=!staff[name].dayKeys.has(sh.dayIdx);
+    if(!staff[name]) staff[name]={shiftCount:0,hours:0,dayKeys:new Set()};
     staff[name].dayKeys.add(sh.dayIdx);
-    if(isNewDay){
-      staff[name].hours+=Math.max(0,ssCloseHour(w1,sh.dayIdx)-parseSSStartHour(sh.time));
-    }
+    // Count hours per individual shift (not per day) — each slot gets its own hours
+    staff[name].hours+=ssShiftHours(sh.time,sh.dayIdx);
+    staff[name].shiftCount++;
   });
 
   const entries=Object.entries(staff).sort((a,b)=>b[1].dayKeys.size-a[1].dayKeys.size||a[0].localeCompare(b[0]));
   if(!entries.length){listEl.innerHTML='<div style="color:var(--text3);font-size:.75rem">// No serving shifts found</div>';if(totalsEl)totalsEl.innerHTML='';return;}
 
-  listEl.innerHTML=entries.map(([name,{dayKeys,hours}])=>{
+  listEl.innerHTML=entries.map(([name,{dayKeys,hours,shiftCount}])=>{
     const days=dayKeys.size;
+    const hrsDisplay=Number.isInteger(hours)?hours:hours.toFixed(1);
     return`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
       <span style="color:var(--text);font-weight:600">${name}</span>
       <span>
         <span style="color:var(--service);font-weight:700">${days}</span><span style="color:var(--text3)"> day${days!==1?'s':''}</span>
         <span style="color:var(--text3);margin:0 8px">·</span>
-        <span style="color:var(--amber);font-weight:700">${hours}</span><span style="color:var(--text3)"> hrs</span>
+        <span style="color:var(--amber);font-weight:700">${hrsDisplay}</span><span style="color:var(--text3)"> hrs</span>
       </span>
     </div>`;
   }).join('');
 
   const totalDays=entries.reduce((s,[,v])=>s+v.dayKeys.size,0);
   const totalHours=entries.reduce((s,[,v])=>s+v.hours,0);
-  if(totalsEl) totalsEl.innerHTML=`Total shift-days: <span style="color:var(--service);font-weight:700">${totalDays}</span> &nbsp;·&nbsp; Total projected hours: <span style="color:var(--amber);font-weight:700">${totalHours}</span>`;
+  const totalHrsDisplay=Number.isInteger(totalHours)?totalHours:totalHours.toFixed(1);
+  if(totalsEl) totalsEl.innerHTML=`Total shift-days: <span style="color:var(--service);font-weight:700">${totalDays}</span> &nbsp;·&nbsp; Total projected hours: <span style="color:var(--amber);font-weight:700">${totalHrsDisplay}</span>`;
 };
 
 // ── DAYS WORKED ──
