@@ -1570,7 +1570,7 @@ let fbChefOverrideListener = null;
 let exportUnlocked = false;
 
 /* ── DATE UTILS ── */
-function dateKey(d) { return d.toISOString().slice(0,10); }
+function dateKey(d) { const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
 
 function formatDateLabel(d) {
   return d.toLocaleDateString('en-CA', { month:'short', day:'numeric', year:'numeric' });
