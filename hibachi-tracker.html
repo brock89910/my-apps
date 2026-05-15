@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="google-site-verification" content="3yopg3yI0TkElAZWqJPdVB_QedQ5d65CFcSQ5BnfiZ8" />
 <title>Hibachi Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
@@ -1133,6 +1134,22 @@ body.staff-mode .real-name { display: inline; }
       <div style="display:flex;align-items:center;gap:8px">
         <span id="modeIndicator"></span>
         <div class="live-dot" id="liveStatus">Live</div>
+        <div id="backupWidget" style="display:none;flex-direction:column;align-items:flex-end;gap:2px">
+          <button id="backupNowBtn"
+            onclick="runAutoBackup(true)"
+            title="Download backup + sync to Google Sheet"
+            style="background:transparent;border:1px solid rgba(210,175,100,0.35);border-radius:5px;
+                   color:var(--gold);font-family:var(--mono);font-size:0.58rem;
+                   letter-spacing:0.06em;padding:3px 8px;cursor:pointer;
+                   transition:all 0.15s;white-space:nowrap"
+            onmouseover="this.style.background='rgba(210,175,100,0.1)'"
+            onmouseout="this.style.background='transparent'">
+            💾 Backup Now
+          </button>
+          <div style="font-family:var(--mono);font-size:0.5rem;color:var(--text3);text-align:right">
+            Last: <span id="lastBackupTime">Never</span>
+          </div>
+        </div>
         <button onclick="window._firebaseLogout()"
           title="Sign out"
           style="background:transparent;border:1px solid var(--border);border-radius:5px;
@@ -4337,8 +4354,10 @@ function enterManagerMode() {
   document.getElementById('app').style.display='';
   document.body.classList.remove('guest-mode','staff-mode'); document.body.classList.add('manager-mode','staff-mode');
   const ind=document.getElementById('modeIndicator'); ind.className='manager'; ind.textContent='✓ Manager';
-  // Manager sees export tab
+  // Manager sees export tab and backup widget
   document.getElementById('tab-export').style.display='';
+  const bw = document.getElementById('backupWidget');
+  if (bw) { bw.style.display='flex'; updateLastBackupDisplay(); }
   startApp();
 }
 
@@ -4435,6 +4454,184 @@ function initStripScrollCollapse() {
   }, { passive: true });
 }
 setInterval(()=>{ purgeExpiredHolds(); }, 60*60*1000);
+
+/* ══════════════════════════════════════════════
+   AUTO-BACKUP SYSTEM
+   - Runs every 2 hours when logged in
+   - Exports all reservations (full year)
+   - Sends email via mailto + syncs to Google Sheet
+   ══════════════════════════════════════════════ */
+
+const BACKUP_INTERVAL_MS = 2 * 60 * 60 * 1000; // 2 hours
+const BACKUP_STORAGE_KEY = 'osaka_last_backup';
+let _backupTimer = null;
+
+function getLastBackupTime() {
+  try { return parseInt(localStorage.getItem(BACKUP_STORAGE_KEY) || '0'); } catch(e) { return 0; }
+}
+function setLastBackupTime() {
+  try { localStorage.setItem(BACKUP_STORAGE_KEY, String(Date.now())); } catch(e) {}
+}
+
+async function fetchAllReservationsForBackup() {
+  if (!window._db) return [];
+  const y = new Date().getFullYear();
+  const rows = [];
+  // Build list of dates for the full year
+  const dates = [];
+  const start = new Date(y, 0, 1);
+  const end   = new Date(y, 11, 31);
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    const dk = d.toISOString().slice(0,10);
+    dates.push(dk);
+  }
+  // Fetch hibachi + dining in parallel batches
+  const batchSize = 30;
+  for (let i = 0; i < dates.length; i += batchSize) {
+    const batch = dates.slice(i, i + batchSize);
+    await Promise.all(batch.map(async dk => {
+      try {
+        const hSnap = await window._get(window._ref(window._db, 'reservations/hibachi/' + dk));
+        if (hSnap.exists()) Object.values(hSnap.val()).forEach(r => rows.push({
+          date: dk, time: r.slot ? displayTime(r.slot) : '—',
+          guests: r.guests||'', name: r.name||'', phone: r.phone||'',
+          initials: r.initials||'', type: 'Hibachi', notes: (r.notes||'').replace(/\n/g,' '),
+          _sortKey: dk + (r.slot||'00:00')
+        }));
+      } catch(e) {}
+      try {
+        const dSnap = await window._get(window._ref(window._db, 'reservations/dining/' + dk));
+        if (dSnap.exists()) Object.values(dSnap.val()).forEach(r => rows.push({
+          date: dk, time: '—', guests: r.guests||'', name: r.name||'',
+          phone: r.phone||'', initials: r.initials||'', type: 'Dining',
+          notes: (r.notes||'').replace(/\n/g,' '), _sortKey: dk + '99:99'
+        }));
+      } catch(e) {}
+    }));
+  }
+  rows.sort((a,b) => a._sortKey < b._sortKey ? -1 : 1);
+  return rows;
+}
+
+function buildBackupTsv(rows) {
+  const headers = ['DATE','TIME','GUESTS','NAME','PHONE','INITIALS','TYPE','NOTES'];
+  const lines = [headers.join('\t')];
+  rows.forEach(r => lines.push([
+    fmtDateDisplay(r.date), r.time, String(r.guests),
+    r.name, r.phone, r.initials, r.type, r.notes||''
+  ].join('\t')));
+  return lines.join('\n');
+}
+
+async function runAutoBackup(isManual) {
+  if (!window._db || !window._fbReady) return;
+  if (!window._currentUserEmail) return; // only run when logged in
+
+  const now = Date.now();
+  if (!isManual && (now - getLastBackupTime()) < BACKUP_INTERVAL_MS) return;
+
+  const btn = document.getElementById('backupNowBtn');
+  if (btn) { btn.textContent = 'Backing up…'; btn.disabled = true; }
+
+  try {
+    const rows = await fetchAllReservationsForBackup();
+    if (!rows.length) {
+      if (btn) { btn.textContent = '✕ No data'; setTimeout(()=>{ btn.textContent='💾 Backup Now'; btn.disabled=false; }, 3000); }
+      return;
+    }
+
+    const tsv = buildBackupTsv(rows);
+    const dateStr = new Date().toLocaleString('en-CA', { timeZone: 'America/Halifax' });
+    const subject = 'Osaka Hibachi — Auto Backup ' + dateStr;
+
+    // ── 1. Download CSV file automatically ──
+    const blob = new Blob([tsv], { type: 'text/tab-separated-values' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'hibachi-backup-' + new Date().toISOString().slice(0,10) + '.tsv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    // ── 2. Sync to Google Sheet if URL saved ──
+    const sheetUrl = localStorage.getItem('appsScriptUrl');
+    if (sheetUrl && sheetUrl.startsWith('https://script.google.com')) {
+      const headers = ['DATE','TIME','GUESTS','NAME','PHONE','INITIALS','TYPE','NOTES'];
+      const sheetRows = [headers];
+      rows.forEach(r => sheetRows.push([fmtDateDisplay(r.date), r.time, String(r.guests), r.name, r.phone, r.initials, r.type, r.notes||'']));
+      try {
+        await fetch(sheetUrl, {
+          method: 'POST', mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rows: sheetRows, sheet: 'Reservations 2026' })
+        });
+      } catch(e) {}
+    }
+
+    // ── 3. Email body — try mailto for small exports, fallback to txt download ──
+    const col = (s,w) => String(s||'').padEnd(w).slice(0,w);
+    const div = '─'.repeat(88);
+    let body = 'OSAKA HIBACHI — AUTO BACKUP\nGenerated: ' + dateStr + '\nTotal: ' + rows.length + ' reservations\n\n' + div + '\n';
+    body += col('DATE',22)+col('TIME',8)+col('#',4)+col('NAME',18)+col('PHONE',15)+col('INIT',6)+col('TYPE',8)+'NOTES\n'+div+'\n';
+    rows.forEach(r => { body += col(fmtDateDisplay(r.date),22)+col(r.time,8)+col(r.guests,4)+col(r.name,18)+col(r.phone,15)+col(r.initials,6)+col(r.type,8)+(r.notes||'')+'\n'; });
+    body += div + '\nTOTAL GUESTS: ' + rows.reduce((s,r) => s + (parseInt(r.guests)||0), 0) + '\n';
+    const enc = encodeURIComponent(body);
+    if (enc.length <= 8000) {
+      window.location.href = 'mailto:ohbc599@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + enc;
+    } else {
+      const txtBlob = new Blob([body], { type: 'text/plain' });
+      const txtUrl  = URL.createObjectURL(txtBlob);
+      const txtA    = document.createElement('a');
+      txtA.href     = txtUrl;
+      txtA.download = 'hibachi-email-' + new Date().toISOString().slice(0,10) + '.txt';
+      document.body.appendChild(txtA);
+      txtA.click();
+      document.body.removeChild(txtA);
+      URL.revokeObjectURL(txtUrl);
+    }
+
+    setLastBackupTime();
+
+    // Update button
+    if (btn) {
+      btn.textContent = '✓ Backed up ' + rows.length + ' reservations';
+      btn.style.color = 'var(--green)';
+      setTimeout(() => { btn.textContent = '💾 Backup Now'; btn.style.color = ''; btn.disabled = false; }, 5000);
+    }
+
+    // Update last backup display
+    updateLastBackupDisplay();
+
+  } catch(err) {
+    if (btn) { btn.textContent = '✕ Backup failed'; setTimeout(()=>{ btn.textContent='💾 Backup Now'; btn.disabled=false; }, 3000); }
+  }
+}
+
+function updateLastBackupDisplay() {
+  const el = document.getElementById('lastBackupTime');
+  if (!el) return;
+  const t = getLastBackupTime();
+  if (!t) { el.textContent = 'Never'; return; }
+  const d = new Date(t);
+  el.textContent = d.toLocaleString('en-CA', { timeZone: 'America/Halifax', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function startBackupTimer() {
+  if (_backupTimer) clearInterval(_backupTimer);
+  // Check every 5 minutes whether 2 hours have passed
+  _backupTimer = setInterval(() => { runAutoBackup(false); }, 5 * 60 * 1000);
+  // Also run once shortly after login to catch any missed backup
+  setTimeout(() => { runAutoBackup(false); }, 30 * 1000);
+}
+
+// Start timer once Firebase is ready and user is logged in
+document.addEventListener('fbReady', () => {
+  startBackupTimer();
+  updateLastBackupDisplay();
+});
+
 </script>
 </body>
 </html>
