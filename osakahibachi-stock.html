@@ -9,6 +9,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   const cfg = {
     apiKey:"AIzaSyAaeU0KbeoxhZ45H6EVmBzwlgwNRUXZ2W4",
     authDomain:"inventory-3dd48.firebaseapp.com",
@@ -19,7 +20,13 @@
     appId:"1:878835385850:web:79cc6698fb0a1f593f5043"
   };
   let db,ok=false;
-  try{const app=initializeApp(cfg);db=getDatabase(app);ok=true;}catch(e){}
+  try{
+    const app=initializeApp(cfg);
+    db=getDatabase(app);
+    const auth=getAuth(app);
+    signInAnonymously(auth).catch(()=>{});
+    ok=true;
+  }catch(e){}
   window._fb={db,ref,onValue,set,ok};
 </script>
 
