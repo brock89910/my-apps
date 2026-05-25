@@ -1539,7 +1539,10 @@ async function wipeCardsForDate(dk) {
 
 /* ── MIDNIGHT CARD WIPE — polling approach (fires reliably even if tab was open overnight) ── */
 let _lastWipeDate = '';
+let _midnightWipeStarted = false;
 function startMidnightWipePoller() {
+  if (_midnightWipeStarted) return;
+  _midnightWipeStarted = true;
   // On startup: immediately wipe cards for today and all past 30 days (catches any missed wipes)
   (async () => {
     for (let i = 0; i <= 30; i++) {
@@ -4510,6 +4513,7 @@ async function fetchAllReservationsForBackup() {
   for (let i = 0; i < dates.length; i += batchSize) {
     const batch = dates.slice(i, i + batchSize);
     await Promise.all(batch.map(async dk => {
+      // Hibachi reservations
       try {
         const snap = await window._get(window._ref(window._db, 'reservations/' + dk));
         if (snap.exists()) {
@@ -4525,6 +4529,25 @@ async function fetchAllReservationsForBackup() {
               type: 'Hibachi',
               notes: (r.notes||'').replace(/\n/g,' '),
               _sortKey: dk + (r.slot||'00:00')
+            });
+          });
+        }
+      } catch(e) {}
+      // Dining reservations
+      try {
+        const dSnap = await window._get(window._ref(window._db, 'dining/' + dk));
+        if (dSnap.exists()) {
+          Object.values(dSnap.val()).forEach(r => {
+            rows.push({
+              date: dk,
+              time: '—',
+              guests: r.guests||'',
+              name: r.name||'',
+              phone: r.phone||'',
+              initials: r.initials||'',
+              type: 'Dining',
+              notes: (r.notes||'').replace(/\n/g,' '),
+              _sortKey: dk + '99:99'
             });
           });
         }
