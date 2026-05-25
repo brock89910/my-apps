@@ -4562,61 +4562,39 @@ async function runAutoBackup(isManual) {
       return;
     }
 
-    const tsv = buildBackupTsv(rows);
-    const dateStr = new Date().toLocaleString('en-CA', { timeZone: 'America/Halifax' });
-    const subject = 'Osaka Hibachi — Auto Backup ' + dateStr;
-
-    // ── 1. Sync to Google Sheet ──
     const sheetUrl = localStorage.getItem('appsScriptUrl');
-    if (sheetUrl && sheetUrl.startsWith('https://script.google.com')) {
-      const headers = ['DATE','TIME','GUESTS','NAME','PHONE','INITIALS','TYPE','NOTES'];
-      const sheetRows = [headers];
-      rows.forEach(r => sheetRows.push([fmtDateDisplay(r.date), r.time, String(r.guests), r.name, r.phone, r.initials, r.type, r.notes||'']));
-      try {
-        await fetch(sheetUrl, {
-          method: 'POST', mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ rows: sheetRows, sheet: 'Reservations 2026' })
-        });
-      } catch(e) {}
+    if (!sheetUrl || !sheetUrl.startsWith('https://script.google.com')) {
+      if (btn) { btn.textContent = '✕ No sheet URL configured'; setTimeout(()=>{ btn.textContent='💾 Backup Now'; btn.disabled=false; }, 4000); }
+      return;
     }
 
-    // ── 2. Email summary ──
-    const col = (s,w) => String(s||'').padEnd(w).slice(0,w);
-    const div = '─'.repeat(88);
-    let body = 'OSAKA HIBACHI — AUTO BACKUP\nGenerated: ' + dateStr + '\nTotal: ' + rows.length + ' reservations\n\n' + div + '\n';
-    body += col('DATE',22)+col('TIME',8)+col('#',4)+col('NAME',18)+col('PHONE',15)+col('INIT',6)+col('TYPE',8)+'NOTES\n'+div+'\n';
-    rows.forEach(r => { body += col(fmtDateDisplay(r.date),22)+col(r.time,8)+col(r.guests,4)+col(r.name,18)+col(r.phone,15)+col(r.initials,6)+col(r.type,8)+(r.notes||'')+'\n'; });
-    body += div + '\nTOTAL GUESTS: ' + rows.reduce((s,r) => s + (parseInt(r.guests)||0), 0) + '\n';
-    const enc = encodeURIComponent(body);
-    if (enc.length <= 8000) {
-      window.location.href = 'mailto:ohbc599@proton.me?subject=' + encodeURIComponent(subject) + '&body=' + enc;
-    } else {
-      const txtBlob = new Blob([body], { type: 'text/plain' });
-      const txtUrl  = URL.createObjectURL(txtBlob);
-      const txtA    = document.createElement('a');
-      txtA.href     = txtUrl;
-      txtA.download = 'hibachi-email-' + new Date().toISOString().slice(0,10) + '.txt';
-      document.body.appendChild(txtA);
-      txtA.click();
-      document.body.removeChild(txtA);
-      URL.revokeObjectURL(txtUrl);
-    }
+    const headers = ['DATE','TIME','GUESTS','NAME','PHONE','INITIALS','GRILL','NOTES'];
+    const sheetRows = [headers];
+    rows.forEach(r => sheetRows.push([
+      fmtDateDisplay(r.date), r.time, String(r.guests),
+      r.name, r.phone, r.initials, r.type, r.notes||''
+    ]));
+
+    const resp = await fetch(sheetUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ rows: sheetRows, sheet: 'Reservations 2026' })
+    });
+
+    if (!resp.ok) throw new Error('Sheet sync failed: ' + resp.status);
 
     setLastBackupTime();
+    updateLastBackupDisplay();
 
-    // Update button
     if (btn) {
-      btn.textContent = '✓ Backed up ' + rows.length + ' reservations';
+      btn.textContent = '✓ Synced ' + rows.length + ' to Sheet';
       btn.style.color = 'var(--green)';
       setTimeout(() => { btn.textContent = '💾 Backup Now'; btn.style.color = ''; btn.disabled = false; }, 5000);
     }
 
-    // Update last backup display
-    updateLastBackupDisplay();
-
   } catch(err) {
-    if (btn) { btn.textContent = '✕ Backup failed'; setTimeout(()=>{ btn.textContent='💾 Backup Now'; btn.disabled=false; }, 3000); }
+    if (btn) { btn.textContent = '✕ Sync failed'; setTimeout(()=>{ btn.textContent='💾 Backup Now'; btn.disabled=false; }, 3000); }
+    console.error('Backup error:', err);
   }
 }
 
