@@ -4597,10 +4597,15 @@ async function runAutoBackup(isManual) {
       r.name, r.phone, r.initials, r.type, r.notes||''
     ]));
 
+    const manualNow = new Date().toLocaleString('en-CA', {
+      timeZone: 'America/Halifax',
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit', hour12: false
+    });
     const resp = await fetch(sheetUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ rows: sheetRows, sheet: 'Reservations 2026' })
+      body: JSON.stringify({ rows: sheetRows, sheet: 'Reservations 2026', syncLabel: 'Manual sync — ' + manualNow })
     });
 
     if (!resp.ok) throw new Error('Sheet sync failed: ' + resp.status);
@@ -4684,8 +4689,9 @@ setInterval(checkDbHealth, 60 * 1000);
 let _sheetSyncInterval = null;
 let _sheetSyncRunning = false;
 
-async function syncToSheets() {
-  if (_sheetSyncRunning) return; // prevent overlap if a run takes long
+async function syncToSheets(source) {
+  // source: 'auto' or 'manual'
+  if (_sheetSyncRunning) return;
   _sheetSyncRunning = true;
   try {
     const sheetUrl = localStorage.getItem('appsScriptUrl');
@@ -4693,6 +4699,12 @@ async function syncToSheets() {
     if (!window._db || !window._fbReady) return;
     const rows = await fetchAllReservationsForBackup();
     if (!rows.length) return;
+    const now = new Date().toLocaleString('en-CA', {
+      timeZone: 'America/Halifax',
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit', hour12: false
+    });
+    const syncLabel = (source === 'manual' ? 'Manual' : 'Auto') + ' sync — ' + now;
     const headers = ['DATE','TIME','GUESTS','NAME','PHONE','INITIALS','TYPE','NOTES'];
     const sheetRows = [headers];
     rows.forEach(r => sheetRows.push([
@@ -4702,7 +4714,7 @@ async function syncToSheets() {
     await fetch(sheetUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ rows: sheetRows, sheet: 'Reservations 2026' })
+      body: JSON.stringify({ rows: sheetRows, sheet: 'Reservations 2026', syncLabel })
     });
   } catch(e) {}
   finally { _sheetSyncRunning = false; }
@@ -4710,7 +4722,7 @@ async function syncToSheets() {
 
 function startSheetSyncInterval() {
   if (_sheetSyncInterval) return; // only one interval ever
-  _sheetSyncInterval = setInterval(syncToSheets, 2 * 60 * 1000); // every 2 minutes
+  _sheetSyncInterval = setInterval(() => syncToSheets('auto'), 2 * 60 * 1000); // every 2 minutes
 }
 
 window._syncToSheets = syncToSheets;
