@@ -4679,14 +4679,38 @@ setInterval(checkDbHealth, 60 * 1000);
    ══════════════════════════════════════════════ */
 
 async function syncToSheets() {
-  // Small delay to let Firebase finish writing before we read it back
-  await new Promise(resolve => setTimeout(resolve, 3000));
   const sheetUrl = localStorage.getItem('appsScriptUrl');
   if (!sheetUrl || !sheetUrl.startsWith('https://script.google.com')) return;
   if (!window._db || !window._fbReady) return;
   try {
-    const rows = await fetchAllReservationsForBackup();
+    // Build rows from local in-memory state — always current, no cache issues
+    const rows = [];
+    Object.entries(reservations).forEach(([dk, dayData]) => {
+      Object.entries(dayData || {}).forEach(([id, r]) => {
+        if (!r || r.removed || id === '__chefRemoved') return;
+        rows.push({
+          date: dk, time: r.slot ? displayTime(r.slot) : '\u2014',
+          guests: r.guests||'', name: r.name||'', phone: r.phone||'',
+          initials: r.initials||'', type: 'Hibachi',
+          notes: (r.notes||'').replace(/\n/g,' '),
+          _sortKey: dk + (r.slot||'00:00')
+        });
+      });
+    });
+    Object.entries(diningReservations).forEach(([dk, dayData]) => {
+      Object.entries(dayData || {}).forEach(([id, r]) => {
+        if (!r) return;
+        rows.push({
+          date: dk, time: r.time ? displayTime(r.time) : '\u2014',
+          guests: r.guests||'', name: r.name||'', phone: r.phone||'',
+          initials: r.initials||'', type: 'Dining',
+          notes: (r.notes||'').replace(/\n/g,' '),
+          _sortKey: dk + '99:99'
+        });
+      });
+    });
     if (!rows.length) return;
+    rows.sort((a,b) => a._sortKey < b._sortKey ? -1 : 1);
     const headers = ['DATE','TIME','GUESTS','NAME','PHONE','INITIALS','TYPE','NOTES'];
     const sheetRows = [headers];
     rows.forEach(r => sheetRows.push([
@@ -4694,8 +4718,8 @@ async function syncToSheets() {
       r.name, r.phone, r.initials, r.type, r.notes||''
     ]));
     await fetch(sheetUrl, {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ rows: sheetRows, sheet: 'Reservations 2026' })
     });
   } catch(e) {}
