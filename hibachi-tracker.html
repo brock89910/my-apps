@@ -4406,6 +4406,8 @@ function startApp() {
   purgeExpiredHolds();
   startMidnightWipePoller(); // polling-based, fires at 23:59 every day reliably
   setTimeout(initStripScrollCollapse, 300); // after DOM is ready
+  // Preload full year into memory so real-time sheet sync is always complete
+  if (window._preloadAllReservations) setTimeout(window._preloadAllReservations, 2000);
 }
 
 function getDisplayName(resId,realName,dateStr) {
@@ -4515,7 +4517,7 @@ async function fetchAllReservationsForBackup() {
     await Promise.all(batch.map(async dk => {
       // Hibachi reservations
       try {
-        const snap = await window._get(window._ref(window._db, 'reservations/' + dk), { source: 'server' });
+        const snap = await window._get(window._ref(window._db, 'reservations/' + dk));
         if (snap.exists()) {
           Object.values(snap.val()).forEach(r => {
             if (r.removed) return; // skip __chefRemoved sentinels
@@ -4535,7 +4537,7 @@ async function fetchAllReservationsForBackup() {
       } catch(e) {}
       // Dining reservations
       try {
-        const dSnap = await window._get(window._ref(window._db, 'dining/' + dk), { source: 'server' });
+        const dSnap = await window._get(window._ref(window._db, 'dining/' + dk));
         if (dSnap.exists()) {
           Object.values(dSnap.val()).forEach(r => {
             rows.push({
@@ -4708,6 +4710,39 @@ async function syncToSheets() {
 
 // Expose so reservation write functions can call it
 window._syncToSheets = syncToSheets;
+
+// Preload full year into memory so real-time sync always has complete data
+async function preloadAllReservations() {
+  if (!window._db || !window._fbReady) return;
+  const y = new Date().getFullYear();
+  const dates = [];
+  const start = new Date(y, 0, 1);
+  const end   = new Date(y, 11, 31);
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    dates.push(d.toISOString().slice(0, 10));
+  }
+  const batchSize = 30;
+  for (let i = 0; i < dates.length; i += batchSize) {
+    const batch = dates.slice(i, i + batchSize);
+    await Promise.all(batch.map(async dk => {
+      try {
+        const snap = await window._get(window._ref(window._db, 'reservations/' + dk));
+        if (snap.exists()) {
+          if (!reservations[dk]) reservations[dk] = {};
+          Object.assign(reservations[dk], snap.val());
+        }
+      } catch(e) {}
+      try {
+        const dSnap = await window._get(window._ref(window._db, 'dining/' + dk));
+        if (dSnap.exists()) {
+          if (!diningReservations[dk]) diningReservations[dk] = {};
+          Object.assign(diningReservations[dk], dSnap.val());
+        }
+      } catch(e) {}
+    }));
+  }
+}
+window._preloadAllReservations = preloadAllReservations;
 
 </script>
 </body>
