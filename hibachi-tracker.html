@@ -4680,7 +4680,7 @@ setInterval(checkDbHealth, 60 * 1000);
 
 async function syncToSheets() {
   // Small delay to let Firebase finish writing before we read it back
-  await new Promise(resolve => setTimeout(resolve, 1500));
+  await new Promise(resolve => setTimeout(resolve, 3000));
   const sheetUrl = localStorage.getItem('appsScriptUrl');
   if (!sheetUrl || !sheetUrl.startsWith('https://script.google.com')) return;
   if (!window._db || !window._fbReady) return;
