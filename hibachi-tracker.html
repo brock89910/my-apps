@@ -598,6 +598,18 @@ body::before {
 .grill-assign-badge.double { background: rgba(196,158,84,0.14); color: var(--gold); border: 1px solid rgba(200,150,42,0.35); }
 
 /* ── WARNING BANNER ── */
+.db-offline-banner {
+  display:none;
+  background:#7a1a1a;
+  color:#ffd0d0;
+  font-size:13px;
+  font-weight:600;
+  padding:10px 16px;
+  text-align:center;
+  border-bottom:2px solid #c03030;
+  letter-spacing:0.01em;
+  z-index:999;
+}
 .warn-banner {
   background: rgba(200,150,42,0.08);
   border: 1px solid rgba(200,150,42,0.3);
@@ -1123,6 +1135,11 @@ body.staff-mode .real-name { display: inline; }
 
 <!-- ════ APP ════ -->
 <div id="app" style="display:none">
+
+  <!-- DB OFFLINE BANNER -->
+  <div id="dbOfflineBanner" class="db-offline-banner">
+    ⚠️ Database offline — reservations cannot be saved or loaded. Do not take reservations. Contact manager.
+  </div>
 
   <!-- HEADER -->
   <div class="app-header">
@@ -3743,6 +3760,7 @@ async function saveHibachi(dk,editId) {
       await logAudit('create',name+' · '+guests+'p · '+displayTime(slot)+' · '+grillStr,initials);
     }
     closeModal();
+    if (window._syncToSheets) window._syncToSheets();
   } catch(e) { showErr('Firebase error: '+e.message); }
 }
 
@@ -3778,6 +3796,7 @@ async function saveHibachiOverride(dk,editId) {
     else await window._push(window._ref(window._db,`reservations/${dk}`),data);
     await logAudit('create',name+' · '+guests+'p · '+displayTime(slot)+' · '+grillStr,initials);
     closeModal();
+    if (window._syncToSheets) window._syncToSheets();
   } catch(e) { if(oeEl){oeEl.textContent='Firebase error: '+e.message;oeEl.style.display='block';} }
 }
 
@@ -3789,6 +3808,7 @@ async function deleteRes(dk,id) {
     await logAudit('delete',(r?.name||'?')+' · '+(r?.guests||'?')+'p · '+displayTime(r?.slot||'00:00'),initials);
     await safeWrite(window._ref(window._db,`reservations/${dk}/${id}`),null,'remove');
     closeModal();
+    if (window._syncToSheets) window._syncToSheets();
   } catch(e) { showErr('Firebase error: '+e.message); }
 }
 
@@ -3833,6 +3853,7 @@ async function saveDining(dk,editId) {
     if (editId) { await window._set(window._ref(window._db,`dining/${dk}/${editId}`),data); await logAudit('edit','Dining: '+name+' · '+guests+'p · '+displayTime(time),''); }
     else { await window._push(window._ref(window._db,`dining/${dk}`),data); await logAudit('create','Dining: '+name+' · '+guests+'p · '+displayTime(time),''); }
     closeModal();
+    if (window._syncToSheets) window._syncToSheets();
   } catch(e) { showErr('Firebase error: '+e.message); }
 }
 
@@ -3840,6 +3861,7 @@ async function deleteDining(dk,id) {
   if (!confirm('Remove this reservation?')) return;
   await window._remove(window._ref(window._db,`dining/${dk}/${id}`));
   closeModal();
+  if (window._syncToSheets) window._syncToSheets();
 }
 
 /* ── BLOCK SLOT & CAP ── */
@@ -3963,6 +3985,7 @@ async function moveReservation() {
     );
 
     closeModal();
+    if (window._syncToSheets) window._syncToSheets();
     alert('✓ Reservation moved to ' + newDate + ' at ' + displayTime(newTime) + '.');
   } catch(e) {
     if (me) me.textContent = '⚠ Error: ' + e.message;
@@ -4477,35 +4500,34 @@ async function fetchAllReservationsForBackup() {
   if (!window._db) return [];
   const y = new Date().getFullYear();
   const rows = [];
-  // Build list of dates for the full year
   const dates = [];
   const start = new Date(y, 0, 1);
   const end   = new Date(y, 11, 31);
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-    const dk = d.toISOString().slice(0,10);
-    dates.push(dk);
+    dates.push(d.toISOString().slice(0,10));
   }
-  // Fetch hibachi + dining in parallel batches
   const batchSize = 30;
   for (let i = 0; i < dates.length; i += batchSize) {
     const batch = dates.slice(i, i + batchSize);
     await Promise.all(batch.map(async dk => {
       try {
-        const hSnap = await window._get(window._ref(window._db, 'reservations/hibachi/' + dk));
-        if (hSnap.exists()) Object.values(hSnap.val()).forEach(r => rows.push({
-          date: dk, time: r.slot ? displayTime(r.slot) : '—',
-          guests: r.guests||'', name: r.name||'', phone: r.phone||'',
-          initials: r.initials||'', type: 'Hibachi', notes: (r.notes||'').replace(/\n/g,' '),
-          _sortKey: dk + (r.slot||'00:00')
-        }));
-      } catch(e) {}
-      try {
-        const dSnap = await window._get(window._ref(window._db, 'reservations/dining/' + dk));
-        if (dSnap.exists()) Object.values(dSnap.val()).forEach(r => rows.push({
-          date: dk, time: '—', guests: r.guests||'', name: r.name||'',
-          phone: r.phone||'', initials: r.initials||'', type: 'Dining',
-          notes: (r.notes||'').replace(/\n/g,' '), _sortKey: dk + '99:99'
-        }));
+        const snap = await window._get(window._ref(window._db, 'reservations/' + dk));
+        if (snap.exists()) {
+          Object.values(snap.val()).forEach(r => {
+            if (r.removed) return; // skip __chefRemoved sentinels
+            rows.push({
+              date: dk,
+              time: r.slot ? displayTime(r.slot) : '—',
+              guests: r.guests||'',
+              name: r.name||'',
+              phone: r.phone||'',
+              initials: r.initials||'',
+              type: 'Hibachi',
+              notes: (r.notes||'').replace(/\n/g,' '),
+              _sortKey: dk + (r.slot||'00:00')
+            });
+          });
+        }
       } catch(e) {}
     }));
   }
@@ -4579,7 +4601,7 @@ async function runAutoBackup(isManual) {
     body += div + '\nTOTAL GUESTS: ' + rows.reduce((s,r) => s + (parseInt(r.guests)||0), 0) + '\n';
     const enc = encodeURIComponent(body);
     if (enc.length <= 8000) {
-      window.location.href = 'mailto:ohbc599@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + enc;
+      window.location.href = 'mailto:ohbc599@proton.me?subject=' + encodeURIComponent(subject) + '&body=' + enc;
     } else {
       const txtBlob = new Blob([body], { type: 'text/plain' });
       const txtUrl  = URL.createObjectURL(txtBlob);
@@ -4630,7 +4652,65 @@ function startBackupTimer() {
 document.addEventListener('fbReady', () => {
   startBackupTimer();
   updateLastBackupDisplay();
+  checkDbHealth();
 });
+
+/* ══════════════════════════════════════════════
+   FIREBASE HEALTH CHECK
+   - Runs on login and every 60 seconds
+   - Shows ⚠️ banner if database is unreachable
+   ══════════════════════════════════════════════ */
+
+async function checkDbHealth() {
+  const banner = document.getElementById('dbOfflineBanner');
+  if (!banner) return;
+  if (!window._db || !window._fbReady) {
+    banner.style.display = 'block';
+    return;
+  }
+  try {
+    const snap = await window._get(window._ref(window._db, '.info/connected'));
+    // .info/connected returns true/false
+    const connected = snap.val();
+    banner.style.display = connected ? 'none' : 'block';
+  } catch(e) {
+    banner.style.display = 'block';
+  }
+}
+
+// Poll health every 60 seconds
+setInterval(checkDbHealth, 60 * 1000);
+
+/* ══════════════════════════════════════════════
+   REAL-TIME GOOGLE SHEETS SYNC
+   - Fires on every reservation write (add/edit/delete/move)
+   - Uses the same Apps Script URL as the backup
+   - Silently fails if no URL configured
+   ══════════════════════════════════════════════ */
+
+async function syncToSheets() {
+  const sheetUrl = localStorage.getItem('appsScriptUrl');
+  if (!sheetUrl || !sheetUrl.startsWith('https://script.google.com')) return;
+  if (!window._db || !window._fbReady) return;
+  try {
+    const rows = await fetchAllReservationsForBackup();
+    if (!rows.length) return;
+    const headers = ['DATE','TIME','GUESTS','NAME','PHONE','INITIALS','TYPE','NOTES'];
+    const sheetRows = [headers];
+    rows.forEach(r => sheetRows.push([
+      fmtDateDisplay(r.date), r.time, String(r.guests),
+      r.name, r.phone, r.initials, r.type, r.notes||''
+    ]));
+    await fetch(sheetUrl, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rows: sheetRows, sheet: 'Reservations 2026' })
+    });
+  } catch(e) {}
+}
+
+// Expose so reservation write functions can call it
+window._syncToSheets = syncToSheets;
 
 </script>
 </body>
