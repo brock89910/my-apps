@@ -3763,7 +3763,6 @@ async function saveHibachi(dk,editId) {
       await logAudit('create',name+' · '+guests+'p · '+displayTime(slot)+' · '+grillStr,initials);
     }
     closeModal();
-    if (window._syncToSheets) window._syncToSheets();
   } catch(e) { showErr('Firebase error: '+e.message); }
 }
 
@@ -3799,7 +3798,6 @@ async function saveHibachiOverride(dk,editId) {
     else await window._push(window._ref(window._db,`reservations/${dk}`),data);
     await logAudit('create',name+' · '+guests+'p · '+displayTime(slot)+' · '+grillStr,initials);
     closeModal();
-    if (window._syncToSheets) window._syncToSheets();
   } catch(e) { if(oeEl){oeEl.textContent='Firebase error: '+e.message;oeEl.style.display='block';} }
 }
 
@@ -3811,7 +3809,6 @@ async function deleteRes(dk,id) {
     await logAudit('delete',(r?.name||'?')+' · '+(r?.guests||'?')+'p · '+displayTime(r?.slot||'00:00'),initials);
     await safeWrite(window._ref(window._db,`reservations/${dk}/${id}`),null,'remove');
     closeModal();
-    if (window._syncToSheets) window._syncToSheets();
   } catch(e) { showErr('Firebase error: '+e.message); }
 }
 
@@ -3856,7 +3853,6 @@ async function saveDining(dk,editId) {
     if (editId) { await window._set(window._ref(window._db,`dining/${dk}/${editId}`),data); await logAudit('edit','Dining: '+name+' · '+guests+'p · '+displayTime(time),''); }
     else { await window._push(window._ref(window._db,`dining/${dk}`),data); await logAudit('create','Dining: '+name+' · '+guests+'p · '+displayTime(time),''); }
     closeModal();
-    if (window._syncToSheets) window._syncToSheets();
   } catch(e) { showErr('Firebase error: '+e.message); }
 }
 
@@ -3864,7 +3860,6 @@ async function deleteDining(dk,id) {
   if (!confirm('Remove this reservation?')) return;
   await window._remove(window._ref(window._db,`dining/${dk}/${id}`));
   closeModal();
-  if (window._syncToSheets) window._syncToSheets();
 }
 
 /* ── BLOCK SLOT & CAP ── */
@@ -3988,7 +3983,6 @@ async function moveReservation() {
     );
 
     closeModal();
-    if (window._syncToSheets) window._syncToSheets();
     alert('✓ Reservation moved to ' + newDate + ' at ' + displayTime(newTime) + '.');
   } catch(e) {
     if (me) me.textContent = '⚠ Error: ' + e.message;
@@ -4406,8 +4400,10 @@ function startApp() {
   purgeExpiredHolds();
   startMidnightWipePoller(); // polling-based, fires at 23:59 every day reliably
   setTimeout(initStripScrollCollapse, 300); // after DOM is ready
-  // Preload full year into memory so real-time sheet sync is always complete
+  // Preload full year into memory so sheet sync always has complete data
   if (window._preloadAllReservations) setTimeout(window._preloadAllReservations, 2000);
+  // Start 2-minute sheet sync interval (only runs if manager is logged in)
+  if (window._startSheetSyncInterval) window._startSheetSyncInterval();
 }
 
 function getDisplayName(resId,realName,dateStr) {
@@ -4680,37 +4676,45 @@ setInterval(checkDbHealth, 60 * 1000);
    - Silently fails if no URL configured
    ══════════════════════════════════════════════ */
 
-// Debounce timer for real-time sync
-let _syncDebounceTimer = null;
+/* ── INTERVAL-BASED SHEET SYNC ─────────────────────────────────────────
+   Runs every 2 minutes. No race conditions, no debounce, no action triggers.
+   Firebase is always settled by the time this fires.
+   ~75 KB per run × 720 runs/day = ~54 MB/day — well within free tier limits.
+   ──────────────────────────────────────────────────────────────────────── */
+let _sheetSyncInterval = null;
+let _sheetSyncRunning = false;
 
 async function syncToSheets() {
-  // Debounce: wait 4s after last action so onValue listeners have time to update Firebase
-  if (_syncDebounceTimer) clearTimeout(_syncDebounceTimer);
-  _syncDebounceTimer = setTimeout(async () => {
+  if (_sheetSyncRunning) return; // prevent overlap if a run takes long
+  _sheetSyncRunning = true;
+  try {
     const sheetUrl = localStorage.getItem('appsScriptUrl');
     if (!sheetUrl || !sheetUrl.startsWith('https://script.google.com')) return;
     if (!window._db || !window._fbReady) return;
-    try {
-      // Always use fetchAllReservationsForBackup — reads fresh from Firebase, never stale
-      const rows = await fetchAllReservationsForBackup();
-      if (!rows.length) return;
-      const headers = ['DATE','TIME','GUESTS','NAME','PHONE','INITIALS','TYPE','NOTES'];
-      const sheetRows = [headers];
-      rows.forEach(r => sheetRows.push([
-        fmtDateDisplay(r.date), r.time, String(r.guests),
-        r.name, r.phone, r.initials, r.type, r.notes||''
-      ]));
-      await fetch(sheetUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ rows: sheetRows, sheet: 'Reservations 2026' })
-      });
-    } catch(e) {}
-  }, 4000);
+    const rows = await fetchAllReservationsForBackup();
+    if (!rows.length) return;
+    const headers = ['DATE','TIME','GUESTS','NAME','PHONE','INITIALS','TYPE','NOTES'];
+    const sheetRows = [headers];
+    rows.forEach(r => sheetRows.push([
+      fmtDateDisplay(r.date), r.time, String(r.guests),
+      r.name, r.phone, r.initials, r.type, r.notes||''
+    ]));
+    await fetch(sheetUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ rows: sheetRows, sheet: 'Reservations 2026' })
+    });
+  } catch(e) {}
+  finally { _sheetSyncRunning = false; }
 }
 
-// Expose so reservation write functions can call it
+function startSheetSyncInterval() {
+  if (_sheetSyncInterval) return; // only one interval ever
+  _sheetSyncInterval = setInterval(syncToSheets, 2 * 60 * 1000); // every 2 minutes
+}
+
 window._syncToSheets = syncToSheets;
+window._startSheetSyncInterval = startSheetSyncInterval;
 
 // Preload full year into memory so real-time sync always has complete data
 async function preloadAllReservations() {
