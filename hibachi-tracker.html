@@ -4566,18 +4566,7 @@ async function runAutoBackup(isManual) {
     const dateStr = new Date().toLocaleString('en-CA', { timeZone: 'America/Halifax' });
     const subject = 'Osaka Hibachi — Auto Backup ' + dateStr;
 
-    // ── 1. Download CSV file automatically ──
-    const blob = new Blob([tsv], { type: 'text/tab-separated-values' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = 'hibachi-backup-' + new Date().toISOString().slice(0,10) + '.tsv';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    // ── 2. Sync to Google Sheet if URL saved ──
+    // ── 1. Sync to Google Sheet ──
     const sheetUrl = localStorage.getItem('appsScriptUrl');
     if (sheetUrl && sheetUrl.startsWith('https://script.google.com')) {
       const headers = ['DATE','TIME','GUESTS','NAME','PHONE','INITIALS','TYPE','NOTES'];
@@ -4592,7 +4581,7 @@ async function runAutoBackup(isManual) {
       } catch(e) {}
     }
 
-    // ── 3. Email body — try mailto for small exports, fallback to txt download ──
+    // ── 2. Email summary ──
     const col = (s,w) => String(s||'').padEnd(w).slice(0,w);
     const div = '─'.repeat(88);
     let body = 'OSAKA HIBACHI — AUTO BACKUP\nGenerated: ' + dateStr + '\nTotal: ' + rows.length + ' reservations\n\n' + div + '\n';
@@ -4669,10 +4658,9 @@ async function checkDbHealth() {
     return;
   }
   try {
-    const snap = await window._get(window._ref(window._db, '.info/connected'));
-    // .info/connected returns true/false
-    const connected = snap.val();
-    banner.style.display = connected ? 'none' : 'block';
+    // Use a real read instead of .info/connected (which doesn't work with get())
+    await window._get(window._ref(window._db, 'reservations'));
+    banner.style.display = 'none';
   } catch(e) {
     banner.style.display = 'block';
   }
