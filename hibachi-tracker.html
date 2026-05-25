@@ -4515,7 +4515,7 @@ async function fetchAllReservationsForBackup() {
     await Promise.all(batch.map(async dk => {
       // Hibachi reservations
       try {
-        const snap = await window._get(window._ref(window._db, 'reservations/' + dk));
+        const snap = await window._get(window._ref(window._db, 'reservations/' + dk), { source: 'server' });
         if (snap.exists()) {
           Object.values(snap.val()).forEach(r => {
             if (r.removed) return; // skip __chefRemoved sentinels
@@ -4535,7 +4535,7 @@ async function fetchAllReservationsForBackup() {
       } catch(e) {}
       // Dining reservations
       try {
-        const dSnap = await window._get(window._ref(window._db, 'dining/' + dk));
+        const dSnap = await window._get(window._ref(window._db, 'dining/' + dk), { source: 'server' });
         if (dSnap.exists()) {
           Object.values(dSnap.val()).forEach(r => {
             rows.push({
@@ -4678,51 +4678,32 @@ setInterval(checkDbHealth, 60 * 1000);
    - Silently fails if no URL configured
    ══════════════════════════════════════════════ */
 
+// Debounce timer for real-time sync
+let _syncDebounceTimer = null;
+
 async function syncToSheets() {
-  const sheetUrl = localStorage.getItem('appsScriptUrl');
-  if (!sheetUrl || !sheetUrl.startsWith('https://script.google.com')) return;
-  if (!window._db || !window._fbReady) return;
-  try {
-    // Build rows from local in-memory state — always current, no cache issues
-    const rows = [];
-    Object.entries(reservations).forEach(([dk, dayData]) => {
-      Object.entries(dayData || {}).forEach(([id, r]) => {
-        if (!r || r.removed || id === '__chefRemoved') return;
-        rows.push({
-          date: dk, time: r.slot ? displayTime(r.slot) : '\u2014',
-          guests: r.guests||'', name: r.name||'', phone: r.phone||'',
-          initials: r.initials||'', type: 'Hibachi',
-          notes: (r.notes||'').replace(/\n/g,' '),
-          _sortKey: dk + (r.slot||'00:00')
-        });
+  // Debounce: wait 2s after last action before syncing
+  if (_syncDebounceTimer) clearTimeout(_syncDebounceTimer);
+  _syncDebounceTimer = setTimeout(async () => {
+    const sheetUrl = localStorage.getItem('appsScriptUrl');
+    if (!sheetUrl || !sheetUrl.startsWith('https://script.google.com')) return;
+    if (!window._db || !window._fbReady) return;
+    try {
+      const rows = await fetchAllReservationsForBackup();
+      if (!rows.length) return;
+      const headers = ['DATE','TIME','GUESTS','NAME','PHONE','INITIALS','TYPE','NOTES'];
+      const sheetRows = [headers];
+      rows.forEach(r => sheetRows.push([
+        fmtDateDisplay(r.date), r.time, String(r.guests),
+        r.name, r.phone, r.initials, r.type, r.notes||''
+      ]));
+      await fetch(sheetUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ rows: sheetRows, sheet: 'Reservations 2026' })
       });
-    });
-    Object.entries(diningReservations).forEach(([dk, dayData]) => {
-      Object.entries(dayData || {}).forEach(([id, r]) => {
-        if (!r) return;
-        rows.push({
-          date: dk, time: r.time ? displayTime(r.time) : '\u2014',
-          guests: r.guests||'', name: r.name||'', phone: r.phone||'',
-          initials: r.initials||'', type: 'Dining',
-          notes: (r.notes||'').replace(/\n/g,' '),
-          _sortKey: dk + '99:99'
-        });
-      });
-    });
-    if (!rows.length) return;
-    rows.sort((a,b) => a._sortKey < b._sortKey ? -1 : 1);
-    const headers = ['DATE','TIME','GUESTS','NAME','PHONE','INITIALS','TYPE','NOTES'];
-    const sheetRows = [headers];
-    rows.forEach(r => sheetRows.push([
-      fmtDateDisplay(r.date), r.time, String(r.guests),
-      r.name, r.phone, r.initials, r.type, r.notes||''
-    ]));
-    await fetch(sheetUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ rows: sheetRows, sheet: 'Reservations 2026' })
-    });
-  } catch(e) {}
+    } catch(e) {}
+  }, 2000);
 }
 
 // Expose so reservation write functions can call it
