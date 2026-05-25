@@ -4684,13 +4684,14 @@ setInterval(checkDbHealth, 60 * 1000);
 let _syncDebounceTimer = null;
 
 async function syncToSheets() {
-  // Debounce: wait 2s after last action before syncing
+  // Debounce: wait 4s after last action so onValue listeners have time to update Firebase
   if (_syncDebounceTimer) clearTimeout(_syncDebounceTimer);
   _syncDebounceTimer = setTimeout(async () => {
     const sheetUrl = localStorage.getItem('appsScriptUrl');
     if (!sheetUrl || !sheetUrl.startsWith('https://script.google.com')) return;
     if (!window._db || !window._fbReady) return;
     try {
+      // Always use fetchAllReservationsForBackup — reads fresh from Firebase, never stale
       const rows = await fetchAllReservationsForBackup();
       if (!rows.length) return;
       const headers = ['DATE','TIME','GUESTS','NAME','PHONE','INITIALS','TYPE','NOTES'];
@@ -4705,7 +4706,7 @@ async function syncToSheets() {
         body: JSON.stringify({ rows: sheetRows, sheet: 'Reservations 2026' })
       });
     } catch(e) {}
-  }, 2000);
+  }, 4000);
 }
 
 // Expose so reservation write functions can call it
