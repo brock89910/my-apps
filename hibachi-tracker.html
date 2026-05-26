@@ -1491,28 +1491,7 @@ async function unlockCardDetails(editId) {
 }
 
 /* ── HOLDS & CARD WIPE ── */
-async function purgeExpiredHolds() {
-  if (!window._db) return;
-  const today = dateKey(new Date());
-  for (let i = 1; i <= 7; i++) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    const dk = dateKey(d);
-    try {
-      const snap = await window._get(window._ref(window._db, `reservations/${dk}`));
-      const data = snap.val();
-      if (!data) continue;
-      for (const [id, r] of Object.entries(data)) {
-        if (!r.holdUntil || r.holdUntil >= today) continue;
-        await window._remove(window._ref(window._db, `reservations/${dk}/${id}`));
-        const mk = dk.slice(0,7);
-        await window._push(window._ref(window._db, `auditlog/${mk}`), {
-          action:'delete', details:`HOLD EXPIRED — ${r.name||'Guest'} · ${r.guests||'?'}p · ${r.slot ? displayTime(r.slot) : '?'} · No card by ${r.holdUntil}`,
-          staff:'AUTO', date:dk, ts:Date.now()
-        });
-      }
-    } catch(e) {}
-  }
-}
+
 
 
 
@@ -4348,8 +4327,6 @@ function startApp() {
   renderDateHeader();
   document.getElementById('liveStatus').style.display=window._fbReady?'flex':'none';
   subscribeToDate();
-  purgeExpiredHolds();
-
   setTimeout(initStripScrollCollapse, 300); // after DOM is ready
   // Preload full year into memory so sheet sync always has complete data
   if (window._preloadAllReservations) setTimeout(window._preloadAllReservations, 2000);
@@ -4428,7 +4405,7 @@ function initStripScrollCollapse() {
     _lastScrollY = y;
   }, { passive: true });
 }
-setInterval(()=>{ purgeExpiredHolds(); }, 60*60*1000);
+
 
 /* ══════════════════════════════════════════════
    AUTO-BACKUP SYSTEM
