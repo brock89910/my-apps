@@ -283,6 +283,7 @@ tr.tbl-drag-over{outline:2px solid #f59e0b;}
     </div>
     <button class="layout-btn" id="layoutBtn" onclick="toggleLayout()">⊞ Side by Side</button>
     <button class="mic-btn" id="micBtn" onclick="openVoiceLogger()">🎙️ Log</button>
+    <button class="layout-btn" id="backupBtn" onclick="openBackupModal()" title="Backup & Restore">💾 Backup</button>
     <div class="sync-st"><span class="sync-dot" id="syncDot"></span><span id="syncLbl">Local</span></div>
     <div class="t-date" id="todayDate"></div>
   </div>
@@ -1007,15 +1008,235 @@ let fb=null, addTarget=null, mlSelColor='red';
   }catch(e){localStorage.removeItem(k);}
 });
 
+// ═══════════════════════════════════════════════════════════════
+//  BACKUP SYSTEM
+// ═══════════════════════════════════════════════════════════════
+const BK_KEY     = 'ohv4_bk';
+const BK_SLOTS   = 6;
+const BK_URL_KEY = 'ohv4_sheetUrl';
+const SHEET_URL  = 'https://script.google.com/macros/s/AKfycbzI6hrez0pf7884TIMotf6f3Ax7uvpxOlmnvjXeIlLc2G5enO6SpR76M_KJbkl3ldGwPA/exec';
+
+function bkList(){
+  try{return JSON.parse(localStorage.getItem(BK_KEY)||'[]');}catch(e){return [];}
+}
+function bkSave(label){
+  const list=bkList();
+  const snap=JSON.parse(JSON.stringify(appData));
+  delete snap._suppressed;
+  const entry={ts:Date.now(),label:label||'Auto',data:JSON.stringify(snap)};
+  list.unshift(entry);
+  if(list.length>BK_SLOTS)list.length=BK_SLOTS;
+  try{localStorage.setItem(BK_KEY,JSON.stringify(list));}catch(e){}
+}
+function bkRestore(ts){
+  const snap=bkList().find(s=>s.ts===ts);
+  if(!snap){alert('Snapshot not found.');return;}
+  const d=new Date(ts);
+  const fmt=`${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+  if(!confirm(`Restore snapshot from ${fmt} — "${snap.label}"?\n\nAll current inventory data will be replaced.`))return;
+  try{
+    const restored=JSON.parse(snap.data);
+    restored._suppressed=appData._suppressed||[];
+    appData=restored;
+    save();renderAll();
+    document.getElementById('backupModal').classList.add('hidden');
+    alert(`✅ Restored: ${snap.label} (${fmt})`);
+  }catch(e){alert('Failed to restore: '+e.message);}
+}
+function manualBackup(){
+  const d=new Date();
+  const lbl=`Manual ${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+  bkSave(lbl);
+  bkRenderSnaps();
+}
+function openBackupModal(){
+  bkRenderSnaps();
+  // Pre-fill URL — prefer saved override, fall back to hardcoded
+  const saved=localStorage.getItem(BK_URL_KEY)||'';
+  document.getElementById('bkSheetUrl').value=saved||SHEET_URL;
+  document.getElementById('bkImportTx').value='';
+  document.getElementById('bkImportStatus').textContent='';
+  document.getElementById('bkSheetStatus').textContent='';
+  document.getElementById('bkPullStatus').textContent='';
+  bkSwitchTab('snap');
+  document.getElementById('backupModal').classList.remove('hidden');
+}
+function bkSwitchTab(name){
+  ['snap','sheet','import'].forEach(t=>{
+    const pane=document.getElementById('bkPane-'+t);
+    const tab=document.getElementById('bkTab-'+t);
+    const active=t===name;
+    pane.style.display=active?'':'none';
+    tab.style.borderBottomColor=active?'#1a1916':'transparent';
+    tab.style.color=active?'#1a1916':'var(--muted)';
+    tab.style.fontWeight=active?'700':'600';
+  });
+}
+function bkRenderSnaps(){
+  const list=bkList();
+  const el=document.getElementById('bkSlotList');
+  if(!list.length){
+    el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px 0;">No snapshots yet — click "Save Now" or wait for auto-save (every 30 min).</div>';
+    return;
+  }
+  el.innerHTML=list.map(s=>{
+    const d=new Date(s.ts);
+    const fmt=`${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+    let preview='';
+    try{
+      const p=JSON.parse(s.data);
+      const cc=(p.costco||[]).length;
+      const all=Object.keys(p).filter(k=>Array.isArray(p[k])).reduce((n,k)=>n+(p[k]||[]).length,0);
+      preview=`costco:${cc} · total:${all} items`;
+    }catch(e){}
+    return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bl);">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:700;">${s.label}
+          <span style="font-size:10px;font-weight:400;color:var(--muted);margin-left:4px;">${fmt}</span>
+        </div>
+        <div style="font-size:10px;color:var(--light);margin-top:2px;">${preview}</div>
+      </div>
+      <button onclick="bkExportSnap(${s.ts})" title="Download as .json file"
+        style="background:var(--bg);color:var(--muted);border:1px solid var(--border);border-radius:5px;padding:4px 8px;font-size:11px;cursor:pointer;">⬇</button>
+      <button onclick="bkRestore(${s.ts})"
+        style="background:#1a1916;color:#fff;border:none;border-radius:5px;padding:5px 10px;font-size:11px;cursor:pointer;white-space:nowrap;">Restore</button>
+    </div>`;
+  }).join('');
+}
+function bkExportSnap(ts){
+  const snap=bkList().find(s=>s.ts===ts);
+  if(!snap)return;
+  const d=new Date(ts);
+  const name=`osakahibachi-stock-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}-${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}.json`;
+  const blob=new Blob([snap.data],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=name;a.click();
+  URL.revokeObjectURL(a.href);
+}
+function bkSaveSheetUrl(){
+  const url=document.getElementById('bkSheetUrl').value.trim();
+  if(!url){alert('Please enter a URL first.');return;}
+  localStorage.setItem(BK_URL_KEY,url);
+  document.getElementById('bkSheetStatus').textContent='✅ URL saved.';
+}
+function bkGetSheetUrl(){
+  return localStorage.getItem(BK_URL_KEY)||document.getElementById('bkSheetUrl').value.trim()||SHEET_URL;
+}
+async function bkPushToSheet(){
+  const url=bkGetSheetUrl();
+  const st=document.getElementById('bkSheetStatus');
+  st.textContent='⏳ Pushing to sheet…';
+  try{
+    const toSend=JSON.parse(JSON.stringify(appData));
+    delete toSend._suppressed;
+    const res=await fetch(url,{method:'POST',body:JSON.stringify(toSend),headers:{'Content-Type':'application/json'}});
+    const json=await res.json();
+    if(json.ok){
+      st.textContent=`✅ Pushed at ${json.ts}`;
+      const d=new Date();
+      bkSave(`Sheet sync ${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`);
+      bkRenderSnaps();
+    }else{st.textContent='❌ Error: '+(json.error||'Unknown');}
+  }catch(err){st.textContent='❌ '+err.message;}
+}
+async function bkPullFromSheet(){
+  const url=bkGetSheetUrl();
+  const st=document.getElementById('bkPullStatus');
+  st.textContent='⏳ Pulling from sheet…';
+  try{
+    const res=await fetch(url+'?action=get');
+    const json=await res.json();
+    if(!json.ok){st.textContent='❌ '+(json.error||'Unknown error');return;}
+    const result=bkValidateJSON(JSON.stringify(json.data));
+    if(result.error){st.textContent='❌ '+result.error;return;}
+    if(!confirm(`Import sheet backup?\n\n${result.summary}\n\nThis will replace all current data.`))return;
+    bkApplyImport(result.parsed);
+    st.textContent='✅ Pulled and applied.';
+    document.getElementById('backupModal').classList.add('hidden');
+  }catch(err){st.textContent='❌ '+err.message;}
+}
+
+// ── JSON Import ──
+const ALL_SECS=['costco','ws','sobeys','dollarama','sysco','chinese','korea',
+  'toronto','fish','bulk','beer','wine','whitewine','draft','bargoods',
+  'mcs','sauce','extras','masterlist'];
+
+function bkValidateJSON(raw){
+  let parsed;
+  try{
+    const clean=raw.trim().replace(/^```json\s*/i,'').replace(/```\s*$/,'').trim();
+    parsed=JSON.parse(clean);
+  }catch(e){return{error:'Invalid JSON — '+e.message};}
+  if(typeof parsed!=='object'||Array.isArray(parsed))
+    return{error:'Expected a JSON object with section keys (costco, ws, …)'};
+  const foundSecs=ALL_SECS.filter(s=>Array.isArray(parsed[s])&&parsed[s].length>0);
+  if(!foundSecs.length)
+    return{error:'No recognisable sections found. Make sure the JSON has keys like "costco", "ws", etc.'};
+  let total=0;
+  foundSecs.forEach(s=>total+=parsed[s].length);
+  // Corruption check
+  let redEmpty=0,stockTotal=0;
+  ALL_SECS.filter(s=>s!=='masterlist').forEach(s=>{
+    (parsed[s]||[]).forEach(r=>{stockTotal++;if(r.cell==='cRed'&&!r.stock&&!r.qty)redEmpty++;});
+  });
+  if(stockTotal>5&&(redEmpty/stockTotal)>0.5)
+    return{error:`⚠️ Data looks corrupted — ${redEmpty}/${stockTotal} items are red with no values. Matches the incident pattern. Import blocked.`};
+  const summary=`${foundSecs.length} sections · ${total} total items\n`
+    +foundSecs.map(s=>`  ${s}: ${(parsed[s]||[]).length}`).join('\n');
+  return{parsed,summary};
+}
+function bkImportJSON(){
+  const raw=document.getElementById('bkImportTx').value;
+  const st=document.getElementById('bkImportStatus');
+  if(!raw.trim()){st.style.color='#e24b4a';st.textContent='Paste JSON first.';return;}
+  const result=bkValidateJSON(raw);
+  if(result.error){st.style.color='#e24b4a';st.textContent=result.error;return;}
+  st.style.color='#4a8a6a';st.textContent='✅ Valid. '+result.summary.split('\n')[0];
+  if(!confirm(`Import this backup?\n\n${result.summary}\n\nAll current inventory data will be replaced.`))return;
+  bkApplyImport(result.parsed);
+  document.getElementById('backupModal').classList.add('hidden');
+  alert('✅ Import complete.');
+}
+function bkApplyImport(parsed){
+  // Safety snapshot before overwriting
+  const d=new Date();
+  bkSave(`Pre-import ${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`);
+  const sup=appData._suppressed||[];
+  appData={...parsed};
+  appData._suppressed=sup;
+  save();renderAll();
+}
+
+// ── Corruption guard (also used by Firebase onValue) ──
+function looksCorrupted(v){
+  const secs=['costco','ws','sobeys','dollarama','sysco','chinese','korea','toronto',
+    'fish','bulk','beer','wine','whitewine','draft','bargoods','mcs','sauce','extras'];
+  let total=0,redEmpty=0;
+  secs.forEach(sec=>{
+    if(!v[sec])return;
+    const arr=Array.isArray(v[sec])?v[sec]:Object.values(v[sec]);
+    arr.forEach(row=>{total++;if(row.cell==='cRed'&&!row.stock&&!row.qty)redEmpty++;});
+  });
+  return total>5&&(redEmpty/total)>0.5;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CORE APP FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
 function init(){
   const d=new Date();
   document.getElementById('todayDate').textContent=`${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
 
-  // Step 1: Always render defaults immediately so items show right away
   loadSuppressed();
   renderAll();
 
-  // Step 2: Try to connect Firebase — poll until window._fb is ready (max 5s)
+  // Auto-backup every 30 minutes
+  setInterval(()=>{
+    const d=new Date();
+    bkSave(`Auto ${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`);
+  },30*60*1000);
+
+  // Firebase connection
   let attempts=0;
   const tryConnect=()=>{
     attempts++;
@@ -1027,7 +1248,13 @@ function init(){
           'fish','bulk','beer','wine','whitewine','draft','bargoods','mcs','sauce',
           'extras','masterlist'];
         if(v){
-          // Only update sections that have actual data — never reset to empty
+          // Corruption guard — reject snapshot if it looks like last night's incident
+          if(looksCorrupted(v)){
+            console.warn('[Stock] Firebase snapshot rejected — looks corrupted (mass red/empty). Keeping local data.');
+            document.getElementById('syncDot').style.background='#f59e0b';
+            document.getElementById('syncLbl').textContent='⚠️ Guard';
+            return;
+          }
           sections.forEach(sec=>{
             if(v[sec]){
               const raw=v[sec];
@@ -1035,18 +1262,16 @@ function init(){
               if(arr.length>0)appData[sec]=arr;
             }
           });
-          // _suppressed is LOCAL ONLY — never pull from Firebase
-          // This prevents race condition where suppress gets wiped on sync
         }
         renderAll();
         document.getElementById('syncDot').className='sync-dot live';
         document.getElementById('syncLbl').textContent='Live';
       },()=>{});
-    } else if(attempts<25){
-      setTimeout(tryConnect, 200);
+    }else if(attempts<25){
+      setTimeout(tryConnect,200);
     }
   };
-  setTimeout(tryConnect, 200);
+  setTimeout(tryConnect,200);
 
   document.addEventListener('click',e=>{
     if(!document.getElementById('srchWrap').contains(e.target))
@@ -1071,18 +1296,16 @@ function loadLocal(){
     });
     if(Array.isArray(v._suppressed))appData._suppressed=v._suppressed;
   }catch(e){
-    localStorage.removeItem('ohv4'); // wipe corrupted data
+    localStorage.removeItem('ohv4');
   }
 }
 function save(){
-  // Always save suppressed list locally
   try{localStorage.setItem('ohv4_sup',JSON.stringify(appData._suppressed||[]));}catch(e){}
   if(fb&&fb.ok){
-    // Strip _suppressed before sending to Firebase — it's local-only
     const toSave={...appData};
     delete toSave._suppressed;
     fb.set(fb.ref(fb.db,'osakahibachi/stock'),toSave);
-  } else {
+  }else{
     localStorage.setItem('ohv4',JSON.stringify(appData));
   }
 }
@@ -1739,6 +1962,75 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 init();
 </script>
+
+<!-- BACKUP / RESTORE / IMPORT MODAL -->
+<div class="modal-bg hidden" id="backupModal">
+  <div class="modal" style="max-width:480px;">
+    <h3>💾 Backup & Restore</h3>
+    <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:14px;">
+      <button id="bkTab-snap" onclick="bkSwitchTab('snap')"
+        style="flex:1;padding:8px 4px;border:none;background:none;font-size:12px;font-weight:700;cursor:pointer;border-bottom:3px solid #1a1916;color:#1a1916;font-family:'Noto Sans KR',sans-serif;">
+        🕓 Snapshots
+      </button>
+      <button id="bkTab-sheet" onclick="bkSwitchTab('sheet')"
+        style="flex:1;padding:8px 4px;border:none;background:none;font-size:12px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;color:var(--muted);font-family:'Noto Sans KR',sans-serif;">
+        📊 Sheet Sync
+      </button>
+      <button id="bkTab-import" onclick="bkSwitchTab('import')"
+        style="flex:1;padding:8px 4px;border:none;background:none;font-size:12px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;color:var(--muted);font-family:'Noto Sans KR',sans-serif;">
+        📥 Import JSON
+      </button>
+    </div>
+
+    <!-- SNAPSHOTS -->
+    <div id="bkPane-snap">
+      <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">Auto-saves every 30 min · 6 rolling slots · stored in your browser.</p>
+      <div id="bkSlotList" style="margin-bottom:12px;"></div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="document.getElementById('backupModal').classList.add('hidden')"
+          style="flex:1;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--bg);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">Close</button>
+        <button onclick="manualBackup()"
+          style="flex:1;padding:8px;border-radius:6px;border:none;background:#1a1916;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">💾 Save Now</button>
+      </div>
+    </div>
+
+    <!-- SHEET SYNC -->
+    <div id="bkPane-sheet" style="display:none;">
+      <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">Push current inventory to Google Sheets. URL is pre-configured.</p>
+      <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;">Apps Script Web App URL</label>
+      <input id="bkSheetUrl" type="text" placeholder="https://script.google.com/macros/s/…/exec"
+        style="width:100%;border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:11px;margin-bottom:8px;font-family:monospace;">
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <button onclick="bkSaveSheetUrl()"
+          style="flex:1;padding:8px;border-radius:6px;border:none;background:#5578a0;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">Save URL</button>
+        <button onclick="bkPushToSheet()"
+          style="flex:1;padding:8px;border-radius:6px;border:none;background:#1a6b3a;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">☁️ Push to Sheet</button>
+      </div>
+      <div id="bkSheetStatus" style="font-size:12px;color:var(--muted);min-height:16px;margin-bottom:12px;"></div>
+      <hr style="border:none;border-top:1px solid var(--bl);margin:0 0 12px;">
+      <p style="font-size:11px;color:var(--muted);margin-bottom:8px;">Pull latest backup from Sheet and apply it (overwrites current data after confirmation).</p>
+      <button onclick="bkPullFromSheet()"
+        style="width:100%;padding:8px;border-radius:6px;border:none;background:#b45309;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">⬇️ Pull Latest from Sheet</button>
+      <div id="bkPullStatus" style="font-size:12px;color:var(--muted);min-height:16px;margin-top:8px;"></div>
+    </div>
+
+    <!-- IMPORT JSON -->
+    <div id="bkPane-import" style="display:none;">
+      <p style="font-size:11px;color:var(--muted);margin-bottom:6px;"><strong>Emergency recovery:</strong> copy JSON from your Google Sheet backup, paste below, hit Import. Validated before touching any data.</p>
+      <p style="font-size:11px;color:#b45309;margin-bottom:10px;">⚠️ Fully replaces all current inventory data.</p>
+      <textarea id="bkImportTx"
+        placeholder='Paste full JSON here — e.g. {"costco":[...],"ws":[...],...}'
+        style="width:100%;min-height:130px;padding:9px 11px;border:2px solid var(--border);border-radius:7px;font-size:11px;resize:vertical;background:#fafaf8;font-family:monospace;line-height:1.5;margin-bottom:8px;"></textarea>
+      <div id="bkImportStatus" style="font-size:12px;min-height:16px;margin-bottom:8px;"></div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="document.getElementById('backupModal').classList.add('hidden')"
+          style="flex:1;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--bg);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">Cancel</button>
+        <button onclick="bkImportJSON()"
+          style="flex:1;padding:8px;border-radius:6px;border:none;background:#c0392b;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">📥 Import & Replace</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- VOICE LOGGER -->
 <div class="vl-overlay hidden" id="vlOverlay">
