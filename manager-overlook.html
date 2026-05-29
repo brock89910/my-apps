@@ -490,7 +490,7 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div class="ni" onclick="go('pricing',this)"><span class="ico">◎</span><span class="lbl">Pricing</span><span class="dot"></span></div>
 <div class="ni" onclick="go('cleaning',this)"><span class="ico">✓</span><span class="lbl">Cleaning</span><span class="dot"></span></div>
 </nav>
-<div class="sidebar-foot"><div><span class="status-dot"></span>Firebase Connected</div><div id="sb-date"></div></div>
+<div class="sidebar-foot"><div><span class="status-dot"></span>Firebase Connected</div><div id="sb-date"></div><button onclick="window.openOverlookBackup()" style="margin-top:6px;width:100%;background:rgba(232,160,32,.12);border:1px solid rgba(232,160,32,.25);color:var(--amber);border-radius:4px;padding:7px 10px;font-family:var(--font-mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;text-align:left;">💾 Backup / Restore</button></div>
 </aside>
 
 <main>
@@ -994,6 +994,38 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div class="mf"><button class="btn bo" onclick="closeModal('quick-shift-modal')">Cancel</button><button class="btn bg" onclick="confirmQuickShift()">Add Shift</button></div>
 </div></div>
 
+<!-- OVERLOOK BACKUP / RESTORE MODAL -->
+<div class="mb" id="overlook-backup-modal" style="z-index:600;">
+  <div class="mo" style="max-width:500px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <h3 style="font-family:var(--font-head);font-size:1.2rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--amber);">&#x1F4BE; Backup / Restore</h3>
+      <button onclick="closeModal('overlook-backup-modal')" style="background:none;border:none;color:var(--text3);font-size:1.1rem;cursor:pointer;padding:2px 6px;">&#x2715;</button>
+    </div>
+    <div style="display:flex;border-bottom:1px solid var(--border);margin-bottom:14px;gap:0;">
+      <button id="obk-tab-export" onclick="window.obkTab('export')"
+        style="flex:1;padding:8px 4px;border:none;background:none;font-family:var(--font-mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;color:var(--amber);border-bottom:2px solid var(--amber);">Export</button>
+      <button id="obk-tab-import" onclick="window.obkTab('import')"
+        style="flex:1;padding:8px 4px;border:none;background:none;font-family:var(--font-mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;">Import</button>
+    </div>
+    <div id="obk-pane-export">
+      <p style="font-family:var(--font-mono);font-size:.65rem;color:var(--text3);margin-bottom:10px;line-height:1.6;">Exports all Overlook data &#8212; employees, schedule, bills, vendors, price items, tasks, restrictions &#8212; as a single JSON blob. Save it anywhere. Paste it back in the Import tab to fully restore.</p>
+      <button onclick="window.obkExport()" style="width:100%;padding:10px;border-radius:4px;border:none;background:var(--amber);color:#111;font-family:var(--font-mono);font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;margin-bottom:8px;">&#x2B07; Copy JSON to Clipboard</button>
+      <button onclick="window.obkDownload()" style="width:100%;padding:10px;border-radius:4px;border:1px solid var(--border2);background:var(--s3);color:var(--text2);font-family:var(--font-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;margin-bottom:8px;">&#x2B07; Download as .json file</button>
+      <div id="obk-export-status" style="font-family:var(--font-mono);font-size:.65rem;color:var(--text3);min-height:16px;"></div>
+    </div>
+    <div id="obk-pane-import" style="display:none;">
+      <p style="font-family:var(--font-mono);font-size:.65rem;color:var(--text3);margin-bottom:6px;line-height:1.6;">Paste your previously exported JSON below. All current Firestore data will be <span style="color:var(--red);">fully replaced</span> &#8212; employees, bills, shifts, tasks, vendors, price items, restrictions.</p>
+      <p style="font-family:var(--font-mono);font-size:.63rem;color:var(--red);margin-bottom:10px;">&#x26A0; This writes directly to Firebase. Cannot be undone without another backup.</p>
+      <textarea id="obk-import-tx" placeholder='Paste full JSON here' style="width:100%;min-height:120px;padding:9px 11px;border:1px solid var(--border2);border-radius:4px;font-size:.65rem;resize:vertical;background:var(--bg2);font-family:'JetBrains Mono',monospace;line-height:1.5;margin-bottom:8px;color:var(--text);"></textarea>
+      <div id="obk-import-status" style="font-family:var(--font-mono);font-size:.65rem;min-height:16px;margin-bottom:10px;"></div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="closeModal('overlook-backup-modal')" style="flex:1;padding:9px;border-radius:4px;border:1px solid var(--border2);background:var(--s3);color:var(--text2);font-family:var(--font-mono);font-size:.65rem;cursor:pointer;text-transform:uppercase;letter-spacing:.06em;">Cancel</button>
+        <button onclick="window.obkImport()" style="flex:1;padding:9px;border-radius:4px;border:none;background:var(--red);color:#fff;font-family:var(--font-mono);font-size:.65rem;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.06em;">&#x1F4E5; Import &amp; Replace</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- MOBILE BOTTOM NAV -->
@@ -1252,6 +1284,154 @@ async function boot(){
   document.getElementById('pi-weight').addEventListener('input',updatePiCalc);
   document.getElementById('pi-unit').addEventListener('change',updatePiCalc);
 }
+// ═══════════════════════════════════════════════════════════
+//  OVERLOOK BACKUP / RESTORE
+//  Export: serialises S into JSON → clipboard or .json file
+//  Import: parses JSON → wipes Firestore collections → re-adds all docs
+// ═══════════════════════════════════════════════════════════
+
+const OBK_COLLECTIONS = ['employees','shifts','bills','cleanLogs','restrictions',
+  'reqOffs','clTasks','vendors','priceItems','permaRestrictions'];
+
+// Build export payload from live S object
+function obkBuildPayload(){
+  const payload = {};
+  OBK_COLLECTIONS.forEach(col => {
+    payload[col] = (S[col] || []).map(item => {
+      const copy = {...item};
+      delete copy._ts; // strip internal timestamp
+      return copy;
+    });
+  });
+  return payload;
+}
+
+window.openOverlookBackup = function(){
+  document.getElementById('obk-import-tx').value = '';
+  document.getElementById('obk-import-status').textContent = '';
+  document.getElementById('obk-export-status').textContent = '';
+  window.obkTab('export');
+  openModal('overlook-backup-modal');
+};
+
+window.obkTab = function(name){
+  ['export','import'].forEach(t => {
+    const pane = document.getElementById('obk-pane-'+t);
+    const tab  = document.getElementById('obk-tab-'+t);
+    const active = t === name;
+    pane.style.display = active ? '' : 'none';
+    tab.style.color = active ? 'var(--amber)' : 'var(--text3)';
+    tab.style.borderBottomColor = active ? 'var(--amber)' : 'transparent';
+  });
+};
+
+window.obkExport = function(){
+  const st = document.getElementById('obk-export-status');
+  try {
+    const json = JSON.stringify(obkBuildPayload(), null, 2);
+    navigator.clipboard.writeText(json);
+    st.style.color = 'var(--green-l)';
+    st.textContent = '✓ Copied to clipboard — paste into a text file to save.';
+  } catch(e) {
+    st.style.color = 'var(--red)';
+    st.textContent = 'Copy failed: ' + e.message;
+  }
+};
+
+window.obkDownload = function(){
+  const st = document.getElementById('obk-export-status');
+  try {
+    const json = JSON.stringify(obkBuildPayload(), null, 2);
+    const d = new Date();
+    const name = `overlook-backup-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.json`;
+    const blob = new Blob([json], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name; a.click();
+    URL.revokeObjectURL(a.href);
+    st.style.color = 'var(--green-l)';
+    st.textContent = '✓ Downloading ' + name;
+  } catch(e) {
+    st.style.color = 'var(--red)';
+    st.textContent = 'Download failed: ' + e.message;
+  }
+};
+
+window.obkImport = async function(){
+  const raw = document.getElementById('obk-import-tx').value.trim();
+  const st  = document.getElementById('obk-import-status');
+  if(!raw){ st.style.color='var(--red)'; st.textContent='Paste JSON first.'; return; }
+
+  // Parse + validate
+  let payload;
+  try {
+    const clean = raw.replace(/^```json\s*/i,'').replace(/```\s*$/,'').trim();
+    payload = JSON.parse(clean);
+  } catch(e) {
+    st.style.color = 'var(--red)';
+    st.textContent = 'Invalid JSON: ' + e.message;
+    return;
+  }
+
+  // Must have at least one known collection
+  const found = OBK_COLLECTIONS.filter(c => Array.isArray(payload[c]) && payload[c].length > 0);
+  if(!found.length){
+    st.style.color = 'var(--red)';
+    st.textContent = 'No recognisable collections found. Check your JSON.';
+    return;
+  }
+
+  // Summary for confirm
+  const summary = found.map(c => `${c}: ${payload[c].length}`).join(', ');
+  if(!confirm(`Import this backup?
+
+${summary}
+
+All current Overlook data in Firebase will be fully replaced. This cannot be undone.`)) return;
+
+  st.style.color = 'var(--amber)';
+  st.textContent = '⏳ Importing…';
+
+  try {
+    // Import collection-by-collection:
+    // 1. Delete all existing docs in the collection
+    // 2. Re-add each doc from the backup (preserving the original id as a field)
+    for(const col of OBK_COLLECTIONS){
+      const items = payload[col];
+      if(!Array.isArray(items)) continue;
+
+      // Delete existing
+      const existing = await getDocs(collection(db, col));
+      await Promise.all(existing.docs.map(d => deleteDoc(doc(db, col, d.id))));
+
+      // Re-add from backup
+      for(const item of items){
+        const copy = {...item, _ts: Date.now()};
+        const origId = copy.id;
+        delete copy.id; // Firestore auto-generates id
+        const ref = await addDoc(collection(db, col), copy);
+        // Update S in memory with new Firestore id
+        copy.id = ref.id;
+      }
+
+      // Reload this collection into S
+      const fresh = await getDocs(collection(db, col));
+      S[col] = fresh.docs.map(d => ({id: d.id, ...d.data()}));
+    }
+
+    renderAll();
+    st.style.color = 'var(--green-l)';
+    st.textContent = '✅ Import complete — ' + found.length + ' collections restored.';
+    showToast('Backup restored ✓');
+    setTimeout(() => closeModal('overlook-backup-modal'), 1800);
+
+  } catch(e) {
+    st.style.color = 'var(--red)';
+    st.textContent = '❌ Import failed: ' + e.message;
+    console.error('obkImport error:', e);
+  }
+};
+
+
 boot();
 
 function renderAll(){renderDash();renderBills();renderCleanLog();renderRestrictions();renderReqOffs();renderEmployees();updateEmpDatalist();renderClTasks();renderPricing();renderVendorDropdown();updatePiItemList();renderPermaRestrictions();updatePermaRestrictDatalist();renderScheduleWithCopy();}
