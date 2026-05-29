@@ -1129,14 +1129,19 @@ async function bkPushToSheet(){
   try{
     const toSend=JSON.parse(JSON.stringify(appData));
     delete toSend._suppressed;
-    const res=await fetch(url,{method:'POST',body:JSON.stringify(toSend),headers:{'Content-Type':'application/json'}});
-    const json=await res.json();
-    if(json.ok){
-      st.textContent=`✅ Pushed at ${json.ts}`;
-      const d=new Date();
-      bkSave(`Sheet sync ${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`);
-      bkRenderSnaps();
-    }else{st.textContent='❌ Error: '+(json.error||'Unknown');}
+    // no-cors + text/plain avoids CORS preflight — Apps Script receives it fine
+    // We can't read the response in no-cors mode, so we confirm via the sheet
+    await fetch(url,{
+      method:'POST',
+      mode:'no-cors',
+      body:JSON.stringify(toSend),
+      headers:{'Content-Type':'text/plain'}
+    });
+    const d=new Date();
+    const ts=`${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+    st.textContent=`✅ Sent at ${ts} — verify in your Google Sheet.`;
+    bkSave(`Sheet sync ${ts}`);
+    bkRenderSnaps();
   }catch(err){st.textContent='❌ '+err.message;}
 }
 async function bkPullFromSheet(){
@@ -1144,6 +1149,7 @@ async function bkPullFromSheet(){
   const st=document.getElementById('bkPullStatus');
   st.textContent='⏳ Pulling from sheet…';
   try{
+    // GET requests to Apps Script work without CORS issues
     const res=await fetch(url+'?action=get');
     const json=await res.json();
     if(!json.ok){st.textContent='❌ '+(json.error||'Unknown error');return;}
