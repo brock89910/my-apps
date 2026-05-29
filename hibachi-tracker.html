@@ -1782,7 +1782,7 @@ async function postToVault(dk, id, resData) {
   if (!sheetUrl || !sheetUrl.startsWith('https://script.google.com')) return;
   if (!resData.card) return;
   try {
-    await fetch(sheetUrl, {
+    const resp = await fetch(sheetUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({
@@ -1794,15 +1794,6 @@ async function postToVault(dk, id, resData) {
           guests:      resData.guests      || '',
           slot:        resData.slot        || '',
           grill:       resData.grill       || '',
-          grill2:      resData.grill2      || '',
-          isDouble:    resData.isDouble    || false,
-          initials:    resData.initials    || '',
-          notes:       resData.notes       || '',
-          noteText:    resData.noteText    || '',
-          noteType:    resData.noteType    || '',
-          confirmed:   resData.confirmed   || '',
-          confirmedBy: resData.confirmedBy || '',
-          confirmedAt: resData.confirmedAt || '',
           bookedOn:    resData.bookedOn    || '',
           updatedAt:   resData.updatedAt   || '',
           card:        resData.card        || '',
@@ -1810,19 +1801,24 @@ async function postToVault(dk, id, resData) {
         }]
       })
     });
-  } catch(err) {
-    console.warn('Vault post failed (non-fatal):', err.message);
-  }
-  // Wipe card+expiry from Firebase after 60 minutes
-  setTimeout(async () => {
-    try {
-      await window._set(window._ref(window._db, `reservations/${dk}/${id}/card`), null);
-      await window._set(window._ref(window._db, `reservations/${dk}/${id}/expiry`), null);
-      console.log('Card wiped from Firebase for', id);
-    } catch(e) {
-      console.warn('Card wipe failed:', e.message);
+    const text = await resp.text();
+    if (text === 'VAULT: OK') {
+      // Sheet confirmed receipt — wipe from Firebase immediately
+      try {
+        await window._set(window._ref(window._db, `reservations/${dk}/${id}/card`), null);
+        await window._set(window._ref(window._db, `reservations/${dk}/${id}/expiry`), null);
+        console.log('Card wiped from Firebase for', id);
+      } catch(e) {
+        console.warn('Card wipe failed:', e.message);
+      }
+    } else {
+      // Sheet did not confirm — leave card in Firebase, 3AM Apps Script will clean up
+      console.warn('Vault post unexpected response — card left in Firebase:', text);
     }
-  }, 60 * 60 * 1000);
+  } catch(err) {
+    // Network failure — leave card in Firebase, 3AM Apps Script will clean up
+    console.warn('Vault post failed — card left in Firebase:', err.message);
+  }
 }
 
 const _origPush = async (ref, data) => window._push(ref, data);
