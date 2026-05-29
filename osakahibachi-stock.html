@@ -1144,6 +1144,19 @@ async function bkPushToSheet(){
     bkRenderSnaps();
   }catch(err){st.textContent='❌ '+err.message;}
 }
+// Silent auto-push — no UI feedback, used by hourly interval and on-load
+async function bkAutoPushToSheet(){
+  const url=bkGetSheetUrl();
+  if(!url)return;
+  try{
+    const toSend=JSON.parse(JSON.stringify(appData));
+    delete toSend._suppressed;
+    await fetch(url,{method:'POST',mode:'no-cors',body:JSON.stringify(toSend),headers:{'Content-Type':'text/plain'}});
+    const d=new Date();
+    const ts=`${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+    console.log(`[Stock] Auto-pushed to sheet at ${ts}`);
+  }catch(e){console.warn('[Stock] Auto-push failed:',e.message);}
+}
 async function bkPullFromSheet(){
   const url=bkGetSheetUrl();
   const st=document.getElementById('bkPullStatus');
@@ -1241,6 +1254,11 @@ function init(){
     const d=new Date();
     bkSave(`Auto ${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`);
   },30*60*1000);
+
+  // Auto-push to Google Sheet every hour
+  setInterval(()=>{ bkAutoPushToSheet(); }, 60*60*1000);
+  // Push once on load after Firebase has had time to sync
+  setTimeout(()=>{ bkAutoPushToSheet(); }, 8000);
 
   // Firebase connection
   let attempts=0;
