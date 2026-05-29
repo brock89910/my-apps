@@ -1773,6 +1773,58 @@ function rateLimitCheck(action, maxPerMinute) {
   return true;
 }
 // Wrap the core write ops with rate checks (15 saves/min, 10 deletes/min)
+// ── VAULT POST ──
+// Called immediately after any Firebase write that includes card data.
+// Posts the reservation to the Card Vault sheet, then schedules
+// a wipe of card+expiry from Firebase after 60 minutes.
+async function postToVault(dk, id, resData) {
+  const sheetUrl = localStorage.getItem('appsScriptUrl');
+  if (!sheetUrl || !sheetUrl.startsWith('https://script.google.com')) return;
+  if (!resData.card) return;
+  try {
+    await fetch(sheetUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        type: 'vault',
+        reservations: [{
+          dateKey:     dk,
+          id:          id,
+          name:        resData.name        || '',
+          guests:      resData.guests      || '',
+          slot:        resData.slot        || '',
+          grill:       resData.grill       || '',
+          grill2:      resData.grill2      || '',
+          isDouble:    resData.isDouble    || false,
+          initials:    resData.initials    || '',
+          notes:       resData.notes       || '',
+          noteText:    resData.noteText    || '',
+          noteType:    resData.noteType    || '',
+          confirmed:   resData.confirmed   || '',
+          confirmedBy: resData.confirmedBy || '',
+          confirmedAt: resData.confirmedAt || '',
+          bookedOn:    resData.bookedOn    || '',
+          updatedAt:   resData.updatedAt   || '',
+          card:        resData.card        || '',
+          expiry:      resData.expiry      || ''
+        }]
+      })
+    });
+  } catch(err) {
+    console.warn('Vault post failed (non-fatal):', err.message);
+  }
+  // Wipe card+expiry from Firebase after 60 minutes
+  setTimeout(async () => {
+    try {
+      await window._set(window._ref(window._db, `reservations/${dk}/${id}/card`), null);
+      await window._set(window._ref(window._db, `reservations/${dk}/${id}/expiry`), null);
+      console.log('Card wiped from Firebase for', id);
+    } catch(e) {
+      console.warn('Card wipe failed:', e.message);
+    }
+  }, 60 * 60 * 1000);
+}
+
 const _origPush = async (ref, data) => window._push(ref, data);
 const _origSet  = async (ref, data) => window._set(ref, data);
 const _origRemove = async (ref) => window._remove(ref);
@@ -3359,9 +3411,11 @@ async function srSave() {
 
   if (!window._db||!window._ref||!window._push) return _srErr('Firebase not ready. Please wait and try again.');
   try {
-    await window._push(window._ref(window._db,`reservations/${key}`),data);
+    const pushRef = await window._push(window._ref(window._db,`reservations/${key}`),data);
+    const newId = pushRef.key;
     const grillStr=finalAssign.isDouble?'Grills '+finalAssign.grill+'+'+finalAssign.grill2:'Grill '+finalAssign.grill;
     await logAudit('create',_sr.name+' · '+_sr.guests+'p · '+displayTime(_sr.slot)+' · '+grillStr,initials);
+    if (data.card) postToVault(key, newId, data);
     closeModal();
   } catch(e) { _srErr('Error saving: '+e.message); }
 }
@@ -3688,9 +3742,12 @@ async function saveHibachi(dk,editId) {
     if (editId) {
       await safeWrite(window._ref(window._db,`reservations/${dk}/${editId}`),data,'set');
       await logAudit('edit',wasHold?'HOLD CONFIRMED — '+name+' · '+guests+'p · '+displayTime(slot)+' · '+grillStr:name+' · '+guests+'p · '+displayTime(slot)+' · '+grillStr+(oldData?' (was: '+oldData.name+', '+oldData.guests+'p)':''),initials);
+      if (data.card) postToVault(dk, editId, data);
     } else {
-      await safeWrite(window._ref(window._db,`reservations/${dk}`),data,'push');
+      const pushRef = await safeWrite(window._ref(window._db,`reservations/${dk}`),data,'push');
+      const newId = pushRef.key;
       await logAudit('create',name+' · '+guests+'p · '+displayTime(slot)+' · '+grillStr,initials);
+      if (data.card) postToVault(dk, newId, data);
     }
     closeModal();
   } catch(e) { showErr('Firebase error: '+e.message); }
@@ -3724,9 +3781,16 @@ async function saveHibachiOverride(dk,editId) {
   if (card) { data.card=card; data.expiry=expiry; }
   const grillStr=isDouble?'Grills '+g1+'+'+g2+' (OVERRIDE)':'Grill '+g1+' (OVERRIDE)';
   try {
-    if (editId) await window._set(window._ref(window._db,`reservations/${dk}/${editId}`),data);
-    else await window._push(window._ref(window._db,`reservations/${dk}`),data);
-    await logAudit('create',name+' · '+guests+'p · '+displayTime(slot)+' · '+grillStr,initials);
+    if (editId) {
+      await window._set(window._ref(window._db,`reservations/${dk}/${editId}`),data);
+      await logAudit('create',name+' · '+guests+'p · '+displayTime(slot)+' · '+grillStr,initials);
+      if (data.card) postToVault(dk, editId, data);
+    } else {
+      const pushRef = await window._push(window._ref(window._db,`reservations/${dk}`),data);
+      const newId = pushRef.key;
+      await logAudit('create',name+' · '+guests+'p · '+displayTime(slot)+' · '+grillStr,initials);
+      if (data.card) postToVault(dk, newId, data);
+    }
     closeModal();
   } catch(e) { if(oeEl){oeEl.textContent='Firebase error: '+e.message;oeEl.style.display='block';} }
 }
