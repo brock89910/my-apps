@@ -1803,21 +1803,28 @@ async function postToVault(dk, id, resData) {
     });
     const text = await resp.text();
     if (text === 'VAULT: OK') {
-      // Sheet confirmed receipt — wipe from Firebase immediately
+      // Sheet confirmed receipt — wipe card+expiry from Firebase, set permanent capture flag
       try {
         await window._set(window._ref(window._db, `reservations/${dk}/${id}/card`), null);
         await window._set(window._ref(window._db, `reservations/${dk}/${id}/expiry`), null);
-        console.log('Card wiped from Firebase for', id);
+        await window._set(window._ref(window._db, `reservations/${dk}/${id}/cardCaptured`), true);
+        console.log('Card wiped + cardCaptured flagged for', id);
       } catch(e) {
-        console.warn('Card wipe failed:', e.message);
+        console.warn('Card wipe/flag failed:', e.message);
       }
     } else {
-      // Sheet did not confirm — leave card in Firebase, 3AM Apps Script will clean up
+      // Sheet did not confirm — leave card in Firebase, still flag that a card was entered
       console.warn('Vault post unexpected response — card left in Firebase:', text);
+      try {
+        await window._set(window._ref(window._db, `reservations/${dk}/${id}/cardCaptured`), true);
+      } catch(e) { /* non-critical */ }
     }
   } catch(err) {
-    // Network failure — leave card in Firebase, 3AM Apps Script will clean up
+    // Network failure — leave card in Firebase, still flag that a card was entered
     console.warn('Vault post failed — card left in Firebase:', err.message);
+    try {
+      await window._set(window._ref(window._db, `reservations/${dk}/${id}/cardCaptured`), true);
+    } catch(e) { /* non-critical */ }
   }
 }
 
@@ -2691,6 +2698,7 @@ function renderTimeSlots() {
             +(isLargeGroup?' <span class="large-group-badge">⚡</span>':'')
             // override/changed badges hidden from staff view
             +(r.holdUntil?' <span style="font-size:0.56rem;color:var(--amber);font-weight:600;background:rgba(196,158,84,0.12);border:1px solid rgba(200,150,42,0.3);padding:1px 5px;border-radius:2px">HOLD</span>':'')
+            +(r.cardCaptured?' <span title="Card on file" style="font-size:0.6rem;color:var(--green);opacity:0.8">💳</span>':'')
             +(r.noteType==='allergy'?' <span class="note-badge allergy" title="'+escHtml(r.noteText||r.notes||'')+'">ALLERGY</span>':'')
             +(r.noteType==='restriction'?' <span class="note-badge restriction" title="'+escHtml(r.noteText||r.notes||'')+'">REST.</span>':'')
             +'</div>'
