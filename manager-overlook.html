@@ -669,7 +669,13 @@ tr:hover td{background:rgba(232,160,32,.03)}
 </div>
 <div class="day-count-strip" id="day-count-strip"></div>
 <div class="sch-tab-pane on" id="sch-pane-kitchen"><div class="pn" style="padding:10px"><div class="sg-wrap"><table class="sg" id="sg-kitchen"></table></div></div></div>
-<div class="sch-tab-pane" id="sch-pane-serving"><div class="pn" style="padding:10px"><div class="sg-wrap"><table class="sg" id="sg-serving"></table></div></div></div>
+<div class="sch-tab-pane" id="sch-pane-serving">
+  <div class="pn" style="padding:10px"><div class="sg-wrap"><table class="sg" id="sg-serving"></table></div></div>
+  <div class="pn" style="margin-top:0;border-top:none;border-radius:0 0 var(--r) var(--r)">
+    <div class="pnh" style="margin-bottom:10px"><h3 style="font-size:.85rem">📊 Serving Hours — This Week</h3><span style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3)">Based on actual clock-out data</span></div>
+    <div id="inline-serving-summary"><span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">// Select a week</span></div>
+  </div>
+</div>
 <div class="sch-tab-pane" id="sch-pane-perma-restrict">
 <div class="pn">
   <div class="pnh"><h3>Permanent Scheduling Rules</h3><button class="btn bg bs" onclick="openAddPermaRestrict()">＋ Add Rule</button></div>
@@ -1984,6 +1990,7 @@ function renderSchedule(){
   buildScheduleGrid('sg-serving',['SERVING']);
   renderStaffQuickPanel();
   renderDayCountStrip();
+  renderInlineServingSummary();
 }
 
 // ── QUICK-ADD STAFF PANEL ──
@@ -3358,31 +3365,57 @@ window.downloadSchedulePng = function(){
   a.click();
 };
 
-// ── SERVING SUMMARY ──
-// ── SERVING SUMMARY HOURS ──
-// Maps each schedule slot label to its realistic projected hours.
-// "11" and "12" = full AM server (open to ~9pm close) ≈ 9 hrs weekday / 10 Fri-Sat
-// "11-2" = AM split, leaves at 2pm = ~3 hrs
-// "5","5:30","6" = PM server, works to close (~9pm weekday / 10pm Fri-Sat)
-// empty/name-only = treated as a standard PM dinner shift ≈ 4 hrs
+// ── SHIFT HOURS — derived from actual clock-in/out data ──
+// DOW: 0=Mon,1=Tue,2=Wed,3=Thu,4=Fri,5=Sat,6=Sun
+// PM main (16:30–17:59): weekday→21:15, Fri→22:15, Sat→22:30, Sun→21:15
+// PM late (18:00+):      weekday→21:15, Fri→22:15, Sat→22:30, Sun→21:15
+// AM (<14:00) weekday:   out 14:00 (split) — flag unknown for Fri/Sat (can stay all day)
+// 11-2 slot:             always 3 hrs
 function ssShiftHours(timeStr, dayIdx){
   const t=(timeStr||'').trim().toLowerCase();
-  const isFriSat=(dayIdx===4||dayIdx===5);
-  if(!t) return isFriSat?5:4;              // name-only: PM dinner shift
-  if(t==='11'||t==='12') return isFriSat?10:9;   // full AM open-to-close server
-  if(t==='11-2'||t.startsWith('11-2')) return 3; // AM split, out at 2pm
-  if(t==='5')   return isFriSat?5:4;       // PM: ~17:00–22:00 or 17:00–21:00
-  if(t==='5:30'||t==='5.30') return isFriSat?4.5:3.5; // PM: 17:30 start
-  if(t==='6')   return isFriSat?4:3;       // PM: 18:00 start
-  // Any other custom numeric entry: treat as start hour, calc to close
-  const n=parseFloat(t);
-  if(!isNaN(n)&&n>=1&&n<=23){
-    const closeHour=isFriSat?22:21;
-    // If it looks like a PM time (1–9), assume 17:xx range — add 12 for PM slots 1–6
-    const startHour=(n>=1&&n<=6)?n+12:n;
-    return Math.max(0.5,closeHour-startHour);
+  const isFri=(dayIdx===4);
+  const isSat=(dayIdx===5);
+  const isSun=(dayIdx===6);
+  const isFriSat=isFri||isSat;
+
+  // Named slots first
+  if(t==='11-2'||t.startsWith('11-2')) return 3;
+
+  // AM clock-ins (before 14:00): split shift structure
+  // Weekday AM → out ~14:00 = 3 hrs from 11
+  // Fri/Sat AM → unpredictable (could stay to close), use conservative 7 hrs
+  if(t==='11') return isFriSat ? 7 : 3;
+  if(t==='12') return isFriSat ? 6 : 2;
+
+  // PM clock-ins — use median clock-out from training data
+  // Close times: weekday≈21:15, Fri≈22:15, Sat≈22:30, Sun≈21:15
+  function closeMin(){ // returns close time in minutes from midnight
+    if(isFri) return 22*60+15;
+    if(isSat) return 22*60+30;
+    return 21*60+15; // Mon–Thu, Sun
   }
-  return isFriSat?5:4; // fallback
+
+  // Parse time to minutes
+  function cinMin(str){
+    if(!str) return null;
+    // handle "5", "5:30", "5.30", "6", "11", "12", "17:30" etc
+    const clean=str.replace(',','.');
+    if(clean.includes(':')){ const [h,m]=clean.split(':'); return parseInt(h)*60+parseInt(m); }
+    const n=parseFloat(clean);
+    if(isNaN(n)) return null;
+    // If 1–9 treat as PM hour (add 12), 10–12 treat as AM, 13+ treat as 24h
+    if(n>=1&&n<=9) return (n+12)*60;
+    return n*60;
+  }
+
+  const ci=cinMin(t);
+  if(ci!==null){
+    const hrs=(closeMin()-ci)/60;
+    return Math.max(0.5, Math.round(hrs*4)/4); // round to nearest 0.25
+  }
+
+  // Fallback: name-only = standard PM dinner
+  return isFriSat ? 5 : 4;
 }
 
 window.autoDetectSSRange=function(){
@@ -3398,32 +3431,22 @@ window.openServingSummaryModal=function(){
   openModal('serving-summary-modal');
 };
 
-window.renderServingSummary=function(){
-  const w1=document.getElementById('ss-week1').value;
-  const rangeEl=document.getElementById('ss-range-label');
-  const listEl=document.getElementById('ss-list');
-  const totalsEl=document.getElementById('ss-totals');
-  if(!w1){rangeEl.textContent='Select a week.';listEl.innerHTML='';if(totalsEl)totalsEl.innerHTML='';return;}
-
-  const fmt=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('en-CA',{month:'short',day:'numeric'});}catch(e){return d;}};
-  const wEnd=new Date(w1+'T12:00:00');wEnd.setDate(wEnd.getDate()+6);
-  rangeEl.textContent=`${fmt(w1)} – ${wEnd.toLocaleDateString('en-CA',{month:'short',day:'numeric'})}`;
-
+// Core summary calc — shared between modal and inline panel
+function calcServingSummary(w1){
   const ws=S.shifts.filter(s=>s.week===w1&&(s.section||'').toUpperCase()==='SERVING');
   const staff={};
   ws.forEach(sh=>{
     const name=(sh.name||'').trim();if(!name)return;
-    if(!staff[name]) staff[name]={shiftCount:0,hours:0,dayKeys:new Set()};
+    if(!staff[name]) staff[name]={hours:0,dayKeys:new Set()};
     staff[name].dayKeys.add(sh.dayIdx);
-    // Count hours per individual shift (not per day) — each slot gets its own hours
     staff[name].hours+=ssShiftHours(sh.time,sh.dayIdx);
-    staff[name].shiftCount++;
   });
+  return Object.entries(staff).sort((a,b)=>b[1].dayKeys.size-a[1].dayKeys.size||a[0].localeCompare(b[0]));
+}
 
-  const entries=Object.entries(staff).sort((a,b)=>b[1].dayKeys.size-a[1].dayKeys.size||a[0].localeCompare(b[0]));
-  if(!entries.length){listEl.innerHTML='<div style="color:var(--text3);font-size:.75rem">// No serving shifts found</div>';if(totalsEl)totalsEl.innerHTML='';return;}
-
-  listEl.innerHTML=entries.map(([name,{dayKeys,hours,shiftCount}])=>{
+function buildSummaryHTML(entries){
+  if(!entries.length) return '<div style="color:var(--text3);font-size:.75rem;font-family:var(--font-mono)">// No serving shifts found</div>';
+  return entries.map(([name,{dayKeys,hours}])=>{
     const days=dayKeys.size;
     const hrsDisplay=Number.isInteger(hours)?hours:hours.toFixed(1);
     return`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
@@ -3435,12 +3458,43 @@ window.renderServingSummary=function(){
       </span>
     </div>`;
   }).join('');
+}
 
+window.renderServingSummary=function(){
+  const w1=document.getElementById('ss-week1').value;
+  const rangeEl=document.getElementById('ss-range-label');
+  const listEl=document.getElementById('ss-list');
+  const totalsEl=document.getElementById('ss-totals');
+  if(!w1){rangeEl.textContent='Select a week.';listEl.innerHTML='';if(totalsEl)totalsEl.innerHTML='';return;}
+  const fmt=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('en-CA',{month:'short',day:'numeric'});}catch(e){return d;}};
+  const wEnd=new Date(w1+'T12:00:00');wEnd.setDate(wEnd.getDate()+6);
+  rangeEl.textContent=`${fmt(w1)} – ${wEnd.toLocaleDateString('en-CA',{month:'short',day:'numeric'})}`;
+  const entries=calcServingSummary(w1);
+  listEl.innerHTML=buildSummaryHTML(entries);
   const totalDays=entries.reduce((s,[,v])=>s+v.dayKeys.size,0);
   const totalHours=entries.reduce((s,[,v])=>s+v.hours,0);
   const totalHrsDisplay=Number.isInteger(totalHours)?totalHours:totalHours.toFixed(1);
   if(totalsEl) totalsEl.innerHTML=`Total shift-days: <span style="color:var(--service);font-weight:700">${totalDays}</span> &nbsp;·&nbsp; Total projected hours: <span style="color:var(--amber);font-weight:700">${totalHrsDisplay}</span>`;
+  // Also update inline panel if visible
+  renderInlineServingSummary();
 };
+
+// Inline serving summary in schedule tab
+function renderInlineServingSummary(){
+  const panel=document.getElementById('inline-serving-summary');
+  if(!panel)return;
+  const wk=getWeekKey();
+  if(!wk||wk==='default'){panel.innerHTML='<span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">// Select a week</span>';return;}
+  const entries=calcServingSummary(wk);
+  const totalDays=entries.reduce((s,[,v])=>s+v.dayKeys.size,0);
+  const totalHours=entries.reduce((s,[,v])=>s+v.hours,0);
+  const totalHrsDisplay=Number.isInteger(totalHours)?totalHours:totalHours.toFixed(1);
+  panel.innerHTML=`
+    ${buildSummaryHTML(entries)}
+    ${entries.length?`<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:.72rem;color:var(--text3)">
+      Total shift-days: <span style="color:var(--service);font-weight:700">${totalDays}</span> &nbsp;·&nbsp; Projected hrs: <span style="color:var(--amber);font-weight:700">${totalHrsDisplay}</span>
+    </div>`:''}`;
+}
 
 // ── DAYS WORKED ──
 // Staff to count (normalized) — exact output order
