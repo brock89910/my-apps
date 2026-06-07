@@ -303,6 +303,63 @@ tr:hover td{background:rgba(232,160,32,.03)}
 .quick-add-section{margin-bottom:8px}
 .quick-add-section-label{font-family:var(--font-mono);font-size:.58rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
 
+/* ── STAFF CHIP RESTRICTION BADGE ── */
+.staff-chip.chip-restricted{opacity:.5;border-style:dashed}
+.staff-chip .sc-restrict-dot{width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;box-shadow:0 0 4px var(--red)}
+
+/* ── DAY COUNT STRIP ── */
+.day-count-strip{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px}
+.dcs-item{font-family:var(--font-mono);font-size:.68rem;display:flex;align-items:center;gap:4px}
+.dcs-name{color:var(--text2)}
+.dcs-count{font-weight:700;padding:1px 6px;border-radius:2px;font-size:.7rem}
+.dcs-0{color:var(--text3)}
+.dcs-1,.dcs-2{color:var(--kitchen);background:var(--kitchen-g)}
+.dcs-3,.dcs-4{color:var(--amber);background:var(--amber-g)}
+.dcs-5,.dcs-6,.dcs-7{color:var(--green-l);background:rgba(74,138,74,.1)}
+
+/* ── ROSTER MANAGER ── */
+.roster-mgr{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px}
+.roster-mgr-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
+.roster-mgr-head h4{font-family:var(--font-mono);font-size:.65rem;color:var(--amber);text-transform:uppercase;letter-spacing:.1em}
+.roster-sections{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.roster-sec{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px;position:relative}
+.roster-sec-title{font-family:var(--font-head);font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.roster-sec.sec-sushi .roster-sec-title{color:var(--sushi)}
+.roster-sec.sec-kitchen .roster-sec-title{color:var(--kitchen)}
+.roster-sec.sec-teppan .roster-sec-title{color:var(--teppan)}
+.roster-sec.sec-serving .roster-sec-title{color:var(--service)}
+.roster-row{display:flex;align-items:center;gap:5px;padding:4px 2px;border-radius:3px;cursor:grab;transition:background .1s;user-select:none}
+.roster-row:hover{background:var(--s3)}
+.roster-row.roster-drag-over{background:var(--amber-d);border:1px dashed var(--amber)}
+.roster-row.roster-dragging{opacity:.35}
+.roster-row .rr-handle{color:var(--text3);font-size:.7rem;cursor:grab;flex-shrink:0;padding:0 2px}
+.roster-row .rr-name{flex:1;font-size:.8rem;font-weight:600;font-family:var(--font-body)}
+.roster-row .rr-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.65rem;padding:2px 4px;border-radius:2px;flex-shrink:0;transition:all .1s}
+.roster-row .rr-del:hover{color:var(--red);background:var(--red-d)}
+.roster-add{display:flex;gap:5px;margin-top:8px}
+.roster-add input{flex:1;background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:5px 8px;font-size:.78rem;font-family:var(--font-body);outline:none;min-width:0}
+.roster-add input:focus{border-color:var(--amber)}
+.roster-add button{background:var(--amber);color:#0a0908;border:none;border-radius:var(--r);padding:5px 9px;font-size:.75rem;font-weight:700;cursor:pointer;flex-shrink:0}
+.roster-add button:hover{background:var(--amber2)}
+
+/* ── SHIFT DRAG-DROP ── */
+.sg td.drop-target{background:rgba(232,160,32,.12)!important;outline:2px dashed var(--amber);outline-offset:-2px}
+.sg td.drop-invalid{background:rgba(208,72,40,.1)!important;outline:2px dashed var(--red);outline-offset:-2px}
+.sg-chip.shift-dragging{opacity:.35;cursor:grabbing}
+.sg-chip[draggable="true"]{cursor:grab}
+.drag-trash{position:fixed;bottom:72px;right:16px;width:52px;height:52px;border-radius:50%;background:var(--red-d);border:2px dashed rgba(208,72,40,.5);display:flex;align-items:center;justify-content:center;font-size:1.3rem;z-index:500;transition:all .15s;pointer-events:none;opacity:0}
+.drag-trash.visible{opacity:1;pointer-events:auto}
+.drag-trash.trash-active{background:rgba(208,72,40,.4);border-color:var(--red);transform:scale(1.15)}
+@media(max-width:760px){.drag-trash{bottom:68px}}
+
+/* ── WEEK ARCHIVE ── */
+.archive-list{display:flex;flex-direction:column;gap:6px}
+.archive-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.archive-item .ai-week{font-family:var(--font-mono);font-size:.72rem;color:var(--amber);font-weight:700}
+.archive-item .ai-meta{font-family:var(--font-mono);font-size:.62rem;color:var(--text3)}
+.archive-item .ai-restore{background:transparent;border:1px solid var(--border2);color:var(--text2);border-radius:var(--r);padding:4px 10px;font-family:var(--font-mono);font-size:.6rem;cursor:pointer;transition:all .1s;text-transform:uppercase;letter-spacing:.06em}
+.archive-item .ai-restore:hover{border-color:var(--amber);color:var(--amber)}
+
 /* ── PRICING TAB ── */
 .price-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
 .sort-btn-group{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
@@ -607,7 +664,10 @@ tr:hover td{background:rgba(232,160,32,.03)}
   <div class="sch-tab on" onclick="switchSchTab('kitchen',this)">🍳 Kitchen + Sushi</div>
   <div class="sch-tab" onclick="switchSchTab('serving',this)">🍽 Serving</div>
   <div class="sch-tab" onclick="switchSchTab('perma-restrict',this)">📌 Permanent Rules</div>
+  <div class="sch-tab" onclick="switchSchTab('roster',this)">👥 Roster</div>
+  <div class="sch-tab" onclick="switchSchTab('archive',this)">🗂 Archive</div>
 </div>
+<div class="day-count-strip" id="day-count-strip"></div>
 <div class="sch-tab-pane on" id="sch-pane-kitchen"><div class="pn" style="padding:10px"><div class="sg-wrap"><table class="sg" id="sg-kitchen"></table></div></div></div>
 <div class="sch-tab-pane" id="sch-pane-serving"><div class="pn" style="padding:10px"><div class="sg-wrap"><table class="sg" id="sg-serving"></table></div></div></div>
 <div class="sch-tab-pane" id="sch-pane-perma-restrict">
@@ -633,6 +693,26 @@ tr:hover td{background:rgba(232,160,32,.03)}
     </div>
     <div class="mf"><button class="btn bo bs" onclick="cancelAddPermaRestrict()">Cancel</button><button class="btn bg bs" onclick="confirmAddPermaRestrict()">Save Rule</button></div>
   </div>
+</div>
+</div>
+
+<!-- ROSTER TAB -->
+<div class="sch-tab-pane" id="sch-pane-roster">
+<div class="pn">
+  <div class="pnh"><h3>Roster Order</h3></div>
+  <p style="font-family:var(--font-mono);font-size:.65rem;color:var(--text3);margin-bottom:14px;line-height:1.65;letter-spacing:.04em">Drag to reorder rows within each section. Add names that will appear in the schedule grid. Changes save to Firestore automatically.</p>
+  <div class="roster-sections" id="roster-sections"></div>
+</div>
+</div>
+
+<!-- ARCHIVE TAB -->
+<div class="sch-tab-pane" id="sch-pane-archive">
+<div class="pn">
+  <div class="pnh"><h3>Week Archive</h3>
+    <button class="btn bg bs" onclick="archiveCurrentWeek()" style="background:var(--red-d);color:#e87858;border:1px solid rgba(208,72,40,.3)">🗂 Archive This Week</button>
+  </div>
+  <p style="font-family:var(--font-mono);font-size:.65rem;color:var(--text3);margin-bottom:14px;line-height:1.65;letter-spacing:.04em">Archive saves a snapshot of the current week's schedule. Archived weeks are read-only — you can restore them to copy shifts back to any week.</p>
+  <div class="archive-list" id="archive-list"><span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">// No archived weeks yet</span></div>
 </div>
 </div>
 <div class="pn" id="sch-prompt-pn" style="display:none"><div class="pnh"><h3>AI Schedule Prompt</h3><button class="btn bo bs" onclick="copyEl('sch-prompt-txt')">Copy</button></div><div class="aip" id="sch-prompt-txt"></div></div>
@@ -1027,6 +1107,7 @@ tr:hover td{background:rgba(232,160,32,.03)}
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="drag-trash" id="drag-trash">🗑</div>
 
 <!-- MOBILE BOTTOM NAV -->
 <nav class="mobile-nav" id="mobile-nav">
@@ -1065,7 +1146,7 @@ window.copyEl=function(id){var el=document.getElementById(id);if(el)navigator.cl
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,addDoc,getDocs,deleteDoc,doc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,collection,addDoc,getDocs,deleteDoc,doc,updateDoc,setDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import{getDatabase,ref,get}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import{getAuth,signInAnonymously,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -1084,7 +1165,7 @@ onAuthStateChanged(resAuth,user=>{
   updateResAuthUI();
   if(user){console.log('Hibachi auth user:',user.email||user.uid);window.loadReservations();}
 });
-const S={bills:[],shifts:[],cleanLogs:[],restrictions:[],reservations:{},reqOffs:[],employees:[],clTasks:[],vendors:[],priceItems:[],permaRestrictions:[]};
+const S={bills:[],shifts:[],cleanLogs:[],restrictions:[],reservations:{},reqOffs:[],employees:[],clTasks:[],vendors:[],priceItems:[],permaRestrictions:[],rosterOrder:{},weekArchive:[]};
 const DAYS_SHORT=['MON','TUE','WED','THU','FRI','SAT','SUN'];
 const COOK_SECTIONS=['SUSHI','KITCHEN','TEPPAN'];
 const SERVICE_SECTIONS=['SERVING'];
@@ -1145,11 +1226,15 @@ async function boot(){
       fsGet('bills'),fsGet('shifts'),fsGet('cleanLogs'),fsGet('restrictions'),
       fsGet('reqOffs').catch(()=>[]),fsGet('employees').catch(()=>[]),
       fsGet('clTasks').catch(()=>[]),fsGet('vendors').catch(()=>[]),
-      fsGet('priceItems').catch(()=>[]),fsGet('permaRestrictions').catch(()=>[])
+      fsGet('priceItems').catch(()=>[]),fsGet('permaRestrictions').catch(()=>[]),
+      fsGet('rosterOrder').catch(()=>[]),fsGet('weekArchive').catch(()=>[])
     ]);
     S.bills=results[0];S.shifts=results[1];S.cleanLogs=results[2];S.restrictions=results[3];
     S.reqOffs=results[4];S.employees=results[5];S.clTasks=results[6];
     S.vendors=results[7];S.priceItems=results[8];S.permaRestrictions=results[9]||[];
+    // rosterOrder: stored as one doc per section, id=section key
+    (results[10]||[]).forEach(doc=>{if(doc.id&&doc.names)S.rosterOrder[doc.id]=doc.names;});
+    S.weekArchive=results[11]||[];
   }catch(e){showToast('Firebase error');console.error(e);}
 
   // Seed checklist tasks if none exist
@@ -1291,7 +1376,7 @@ async function boot(){
 // ═══════════════════════════════════════════════════════════
 
 const OBK_COLLECTIONS = ['employees','shifts','bills','cleanLogs','restrictions',
-  'reqOffs','clTasks','vendors','priceItems','permaRestrictions'];
+  'reqOffs','clTasks','vendors','priceItems','permaRestrictions','weekArchive'];
 
 // Build export payload from live S object
 function obkBuildPayload(){
@@ -1434,7 +1519,7 @@ All current Overlook data in Firebase will be fully replaced. This cannot be und
 
 boot();
 
-function renderAll(){renderDash();renderBills();renderCleanLog();renderRestrictions();renderReqOffs();renderEmployees();updateEmpDatalist();renderClTasks();renderPricing();renderVendorDropdown();updatePiItemList();renderPermaRestrictions();updatePermaRestrictDatalist();renderScheduleWithCopy();}
+function renderAll(){renderDash();renderBills();renderCleanLog();renderRestrictions();renderReqOffs();renderEmployees();updateEmpDatalist();renderClTasks();renderPricing();renderVendorDropdown();updatePiItemList();renderPermaRestrictions();updatePermaRestrictDatalist();renderScheduleWithCopy();renderRosterManager();renderArchiveList();}
 
 const fmt=n=>'$'+parseFloat(n||0).toFixed(2);
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2700);}
@@ -1795,12 +1880,23 @@ function shiftSortKey(time){
 // Section print order: determines employee row order in print sheet (roster order, not time-based for kitchen+sushi)
 const SECTION_PRINT_ORDER=['SUSHI','KITCHEN','TEPPAN'];
 
-// Fixed named-row config for the on-screen grid (mirrors print sheet)
-const GRID_SECTION_ROWS={
+// ── ROSTER — dynamic from Firestore, falls back to defaults ──
+const ROSTER_DEFAULT={
   SUSHI:['Kim','Lee','Gu','Aladin'],
   KITCHEN:['Kim','Yang','Mike'],
-  TEPPAN:['D.D','YOM','C.P']
+  TEPPAN:['D.D','YOM','C.P'],
+  SERVING:[]
 };
+// Save roster order for a section to Firestore
+async function saveRosterOrder(section,names){
+  S.rosterOrder[section]=names;
+  await setDoc(doc(db,'rosterOrder',section),{names,_ts:Date.now()});
+}
+function getRosterNames(section){
+  const s=(section||'').toUpperCase();
+  if(S.rosterOrder[s]&&S.rosterOrder[s].length)return S.rosterOrder[s];
+  return ROSTER_DEFAULT[s]||[];
+}
 const normG=n=>(n||'').toLowerCase().replace(/[\s.]/g,'');
 function gridRowMatch(sec,rowLabel,shiftName){
   return normG(shiftName).includes(normG(rowLabel.split('/')[0].trim()));
@@ -1809,6 +1905,9 @@ function gridRowMatch(sec,rowLabel,shiftName){
 function buildScheduleGrid(tableId,sections){
   const wk=getWeekKey(),ws=S.shifts.filter(s=>s.week===wk);
   const v=document.getElementById('sch-weekdate').value,mon=v?new Date(v+'T12:00:00'):new Date();
+  const blockedThisWeek=parseRestrictionBlocks();
+  // Build set of blocked names per day for quick lookup
+  const blockedSet=new Set(blockedThisWeek.map(b=>`${b.name}:${b.dayIdx}`));
   let html='<thead><tr><td class="corner" style="background:var(--bg2);border:1px solid var(--border)"></td>';
   DAYS_SHORT.forEach((_,i)=>{const d=new Date(mon);d.setDate(d.getDate()+i);html+=`<td class="dn">${d.getDate()}</td>`;});
   html+='</tr><tr><th class="corner"></th>';
@@ -1816,25 +1915,31 @@ function buildScheduleGrid(tableId,sections){
   html+='</tr></thead><tbody>';
   sections.forEach(sec=>{
     const cc=secClass(sec);
-    const namedRows=GRID_SECTION_ROWS[sec];
-    if(namedRows){
-      // Fixed named rows — skip row entirely if no one is scheduled this whole week
+    const namedRows=getRosterNames(sec);
+    if(namedRows&&namedRows.length){
+      // Find any shifts not matched by any named row — show in last row
       namedRows.forEach((rowLabel,rIdx)=>{
         const weekShifts=ws.filter(s=>s.section===sec&&gridRowMatch(sec,rowLabel,s.name));
-        if(!weekShifts.length)return; // skip empty rows
+        // Always show all named rows — even empty ones (so layout is stable)
         html+=`<tr><td class="sc2 ${cc}" style="font-size:.62rem;opacity:.75">${rIdx===0?sec:''}<br><span style="font-size:.68rem;color:var(--text2);font-family:var(--font-mono);text-transform:none;letter-spacing:0;font-weight:400">${rowLabel}</span></td>`;
         DAYS_SHORT.forEach((_,di)=>{
           const cs=ws.filter(s=>s.section===sec&&s.dayIdx===di&&gridRowMatch(sec,rowLabel,s.name)).sort((a,b)=>shiftSortKey(a.time)-shiftSortKey(b.time));
-          // Also catch unmatched shifts in last row
+          // Catch unmatched shifts in last row
           const isLastRow=rIdx===namedRows.length-1;
           const matchedIds=new Set(namedRows.flatMap(rl=>ws.filter(s=>s.section===sec&&s.dayIdx===di&&gridRowMatch(sec,rl,s.name)).map(s=>s.id)));
           const extra=isLastRow?ws.filter(s=>s.section===sec&&s.dayIdx===di&&!matchedIds.has(s.id)):[];
           const allCs=[...cs,...extra];
-          html+=`<td onclick="window.handleCellClick('${sec}',${di},this)">`;
+          html+=`<td onclick="window.handleCellClick('${sec}',${di},this)" ondragover="window.shiftDragOver(event,this,'${sec}',${di})" ondrop="window.shiftDrop(event,this,'${sec}',${di})" ondragleave="window.shiftDragLeave(this)">`;
           allCs.forEach(sh=>{
             const cc2=chipClass(sec);
             const hasViolation=checkRestrictionViolation(sh.name,di);
-            html+=`<div class="sg-chip ${cc2}${hasViolation?' chip-warn':''}" title="${hasViolation?'⚠ Restriction this day':''}">
+            html+=`<div class="sg-chip ${cc2}${hasViolation?' chip-warn':''}" draggable="true"
+              ondragstart="window.shiftDragStart(event,'${sh.id}','${sec}',${di})"
+              ondragend="window.shiftDragEnd(event)"
+              ontouchstart="window.shiftTouchStart(event,'${sh.id}','${sec}',${di})"
+              ontouchmove="window.shiftTouchMove(event)"
+              ontouchend="window.shiftTouchEnd(event)"
+              title="${hasViolation?'⚠ Restriction this day':'Drag to move'}">
               <span class="cn">${sh.name}</span>${sh.time?`<span class="ct">${sh.time}</span>`:''}
               ${hasViolation?'<span class="chip-warn-ico">⚠</span>':''}
               <button class="cx" onclick="event.stopPropagation();window.delShift('${sh.id}')">✕</button>
@@ -1849,11 +1954,17 @@ function buildScheduleGrid(tableId,sections){
       html+=`<tr><td class="sc2 ${cc}">${sec}</td>`;
       DAYS_SHORT.forEach((_,di)=>{
         const cs=ws.filter(s=>s.section===sec&&s.dayIdx===di).sort((a,b)=>shiftSortKey(a.time)-shiftSortKey(b.time));
-        html+=`<td onclick="window.handleCellClick('${sec}',${di},this)">`;
+        html+=`<td onclick="window.handleCellClick('${sec}',${di},this)" ondragover="window.shiftDragOver(event,this,'${sec}',${di})" ondrop="window.shiftDrop(event,this,'${sec}',${di})" ondragleave="window.shiftDragLeave(this)">`;
         cs.forEach(sh=>{
           const cc2=chipClass(sec);
           const hasViolation=checkRestrictionViolation(sh.name,di);
-          html+=`<div class="sg-chip ${cc2}${hasViolation?' chip-warn':''}" title="${hasViolation?'⚠ Restriction this day':''}">
+          html+=`<div class="sg-chip ${cc2}${hasViolation?' chip-warn':''}" draggable="true"
+            ondragstart="window.shiftDragStart(event,'${sh.id}','${sec}',${di})"
+            ondragend="window.shiftDragEnd(event)"
+            ontouchstart="window.shiftTouchStart(event,'${sh.id}','${sec}',${di})"
+            ontouchmove="window.shiftTouchMove(event)"
+            ontouchend="window.shiftTouchEnd(event)"
+            title="${hasViolation?'⚠ Restriction this day':'Drag to move'}">
             <span class="cn">${sh.name}</span>${sh.time?`<span class="ct">${sh.time}</span>`:''}
             ${hasViolation?'<span class="chip-warn-ico">⚠</span>':''}
             <button class="cx" onclick="event.stopPropagation();window.delShift('${sh.id}')">✕</button>
@@ -1872,6 +1983,7 @@ function renderSchedule(){
   buildScheduleGrid('sg-kitchen',['SUSHI','KITCHEN','TEPPAN']);
   buildScheduleGrid('sg-serving',['SERVING']);
   renderStaffQuickPanel();
+  renderDayCountStrip();
 }
 
 // ── QUICK-ADD STAFF PANEL ──
@@ -1879,6 +1991,9 @@ function renderStaffQuickPanel(){
   const panel=document.getElementById('staff-quick-chips');
   if(!panel)return;
   if(!S.employees.length){panel.innerHTML='<span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">No employees — add them in the Employees tab</span>';return;}
+  // Build set of restricted names for this week (any day)
+  const blocked=parseRestrictionBlocks();
+  const restrictedNames=new Set(blocked.map(b=>b.name.toLowerCase()));
   const groups={TEPPAN:[],SUSHI:[],KITCHEN:[],SERVICE:[]};
   S.employees.forEach(emp=>{
     const roles=getEmpRoles(emp);
@@ -1894,7 +2009,8 @@ function renderStaffQuickPanel(){
     html+=`<div class="quick-add-section"><div class="quick-add-section-label">${roleLabels[role]}</div><div style="display:flex;flex-wrap:wrap;gap:5px">`;
     html+=uniq.map(emp=>{
       const isSelected=quickAddEmp&&quickAddEmp.id===emp.id;
-      return`<div class="staff-chip ${roleCls[role]}${isSelected?' staff-chip-selected':''}" style="${isSelected?'outline:2px solid var(--amber);outline-offset:1px':''}" onclick="window.selectQuickEmp('${emp.id}','${role}')">${emp.name}</div>`;
+      const hasRestriction=restrictedNames.has(emp.name.toLowerCase());
+      return`<div class="staff-chip ${roleCls[role]}${isSelected?' staff-chip-selected':''}${hasRestriction?' chip-restricted':''}" style="${isSelected?'outline:2px solid var(--amber);outline-offset:1px':''}" onclick="window.selectQuickEmp('${emp.id}','${role}')">${emp.name}${hasRestriction?'<span class="sc-restrict-dot"></span>':''}</div>`;
     }).join('');
     html+='</div></div>';
   });
@@ -2259,13 +2375,7 @@ window.printScheduleSheet=function(){
   const dates=DAYS_SHORT.map((_,i)=>{const d=new Date(mon);d.setDate(d.getDate()+i);return{day:DAYS_SHORT[i],date:d.toLocaleDateString('en-CA',{month:'short',day:'numeric'})};});
   const thRow=dates.map(h=>`<th><div class="dname">${h.day}</div><div class="ddate">${h.date}</div></th>`).join('');
 
-  // Build rows for a set of sections
- // Fixed named-row order per section (from manager spec)
-  const SECTION_ROWS={
-    SUSHI:['Kim','Lee','Gu','Aladin'],
-    KITCHEN:['Kim','Yang','Mike'],
-    TEPPAN:['D.D','YOM','C.P']
-  };
+  // Build rows for a set of sections — uses dynamic roster order
   const norm=n=>(n||'').toLowerCase().replace(/[\s.]/g,'');
 
   function buildSectionRows(sections){
@@ -2275,7 +2385,7 @@ window.printScheduleSheet=function(){
       const cols={SUSHI:'#1565a0',KITCHEN:'#7a5800',TEPPAN:'#8a2800'};
       const bgs={SUSHI:'#deeef8',KITCHEN:'#fdf3d0',TEPPAN:'#fde8dc'};
       const col=cols[sec]||'#222',bg=bgs[sec]||'#f5f5f5';
-      const namedRows=SECTION_ROWS[sec]||[];
+      const namedRows=getRosterNames(sec);
 
       // Only include rows that have at least one shift this week
       const activeRows=namedRows.filter(rowLabel=>{
@@ -3023,8 +3133,7 @@ window.generateSchedulePng = function(which){
     const sStyle = SEC_STYLE[sec] || SEC_STYLE.KITCHEN;
     const secShifts = ws.filter(s => (s.section||'').toUpperCase() === sec);
 
-    if(sec === 'SERVING'){
-      // AM rows
+    if(sec === 'SERVING'){      // AM rows
       let maxAM = 1;
       for(let di=0;di<7;di++){
         const c = secShifts.filter(s=>s.dayIdx===di&&!isPmServing(s.time)).length;
@@ -3055,9 +3164,8 @@ window.generateSchedulePng = function(which){
         rowData.push({ section:sec, label:'', isFirst:false, sStyle, shifts, isPmDiv:false });
       }
     } else {
-      const NAMED = { SUSHI:['Kim','Lee','Gu','Aladin'], KITCHEN:['Kim','Yang','Mike'], TEPPAN:['D.D','YOM','C.P'] };
       const norm = n=>(n||'').toLowerCase().replace(/[\s.]/g,'');
-      const named = NAMED[sec] || [];
+      const named = getRosterNames(sec);
       const activeNamed = named.filter(rl => secShifts.some(s=>norm(s.name).includes(norm(rl))));
       // fallback: any unmatched shifts
       const matchedNames = new Set(activeNamed.flatMap(rl=>secShifts.filter(s=>norm(s.name).includes(norm(rl))).map(s=>s.id)));
@@ -3460,6 +3568,348 @@ window.copyDaysWorked = function(){
   if(!txt){ showToast('Nothing to copy'); return; }
   navigator.clipboard.writeText(txt);
   showToast('Copied — paste into Google Sheets ✓');
+};
+
+// ── DAY COUNT STRIP ──
+function renderDayCountStrip(){
+  const strip=document.getElementById('day-count-strip');
+  if(!strip)return;
+  const wk=getWeekKey();
+  if(!wk||wk==='default'){strip.innerHTML='';return;}
+  const ws=S.shifts.filter(s=>s.week===wk);
+  // Count unique days per person across all sections
+  const perPerson={};
+  ws.forEach(sh=>{
+    const name=(sh.name||'').trim();if(!name)return;
+    if(!perPerson[name])perPerson[name]=new Set();
+    perPerson[name].add(sh.dayIdx);
+  });
+  const entries=Object.entries(perPerson).sort((a,b)=>b[1].size-a[1].size||a[0].localeCompare(b[0]));
+  if(!entries.length){strip.innerHTML='<span style="font-family:var(--font-mono);font-size:.65rem;color:var(--text3)">// Add shifts to see day counts</span>';return;}
+  strip.innerHTML=entries.map(([name,days])=>{
+    const n=days.size;
+    const cls=n===0?'dcs-0':n<=2?'dcs-1':n<=4?'dcs-3':'dcs-5';
+    return`<div class="dcs-item"><span class="dcs-name">${name}</span><span class="dcs-count ${cls}">${n}d</span></div>`;
+  }).join('');
+}
+
+// ── ROSTER MANAGER ──
+const ROSTER_SECTIONS=['SUSHI','KITCHEN','TEPPAN','SERVING'];
+const ROSTER_SEC_LABELS={SUSHI:'Sushi',KITCHEN:'Kitchen',TEPPAN:'Teppan',SERVING:'Serving'};
+const ROSTER_SEC_CLASS={SUSHI:'sec-sushi',KITCHEN:'sec-kitchen',TEPPAN:'sec-teppan',SERVING:'sec-serving'};
+let rosterDragSec=null,rosterDragIdx=null;
+
+function renderRosterManager(){
+  const container=document.getElementById('roster-sections');
+  if(!container)return;
+  let html='';
+  ROSTER_SECTIONS.forEach(sec=>{
+    const names=getRosterNames(sec);
+    const cls=ROSTER_SEC_CLASS[sec]||'';
+    html+=`<div class="roster-sec ${cls}" id="rsec-${sec}">
+      <div class="roster-sec-title">${ROSTER_SEC_LABELS[sec]||sec}</div>
+      <div id="rrows-${sec}">
+        ${names.map((name,i)=>`
+          <div class="roster-row" draggable="true" data-sec="${sec}" data-idx="${i}"
+            ondragstart="window.rosterDragStart(event,'${sec}',${i})"
+            ondragover="window.rosterDragOver(event,'${sec}',${i})"
+            ondrop="window.rosterDrop(event,'${sec}',${i})"
+            ondragleave="window.rosterDragLeave(this)"
+            ontouchstart="window.rosterTouchStart(event,'${sec}',${i})"
+            ontouchmove="window.rosterTouchMove(event,'${sec}')"
+            ontouchend="window.rosterTouchEnd(event,'${sec}',${i})">
+            <span class="rr-handle">⠿</span>
+            <span class="rr-name">${name}</span>
+            <button class="rr-del" onclick="window.rosterDelName('${sec}',${i})">✕</button>
+          </div>`).join('')}
+      </div>
+      <div class="roster-add">
+        <input id="radd-${sec}" placeholder="Add name..." onkeydown="if(event.key==='Enter')window.rosterAddName('${sec}')">
+        <button onclick="window.rosterAddName('${sec}')">＋</button>
+      </div>
+    </div>`;
+  });
+  container.innerHTML=html;
+}
+
+window.rosterAddName=async function(sec){
+  const inp=document.getElementById(`radd-${sec}`);
+  if(!inp)return;
+  const name=inp.value.trim();
+  if(!name){showToast('Enter a name');return;}
+  const names=[...getRosterNames(sec),name];
+  await saveRosterOrder(sec,names);
+  inp.value='';
+  renderRosterManager();
+  renderSchedule();
+  showToast(`${name} added to ${sec} roster ✓`);
+};
+
+window.rosterDelName=async function(sec,idx){
+  const names=[...getRosterNames(sec)];
+  const removed=names.splice(idx,1);
+  await saveRosterOrder(sec,names);
+  renderRosterManager();
+  renderSchedule();
+  showToast(`${removed[0]} removed from roster`);
+};
+
+// Roster drag-drop (desktop)
+window.rosterDragStart=function(e,sec,idx){rosterDragSec=sec;rosterDragIdx=idx;e.currentTarget.classList.add('roster-dragging');e.dataTransfer.effectAllowed='move';};
+window.rosterDragOver=function(e,sec,idx){if(rosterDragSec!==sec)return;e.preventDefault();e.currentTarget.classList.add('roster-drag-over');};
+window.rosterDragLeave=function(el){el.classList.remove('roster-drag-over');};
+window.rosterDrop=async function(e,sec,toIdx){
+  e.preventDefault();
+  document.querySelectorAll('.roster-row').forEach(r=>r.classList.remove('roster-dragging','roster-drag-over'));
+  if(rosterDragSec!==sec||rosterDragIdx===null||rosterDragIdx===toIdx)return;
+  const names=[...getRosterNames(sec)];
+  const [moved]=names.splice(rosterDragIdx,1);
+  names.splice(toIdx,0,moved);
+  await saveRosterOrder(sec,names);
+  renderRosterManager();
+  renderSchedule();
+  rosterDragSec=null;rosterDragIdx=null;
+};
+
+// Roster touch support
+let _rosterTouchSec=null,_rosterTouchIdx=null,_rosterTouchClone=null;
+window.rosterTouchStart=function(e,sec,idx){
+  _rosterTouchSec=sec;_rosterTouchIdx=idx;
+  const el=e.currentTarget;
+  const rect=el.getBoundingClientRect();
+  _rosterTouchClone=el.cloneNode(true);
+  _rosterTouchClone.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;opacity:.8;pointer-events:none;z-index:9999;`;
+  document.body.appendChild(_rosterTouchClone);
+  el.classList.add('roster-dragging');
+};
+window.rosterTouchMove=function(e,sec){
+  if(!_rosterTouchClone)return;
+  e.preventDefault();
+  const t=e.touches[0];
+  _rosterTouchClone.style.left=(t.clientX-40)+'px';
+  _rosterTouchClone.style.top=(t.clientY-15)+'px';
+};
+window.rosterTouchEnd=async function(e,sec,toIdx){
+  if(_rosterTouchClone){_rosterTouchClone.remove();_rosterTouchClone=null;}
+  document.querySelectorAll('.roster-row').forEach(r=>r.classList.remove('roster-dragging'));
+  if(_rosterTouchSec!==sec||_rosterTouchIdx===null||_rosterTouchIdx===toIdx){_rosterTouchSec=null;_rosterTouchIdx=null;return;}
+  const names=[...getRosterNames(sec)];
+  const [moved]=names.splice(_rosterTouchIdx,1);
+  names.splice(toIdx,0,moved);
+  await saveRosterOrder(sec,names);
+  renderRosterManager();
+  renderSchedule();
+  _rosterTouchSec=null;_rosterTouchIdx=null;
+};
+
+// ── SHIFT DRAG-DROP ──
+let _shiftDragId=null,_shiftDragSec=null,_shiftDragDay=null;
+let _touchShiftId=null,_touchShiftSec=null,_touchShiftDay=null,_touchClone=null;
+
+window.shiftDragStart=function(e,shiftId,sec,dayIdx){
+  _shiftDragId=shiftId;_shiftDragSec=sec;_shiftDragDay=dayIdx;
+  e.dataTransfer.effectAllowed='move';
+  e.currentTarget.classList.add('shift-dragging');
+  const trash=document.getElementById('drag-trash');
+  if(trash)trash.classList.add('visible');
+};
+window.shiftDragEnd=function(e){
+  e.currentTarget.classList.remove('shift-dragging');
+  document.querySelectorAll('.sg td').forEach(td=>td.classList.remove('drop-target','drop-invalid'));
+  const trash=document.getElementById('drag-trash');
+  if(trash){trash.classList.remove('visible','trash-active');}
+  _shiftDragId=null;_shiftDragSec=null;_shiftDragDay=null;
+};
+window.shiftDragOver=function(e,td,sec,dayIdx){
+  if(!_shiftDragId)return;
+  e.preventDefault();
+  // Check if drop would cause restriction
+  const sh=S.shifts.find(s=>s.id===_shiftDragId);
+  if(sh){
+    const violation=checkRestrictionViolation(sh.name,dayIdx);
+    td.classList.remove('drop-target','drop-invalid');
+    td.classList.add(violation?'drop-invalid':'drop-target');
+  }
+  e.dataTransfer.dropEffect='move';
+};
+window.shiftDragLeave=function(td){td.classList.remove('drop-target','drop-invalid');};
+window.shiftDrop=async function(e,td,toSec,toDayIdx){
+  e.preventDefault();
+  td.classList.remove('drop-target','drop-invalid');
+  if(!_shiftDragId)return;
+  const sh=S.shifts.find(s=>s.id===_shiftDragId);
+  if(!sh)return;
+  if(sh.section===toSec&&sh.dayIdx===toDayIdx){return;} // same cell
+  // Check restriction
+  const violation=checkRestrictionViolation(sh.name,toDayIdx);
+  if(violation){
+    showToast(`⚠ ${sh.name} has a restriction on ${DAYS_SHORT[toDayIdx]} — not moved`,3500);
+    return;
+  }
+  await fsUp('shifts',sh.id,{section:toSec,dayIdx:toDayIdx});
+  sh.section=toSec;sh.dayIdx=toDayIdx;
+  renderSchedule();
+  showToast(`${sh.name} moved to ${toSec} ${DAYS_SHORT[toDayIdx]} ✓`);
+};
+
+// Trash drop
+document.addEventListener('DOMContentLoaded',()=>{
+  const trash=document.getElementById('drag-trash');
+  if(!trash)return;
+  trash.addEventListener('dragover',e=>{e.preventDefault();trash.classList.add('trash-active');});
+  trash.addEventListener('dragleave',()=>trash.classList.remove('trash-active'));
+  trash.addEventListener('drop',async e=>{
+    e.preventDefault();
+    trash.classList.remove('trash-active','visible');
+    if(!_shiftDragId)return;
+    await fsDel('shifts',_shiftDragId);
+    S.shifts=S.shifts.filter(s=>s.id!==_shiftDragId);
+    renderSchedule();
+    showToast('Shift deleted ✓');
+    _shiftDragId=null;
+  });
+});
+
+// Touch drag for shift chips
+window.shiftTouchStart=function(e,shiftId,sec,dayIdx){
+  _touchShiftId=shiftId;_touchShiftSec=sec;_touchShiftDay=dayIdx;
+  const el=e.currentTarget;
+  const rect=el.getBoundingClientRect();
+  _touchClone=el.cloneNode(true);
+  _touchClone.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;opacity:.75;pointer-events:none;z-index:9999;border-radius:3px;`;
+  document.body.appendChild(_touchClone);
+  el.classList.add('shift-dragging');
+  const trash=document.getElementById('drag-trash');
+  if(trash)trash.classList.add('visible');
+};
+window.shiftTouchMove=function(e){
+  if(!_touchClone)return;
+  e.preventDefault();
+  const t=e.touches[0];
+  _touchClone.style.left=(t.clientX-30)+'px';
+  _touchClone.style.top=(t.clientY-12)+'px';
+  // Highlight cell under finger
+  document.querySelectorAll('.sg td').forEach(td=>td.classList.remove('drop-target','drop-invalid'));
+  const el=document.elementFromPoint(t.clientX,t.clientY);
+  const td=el?.closest('.sg td');
+  if(td){
+    const sh=S.shifts.find(s=>s.id===_touchShiftId);
+    if(sh){
+      // Get section/day from td — parse from onclick attr
+      const onclick=td.getAttribute('onclick')||'';
+      const m=onclick.match(/'([A-Z]+)',(\d+)/);
+      if(m){
+        const violation=checkRestrictionViolation(sh.name,parseInt(m[2]));
+        td.classList.add(violation?'drop-invalid':'drop-target');
+      }
+    }
+  }
+  // Trash highlight
+  const trash=document.getElementById('drag-trash');
+  if(trash){
+    const tr=trash.getBoundingClientRect();
+    const over=t.clientX>=tr.left&&t.clientX<=tr.right&&t.clientY>=tr.top&&t.clientY<=tr.bottom;
+    trash.classList.toggle('trash-active',over);
+  }
+};
+window.shiftTouchEnd=async function(e){
+  if(_touchClone){_touchClone.remove();_touchClone=null;}
+  document.querySelectorAll('.sg td').forEach(td=>td.classList.remove('drop-target','drop-invalid'));
+  document.querySelectorAll('.sg-chip').forEach(c=>c.classList.remove('shift-dragging'));
+  const trash=document.getElementById('drag-trash');
+  if(trash)trash.classList.remove('visible','trash-active');
+  if(!_touchShiftId)return;
+  const t=e.changedTouches[0];
+  // Check if over trash
+  if(trash){
+    const tr=trash.getBoundingClientRect();
+    if(t.clientX>=tr.left&&t.clientX<=tr.right&&t.clientY>=tr.top&&t.clientY<=tr.bottom){
+      await fsDel('shifts',_touchShiftId);
+      S.shifts=S.shifts.filter(s=>s.id!==_touchShiftId);
+      renderSchedule();
+      showToast('Shift deleted ✓');
+      _touchShiftId=null;_touchShiftSec=null;_touchShiftDay=null;
+      return;
+    }
+  }
+  // Find target cell
+  const el=document.elementFromPoint(t.clientX,t.clientY);
+  const td=el?.closest('.sg td');
+  if(!td){_touchShiftId=null;return;}
+  const onclick=td.getAttribute('onclick')||'';
+  const m=onclick.match(/'([A-Z]+)',(\d+)/);
+  if(!m){_touchShiftId=null;return;}
+  const toSec=m[1],toDayIdx=parseInt(m[2]);
+  const sh=S.shifts.find(s=>s.id===_touchShiftId);
+  if(!sh){_touchShiftId=null;return;}
+  if(sh.section===toSec&&sh.dayIdx===toDayIdx){_touchShiftId=null;return;}
+  const violation=checkRestrictionViolation(sh.name,toDayIdx);
+  if(violation){showToast(`⚠ ${sh.name} has a restriction on ${DAYS_SHORT[toDayIdx]}`,3500);_touchShiftId=null;return;}
+  await fsUp('shifts',sh.id,{section:toSec,dayIdx:toDayIdx});
+  sh.section=toSec;sh.dayIdx=toDayIdx;
+  renderSchedule();
+  showToast(`${sh.name} moved to ${toSec} ${DAYS_SHORT[toDayIdx]} ✓`);
+  _touchShiftId=null;_touchShiftSec=null;_touchShiftDay=null;
+};
+
+// ── WEEK ARCHIVE ──
+window.archiveCurrentWeek=async function(){
+  const wk=getWeekKey();
+  if(!wk||wk==='default'){showToast('Select a week first');return;}
+  const ws=S.shifts.filter(s=>s.week===wk);
+  if(!ws.length){showToast('No shifts to archive');return;}
+  if(!confirm(`Archive week ${document.getElementById('sch-week-label').textContent}? This saves a snapshot. Shifts are not deleted.`))return;
+  const snap={week:wk,label:document.getElementById('sch-week-label').textContent,archivedAt:new Date().toISOString(),shifts:ws.map(s=>({section:s.section,dayIdx:s.dayIdx,name:s.name,time:s.time||''}))};
+  snap.id=await fsAdd('weekArchive',snap);
+  S.weekArchive.push(snap);
+  renderArchiveList();
+  showToast(`Week archived ✓`);
+};
+
+function renderArchiveList(){
+  const container=document.getElementById('archive-list');
+  if(!container)return;
+  const sorted=[...S.weekArchive].sort((a,b)=>b.week.localeCompare(a.week));
+  if(!sorted.length){container.innerHTML='<span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">// No archived weeks yet</span>';return;}
+  container.innerHTML=sorted.map(arc=>{
+    const shiftCount=arc.shifts?arc.shifts.length:0;
+    const arDate=arc.archivedAt?new Date(arc.archivedAt).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'}):'';
+    return`<div class="archive-item">
+      <div>
+        <div class="ai-week">${arc.label||arc.week}</div>
+        <div class="ai-meta">${shiftCount} shifts · Archived ${arDate}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="ai-restore" onclick="window.restoreArchivedWeek('${arc.id}')">↩ Restore to This Week</button>
+        <button class="ai-restore" style="color:var(--red);border-color:rgba(208,72,40,.25)" onclick="window.delArchive('${arc.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.restoreArchivedWeek=async function(arcId){
+  const arc=S.weekArchive.find(a=>a.id===arcId);
+  if(!arc||!arc.shifts){showToast('Archive not found');return;}
+  const wk=getWeekKey();
+  if(!wk||wk==='default'){showToast('Select a target week first');return;}
+  const existing=S.shifts.filter(s=>s.week===wk);
+  if(existing.length){if(!confirm(`Replace ${existing.length} existing shifts for ${document.getElementById('sch-week-label').textContent} with the archived week?`))return;
+    await Promise.all(existing.map(s=>fsDel('shifts',s.id)));
+    S.shifts=S.shifts.filter(s=>s.week!==wk);}
+  await Promise.all(arc.shifts.map(async s=>{
+    const ns={week:wk,section:s.section,dayIdx:s.dayIdx,name:s.name,time:s.time||''};
+    ns.id=await fsAdd('shifts',ns);S.shifts.push(ns);
+  }));
+  renderSchedule();
+  showToast(`Restored ${arc.shifts.length} shifts ✓`);
+};
+
+window.delArchive=async function(arcId){
+  if(!confirm('Delete this archive?'))return;
+  await fsDel('weekArchive',arcId);
+  S.weekArchive=S.weekArchive.filter(a=>a.id!==arcId);
+  renderArchiveList();
+  showToast('Archive deleted');
 };
 
 window.confirmVendor=async function(){
