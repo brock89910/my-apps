@@ -1828,6 +1828,40 @@ async function postToVault(dk, id, resData) {
   }
 }
 
+// ── VAULT SWEEP — every 5 minutes ──
+// Catches any cards that failed to vault on save (network blip, tab closed, etc.)
+let _vaultSweepRunning = false;
+
+async function vaultSweep() {
+  if (_vaultSweepRunning) return;
+  if (!window._db || !window._fbReady) return;
+  const sheetUrl = localStorage.getItem('appsScriptUrl');
+  if (!sheetUrl || !sheetUrl.startsWith('https://script.google.com')) return;
+  _vaultSweepRunning = true;
+  try {
+    const snap = await window._get(window._ref(window._db, 'reservations'));
+    const data = snap.val();
+    if (!data) return;
+    for (const [date, slots] of Object.entries(data)) {
+      for (const [id, res] of Object.entries(slots || {})) {
+        if (!res.card) continue;
+        await postToVault(date, id, { ...res, dateKey: date, id });
+      }
+    }
+  } catch(e) {
+    console.warn('vaultSweep error:', e.message);
+  } finally {
+    _vaultSweepRunning = false;
+  }
+}
+
+function startVaultSweep() {
+  setInterval(vaultSweep, 5 * 60 * 1000);
+  setTimeout(vaultSweep, 15 * 1000); // also run 15s after login
+}
+
+window._startVaultSweep = startVaultSweep;
+
 const _origPush = async (ref, data) => window._push(ref, data);
 const _origSet  = async (ref, data) => window._set(ref, data);
 const _origRemove = async (ref) => window._remove(ref);
@@ -4400,6 +4434,8 @@ function startApp() {
   if (window._preloadAllReservations) setTimeout(window._preloadAllReservations, 2000);
   // Start 2-minute sheet sync interval (only runs if manager is logged in)
   if (window._startSheetSyncInterval) window._startSheetSyncInterval();
+  // Start 5-minute vault sweep (catches any cards that failed to vault on save)
+  if (window._startVaultSweep) window._startVaultSweep();
 }
 
 function getDisplayName(resId,realName,dateStr) {
