@@ -1064,6 +1064,90 @@ body.staff-mode .real-name { display: inline; }
   padding: 9px 14px 3px;
   border-top: 1px solid var(--border2);
 }
+
+/* ══════════════════════════════════════════════
+   STAFF2 MODE — CREAM / LIGHT THEME (password 2599)
+   Same palette as manager-overlook light theme.
+   All font weights bumped for readability.
+   ══════════════════════════════════════════════ */
+body.staff2-mode {
+  --bg:        #f5f2ec;
+  --bg2:       #ede9e0;
+  --bg3:       #e8e3d8;
+  --panel:     #f0ece4;
+  --lift:      #ddd8ce;
+  --border:    rgba(160,140,100,0.35);
+  --border2:   rgba(160,140,100,0.2);
+  --gold:      #9a6800;
+  --gold2:     #7a5200;
+  --gold3:     rgba(154,104,0,0.1);
+  --gold-light:#6a4400;
+  --text:      #2a2520;
+  --text2:     #5a5048;
+  --text3:     #8a8070;
+  --green:     #2a7a2a;
+  --red:       #c02020;
+  --red-deep:  #6a0a0a;
+  --amber:     #8a5800;
+  --blue:      #1a5a98;
+}
+
+/* Remove dark noise texture in staff2 mode */
+body.staff2-mode::before { display: none; }
+
+/* ── Thicker fonts everywhere ── */
+body.staff2-mode { font-weight: 500; }
+
+body.staff2-mode .app-title          { font-weight: 800; color: var(--gold); }
+body.staff2-mode .app-title-sub      { font-weight: 600; color: var(--text2); }
+body.staff2-mode .date-label         { font-weight: 800; }
+body.staff2-mode .date-sub           { font-weight: 600; }
+body.staff2-mode .tab-btn            { font-weight: 700; color: var(--text2); }
+body.staff2-mode .tab-btn.active     { color: var(--gold); border-bottom-color: var(--gold); }
+body.staff2-mode .time-label         { font-weight: 800; color: var(--gold); }
+body.staff2-mode .time-chef-info     { font-weight: 600; }
+body.staff2-mode .res-row-name       { font-weight: 700; }
+body.staff2-mode .res-row-meta       { font-weight: 600; }
+body.staff2-mode .res-row-badge      { font-weight: 700; }
+body.staff2-mode .modal-title        { font-weight: 800; color: var(--gold); }
+body.staff2-mode .form-label         { font-weight: 700; color: var(--text2); }
+body.staff2-mode .form-input,
+body.staff2-mode .form-select,
+body.staff2-mode .form-textarea      { font-weight: 600; color: var(--text); background: #fff; border-color: rgba(160,140,100,0.4); }
+body.staff2-mode .form-input:focus,
+body.staff2-mode .form-select:focus,
+body.staff2-mode .form-textarea:focus { background: #fff; border-color: rgba(154,104,0,0.5); }
+body.staff2-mode .btn-gold           { color: #fff; font-weight: 800; }
+body.staff2-mode .btn-danger         { font-weight: 700; }
+body.staff2-mode .btn-outline        { font-weight: 700; }
+body.staff2-mode .history-month-label{ font-weight: 800; color: var(--gold); }
+body.staff2-mode .history-entry      { font-weight: 600; background: var(--bg3); }
+body.staff2-mode .login-wordmark     { color: var(--gold); font-weight: 800; }
+body.staff2-mode .slot-empty,
+body.staff2-mode .empty-slot         { font-weight: 600; }
+body.staff2-mode .section-divider    { font-weight: 700; }
+body.staff2-mode .dining-name        { font-weight: 700; }
+body.staff2-mode .dining-detail      { font-weight: 600; }
+
+/* Borders & surfaces */
+body.staff2-mode .app-header         { background: var(--bg2); border-color: rgba(160,140,100,0.3); }
+body.staff2-mode .tab-bar            { background: var(--bg3); border-color: rgba(160,140,100,0.25); }
+body.staff2-mode .res-row            { background: var(--bg3); }
+body.staff2-mode .modal-sheet        { background: var(--bg2); }
+body.staff2-mode .modal-overlay      { background: rgba(80,70,60,0.45); }
+body.staff2-mode .modal-close        { background: var(--lift); border-color: rgba(160,140,100,0.35); }
+body.staff2-mode .time-header        { background: var(--bg2); }
+body.staff2-mode #calDropdown        { background: var(--bg2); }
+body.staff2-mode .db-offline-banner  { background: #8a1a1a; }
+
+/* Full slot — override hardcoded white header */
+body.staff2-mode .slot-full .time-header  { background: #2a2520 !important; }
+body.staff2-mode .slot-full .time-header .time-chef-info { color: #f5f2ec !important; }
+body.staff2-mode .slot-full .time-header .time-label     { color: #f5f2ec !important; }
+body.staff2-mode .time-block.slot-full .time-label        { color: #f5f2ec !important; }
+
+/* Scrollbar */
+body.staff2-mode ::-webkit-scrollbar-thumb { background: rgba(160,140,100,0.4); }
 </style>
 </head>
 <body>
@@ -4386,7 +4470,7 @@ function enterStaff2Mode() {
   appMode='staff2';
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('app').style.display='';
-  document.body.classList.remove('guest-mode','manager-mode'); document.body.classList.add('staff-mode');
+  document.body.classList.remove('guest-mode','manager-mode'); document.body.classList.add('staff-mode','staff2-mode');
   const ind=document.getElementById('modeIndicator'); ind.className='staff'; ind.textContent='✓ Staff';
   startApp();
 }
@@ -4395,7 +4479,7 @@ function enterStaffMode() {
   appMode='staff';
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('app').style.display='';
-  document.body.classList.remove('guest-mode','manager-mode'); document.body.classList.add('staff-mode');
+  document.body.classList.remove('guest-mode','manager-mode','staff2-mode'); document.body.classList.add('staff-mode');
   const ind=document.getElementById('modeIndicator'); ind.className='staff'; ind.textContent='✓ Staff';
   startApp();
 }
