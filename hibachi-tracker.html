@@ -1136,15 +1136,28 @@ body.staff2-mode .res-row            { background: var(--bg3); }
 body.staff2-mode .modal-sheet        { background: var(--bg2); }
 body.staff2-mode .modal-overlay      { background: rgba(80,70,60,0.45); }
 body.staff2-mode .modal-close        { background: var(--lift); border-color: rgba(160,140,100,0.35); }
-body.staff2-mode .time-header        { background: var(--bg2); }
 body.staff2-mode #calDropdown        { background: var(--bg2); }
 body.staff2-mode .db-offline-banner  { background: #8a1a1a; }
 
-/* Full slot — override hardcoded white header */
-body.staff2-mode .slot-full .time-header  { background: #2a2520 !important; }
-body.staff2-mode .slot-full .time-header .time-chef-info { color: #f5f2ec !important; }
-body.staff2-mode .slot-full .time-header .time-label     { color: #f5f2ec !important; }
-body.staff2-mode .time-block.slot-full .time-label        { color: #f5f2ec !important; }
+/* ALL time slot headers go dark in staff2 mode */
+body.staff2-mode .time-header        { background: #2a2520 !important; border-color: rgba(255,255,255,0.06) !important; }
+body.staff2-mode .time-header .time-label      { color: #d4a843 !important; }
+body.staff2-mode .time-header .time-chef-info  { color: rgba(245,242,236,0.7) !important; }
+body.staff2-mode .time-header .slot-cap-label.plenty { color: #6ab86a !important; background: rgba(74,138,74,0.2) !important; border-color: rgba(74,138,74,0.4) !important; }
+body.staff2-mode .time-header .slot-cap-label.low    { color: #e87858 !important; background: rgba(208,72,40,0.2) !important; border-color: rgba(208,72,40,0.4) !important; }
+body.staff2-mode .time-header .slot-cap-label.none   { color: #e87858 !important; background: rgba(208,72,40,0.25) !important; border-color: rgba(208,72,40,0.5) !important; }
+body.staff2-mode .time-header .slot-cap-label.custom { color: #7ab4cc !important; background: rgba(58,122,184,0.2) !important; border-color: rgba(58,122,184,0.4) !important; }
+body.staff2-mode .time-header .time-add-btn    { background: rgba(212,168,67,0.15) !important; border-color: rgba(212,168,67,0.4) !important; color: #d4a843 !important; }
+body.staff2-mode .time-header .force-add-btn   { opacity: 0.9; }
+
+/* Swap guest count (#p) and name colors:
+   - First span inside res-row-name = "Np" count → dark/black (override inline gold color)
+   - Second span inside res-row-name = customer name → amber
+   - res-row-meta (phone, initials) → dark */
+body.staff2-mode .res-row-name span:first-child { color: #2a2520 !important; font-weight: 800; }
+body.staff2-mode .res-row-name span:nth-child(2) { color: #9a6800 !important; font-weight: 600; }
+body.staff2-mode .res-row-name       { font-weight: 700; }
+body.staff2-mode .res-row-meta       { color: #2a2520 !important; font-weight: 700; }
 
 /* Scrollbar */
 body.staff2-mode ::-webkit-scrollbar-thumb { background: rgba(160,140,100,0.4); }
