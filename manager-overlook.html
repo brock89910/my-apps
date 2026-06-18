@@ -2280,24 +2280,17 @@ window.openSheetModal=function(){buildSheetPreviews();openModal('sheet-modal');}
 const SERVING_AM_TIMES=['11','12','11-2','11-2 (11am–2pm)'];
 const SERVING_PM_TIMES=['5','5:30','6'];
 function servingTimeOrder(time){
-  const t=(time||'').trim();
-  if(t==='11')return 0;
-  if(t==='12')return 1;
-  if(t==='11-2'||t.startsWith('11-2'))return 2;
-  if(t==='5')return 4;
-  if(t==='5:30'||t==='5.30')return 5;
-  if(t==='6')return 6;
-  // fallback: name-only goes first, others go to end
-  if(!t)return 0;
-  return 7;
+  // Delegate to shiftSortKey for consistent chronological ordering
+  return shiftSortKey(time);
 }
 function isPmServing(time){
   const t=(time||'').trim();
-  return t==='5'||t==='5:30'||t==='5.30'||t==='6';
+  if(!t||t==='1/2'||t==='half')return false; // name-only / half-day → AM group
+  // PM = starts at 1pm (13:00) or later
+  return shiftSortKey(t)>=13*60;
 }
 function isAmServing(time){
-  const t=(time||'').trim();
-  return !t||t==='11'||t==='12'||t==='11-2'||t.startsWith('11-2');
+  return !isPmServing(time);
 }
 function buildSheetPreview(containerId,sections){
   const wk=getWeekKey(),ws=S.shifts.filter(s=>s.week===wk);
