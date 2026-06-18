@@ -3420,7 +3420,13 @@ function ssShiftHours(timeStr, dayIdx){
     if(!str) return null;
     // handle "5", "5:30", "5.30", "6", "11", "12", "17:30" etc
     const clean=str.replace(',','.');
-    if(clean.includes(':')){ const [h,m]=clean.split(':'); return parseInt(h)*60+parseInt(m); }
+    if(clean.includes(':')){
+      const [hStr,mStr]=clean.split(':');
+      let hh=parseInt(hStr), mm=parseInt(mStr);
+      // Apply same PM correction as shiftSortKey: 1–9 = PM hour
+      if(hh>=1&&hh<=9) hh+=12;
+      return hh*60+mm;
+    }
     const n=parseFloat(clean);
     if(isNaN(n)) return null;
     // If 1–9 treat as PM hour (add 12), 10–12 treat as AM, 13+ treat as 24h
