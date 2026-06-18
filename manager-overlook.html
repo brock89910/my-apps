@@ -1891,7 +1891,8 @@ function shiftSortKey(time){
   let h=parseFloat(parts[0]);
   const m=parts[1]?parseInt(parts[1],10):0;
   if(isNaN(h))return 9998;
-  if(h<=8)h+=12;
+  // 2–9 are PM, 10–12 are AM/noon — threshold at 9
+  if(h<=9)h+=12;
   return h*60+m;
 }
 
@@ -2049,8 +2050,8 @@ window.selectQuickEmp=function(empId,role){
 };
 
 // TIME SLOT OPTIONS for inline picker
-const TIME_SLOTS=['','1/2','11','12','11-2','5','5:30','6'];
-const TIME_SLOT_LABELS={'':'Name only','1/2':'1/2','11':'11','12':'12','11-2':'11-2','5':'5','5:30':'5:30','6':'6'};
+const TIME_SLOTS=['','1/2','11','11-2','11-4','12','5','5:30','6'];
+const TIME_SLOT_LABELS={'':'Name only','1/2':'1/2','11':'11','11-2':'11-2','11-4':'11-4','12':'12','5':'5','5:30':'5:30','6':'6'};
 
 // Inline cell picker — shows a compact time picker directly in the cell
 window.handleCellClick=function(section,dayIdx,cellEl){
