@@ -19,6 +19,13 @@
 .itp-btn:hover{background:var(--amber-d);border-color:var(--amber);color:var(--amber)}
 .itp-cancel{position:absolute;top:5px;right:7px;background:none;border:none;color:var(--text3);font-size:.75rem;cursor:pointer;padding:1px 4px}
 .itp-cancel:hover{color:var(--red)}
+.itp-custom-btn{background:var(--s3)!important;border-color:var(--border2)!important;color:var(--text2)!important}
+.itp-custom-btn:hover{border-color:var(--amber)!important;color:var(--amber)!important}
+.itp-custom-row{display:none;gap:4px;align-items:center;margin-top:6px;padding-top:6px;border-top:1px solid var(--border)}
+.itp-custom-row input{flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--text);border-radius:3px;padding:4px 7px;font-family:var(--font-mono);font-size:.68rem;outline:none;min-width:0;transition:border-color .1s}
+.itp-custom-row input:focus{border-color:var(--amber)}
+.itp-custom-row button{background:var(--amber);color:#2a2520;border:none;border-radius:3px;padding:4px 8px;font-size:.72rem;font-weight:700;cursor:pointer;flex-shrink:0;transition:background .1s}
+.itp-custom-row button:hover{background:var(--amber2)}
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
 --bg:#f5f2ec;--bg2:#ede9e0;--surface:#faf8f4;--s2:#f0ece4;--s3:#e8e3d8;
@@ -1877,9 +1884,15 @@ function checkRestrictionViolation(empName,dayIdx){
 
 function shiftSortKey(time){
   const t=(time||'').trim().toLowerCase();
-  if(!t)return 0;
-  if(t==='half'||t==='1/2')return 1;
-  return 2;
+  if(!t)return 9999;
+  if(t==='half'||t==='1/2')return -1;
+  const startStr=t.split(/[-–]/)[0].trim();
+  const parts=startStr.split(':');
+  let h=parseFloat(parts[0]);
+  const m=parts[1]?parseInt(parts[1],10):0;
+  if(isNaN(h))return 9998;
+  if(h<=8)h+=12;
+  return h*60+m;
 }
 
 // Section print order: determines employee row order in print sheet (roster order, not time-based for kitchen+sushi)
@@ -2064,20 +2077,34 @@ window.handleCellClick=function(section,dayIdx,cellEl){
 };
 
 function showInlineTimePicker(tdEl,section,dayIdx,empName){
-  // Remove any existing picker
   document.querySelectorAll('.inline-time-picker').forEach(el=>el.remove());
   const picker=document.createElement('div');
   picker.className='inline-time-picker';
+  const cancelBtn=`<button class="itp-cancel" onclick="event.stopPropagation();document.querySelectorAll('.inline-time-picker').forEach(e=>e.remove())">✕</button>`;
   picker.innerHTML=`<div class="itp-name">${empName}</div><div class="itp-slots">${
     TIME_SLOTS.map(t=>`<button class="itp-btn" onclick="window.pickInlineTime('${section}',${dayIdx},'${empName}','${t}')">${TIME_SLOT_LABELS[t]}</button>`).join('')
-  }</div><button class="itp-cancel" onclick="event.stopPropagation();document.querySelectorAll('.inline-time-picker').forEach(e=>e.remove())">✕</button>`;
+  }<button class="itp-btn itp-custom-btn" onclick="event.stopPropagation();window._itpShowCustom(this)">✎ Custom</button></div><div class="itp-custom-row" id="itp-cr"><input id="itp-cinput" type="text" placeholder="e.g. 4:30" autocomplete="off"><button onclick="event.stopPropagation();window._itpConfirmCustom('${section}',${dayIdx},'${empName}')">✓</button></div>${cancelBtn}`;
   tdEl.appendChild(picker);
-  // Close if clicking outside
+  const inp=picker.querySelector('#itp-cinput');
+  if(inp)inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();window._itpConfirmCustom(section,dayIdx,empName);}});
   setTimeout(()=>{
     const close=e=>{if(!picker.contains(e.target)){picker.remove();document.removeEventListener('click',close);}};
     document.addEventListener('click',close);
   },10);
 }
+window._itpShowCustom=function(btn){
+  const row=btn.closest('.inline-time-picker').querySelector('.itp-custom-row');
+  row.style.display='flex';
+  const inp=row.querySelector('input');
+  if(inp)inp.focus();
+};
+window._itpConfirmCustom=function(section,dayIdx,empName){
+  const picker=document.querySelector('.inline-time-picker');
+  if(!picker)return;
+  const val=(picker.querySelector('#itp-cinput').value||'').trim();
+  if(!val){showToast('Enter a time');return;}
+  window.pickInlineTime(section,dayIdx,empName,val);
+};
 
 window.pickInlineTime=async function(section,dayIdx,empName,time){
   document.querySelectorAll('.inline-time-picker').forEach(el=>el.remove());
