@@ -11,6 +11,15 @@
 <style>
   .chip-warn{border-color:rgba(208,72,40,.5)!important;background:rgba(208,72,40,.1)!important}
 .chip-warn-ico{color:#b83018;font-size:.65rem;flex-shrink:0}
+.chip-hourcap{border-color:rgba(200,160,32,.6)!important;background:rgba(200,160,32,.12)!important}
+.chip-hourcap-ico{color:#c8a020;font-size:.65rem;flex-shrink:0}
+.sch-dayoff-grid{display:flex;flex-wrap:wrap;gap:6px}
+.sch-dayoff-pill{font-family:var(--font-mono);font-size:.65rem;padding:5px 9px;border:1px solid var(--border);border-radius:999px;cursor:pointer;user-select:none;color:var(--text2)}
+.sch-dayoff-pill.on{background:rgba(208,72,40,.15);border-color:var(--red);color:var(--red)}
+.ec-profile-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.ec-tier-badge{font-family:var(--font-mono);font-size:.6rem;padding:2px 6px;border-radius:3px;border:1px solid var(--border);color:var(--text2)}
+.ec-bench-badge{font-family:var(--font-mono);font-size:.6rem;padding:2px 6px;border-radius:3px;border:1px solid var(--text3);color:var(--text3)}
+.avoidpair-row{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:8px 12px;margin-bottom:6px}
 /* Inline time picker */
 .inline-time-picker{position:absolute;z-index:200;background:var(--surface);border:1px solid var(--amber);border-radius:6px;padding:8px 10px;box-shadow:0 8px 32px rgba(0,0,0,.25);min-width:180px;top:4px;left:4px}
 .itp-name{font-family:var(--font-mono);font-size:.6rem;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
@@ -670,6 +679,7 @@ tr:hover td{background:rgba(232,160,32,.03)}
   <div class="sch-tab on" onclick="switchSchTab('kitchen',this)">🍳 Kitchen + Sushi</div>
   <div class="sch-tab" onclick="switchSchTab('serving',this)">🍽 Serving</div>
   <div class="sch-tab" onclick="switchSchTab('perma-restrict',this)">📌 Permanent Rules</div>
+  <div class="sch-tab" onclick="switchSchTab('autogen',this)">🤖 Auto-Generate</div>
   <div class="sch-tab" onclick="switchSchTab('roster',this)">👥 Roster</div>
   <div class="sch-tab" onclick="switchSchTab('archive',this)">🗂 Archive</div>
 </div>
@@ -708,6 +718,28 @@ tr:hover td{background:rgba(232,160,32,.03)}
 </div>
 </div>
 
+<!-- AUTO-GENERATE TAB -->
+<div class="sch-tab-pane" id="sch-pane-autogen">
+<div class="pn">
+  <div class="pnh"><h3>Generate Draft Schedule</h3></div>
+  <p style="font-family:var(--font-mono);font-size:.65rem;color:var(--text3);margin-bottom:14px;line-height:1.65;letter-spacing:.04em">Builds the selected week from scratch: Sushi/Kitchen/Teppan mirror last week's pattern (skipping anyone now marked off), Serving headcount is driven by Hibachi reservation demand for that day, ranked by tier → all-rounder → fewest hours this week. Hard days-off are never violated. Hour caps and avoid-pairs are soft — flagged, not blocked. This <span style="color:var(--red)">replaces</span> the current week's shifts in those sections — archive first if you want a backup.</p>
+  <button class="btn bg" onclick="window.generateDraftSchedule()" style="margin-bottom:8px">⚡ Generate Draft for Selected Week</button>
+  <div id="autogen-summary" style="margin-top:10px"></div>
+</div>
+<div class="pn">
+  <div class="pnh"><h3>Avoid-Pairs (soft)</h3><button class="btn bg bs" onclick="openAddAvoidPair()">＋ Add Pair</button></div>
+  <p style="font-family:var(--font-mono);font-size:.65rem;color:var(--text3);margin-bottom:14px;line-height:1.65;letter-spacing:.04em">The generator deprioritizes scheduling both people the same day — but won't refuse to if there's no better option.</p>
+  <div id="avoidpair-list"><span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">// No avoid-pairs yet</span></div>
+  <div id="avoidpair-add" style="display:none;margin-top:14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="fg"><label>Person A</label><input id="avoidpair-a" list="emp-name-list4" placeholder="e.g. Maulvin"><datalist id="emp-name-list4"></datalist></div>
+      <div class="fg"><label>Person B</label><input id="avoidpair-b" list="emp-name-list4" placeholder="e.g. Audrey"></div>
+    </div>
+    <div class="mf"><button class="btn bo bs" onclick="cancelAddAvoidPair()">Cancel</button><button class="btn bg bs" onclick="confirmAddAvoidPair()">Save Pair</button></div>
+  </div>
+</div>
+</div>
+
 <!-- ROSTER TAB -->
 <div class="sch-tab-pane" id="sch-pane-roster">
 <div class="pn">
@@ -733,7 +765,7 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <!-- EMPLOYEES -->
 <div class="pg" id="pg-employees">
 <div class="topbar"><div class="topbar-left"><div class="bc">OVERLOOK / EMPLOYEES</div><h2>Employees</h2></div>
-<button class="btn bg" onclick="openModal('emp-modal')">＋ Add Employee</button></div>
+<button class="btn bg" onclick="window.openAddEmployeeModal()">＋ Add Employee</button></div>
 <div class="role-legend">
   <div class="role-pill" style="background:var(--teppan-d);color:var(--teppan);border:1px solid rgba(224,96,32,.25)"><div class="rdot" style="background:var(--teppan)"></div>Teppan</div>
   <div class="role-pill" style="background:var(--sushi-d);color:var(--sushi);border:1px solid rgba(58,154,184,.25)"><div class="rdot" style="background:var(--sushi)"></div>Sushi</div>
@@ -986,6 +1018,35 @@ tr:hover td{background:rgba(232,160,32,.03)}
   </div>
   <div class="fg"><label>Phone (optional)</label><input id="emp-phone" placeholder="e.g. 506-555-0100" type="tel"></div>
   <div class="fg"><label>Notes (optional)</label><input id="emp-notes" placeholder="e.g. Part-time, Fridays only..."></div>
+  <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:2px">
+    <div style="font-family:var(--font-mono);font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">// Scheduling profile (optional — used by Generate Draft)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div class="fg"><label>Tier (1=best, 5=trainee)</label>
+        <select id="emp-tier"><option value="">— None —</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+      </div>
+      <div class="fg"><label>Station</label>
+        <select id="emp-station"><option value="">— N/A —</option><option value="A">All-rounder (A)</option><option value="S">Sushi-only (S)</option><option value="T">Teppan-only (T)</option></select>
+      </div>
+    </div>
+    <div class="fg"><label>Fixed days off (hard — generator never places here)</label>
+      <div class="sch-dayoff-grid" id="emp-dayoff-grid">
+        <div class="sch-dayoff-pill" id="emp-dayoff-0" onclick="toggleEmpDayOff(0)">MON</div>
+        <div class="sch-dayoff-pill" id="emp-dayoff-1" onclick="toggleEmpDayOff(1)">TUE</div>
+        <div class="sch-dayoff-pill" id="emp-dayoff-2" onclick="toggleEmpDayOff(2)">WED</div>
+        <div class="sch-dayoff-pill" id="emp-dayoff-3" onclick="toggleEmpDayOff(3)">THU</div>
+        <div class="sch-dayoff-pill" id="emp-dayoff-4" onclick="toggleEmpDayOff(4)">FRI</div>
+        <div class="sch-dayoff-pill" id="emp-dayoff-5" onclick="toggleEmpDayOff(5)">SAT</div>
+        <div class="sch-dayoff-pill" id="emp-dayoff-6" onclick="toggleEmpDayOff(6)">SUN</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+      <div class="fg"><label>Weekly hour cap (soft — colour-flags only)</label><input id="emp-hourcap" type="number" min="0" step="0.5" placeholder="e.g. 30"></div>
+      <div class="fg" style="display:flex;align-items:center;gap:8px;padding-top:18px">
+        <input type="checkbox" id="emp-benched" style="width:16px;height:16px;margin:0">
+        <label for="emp-benched" style="margin:0;cursor:pointer">Benched (excluded from auto-generate)</label>
+      </div>
+    </div>
+  </div>
 </div>
 <div class="mf"><button class="btn bo" onclick="closeModal('emp-modal')">Cancel</button><button class="btn bg" onclick="confirmEmployee()">Save</button></div>
 </div></div>
@@ -1177,7 +1238,7 @@ onAuthStateChanged(resAuth,user=>{
   updateResAuthUI();
   if(user){console.log('Hibachi auth user:',user.email||user.uid);window.loadReservations();}
 });
-const S={bills:[],shifts:[],cleanLogs:[],restrictions:[],reservations:{},reqOffs:[],employees:[],clTasks:[],vendors:[],priceItems:[],permaRestrictions:[],rosterOrder:{},weekArchive:[]};
+const S={bills:[],shifts:[],cleanLogs:[],restrictions:[],reservations:{},reqOffs:[],employees:[],clTasks:[],vendors:[],priceItems:[],permaRestrictions:[],rosterOrder:{},weekArchive:[],avoidPairs:[]};
 const DAYS_SHORT=['MON','TUE','WED','THU','FRI','SAT','SUN'];
 const COOK_SECTIONS=['SUSHI','KITCHEN','TEPPAN'];
 const SERVICE_SECTIONS=['SERVING'];
@@ -1190,6 +1251,7 @@ let priceView='by-vendor';
 let priceSort='cheapest';
 let quickAddEmp=null; // employee being quick-added to schedule
 let pendingQuickCell=null;
+let empDayOffSel=new Set(); // days-off selection while editing emp-modal
 
 const fsAdd=async(col,data)=>{const r=await addDoc(collection(db,col),{...data,_ts:Date.now()});return r.id;};
 const fsDel=async(col,id)=>deleteDoc(doc(db,col,id));
@@ -1239,7 +1301,8 @@ async function boot(){
       fsGet('reqOffs').catch(()=>[]),fsGet('employees').catch(()=>[]),
       fsGet('clTasks').catch(()=>[]),fsGet('vendors').catch(()=>[]),
       fsGet('priceItems').catch(()=>[]),fsGet('permaRestrictions').catch(()=>[]),
-      fsGet('rosterOrder').catch(()=>[]),fsGet('weekArchive').catch(()=>[])
+      fsGet('rosterOrder').catch(()=>[]),fsGet('weekArchive').catch(()=>[]),
+      fsGet('avoidPairs').catch(()=>[])
     ]);
     S.bills=results[0];S.shifts=results[1];S.cleanLogs=results[2];S.restrictions=results[3];
     S.reqOffs=results[4];S.employees=results[5];S.clTasks=results[6];
@@ -1247,6 +1310,7 @@ async function boot(){
     // rosterOrder: stored as one doc per section, id=section key
     (results[10]||[]).forEach(doc=>{if(doc.id&&doc.names)S.rosterOrder[doc.id]=doc.names;});
     S.weekArchive=results[11]||[];
+    S.avoidPairs=results[12]||[];
   }catch(e){showToast('Firebase error');console.error(e);}
 
   // Seed checklist tasks if none exist
@@ -1388,7 +1452,7 @@ async function boot(){
 // ═══════════════════════════════════════════════════════════
 
 const OBK_COLLECTIONS = ['employees','shifts','bills','cleanLogs','restrictions',
-  'reqOffs','clTasks','vendors','priceItems','permaRestrictions','weekArchive'];
+  'reqOffs','clTasks','vendors','priceItems','permaRestrictions','weekArchive','avoidPairs'];
 
 // Build export payload from live S object
 function obkBuildPayload(){
@@ -1531,7 +1595,7 @@ All current Overlook data in Firebase will be fully replaced. This cannot be und
 
 boot();
 
-function renderAll(){renderDash();renderBills();renderCleanLog();renderRestrictions();renderReqOffs();renderEmployees();updateEmpDatalist();renderClTasks();renderPricing();renderVendorDropdown();updatePiItemList();renderPermaRestrictions();updatePermaRestrictDatalist();renderScheduleWithCopy();renderRosterManager();renderArchiveList();}
+function renderAll(){renderDash();renderBills();renderCleanLog();renderRestrictions();renderReqOffs();renderEmployees();updateEmpDatalist();renderClTasks();renderPricing();renderVendorDropdown();updatePiItemList();renderPermaRestrictions();updatePermaRestrictDatalist();renderScheduleWithCopy();renderRosterManager();renderArchiveList();renderAvoidPairs();}
 
 const fmt=n=>'$'+parseFloat(n||0).toFixed(2);
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2700);}
@@ -1670,9 +1734,15 @@ window.loadReservations=async function(){
     if(!snap.exists()){setStatus('No reservations found','var(--text3)');renderForecast();return;}
     const byDate={};
     snap.forEach(dateSnap=>{
-      const date=dateSnap.key;let totalGuests=0,totalGrills=0,bookings=0;
-      dateSnap.forEach(resSnap=>{const r=resSnap.val();totalGuests+=parseInt(r.guests)||0;totalGrills+=parseInt(r.grill)||0;bookings++;});
-      byDate[date]={bookings,guests:totalGuests,grills:totalGrills};
+      const date=dateSnap.key;let totalGuests=0,totalGrills=0,bookings=0;const slotSet=new Set();
+      dateSnap.forEach(resSnap=>{
+        if(String(resSnap.key||'').startsWith('__'))return; // skip metadata keys like __chefRemoved
+        const r=resSnap.val();
+        if(!r||typeof r!=='object')return;
+        totalGuests+=parseInt(r.guests)||0;totalGrills+=parseInt(r.grill)||0;bookings++;
+        if(r.slot)slotSet.add(String(r.slot));
+      });
+      byDate[date]={bookings,guests:totalGuests,grills:totalGrills,timeSlots:slotSet.size};
     });
     S.reservations=byDate;
     const count=Object.keys(byDate).length;
@@ -1882,6 +1952,22 @@ function checkRestrictionViolation(empName,dayIdx){
   return blocked.find(b=>b.name===empName.toLowerCase()&&b.dayIdx===dayIdx)||null;
 }
 
+// Total scheduled hours for a person across ALL sections for a given week (uses ssShiftHours, defined later but hoisted via function decl)
+function calcWeeklyHoursForName(name,week){
+  const n=(name||'').trim().toLowerCase();if(!n)return 0;
+  return S.shifts.filter(s=>s.week===week&&(s.name||'').trim().toLowerCase()===n)
+    .reduce((sum,s)=>sum+ssShiftHours(s.time,s.dayIdx),0);
+}
+function findEmpByName(name){
+  const n=(name||'').trim().toLowerCase();
+  return S.employees.find(e=>(e.name||'').trim().toLowerCase()===n)||null;
+}
+// Returns true if this person's total hours this week exceed their soft cap (null cap = no warning)
+function checkHourCapWarning(name,week){
+  const emp=findEmpByName(name);
+  if(!emp||!emp.hourCap)return false;
+  return calcWeeklyHoursForName(name,week)>emp.hourCap;
+}
 function shiftSortKey(time){
   const t=(time||'').trim().toLowerCase();
   if(!t)return 9999;
@@ -1952,15 +2038,16 @@ function buildScheduleGrid(tableId,sections){
           allCs.forEach(sh=>{
             const cc2=chipClass(sec);
             const hasViolation=checkRestrictionViolation(sh.name,di);
-            html+=`<div class="sg-chip ${cc2}${hasViolation?' chip-warn':''}" draggable="true"
+            const hasCapWarn=!hasViolation&&checkHourCapWarning(sh.name,wk);
+            html+=`<div class="sg-chip ${cc2}${hasViolation?' chip-warn':hasCapWarn?' chip-hourcap':''}" draggable="true"
               ondragstart="window.shiftDragStart(event,'${sh.id}','${sec}',${di})"
               ondragend="window.shiftDragEnd(event)"
               ontouchstart="window.shiftTouchStart(event,'${sh.id}','${sec}',${di})"
               ontouchmove="window.shiftTouchMove(event)"
               ontouchend="window.shiftTouchEnd(event)"
-              title="${hasViolation?'⚠ Restriction this day':'Drag to move'}">
+              title="${hasViolation?'⚠ Restriction this day':hasCapWarn?'⚠ Over weekly hour cap':'Drag to move'}">
               <span class="cn">${sh.name}</span>${sh.time?`<span class="ct">${sh.time}</span>`:''}
-              ${hasViolation?'<span class="chip-warn-ico">⚠</span>':''}
+              ${hasViolation?'<span class="chip-warn-ico">⚠</span>':hasCapWarn?'<span class="chip-hourcap-ico">⏱</span>':''}
               <button class="cx" onclick="event.stopPropagation();window.delShift('${sh.id}')">✕</button>
             </div>`;
           });
@@ -1977,15 +2064,16 @@ function buildScheduleGrid(tableId,sections){
         cs.forEach(sh=>{
           const cc2=chipClass(sec);
           const hasViolation=checkRestrictionViolation(sh.name,di);
-          html+=`<div class="sg-chip ${cc2}${hasViolation?' chip-warn':''}" draggable="true"
+          const hasCapWarn=!hasViolation&&checkHourCapWarning(sh.name,wk);
+          html+=`<div class="sg-chip ${cc2}${hasViolation?' chip-warn':hasCapWarn?' chip-hourcap':''}" draggable="true"
             ondragstart="window.shiftDragStart(event,'${sh.id}','${sec}',${di})"
             ondragend="window.shiftDragEnd(event)"
             ontouchstart="window.shiftTouchStart(event,'${sh.id}','${sec}',${di})"
             ontouchmove="window.shiftTouchMove(event)"
             ontouchend="window.shiftTouchEnd(event)"
-            title="${hasViolation?'⚠ Restriction this day':'Drag to move'}">
+            title="${hasViolation?'⚠ Restriction this day':hasCapWarn?'⚠ Over weekly hour cap':'Drag to move'}">
             <span class="cn">${sh.name}</span>${sh.time?`<span class="ct">${sh.time}</span>`:''}
-            ${hasViolation?'<span class="chip-warn-ico">⚠</span>':''}
+            ${hasViolation?'<span class="chip-warn-ico">⚠</span>':hasCapWarn?'<span class="chip-hourcap-ico">⏱</span>':''}
             <button class="cx" onclick="event.stopPropagation();window.delShift('${sh.id}')">✕</button>
           </div>`;
         });
@@ -2228,6 +2316,188 @@ function updatePermaRestrictDatalist(){
   const names=S.employees.length?S.employees.map(e=>e.name):[...new Set(S.shifts.map(s=>s.name))];
   dl.innerHTML=names.map(n=>`<option value="${n}">`).join('');
 }
+
+// ── AVOID-PAIRS (soft) ──
+window.openAddAvoidPair=function(){
+  document.getElementById('avoidpair-add').style.display='block';
+  const dl=document.getElementById('emp-name-list4');
+  if(dl){const names=S.employees.length?S.employees.map(e=>e.name):[...new Set(S.shifts.map(s=>s.name))];dl.innerHTML=names.map(n=>`<option value="${n}">`).join('');}
+  document.getElementById('avoidpair-a').focus();
+};
+window.cancelAddAvoidPair=function(){
+  document.getElementById('avoidpair-add').style.display='none';
+  document.getElementById('avoidpair-a').value='';document.getElementById('avoidpair-b').value='';
+};
+window.confirmAddAvoidPair=async function(){
+  const a=document.getElementById('avoidpair-a').value.trim();
+  const b=document.getElementById('avoidpair-b').value.trim();
+  if(!a||!b){showToast('Enter both names');return;}
+  if(a.toLowerCase()===b.toLowerCase()){showToast('Pick two different people');return;}
+  const rec={a,b};
+  rec.id=await fsAdd('avoidPairs',rec);
+  S.avoidPairs.push(rec);
+  document.getElementById('avoidpair-a').value='';document.getElementById('avoidpair-b').value='';
+  document.getElementById('avoidpair-add').style.display='none';
+  renderAvoidPairs();showToast('Avoid-pair saved ✓');
+};
+window.delAvoidPair=async function(id){
+  if(!confirm('Remove this avoid-pair?'))return;
+  await fsDel('avoidPairs',id);
+  S.avoidPairs=S.avoidPairs.filter(p=>p.id!==id);
+  renderAvoidPairs();showToast('Removed ✓');
+};
+function renderAvoidPairs(){
+  const container=document.getElementById('avoidpair-list');
+  if(!container)return;
+  const list=S.avoidPairs||[];
+  if(!list.length){container.innerHTML='<span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">// No avoid-pairs yet</span>';return;}
+  container.innerHTML=list.map(p=>`<div class="avoidpair-row">
+    <span style="flex:1;font-size:.8rem;font-weight:600">${p.a} <span style="color:var(--text3);font-weight:400">&amp;</span> ${p.b}</span>
+    <button onclick="window.delAvoidPair('${p.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:.7rem;padding:2px 5px">✕</button>
+  </div>`).join('');
+}
+// True if two names form a saved avoid-pair (case-insensitive)
+function isAvoidPair(nameA,nameB){
+  const a=(nameA||'').toLowerCase(),b=(nameB||'').toLowerCase();
+  return (S.avoidPairs||[]).some(p=>{
+    const pa=(p.a||'').toLowerCase(),pb=(p.b||'').toLowerCase();
+    return (pa===a&&pb===b)||(pa===b&&pb===a);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  AUTO-GENERATE DRAFT SCHEDULE
+//  Sushi/Kitchen/Teppan: mirror previous week's shifts exactly (skip hard days-off)
+//  Serving AM: mirror previous week's AM shifts (skip hard days-off)
+//  Serving PM: demand-driven headcount from Hibachi reservations, ranked by
+//              tier → all-rounder → fewest hours this week, soft avoid-pairs deferred
+// ═══════════════════════════════════════════════════════════
+
+// Demand formula for PM/dinner serving headcount, based on that day's Hibachi reservation data
+function getServingDemand(dateStr,dayIdx){
+  const data=S.reservations[dateStr]||{};
+  const guests=data.guests||0,slots=data.timeSlots||0;
+  if(dayIdx>=0&&dayIdx<=3){ // Mon–Thu
+    if(slots>=3||guests>=30)return{count:4,requestRyan:true};
+    return{count:3,requestRyan:false};
+  }
+  if(dayIdx===4||dayIdx===5){ // Fri/Sat — Ryan always counted in
+    if(guests>85||slots>=10)return{count:9,requestRyan:true};
+    return{count:7,requestRyan:true};
+  }
+  // Sunday
+  if(slots>=7||guests>=61)return{count:6,requestRyan:true};
+  return{count:6,requestRyan:false};
+}
+
+// Ranked eligible PM serving candidates for a given day: tier asc → all-rounder → fewest hours this week
+function rankServingCandidates(dayIdx,week,excludeNamesLower){
+  return S.employees.filter(emp=>{
+    if(!getEmpRoles(emp).includes('SERVICE'))return false;
+    if(emp.benched)return false;
+    if(Array.isArray(emp.daysOff)&&emp.daysOff.includes(dayIdx))return false;
+    if(excludeNamesLower&&excludeNamesLower.has((emp.name||'').toLowerCase()))return false;
+    return true;
+  }).map(emp=>({emp,hours:calcWeeklyHoursForName(emp.name,week)}))
+    .sort((a,b)=>{
+      const ta=a.emp.tier||99,tb=b.emp.tier||99;
+      if(ta!==tb)return ta-tb;
+      const aAll=a.emp.station==='A'?0:1,bAll=b.emp.station==='A'?0:1;
+      if(aAll!==bAll)return aAll-bAll;
+      return a.hours-b.hours;
+    });
+}
+
+// Select N people for PM serving on a given day, with soft avoid-pair deferral
+function selectServingForDay(dayIdx,week,count,forceNames,excludeNamesLower){
+  const ranked=rankServingCandidates(dayIdx,week,excludeNamesLower);
+  const selected=[];
+  (forceNames||[]).forEach(n=>{
+    const c=ranked.find(r=>r.emp.name.toLowerCase()===n.toLowerCase());
+    if(c&&!selected.includes(c))selected.push(c);
+  });
+  const pool=ranked.filter(c=>!selected.includes(c));
+  const deferred=[];
+  pool.forEach(cand=>{
+    if(selected.length>=count)return;
+    const conflicts=selected.some(s=>isAvoidPair(s.emp.name,cand.emp.name));
+    if(conflicts){deferred.push(cand);return;}
+    selected.push(cand);
+  });
+  for(const cand of deferred){
+    if(selected.length>=count)break;
+    selected.push(cand);
+  }
+  return selected.slice(0,count).map(c=>c.emp);
+}
+
+window.generateDraftSchedule=async function(){
+  const wk=getWeekKey();
+  if(!wk||wk==='default'){showToast('Select a week first');return;}
+  const prevWk=prevWeekKey(wk);
+  if(!prevWk){showToast('Could not determine previous week');return;}
+  if(!confirm(`This replaces all Sushi/Kitchen/Teppan/Serving shifts for the week of ${wk} with a generated draft. Continue?`))return;
+
+  const summaryEl=document.getElementById('autogen-summary');
+  if(summaryEl)summaryEl.innerHTML='<span style="font-family:var(--font-mono);font-size:.7rem;color:var(--text3)">Generating…</span>';
+
+  const weekDates=getWeekDates('sch-weekdate');
+  const placed=[],skippedOff=[],shortStaffed=[];
+
+  // 1) Clear current week's shifts in the sections we're regenerating
+  const toDelete=S.shifts.filter(s=>s.week===wk&&['SUSHI','KITCHEN','TEPPAN','SERVING'].includes((s.section||'').toUpperCase()));
+  await Promise.all(toDelete.map(s=>fsDel('shifts',s.id)));
+  const toDeleteIds=new Set(toDelete.map(s=>s.id));
+  S.shifts=S.shifts.filter(s=>!toDeleteIds.has(s.id));
+
+  // 2) Mirror Sushi/Kitchen/Teppan straight from last week
+  const prevCookShifts=S.shifts.filter(s=>s.week===prevWk&&['SUSHI','KITCHEN','TEPPAN'].includes((s.section||'').toUpperCase()));
+  for(const prevShift of prevCookShifts){
+    const emp=findEmpByName(prevShift.name);
+    if(emp&&Array.isArray(emp.daysOff)&&emp.daysOff.includes(prevShift.dayIdx)){
+      skippedOff.push(`${prevShift.name} — ${DAYS_SHORT[prevShift.dayIdx]} (day off)`);continue;
+    }
+    const rec={section:prevShift.section,dayIdx:prevShift.dayIdx,name:prevShift.name,time:prevShift.time,week:wk};
+    rec.id=await fsAdd('shifts',rec);S.shifts.push(rec);placed.push(`${prevShift.name} ${prevShift.section} ${DAYS_SHORT[prevShift.dayIdx]}`);
+  }
+
+  // 3) Serving — AM mirrored, PM demand-driven
+  const prevServingShifts=S.shifts.filter(s=>s.week===prevWk&&(s.section||'').toUpperCase()==='SERVING');
+  for(let dayIdx=0;dayIdx<7;dayIdx++){
+    const date=weekDates[dayIdx];
+    const placedNamesToday=new Set();
+    const prevAm=prevServingShifts.filter(s=>s.dayIdx===dayIdx&&isAmServing(s.time));
+    for(const sh of prevAm){
+      const emp=findEmpByName(sh.name);
+      if(emp&&Array.isArray(emp.daysOff)&&emp.daysOff.includes(dayIdx)){
+        skippedOff.push(`${sh.name} — ${DAYS_SHORT[dayIdx]} AM (day off)`);continue;
+      }
+      const rec={section:'SERVING',dayIdx,name:sh.name,time:sh.time,week:wk};
+      rec.id=await fsAdd('shifts',rec);S.shifts.push(rec);placed.push(`${sh.name} SERVING-AM ${DAYS_SHORT[dayIdx]}`);
+      placedNamesToday.add(sh.name.toLowerCase());
+    }
+    const demand=getServingDemand(date,dayIdx);
+    const forceNames=demand.requestRyan?['Ryan']:[];
+    const picks=selectServingForDay(dayIdx,wk,demand.count,forceNames,placedNamesToday);
+    for(const emp of picks){
+      const prevPm=prevServingShifts.find(s=>s.dayIdx===dayIdx&&!isAmServing(s.time)&&(s.name||'').toLowerCase()===emp.name.toLowerCase());
+      const time=prevPm?prevPm.time:'5';
+      const rec={section:'SERVING',dayIdx,name:emp.name,time,week:wk};
+      rec.id=await fsAdd('shifts',rec);S.shifts.push(rec);placed.push(`${emp.name} SERVING-PM ${DAYS_SHORT[dayIdx]}`);
+    }
+    if(picks.length<demand.count)shortStaffed.push(`${DAYS_SHORT[dayIdx]}: needed ${demand.count} PM serving, only ${picks.length} eligible (${demand.requestRyan?'Ryan requested':'no Ryan request'})`);
+  }
+
+  renderAll();renderSchedule();
+  if(summaryEl){
+    summaryEl.innerHTML=`
+      <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--green-l);margin-bottom:6px">✓ ${placed.length} shifts placed for week of ${wk}</div>
+      ${skippedOff.length?`<div style="margin-bottom:8px"><div style="font-family:var(--font-mono);font-size:.62rem;color:var(--amber);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Skipped — day off, needs manual fill</div>${skippedOff.map(s=>`<div style="font-size:.75rem;color:var(--text2);padding:2px 0">${s}</div>`).join('')}</div>`:''}
+      ${shortStaffed.length?`<div><div style="font-family:var(--font-mono);font-size:.62rem;color:var(--red);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Short-staffed — not enough eligible people</div>${shortStaffed.map(s=>`<div style="font-size:.75rem;color:var(--text2);padding:2px 0">${s}</div>`).join('')}</div>`:''}
+    `;
+  }
+  showToast(`Draft generated — ${placed.length} shifts placed`,4000);
+};
 
 // ── REQUEST OFF ──
 window.updateReqOffUI=function(){
@@ -2626,6 +2896,29 @@ function setSelectedRoles(roles){
     if(on)wrap.classList.add('selected');else wrap.classList.remove('selected');
   });
 }
+window.openAddEmployeeModal=function(){
+  ['emp-name','emp-phone','emp-notes','emp-edit-id','emp-tier','emp-station','emp-hourcap'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('emp-benched').checked=false;
+  setSelectedRoles([]);
+  setEmpDayOffSelection([]);
+  document.getElementById('emp-modal-title').textContent='Add Employee';
+  openModal('emp-modal');
+};
+window.toggleEmpDayOff=function(dayIdx){
+  if(empDayOffSel.has(dayIdx))empDayOffSel.delete(dayIdx);else empDayOffSel.add(dayIdx);
+  renderEmpDayOffPills();
+};
+function renderEmpDayOffPills(){
+  for(let i=0;i<7;i++){
+    const el=document.getElementById('emp-dayoff-'+i);
+    if(!el)continue;
+    if(empDayOffSel.has(i))el.classList.add('on');else el.classList.remove('on');
+  }
+}
+function setEmpDayOffSelection(arr){
+  empDayOffSel=new Set(Array.isArray(arr)?arr:[]);
+  renderEmpDayOffPills();
+}
 function updateEmpDatalist(){
   const names=S.employees.length?S.employees.map(e=>e.name):[...new Set(S.shifts.map(s=>s.name))];
   const opts=names.map(n=>`<option value="${n}">`).join('');
@@ -2645,10 +2938,18 @@ window.renderEmployees=function(){
     const roleKey=roles.length>1?'multi':primary.toLowerCase();
     const cardClass=`emp-card-${roleKey}`;
     const nameColor=roles.length>1?'var(--amber)':roleColor(primary);
-    return`<div class="emp-card ${cardClass}">
+    const stationLabel={A:'All-rounder',S:'Sushi-only',T:'Teppan-only'}[e.station]||'';
+    const profileBits=[];
+    if(e.tier)profileBits.push(`<span class="ec-tier-badge">Tier ${e.tier}${e.station?' '+e.station:''}</span>`);
+    else if(e.station)profileBits.push(`<span class="ec-tier-badge">${e.station}</span>`);
+    if(Array.isArray(e.daysOff)&&e.daysOff.length)profileBits.push(`<span class="ec-tier-badge">Off ${e.daysOff.map(d=>DAYS_SHORT[d]).join('/')}</span>`);
+    if(e.hourCap)profileBits.push(`<span class="ec-tier-badge">Cap ${e.hourCap}h</span>`);
+    if(e.benched)profileBits.push(`<span class="ec-bench-badge">Benched</span>`);
+    return`<div class="emp-card ${cardClass}${e.benched?' chip-benched':''}">
       <button class="ec-del" onclick="window.delEmployee('${e.id}')">✕</button>
       <div class="ec-name" style="color:${nameColor}">${e.name}</div>
       <div class="ec-role">${empRoleBadges(e)}</div>
+      ${profileBits.length?`<div class="ec-profile-row">${profileBits.join('')}</div>`:''}
       <div class="ec-info">
         ${e.phone?`<div><span>Phone</span><br>${e.phone}</div>`:''}
         ${e.notes?`<div><span>Notes</span><br>${e.notes}</div>`:''}
@@ -2665,21 +2966,29 @@ window.confirmEmployee=async function(){
   const phone=document.getElementById('emp-phone').value.trim();
   const notes=document.getElementById('emp-notes').value.trim();
   const editId=document.getElementById('emp-edit-id').value;
+  const tier=document.getElementById('emp-tier').value?parseInt(document.getElementById('emp-tier').value,10):null;
+  const station=document.getElementById('emp-station').value||null;
+  const daysOff=[...empDayOffSel].sort();
+  const hourCapRaw=document.getElementById('emp-hourcap').value;
+  const hourCap=hourCapRaw?parseFloat(hourCapRaw):null;
+  const benched=document.getElementById('emp-benched').checked;
   // Keep legacy role field as primary for backward compat
   const role=roles[0];
   if(editId){
-    const rec={name,role,roles,phone,notes};
+    const rec={name,role,roles,phone,notes,tier,station,daysOff,hourCap,benched};
     await fsUp('employees',editId,rec);
     const idx=S.employees.findIndex(e=>e.id===editId);
     if(idx>=0)S.employees[idx]={...S.employees[idx],...rec};
     showToast('Updated ✓');
   }else{
-    const rec={name,role,roles,phone,notes};
+    const rec={name,role,roles,phone,notes,tier,station,daysOff,hourCap,benched};
     rec.id=await fsAdd('employees',rec);S.employees.push(rec);showToast('Employee added ✓');
   }
   closeModal('emp-modal');
-  ['emp-name','emp-phone','emp-notes','emp-edit-id'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['emp-name','emp-phone','emp-notes','emp-edit-id','emp-tier','emp-station','emp-hourcap'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('emp-benched').checked=false;
   setSelectedRoles([]);
+  setEmpDayOffSelection([]);
   document.getElementById('emp-modal-title').textContent='Add Employee';
   renderEmployees();updateEmpDatalist();renderDash();renderStaffQuickPanel();
 };
@@ -2689,7 +2998,12 @@ window.editEmployee=function(id){
   document.getElementById('emp-name').value=e.name||'';
   document.getElementById('emp-phone').value=e.phone||'';
   document.getElementById('emp-notes').value=e.notes||'';
+  document.getElementById('emp-tier').value=e.tier?String(e.tier):'';
+  document.getElementById('emp-station').value=e.station||'';
+  document.getElementById('emp-hourcap').value=e.hourCap||'';
+  document.getElementById('emp-benched').checked=!!e.benched;
   setSelectedRoles(getEmpRoles(e));
+  setEmpDayOffSelection(e.daysOff||[]);
   document.getElementById('emp-modal-title').textContent='Edit Employee';
   openModal('emp-modal');
 };
