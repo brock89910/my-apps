@@ -691,6 +691,10 @@ tr:hover td{background:rgba(232,160,32,.03)}
     <div class="pnh" style="margin-bottom:10px"><h3 style="font-size:.85rem">📊 Serving Hours — This Week</h3><span style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3)">Based on actual clock-out data</span></div>
     <div id="inline-serving-summary"><span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">// Select a week</span></div>
   </div>
+  <div class="pn" style="margin-top:0;border-top:none;border-radius:0 0 var(--r) var(--r)">
+    <div class="pnh" style="margin-bottom:10px"><h3 style="font-size:.85rem">🚨 Coverage Gaps</h3><span style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3)">Solo floor windows needing an all-rounder</span></div>
+    <div id="coverage-gap-panel"></div>
+  </div>
 </div>
 <div class="sch-tab-pane" id="sch-pane-perma-restrict">
 <div class="pn">
@@ -1968,6 +1972,97 @@ function checkHourCapWarning(name,week){
   if(!emp||!emp.hourCap)return false;
   return calcWeeklyHoursForName(name,week)>emp.hourCap;
 }
+
+// ── COVERAGE GAP DETECTION ──
+// If an early-leaver (11-2, 11-4) leaves someone else alone on the floor, that lone
+// person needs to be an all-rounder (station A) — if not, flag it so a manager can react.
+function closeMinForDay(dayIdx){
+  if(dayIdx===4)return 22*60+15; // Fri
+  if(dayIdx===5)return 22*60+30; // Sat
+  return 21*60+15; // Mon–Thu, Sun
+}
+function parseTimeToMinutes(str){
+  if(!str)return null;
+  const clean=str.trim().replace(',','.');
+  if(clean.includes(':')){
+    const[hStr,mStr]=clean.split(':');
+    let hh=parseInt(hStr,10),mm=parseInt(mStr,10)||0;
+    if(hh>=1&&hh<=9)hh+=12;
+    return hh*60+mm;
+  }
+  const n=parseFloat(clean);
+  if(isNaN(n))return null;
+  if(n>=1&&n<=9)return(n+12)*60;
+  return n*60;
+}
+// Start/end minutes for a serving shift string. Returns null if the shift has no fixed clock-in
+// (name-only / 1/2 — too ambiguous to place on a literal timeline).
+function shiftInterval(time,dayIdx){
+  const t=(time||'').trim().toLowerCase();
+  if(!t||t==='1/2'||t==='half')return null;
+  if(t.includes('-')||t.includes('–')){
+    const parts=t.split(/[-–]/);
+    const start=parseTimeToMinutes(parts[0]);
+    const end=parseTimeToMinutes(parts[1]);
+    if(start===null||end===null||end<=start)return null;
+    return{start,end};
+  }
+  const start=parseTimeToMinutes(t);
+  if(start===null)return null;
+  return{start,end:closeMinForDay(dayIdx)};
+}
+function fmtClockMin(m){
+  let h=Math.floor(m/60)%24,mm=m%60;
+  const ap=h>=12?'pm':'am';
+  let hh=h%12;if(hh===0)hh=12;
+  return mm?`${hh}:${String(mm).padStart(2,'0')}${ap}`:`${hh}${ap}`;
+}
+// Computes solo-coverage windows for a given week where the lone person on the floor
+// is not an all-rounder (or has no station on record at all)
+function computeCoverageGaps(week){
+  const weekDates=getWeekDates('sch-weekdate');
+  const raw=[];
+  for(let dayIdx=0;dayIdx<7;dayIdx++){
+    const shifts=S.shifts.filter(s=>s.week===week&&(s.section||'').toUpperCase()==='SERVING'&&s.dayIdx===dayIdx);
+    const intervals=[];
+    shifts.forEach(sh=>{
+      const iv=shiftInterval(sh.time,dayIdx);
+      if(iv)intervals.push({name:sh.name,start:iv.start,end:iv.end});
+    });
+    if(intervals.length<2)continue;
+    const points=[...new Set(intervals.flatMap(iv=>[iv.start,iv.end]))].sort((a,b)=>a-b);
+    for(let i=0;i<points.length-1;i++){
+      const wStart=points[i],wEnd=points[i+1];
+      if(wEnd<=wStart)continue;
+      const active=intervals.filter(iv=>iv.start<=wStart&&iv.end>wStart);
+      if(active.length===1){
+        const person=active[0];
+        const emp=findEmpByName(person.name);
+        const station=emp?emp.station:null;
+        if(station!=='A')raw.push({dayIdx,start:wStart,end:wEnd,name:person.name,station});
+      }
+    }
+  }
+  // Merge back-to-back windows for the same person on the same day into one range
+  raw.sort((a,b)=>a.dayIdx-b.dayIdx||a.start-b.start);
+  const merged=[];
+  raw.forEach(g=>{
+    const last=merged[merged.length-1];
+    if(last&&last.dayIdx===g.dayIdx&&last.name===g.name&&last.end===g.start){last.end=g.end;}
+    else merged.push({...g});
+  });
+  return merged.map(g=>({...g,date:weekDates[g.dayIdx]}));
+}
+function renderCoverageGaps(){
+  const panel=document.getElementById('coverage-gap-panel');
+  if(!panel)return;
+  const wk=getWeekKey();
+  if(!wk||wk==='default'){panel.innerHTML='';return;}
+  const gaps=computeCoverageGaps(wk);
+  if(!gaps.length){panel.innerHTML='<span style="font-family:var(--font-mono);font-size:.67rem;color:var(--green-l)">✓ No solo-coverage gaps this week</span>';return;}
+  panel.innerHTML=`<div style="font-family:var(--font-mono);font-size:.62rem;color:var(--red);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">⚠ Solo coverage — no all-rounder on floor</div>`+
+    gaps.map(g=>`<div style="font-size:.78rem;color:var(--text2);padding:3px 0">${DAYS_SHORT[g.dayIdx]} ${fmtClockMin(g.start)}–${fmtClockMin(g.end)} — <strong style="color:var(--text)">${g.name}</strong> alone${g.station?` (${g.station}-only)`:' (no station on record)'}</div>`).join('');
+}
 function shiftSortKey(time){
   const t=(time||'').trim().toLowerCase();
   if(!t)return 9999;
@@ -2092,6 +2187,7 @@ function renderSchedule(){
   renderStaffQuickPanel();
   renderDayCountStrip();
   renderInlineServingSummary();
+  renderCoverageGaps();
 }
 
 // ── QUICK-ADD STAFF PANEL ──
@@ -2477,15 +2573,37 @@ window.generateDraftSchedule=async function(){
       placedNamesToday.add(sh.name.toLowerCase());
     }
     const demand=getServingDemand(date,dayIdx);
-    const forceNames=demand.requestRyan?['Ryan']:[];
-    const picks=selectServingForDay(dayIdx,wk,demand.count,forceNames,placedNamesToday);
-    for(const emp of picks){
-      const prevPm=prevServingShifts.find(s=>s.dayIdx===dayIdx&&!isAmServing(s.time)&&(s.name||'').toLowerCase()===emp.name.toLowerCase());
-      const time=prevPm?prevPm.time:'5';
-      const rec={section:'SERVING',dayIdx,name:emp.name,time,week:wk};
-      rec.id=await fsAdd('shifts',rec);S.shifts.push(rec);placed.push(`${emp.name} SERVING-PM ${DAYS_SHORT[dayIdx]}`);
+    // Mirror last week's PM people first — only drop someone for a hard day-off, never for re-ranking
+    const prevPm=prevServingShifts.filter(s=>s.dayIdx===dayIdx&&!isAmServing(s.time));
+    const mirroredPicks=[]; // [{name,time}]
+    const mirroredNamesLower=new Set();
+    for(const sh of prevPm){
+      const emp=findEmpByName(sh.name);
+      if(emp&&Array.isArray(emp.daysOff)&&emp.daysOff.includes(dayIdx)){
+        skippedOff.push(`${sh.name} — ${DAYS_SHORT[dayIdx]} PM (day off, kept from last week's pattern)`);continue;
+      }
+      mirroredPicks.push({name:sh.name,time:sh.time});
+      mirroredNamesLower.add(sh.name.toLowerCase());
     }
-    if(picks.length<demand.count)shortStaffed.push(`${DAYS_SHORT[dayIdx]}: needed ${demand.count} PM serving, only ${picks.length} eligible (${demand.requestRyan?'Ryan requested':'no Ryan request'})`);
+    // Top up to demand count only — never trim an existing mirrored person to hit the target
+    const deficit=Math.max(0,demand.count-mirroredPicks.length);
+    let newPicks=[];
+    if(deficit>0){
+      const needRyan=demand.requestRyan&&!mirroredNamesLower.has('ryan');
+      const forceNames=needRyan?['Ryan']:[];
+      const excludeSet=new Set([...mirroredNamesLower,...placedNamesToday]);
+      newPicks=selectServingForDay(dayIdx,wk,deficit,forceNames,excludeSet);
+    }
+    for(const p of mirroredPicks){
+      const rec={section:'SERVING',dayIdx,name:p.name,time:p.time,week:wk};
+      rec.id=await fsAdd('shifts',rec);S.shifts.push(rec);placed.push(`${p.name} SERVING-PM ${DAYS_SHORT[dayIdx]} (mirrored)`);
+    }
+    for(const emp of newPicks){
+      const rec={section:'SERVING',dayIdx,name:emp.name,time:'5',week:wk};
+      rec.id=await fsAdd('shifts',rec);S.shifts.push(rec);placed.push(`${emp.name} SERVING-PM ${DAYS_SHORT[dayIdx]} (new — filled demand gap)`);
+    }
+    const totalPm=mirroredPicks.length+newPicks.length;
+    if(totalPm<demand.count)shortStaffed.push(`${DAYS_SHORT[dayIdx]}: needed ${demand.count} PM serving, only ${totalPm} available (${demand.requestRyan?'Ryan requested':'no Ryan request'})`);
   }
 
   renderAll();renderSchedule();
