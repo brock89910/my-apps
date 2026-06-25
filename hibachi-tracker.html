@@ -3139,6 +3139,60 @@ function _showTightWarning(field) {
     + '</div>';
 }
 
+// No automatic grill/chef availability found — offer the same manager-password
+// "Force Book" override the full form provides, instead of a dead-end error.
+function _showAssignOverride(field, guests) {
+  const el = document.getElementById('editFieldErr');
+  if (!el) return;
+  const pwdRow = isManager() ? '' :
+    '<input type="password" id="efOverridePwd" placeholder="Manager password" style="flex:1;min-width:130px;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--sans);font-size:0.85rem;color:var(--text);outline:none">';
+  el.innerHTML = '<div class="warn-banner" style="flex-direction:column;gap:9px">'
+    + '<div>⚠ No automatic availability'+(guests?(' for '+guests+' guests'):'')+' at this time.</div>'
+    + '<div style="font-size:0.65rem;color:var(--text3)">Use the override below if a grill pair is physically available.</div>'
+    + '<div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">'
+    + pwdRow
+    + '<select id="efOverridePair" style="padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);font-family:var(--mono);font-size:0.78rem;color:var(--text);outline:none"><option value="1,2">Grills 1+2</option><option value="3,4">Grills 3+4</option></select>'
+    + '<button onclick="saveEditFieldOverride(\''+field+'\')" style="padding:8px 14px;background:rgba(192,64,64,0.08);border:1px solid rgba(138,26,26,0.3);border-radius:var(--r);font-family:var(--mono);font-size:0.72rem;font-weight:600;color:#8a1a1a;cursor:pointer;white-space:nowrap">Force Book</button>'
+    + '</div><div id="efOverrideErr" style="display:none;font-size:0.65rem;color:#c04040;font-family:var(--mono)"></div></div>';
+}
+
+async function saveEditFieldOverride(field) {
+  const key = dateKey(currentDate);
+  const editId = _editingResId;
+  const r = (reservations[key]||{})[editId];
+  const oeEl = document.getElementById('efOverrideErr');
+  if (!r) { closeModal(); alert('Reservation not found.'); return; }
+  if (!isManager()) {
+    const pwd = document.getElementById('efOverridePwd')?.value || '';
+    const ok = await checkPassword(pwd, PWD_HASH_LARGE);
+    if (!ok) { if(oeEl){oeEl.textContent='✕ Incorrect password';oeEl.style.display='block';} return; }
+  }
+  const pairVal = document.getElementById('efOverridePair')?.value || '1,2';
+  const [g1,g2] = pairVal.split(',').map(Number);
+  const initials = _editorInitials || 'STAFF';
+
+  let guests = r.guests, slot = r.slot;
+  if (field==='guests') {
+    guests = sanitizeGuests(document.getElementById('efGuests')?.value);
+    if (!guests) { if(oeEl){oeEl.textContent='✕ Enter a valid party size.';oeEl.style.display='block';} return; }
+  } else if (field==='slot') {
+    slot = document.getElementById('efSlot')?.value || r.slot;
+  }
+  if (guests > OVERRIDE_MAX_GUESTS) { if(oeEl){oeEl.textContent='✕ Maximum '+OVERRIDE_MAX_GUESTS+' even with override.';oeEl.style.display='block';} return; }
+
+  const isDouble = guests >= DOUBLE_GRILL_MIN_GUESTS;
+  const data = { guests, slot, grill:g1, grill2:isDouble?g2:null, isDouble, overrideBooked:true, managerOverride:true, overrideType:'too-many', updatedAt:Date.now() };
+  try {
+    await setResFields(key, editId, data);
+    const grillStr = isDouble ? 'Grills '+g1+'+'+g2+' (OVERRIDE)' : 'Grill '+g1+' (OVERRIDE)';
+    await logAudit('edit', (r.name||'Guest')+' · '+guests+'p · '+displayTime(slot)+' · '+grillStr, initials);
+    Object.assign(r, data);
+    openEditChooser(r.slot, editId, 'Saved with manager override — '+grillStr+'.');
+  } catch(e) {
+    if (oeEl) { oeEl.textContent = 'Error: '+e.message; oeEl.style.display='block'; }
+  }
+}
+
 function backToEditChooser() {
   openEditChooser(_editingSlot, _editingResId);
 }
@@ -3299,7 +3353,7 @@ async function saveEditField(field) {
       const dow=currentDate.getDay(), slotMins=timeToMinutes(r.slot);
       const chefs=getChefsAtTime(dow,slotMins);
       const assign=autoAssignGrill(key,r.slot,guests,chefs,editId);
-      if (!assign) return _editErr('No grill availability for '+guests+' guests at '+displayTime(r.slot)+'.');
+      if (!assign) return _showAssignOverride('guests',guests);
       if (!assign.isDouble) {
         const groups=getGroupsAtGrillAtSlot(key,assign.grill,slotMins,editId);
         const existingGuests=groups.reduce((s,g)=>s+(g.guests||0),0);
@@ -3322,7 +3376,7 @@ async function saveEditField(field) {
       const dow=currentDate.getDay(), slotMins=timeToMinutes(newSlot);
       const chefs=getChefsAtTime(dow,slotMins);
       const assign=autoAssignGrill(key,newSlot,r.guests,chefs,editId);
-      if (!assign) return _editErr('No grill availability for '+r.guests+' guests at '+displayTime(newSlot)+'.');
+      if (!assign) return _showAssignOverride('slot',r.guests);
       if (!assign.isDouble) {
         const groups=getGroupsAtGrillAtSlot(key,assign.grill,slotMins,editId);
         const existingGuests=groups.reduce((s,g)=>s+(g.guests||0),0);
