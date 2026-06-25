@@ -627,6 +627,42 @@ body::before {
   color: #c04040; letter-spacing: 0.02em;
 }
 
+/* ── EDIT CHOOSER (simplified edit-reservation flow) ── */
+.edit-summary {
+  font-family: var(--mono); font-size: 0.72rem; color: var(--text2);
+  line-height: 1.6; margin-bottom: 14px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border2);
+}
+.edit-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+.edit-opt {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+  background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 12px 13px; cursor: pointer; transition: all 0.15s; font-family: var(--sans); color: var(--text);
+}
+.edit-opt:active { background: var(--lift); border-color: var(--gold2); }
+.edit-opt-icon { font-size: 1.05rem; width: 22px; text-align: center; flex: 0 0 auto; }
+.edit-opt-body { flex: 1; min-width: 0; }
+.edit-opt-label {
+  font-family: var(--mono); font-size: 0.62rem; font-weight: 500; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text3);
+}
+.edit-opt-value {
+  font-family: var(--sans); font-size: 0.92rem; color: var(--text); margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.edit-opt-chev { color: var(--text3); font-size: 1rem; flex: 0 0 auto; }
+.edit-back {
+  display: inline-flex; align-items: center; gap: 5px; background: none; border: none;
+  cursor: pointer; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.04em;
+  color: var(--text2); padding: 4px 0; margin-bottom: 14px;
+}
+.edit-back:active { color: var(--gold); }
+.edit-flash {
+  background: rgba(109,184,126,0.1); border: 1px solid rgba(109,184,126,0.35);
+  border-radius: var(--r); padding: 8px 12px; margin-bottom: 14px;
+  font-family: var(--mono); font-size: 0.7rem; color: var(--green);
+}
+
 /* ── EMPTY STATE ── */
 .empty-slot {
   padding: 8px 14px;
@@ -1973,6 +2009,15 @@ async function safeWrite(ref, data, action) {
        : _origSet(ref, data);
 }
 
+// Partial update — writes each field to its own sub-path so sibling fields
+// (confirmed, cardCaptured, holdUntil, etc.) are never clobbered by a single-field edit.
+async function setResFields(dk, id, fields) {
+  if (!rateLimitCheck('write', 20)) throw new Error('Too many actions too fast. Please wait a moment.');
+  for (const [k,v] of Object.entries(fields)) {
+    await window._set(window._ref(window._db, `reservations/${dk}/${id}/${k}`), v===undefined?null:v);
+  }
+}
+
 /* ── REMOVE CHEF FOR DAY ── */
 function renderChefRemovedBanner() {
   const banner = document.getElementById('chefRemovedBanner');
@@ -2920,8 +2965,9 @@ async function submitEditAuth(slot, editId) {
     const ok=await checkPassword(pwd,PWD_HASH_EDIT);
     if (!ok){if(errEl){errEl.textContent='✕ Incorrect password.';document.getElementById('editAuthPwd').value='';document.getElementById('editAuthPwd').focus();}return;}
   }
+  _editorInitials = initials; // reuse for every save in this edit session — no repeat prompts
   closeModal();
-  _openHibachiModalInner(slot,editId);
+  openEditChooser(slot,editId);
 }
 
 function _openHibachiModalInner(slot, editId) {
@@ -3060,6 +3106,323 @@ function _openHibachiModalInner(slot, editId) {
   }
   setTimeout(checkHalfHourWarn,0);
   showModal();
+}
+
+/* ══════════════════════════════════════════════
+   SIMPLIFIED EDIT CHOOSER
+   Replaces the old single giant edit form with a
+   tappable list — pick ONE thing to change at a time.
+   ══════════════════════════════════════════════ */
+
+function noteTypeLabel(v) {
+  return {allergy:'Allergy',restriction:'Restriction',chef:'Chef Request',table:'Table Request',other:'Other'}[v] || v;
+}
+
+function _editFieldHeader(title) {
+  return '<button class="edit-back" onclick="backToEditChooser()">‹ Back</button>'
+    + '<div style="font-family:var(--serif);font-size:1.05rem;font-weight:700;color:var(--gold-light);margin-bottom:14px">'+title+'</div>';
+}
+
+function _editErr(msg) {
+  const el = document.getElementById('editFieldErr');
+  if (el) el.innerHTML = '<span style="color:#c04040">⚠ '+escHtml(msg)+'</span>';
+}
+
+function _wordCount(s) { return (String(s||'').trim().match(/\S+/g)||[]).length; }
+
+function _showTightWarning(field) {
+  const el = document.getElementById('editFieldErr');
+  if (!el) return;
+  el.innerHTML = '<div class="warn-banner" style="flex-direction:column;gap:8px">'
+    + '<div>⚠ Timing may be tight — previous group on this grill seated within 2 hours.</div>'
+    + '<button class="btn-gold" style="width:auto;padding:7px 16px;font-size:0.78rem" onclick="_efTightConfirmed=true;saveEditField(\''+field+'\')">Save Anyway</button>'
+    + '</div>';
+}
+
+function backToEditChooser() {
+  openEditChooser(_editingSlot, _editingResId);
+}
+
+// Entry point — replaces the old giant form for edits.
+function openEditChooser(slot, editId, flashMsg) {
+  const key = dateKey(currentDate);
+  const r = (reservations[key]||{})[editId];
+  if (!r) { closeModal(); alert('Reservation not found — it may have been deleted.'); return; }
+  _editingSlot = r.slot || slot;
+  _editingResId = editId;
+  document.getElementById('modalTitle').textContent = 'Edit Reservation';
+  const ts = document.getElementById('transferSection');
+  if (ts) ts.style.display = 'none';
+
+  const cardStatus = r.card ? 'Card on file' : (r.holdUntil ? 'Hold — no card yet' : 'No card on file');
+  const noteVal = r.noteText ? (r.noteType ? noteTypeLabel(r.noteType)+' — ' : '') + r.noteText : 'None';
+
+  const opt = (icon,fieldKey,label,value) =>
+    '<button class="edit-opt" onclick="openEditField(\''+fieldKey+'\')">'
+    +'<span class="edit-opt-icon">'+icon+'</span>'
+    +'<span class="edit-opt-body"><div class="edit-opt-label">'+label+'</div>'
+    +'<div class="edit-opt-value">'+escHtml(String(value))+'</div></span>'
+    +'<span class="edit-opt-chev">›</span></button>';
+
+  const flashHtml = flashMsg ? '<div class="edit-flash">✓ '+escHtml(flashMsg)+'</div>' : '';
+
+  document.getElementById('modalBody').innerHTML =
+      '<div class="edit-summary"><strong style="color:var(--text);font-family:var(--sans);font-size:0.88rem">'+escHtml(r.name||'Guest')+'</strong><br>'
+      + (r.guests||'?')+'p · '+displayTime(r.slot)+' · '+key+'</div>'
+      + flashHtml
+      + '<div class="edit-list">'
+      + opt('👥','guests','Party Size', (r.guests||'?')+' guests')
+      + opt('🕐','slot','Time Slot', displayTime(r.slot))
+      + opt('📅','date','Date', key)
+      + opt('🪪','name','Guest Name', r.name||'—')
+      + opt('📞','phone','Phone Number', r.phone||'—')
+      + opt('💳','card','Card Details', cardStatus)
+      + opt('📝','note','Note', noteVal)
+      + '</div>'
+      + '<button class="btn-danger" style="margin-top:16px" onclick="confirmDeleteFromChooser(\''+key+'\',\''+editId+'\')">✕ Delete Reservation</button>'
+      + (isManager()
+          ? '<div style="text-align:center;margin-top:14px"><button class="edit-back" style="margin:0 auto" onclick="_openHibachiModalInner(\''+(r.slot||slot)+'\',\''+editId+'\')">Open full form (advanced) ›</button></div>'
+          : '');
+
+  showModal();
+}
+
+// Renders the focused single-purpose editor for one field.
+function openEditField(field) {
+  const key = dateKey(currentDate);
+  const editId = _editingResId;
+  const r = (reservations[key]||{})[editId];
+  if (!r) { closeModal(); alert('Reservation not found.'); return; }
+  _efTightConfirmed = false;
+  const body = document.getElementById('modalBody');
+  const errDiv = '<div id="editFieldErr" style="font-family:var(--mono);font-size:0.67rem;min-height:14px;margin:4px 0 8px"></div>';
+  const saveBtn = (lbl) => '<button class="btn-gold" onclick="saveEditField(\''+field+'\')">'+(lbl||'Save Changes')+'</button>';
+
+  if (field==='guests') {
+    body.innerHTML = _editFieldHeader('Party Size')
+      + '<div class="form-row"><label class="form-label">Number of Guests *</label>'
+      + '<input class="form-input" id="efGuests" type="number" min="1" max="'+DOUBLE_GRILL_SOLO_MAX+'" value="'+(r.guests||'')+'" oninput="_efCheckLargeGroup()"></div>'
+      + '<div id="efLargePwdRow" style="display:none" class="form-row"><label class="form-label">Manager Password ('+LARGE_GROUP_PASSWORD_MIN+'+ guests)</label>'
+      + '<input class="form-input" id="efLargePwd" type="password" placeholder="Enter password" style="letter-spacing:0.2em"></div>'
+      + errDiv + saveBtn();
+    setTimeout(_efCheckLargeGroup,0);
+  } else if (field==='slot') {
+    const dow = currentDate.getDay();
+    const opts = generateTimeSlots(dow).filter(s=>getChefsAtTime(dow,timeToMinutes(s))>0)
+      .map(s=>'<option value="'+s+'"'+(s===r.slot?' selected':'')+'>'+displayTime(s)+'</option>').join('');
+    body.innerHTML = _editFieldHeader('Time Slot')
+      + '<div class="form-row"><label class="form-label">New Time Slot *</label>'
+      + '<select class="form-select" id="efSlot">'+opts+'</select></div>'
+      + '<div style="font-family:var(--mono);font-size:0.65rem;color:var(--text3);margin:-6px 0 12px">Same day ('+key+'). To move to a different day, use Date instead.</div>'
+      + errDiv + saveBtn();
+  } else if (field==='date') {
+    const slotOptsForDow = (dow)=>generateTimeSlots(dow).map(s=>'<option value="'+s+'"'+(s===r.slot?' selected':'')+'>'+displayTime(s)+'</option>').join('');
+    body.innerHTML = _editFieldHeader('Date')
+      + '<div class="form-row"><label class="form-label">New Date *</label>'
+      + '<input class="form-input" id="efDate" type="date" value="'+key+'" onchange="_refreshDateSlotOptions()"></div>'
+      + '<div class="form-row"><label class="form-label">Time Slot *</label>'
+      + '<select class="form-select" id="efDateSlot">'+slotOptsForDow(currentDate.getDay())+'</select></div>'
+      + '<div style="font-family:var(--mono);font-size:0.65rem;color:var(--text3);margin:-6px 0 12px">Moves the reservation to a new day. Double-check seating availability on that date separately.</div>'
+      + errDiv + saveBtn('Move Reservation');
+  } else if (field==='name') {
+    body.innerHTML = _editFieldHeader('Guest Name')
+      + '<div class="form-row"><label class="form-label">Guest Name *</label>'
+      + '<input class="form-input" id="efName" type="text" value="'+escHtml(r.name||'')+'"></div>'
+      + errDiv + saveBtn();
+  } else if (field==='phone') {
+    body.innerHTML = _editFieldHeader('Phone Number')
+      + '<div class="form-row"><label class="form-label">Phone *</label>'
+      + '<input class="form-input" id="efPhone" type="tel" maxlength="14" value="'+escHtml(r.phone||'')+'" oninput="fmtPhone(this)"></div>'
+      + errDiv + saveBtn();
+  } else if (field==='card') {
+    const statusLine = r.card ? '🔒 Card on file — existing details are hidden for privacy.' : (r.holdUntil ? '⏳ Hold — no card on file yet.' : 'No card on file.');
+    body.innerHTML = _editFieldHeader('Card Details')
+      + '<div style="font-family:var(--mono);font-size:0.7rem;color:var(--text2);margin-bottom:12px">'+statusLine+'</div>'
+      + '<div class="card-row">'
+      + '<div class="form-row" style="margin:0"><label class="form-label">'+(r.card?'Replace Card Number':'Card Number')+'</label>'
+      + '<input class="form-input" id="efCard" type="text" maxlength="19" placeholder="•••• •••• •••• ••••" oninput="fmtCard(this)"></div>'
+      + '<div class="form-row" style="margin:0"><label class="form-label">Expiry</label>'
+      + '<input class="form-input" id="efExpiry" type="text" maxlength="5" placeholder="MM/YY" oninput="fmtExpiry(this)"></div></div>'
+      + '<div style="font-family:var(--mono);font-size:0.6rem;color:var(--text3);margin:8px 0 12px">Leave blank to keep the existing card on file.</div>'
+      + errDiv + saveBtn(r.card?'Update Card':'Add Card');
+  } else if (field==='note') {
+    const types=['','allergy','restriction','chef','table','other'];
+    body.innerHTML = _editFieldHeader('Note')
+      + '<div class="form-row"><label class="form-label">Note Type</label>'
+      + '<select class="form-select" id="efNoteType">'
+      + types.map(v=>'<option value="'+v+'"'+(r.noteType===v?' selected':'')+'>'+(v?noteTypeLabel(v):'— None —')+'</option>').join('')
+      + '</select></div>'
+      + '<div class="form-row"><label class="form-label">Note (max 10 words)</label>'
+      + '<input class="form-input" id="efNoteText" type="text" maxlength="80" placeholder="Max 10 words…" value="'+escHtml(r.noteText||'')+'"></div>'
+      + errDiv + saveBtn();
+  }
+  setTimeout(()=>body.querySelector('input,select')?.focus(),60);
+}
+
+function _refreshDateSlotOptions() {
+  const dateVal = document.getElementById('efDate')?.value;
+  const sel = document.getElementById('efDateSlot');
+  if (!dateVal || !sel) return;
+  const cur = sel.value;
+  const dow = new Date(dateVal+'T00:00:00').getDay();
+  const opts = generateTimeSlots(dow).map(s=>'<option value="'+s+'"'+(s===cur?' selected':'')+'>'+displayTime(s)+'</option>').join('');
+  sel.innerHTML = opts || '<option value="">No service this day</option>';
+}
+
+function _efCheckLargeGroup() {
+  const g = parseInt(document.getElementById('efGuests')?.value)||0;
+  const row = document.getElementById('efLargePwdRow');
+  if (!row) return;
+  row.style.display = (g>=LARGE_GROUP_PASSWORD_MIN && !isManager()) ? '' : 'none';
+}
+
+// Save dispatcher — one focused write per field, never touching unrelated data.
+async function saveEditField(field) {
+  const key = dateKey(currentDate);
+  const editId = _editingResId;
+  const r = (reservations[key]||{})[editId];
+  if (!r) { closeModal(); alert('Reservation not found.'); return; }
+  const initials = _editorInitials || 'STAFF';
+  const errEl = document.getElementById('editFieldErr');
+  if (errEl) errEl.innerHTML = '';
+
+  try {
+    if (field==='guests') {
+      const guests = sanitizeGuests(document.getElementById('efGuests').value);
+      if (!guests || guests<1) return _editErr('Party size must be at least 1.');
+      if (guests>DOUBLE_GRILL_SOLO_MAX) return _editErr('Maximum party size is '+DOUBLE_GRILL_SOLO_MAX+' for standard booking.');
+      if (guests>=LARGE_GROUP_PASSWORD_MIN && !isManager()) {
+        const pwd=document.getElementById('efLargePwd')?.value||'';
+        const ok=await checkPassword(pwd,PWD_HASH_LARGE);
+        if (!ok) { _efCheckLargeGroup(); return _editErr('Groups of '+LARGE_GROUP_PASSWORD_MIN+'+ require manager password.'); }
+      }
+      const dow=currentDate.getDay(), slotMins=timeToMinutes(r.slot);
+      const chefs=getChefsAtTime(dow,slotMins);
+      const assign=autoAssignGrill(key,r.slot,guests,chefs,editId);
+      if (!assign) return _editErr('No grill availability for '+guests+' guests at '+displayTime(r.slot)+'.');
+      if (!assign.isDouble) {
+        const groups=getGroupsAtGrillAtSlot(key,assign.grill,slotMins,editId);
+        const existingGuests=groups.reduce((s,g)=>s+(g.guests||0),0);
+        const cap=getSingleGrillCap(groups.length);
+        if (existingGuests+guests>cap) return _editErr('Station full: '+existingGuests+'+'+guests+' exceeds max '+cap+'.');
+      }
+      if (assign.tightTiming && !_efTightConfirmed) return _showTightWarning('guests');
+      const oldGuests=r.guests;
+      const data={guests,grill:assign.grill,grill2:assign.grill2||null,isDouble:assign.isDouble||false,updatedAt:Date.now()};
+      await setResFields(key,editId,data);
+      await logAudit('edit',(r.name||'Guest')+' · party size '+oldGuests+'p → '+guests+'p',initials);
+      Object.assign(r,data);
+      const note=(cardRequired(guests,key)&&!r.card)?' Card may now be required — use Card Details to add one.':'';
+      openEditChooser(r.slot,editId,'Party size updated to '+guests+' guests.'+note);
+
+    } else if (field==='slot') {
+      const newSlot=document.getElementById('efSlot').value;
+      if (!newSlot) return _editErr('Please choose a time.');
+      if (newSlot===r.slot) return _editErr('That’s already the current time slot.');
+      const dow=currentDate.getDay(), slotMins=timeToMinutes(newSlot);
+      const chefs=getChefsAtTime(dow,slotMins);
+      const assign=autoAssignGrill(key,newSlot,r.guests,chefs,editId);
+      if (!assign) return _editErr('No grill availability for '+r.guests+' guests at '+displayTime(newSlot)+'.');
+      if (!assign.isDouble) {
+        const groups=getGroupsAtGrillAtSlot(key,assign.grill,slotMins,editId);
+        const existingGuests=groups.reduce((s,g)=>s+(g.guests||0),0);
+        const cap=getSingleGrillCap(groups.length);
+        if (existingGuests+r.guests>cap) return _editErr('Station full at that time.');
+      }
+      if (assign.tightTiming && !_efTightConfirmed) return _showTightWarning('slot');
+      const oldSlot=r.slot;
+      const data={slot:newSlot,grill:assign.grill,grill2:assign.grill2||null,isDouble:assign.isDouble||false,updatedAt:Date.now()};
+      await setResFields(key,editId,data);
+      await logAudit('edit',(r.name||'Guest')+' · time changed '+displayTime(oldSlot)+' → '+displayTime(newSlot),initials);
+      Object.assign(r,data);
+      openEditChooser(r.slot,editId,'Time slot updated to '+displayTime(newSlot)+'.');
+
+    } else if (field==='date') {
+      const newDate=document.getElementById('efDate').value;
+      const newSlot=document.getElementById('efDateSlot').value;
+      if (!newDate) return _editErr('Please choose a date.');
+      if (!newSlot) return _editErr('No service available that day.');
+      if (newDate===key && newSlot===r.slot) return _editErr('That matches the current date and time already.');
+      if (!rateLimitCheck('write',20)) return _editErr('Too many actions too fast. Please wait a moment.');
+      const oldSnap=await window._get(window._ref(window._db,`reservations/${key}/${editId}`));
+      const guestData=oldSnap.val();
+      if (!guestData) { closeModal(); alert('Reservation not found — it may have been deleted.'); return; }
+      const updatedData=Object.assign({},guestData,{slot:newSlot,updatedAt:Date.now()});
+      await window._push(window._ref(window._db,`reservations/${newDate}`),updatedData);
+      await window._remove(window._ref(window._db,`reservations/${key}/${editId}`));
+      await logAudit('edit','MOVED — '+(guestData.name||'Guest')+' · '+(guestData.guests||'?')+'p · from '+key+' '+displayTime(r.slot)+' → '+newDate+' '+displayTime(newSlot),initials);
+      closeModal();
+      alert('✓ Reservation moved to '+newDate+' at '+displayTime(newSlot)+'.');
+
+    } else if (field==='name') {
+      const name=sanitizeText(document.getElementById('efName').value,80);
+      if (!name) return _editErr('Guest name is required.');
+      const oldName=r.name;
+      const data={name,updatedAt:Date.now()};
+      await setResFields(key,editId,data);
+      await logAudit('edit',(oldName||'Guest')+' → '+name+' · '+r.guests+'p · '+displayTime(r.slot),initials);
+      Object.assign(r,data);
+      openEditChooser(r.slot,editId,'Name updated.');
+
+    } else if (field==='phone') {
+      const digits=document.getElementById('efPhone').value.replace(/\D/g,'');
+      if (digits.length!==7 && digits.length!==10) return _editErr('Phone must be 7 digits (local) or 10 digits (with area code).');
+      const fmt=digits.length===10?'('+digits.slice(0,3)+') '+digits.slice(3,6)+'-'+digits.slice(6):digits.slice(0,3)+'-'+digits.slice(3);
+      const data={phone:fmt,updatedAt:Date.now()};
+      await setResFields(key,editId,data);
+      await logAudit('edit',(r.name||'Guest')+' · phone number updated',initials);
+      Object.assign(r,data);
+      openEditChooser(r.slot,editId,'Phone number updated.');
+
+    } else if (field==='card') {
+      const cardRaw=document.getElementById('efCard').value.trim();
+      const expiry=document.getElementById('efExpiry').value.trim();
+      if (!cardRaw && !expiry) return _editErr('Enter a card number to add or replace, or tap Back to cancel.');
+      const digits=cardRaw.replace(/\s/g,'');
+      if (digits.length<12) return _editErr('Card number looks too short.');
+      if (!/^\d{2}\/\d{2}$/.test(expiry)) return _editErr('Expiry must be in MM/YY format.');
+      const wasHold=!!(r.holdUntil && !r.card);
+      const data={card:cardRaw,expiry,holdUntil:null,updatedAt:Date.now()};
+      await setResFields(key,editId,data);
+      await logAudit('edit', wasHold ? 'HOLD CONFIRMED — '+(r.name||'Guest')+' · '+r.guests+'p · '+displayTime(r.slot) : (r.name||'Guest')+' · card added/updated', initials);
+      const merged=Object.assign({},r,data);
+      Object.assign(r,data);
+      postToVault(key,editId,merged);
+      openEditChooser(r.slot,editId, wasHold ? 'Hold confirmed with card on file.' : 'Card updated.');
+
+    } else if (field==='note') {
+      const noteType=document.getElementById('efNoteType').value;
+      const noteText=sanitizeText(document.getElementById('efNoteText').value,120);
+      if (_wordCount(noteText)>10) return _editErr('Note must be 10 words or fewer.');
+      const data={noteType,noteText,notes:noteText,updatedAt:Date.now()};
+      await setResFields(key,editId,data);
+      await logAudit('edit',(r.name||'Guest')+' · note updated',initials);
+      Object.assign(r,data);
+      openEditChooser(r.slot,editId,'Note updated.');
+    }
+  } catch(e) {
+    _editErr('Error: '+e.message);
+  }
+}
+
+function confirmDeleteFromChooser(dk, id) {
+  const r=(reservations[dk]||{})[id];
+  document.getElementById('modalBody').innerHTML =
+      '<button class="edit-back" onclick="backToEditChooser()">‹ Back</button>'
+    + '<div style="font-family:var(--mono);font-size:0.78rem;color:var(--text2);line-height:1.7;margin-bottom:16px">Delete '
+    + '<strong style="color:var(--text)">'+escHtml(r?.name||'this reservation')+'</strong> · '+(r?.guests||'?')+'p · '+displayTime(r?.slot||'00:00')+'? This cannot be undone.</div>'
+    + '<button class="btn-danger" style="background:#c04040;color:#fff;border:none;padding:13px" onclick="deleteResFromChooser(\''+dk+'\',\''+id+'\')">✕ Delete Reservation</button>'
+    + '<div id="editFieldErr" style="font-family:var(--mono);font-size:0.67rem;color:#c04040;min-height:14px;margin-top:8px"></div>';
+}
+
+async function deleteResFromChooser(dk, id) {
+  const r=(reservations[dk]||{})[id];
+  const initials=_editorInitials || 'STAFF';
+  try {
+    await logAudit('delete',(r?.name||'?')+' · '+(r?.guests||'?')+'p · '+displayTime(r?.slot||'00:00'),initials);
+    await safeWrite(window._ref(window._db,`reservations/${dk}/${id}`),null,'remove');
+    closeModal();
+  } catch(e) { _editErr('Error: '+e.message); }
 }
 
 /* ══════════════════════════════════════════════
@@ -4049,6 +4412,8 @@ async function toggleBlockSlot(slot) {
 // Track currently-editing reservation for the Move feature
 let _editingSlot = null;
 let _editingResId = null;
+let _editorInitials = '';   // captured once at edit-auth time, reused for every field save
+let _efTightConfirmed = false; // per-field "save anyway" confirmation for tight grill timing
 
 function showModal() { document.getElementById('modalOverlay').style.display='flex'; document.body.style.overflow='hidden'; }
 function closeModal() {
@@ -4062,6 +4427,8 @@ function closeModal() {
   if (me) me.textContent = '';
   _editingSlot = null;
   _editingResId = null;
+  _editorInitials = '';
+  _efTightConfirmed = false;
 }
 function closeModalIfOutside(e) { if (e.target.id==='modalOverlay') closeModal(); }
 
