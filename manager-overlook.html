@@ -146,19 +146,23 @@ tr:hover td{background:rgba(232,160,32,.03)}
 .sg td.sc2.sec-kitchen{color:var(--kitchen)}
 .sg td.sc2.sec-serving{color:var(--service)}
 .sg td.dn{background:var(--bg2);font-family:var(--font-mono);font-size:.68rem;color:var(--text3);text-align:center;padding:4px;border:1px solid var(--border)}
-.sg-chip{border-radius:2px;padding:4px 5px;margin-bottom:3px;font-size:.72rem;display:flex;justify-content:space-between;align-items:center;gap:3px}
-.sg-chip.chip-teppan{background:var(--teppan-g);border:1px solid rgba(224,96,32,.2)}
-.sg-chip.chip-sushi{background:var(--sushi-g);border:1px solid rgba(58,154,184,.2)}
-.sg-chip.chip-kitchen{background:var(--kitchen-g);border:1px solid rgba(200,160,32,.2)}
-.sg-chip.chip-serving{background:var(--service-g);border:1px solid rgba(138,90,184,.2)}
-.sg-chip .cn{font-weight:600}
-.sg-chip.chip-teppan .cn{color:var(--teppan)}
-.sg-chip.chip-sushi .cn{color:var(--sushi)}
-.sg-chip.chip-kitchen .cn{color:var(--kitchen)}
-.sg-chip.chip-serving .cn{color:var(--service)}
-.sg-chip .ct{color:var(--text2);font-family:var(--font-mono);font-size:.65rem}
-.sg-chip .cx{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.65rem;padding:0;flex-shrink:0}
+.sg-chip{border-radius:3px;padding:4px 6px 4px 8px;margin-bottom:3px;font-size:.72rem;display:flex;justify-content:space-between;align-items:center;gap:3px;border-left:4px solid transparent}
+.sg-chip.chip-teppan{background:rgba(192,72,0,.17);border:1.5px solid rgba(192,72,0,.5);border-left:4px solid var(--teppan)}
+.sg-chip.chip-sushi{background:rgba(26,122,152,.17);border:1.5px solid rgba(26,122,152,.5);border-left:4px solid var(--sushi)}
+.sg-chip.chip-kitchen{background:rgba(148,104,0,.17);border:1.5px solid rgba(148,104,0,.5);border-left:4px solid var(--kitchen)}
+.sg-chip.chip-serving{background:rgba(106,58,152,.17);border:1.5px solid rgba(106,58,152,.5);border-left:4px solid var(--service)}
+.sg-chip .cn{font-weight:800}
+.sg-chip.chip-teppan .cn{color:#9c3a00}
+.sg-chip.chip-sushi .cn{color:#0f5c72}
+.sg-chip.chip-kitchen .cn{color:#7a5400}
+.sg-chip.chip-serving .cn{color:#552c80}
+.sg-chip .ct{color:var(--text);font-family:var(--font-mono);font-size:.65rem;font-weight:600}
+.sg-chip .cx{background:none;border:none;color:var(--text2);cursor:pointer;font-size:.7rem;padding:0;flex-shrink:0;font-weight:700}
 .sg-chip .cx:hover{color:var(--red)}
+.ss-mode-toggle{display:inline-flex;gap:5px}
+.ss-mode-btn{font-family:var(--font-mono);font-size:.6rem;padding:4px 10px;border-radius:999px;border:1px solid var(--border2);color:var(--text2);cursor:pointer;user-select:none;text-transform:uppercase;letter-spacing:.04em;transition:all .12s;font-weight:600}
+.ss-mode-btn:hover{border-color:var(--service);color:var(--service)}
+.ss-mode-btn.on{background:var(--service);border-color:var(--service);color:#fff;font-weight:700}
 .sg-add{font-family:var(--font-mono);font-size:.62rem;color:var(--text3);padding:3px;cursor:pointer;border:1px dashed var(--border);border-radius:2px;text-align:center;transition:all .1s;margin-top:2px}
 .sg-add:hover{border-color:var(--amber);color:var(--amber)}
 .week-lbl{font-family:var(--font-head);font-size:1rem;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.04em}
@@ -688,7 +692,15 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div class="sch-tab-pane" id="sch-pane-serving">
   <div class="pn" style="padding:10px"><div class="sg-wrap"><table class="sg" id="sg-serving"></table></div></div>
   <div class="pn" style="margin-top:0;border-top:none;border-radius:0 0 var(--r) var(--r)">
-    <div class="pnh" style="margin-bottom:10px"><h3 style="font-size:.85rem">📊 Serving Hours — This Week</h3><span style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3)">Based on actual clock-out data</span></div>
+    <div class="pnh" style="margin-bottom:10px"><h3 style="font-size:.85rem">📊 Serving Hours — This Week</h3>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span class="ss-mode-note" style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3)">Based on actual clock-out data</span>
+        <div class="ss-mode-toggle">
+          <span class="ss-mode-btn on" data-mode="actual" onclick="setSSCloseMode('actual')">Actual</span>
+          <span class="ss-mode-btn" data-mode="nine" onclick="setSSCloseMode('nine')">Flat 9PM Close</span>
+        </div>
+      </div>
+    </div>
     <div id="inline-serving-summary"><span style="font-family:var(--font-mono);font-size:.67rem;color:var(--text3)">// Select a week</span></div>
   </div>
   <div class="pn" style="margin-top:0;border-top:none;border-radius:0 0 var(--r) var(--r)">
@@ -964,6 +976,13 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div class="mb" id="serving-summary-modal"><div class="mo mo-wide">
 <h3>Serving Staff Summary</h3>
 <p style="font-family:var(--font-mono);font-size:.62rem;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.07em">Total days & projected hours for serving staff — one week</p>
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+  <span class="ss-mode-note" style="font-family:var(--font-mono);font-size:.62rem;color:var(--text3)">Based on actual clock-out data</span>
+  <div class="ss-mode-toggle">
+    <span class="ss-mode-btn on" data-mode="actual" onclick="setSSCloseMode('actual')">Actual</span>
+    <span class="ss-mode-btn" data-mode="nine" onclick="setSSCloseMode('nine')">Flat 9PM Close</span>
+  </div>
+</div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
   <div class="fg" style="flex:none">
     <label>Week (Mon)</label>
@@ -3823,7 +3842,18 @@ window.downloadSchedulePng = function(){
 // PM late (18:00+):      weekday→21:15, Fri→22:15, Sat→22:30, Sun→21:15
 // AM (<14:00) weekday:   out 14:00 (split) — flag unknown for Fri/Sat (can stay all day)
 // 11-2 slot:             always 3 hrs
-function ssShiftHours(timeStr, dayIdx){
+let ssCloseMode='actual'; // 'actual' = projected from real per-day clock-out data; 'nine' = flat 9:00pm close every day
+window.setSSCloseMode=function(mode){
+  ssCloseMode=mode;
+  document.querySelectorAll('.ss-mode-btn').forEach(b=>b.classList.toggle('on', b.dataset.mode===mode));
+  document.querySelectorAll('.ss-mode-note').forEach(n=>{
+    n.textContent = mode==='nine' ? 'Assumes every shift runs until 9:00pm' : 'Based on actual clock-out data';
+  });
+  renderInlineServingSummary();
+  if(document.getElementById('ss-week1')) renderServingSummary();
+};
+function ssShiftHours(timeStr, dayIdx, mode){
+  mode = mode || ssCloseMode;
   const t=(timeStr||'').trim().toLowerCase();
   const isFri=(dayIdx===4);
   const isSat=(dayIdx===5);
@@ -3833,21 +3863,7 @@ function ssShiftHours(timeStr, dayIdx){
   // Named slots first
   if(t==='11-2'||t.startsWith('11-2')) return 3;
 
-  // AM clock-ins (before 14:00): split shift structure
-  // Weekday AM → out ~14:00 = 3 hrs from 11
-  // Fri/Sat AM → unpredictable (could stay to close), use conservative 7 hrs
-  if(t==='11') return isFriSat ? 7 : 3;
-  if(t==='12') return isFriSat ? 6 : 2;
-
-  // PM clock-ins — use median clock-out from training data
-  // Close times: weekday≈21:15, Fri≈22:15, Sat≈22:30, Sun≈21:15
-  function closeMin(){ // returns close time in minutes from midnight
-    if(isFri) return 22*60+15;
-    if(isSat) return 22*60+30;
-    return 21*60+15; // Mon–Thu, Sun
-  }
-
-  // Parse time to minutes
+  // Parse time to minutes — shared by both projection modes
   function cinMin(str){
     if(!str) return null;
     // handle "5", "5:30", "5.30", "6", "11", "12", "17:30" etc
@@ -3864,6 +3880,31 @@ function ssShiftHours(timeStr, dayIdx){
     // If 1–9 treat as PM hour (add 12), 10–12 treat as AM, 13+ treat as 24h
     if(n>=1&&n<=9) return (n+12)*60;
     return n*60;
+  }
+
+  // ── FLAT 9PM CLOSE — every shift assumed to run until 21:00, every day, no day-of-week variation ──
+  if(mode==='nine'){
+    const ci=cinMin(t);
+    if(ci!==null){
+      const hrs=(21*60-ci)/60;
+      return Math.max(0.5, Math.round(hrs*4)/4); // round to nearest 0.25
+    }
+    return 3; // name-only fallback — flat 6–9 dinner shift
+  }
+
+  // ── ACTUAL CLOCK-OUT DATA (default) ──
+  // AM clock-ins (before 14:00): split shift structure
+  // Weekday AM → out ~14:00 = 3 hrs from 11
+  // Fri/Sat AM → unpredictable (could stay to close), use conservative 7 hrs
+  if(t==='11') return isFriSat ? 7 : 3;
+  if(t==='12') return isFriSat ? 6 : 2;
+
+  // PM clock-ins — use median clock-out from training data
+  // Close times: weekday≈21:15, Fri≈22:15, Sat≈22:30, Sun≈21:15
+  function closeMin(){ // returns close time in minutes from midnight
+    if(isFri) return 22*60+15;
+    if(isSat) return 22*60+30;
+    return 21*60+15; // Mon–Thu, Sun
   }
 
   const ci=cinMin(t);
@@ -3890,14 +3931,15 @@ window.openServingSummaryModal=function(){
 };
 
 // Core summary calc — shared between modal and inline panel
-function calcServingSummary(w1){
+function calcServingSummary(w1, mode){
+  mode = mode || ssCloseMode;
   const ws=S.shifts.filter(s=>s.week===w1&&(s.section||'').toUpperCase()==='SERVING');
   const staff={};
   ws.forEach(sh=>{
     const name=(sh.name||'').trim();if(!name)return;
     if(!staff[name]) staff[name]={hours:0,dayKeys:new Set()};
     staff[name].dayKeys.add(sh.dayIdx);
-    staff[name].hours+=ssShiftHours(sh.time,sh.dayIdx);
+    staff[name].hours+=ssShiftHours(sh.time,sh.dayIdx,mode);
   });
   return Object.entries(staff).sort((a,b)=>b[1].dayKeys.size-a[1].dayKeys.size||a[0].localeCompare(b[0]));
 }
