@@ -2808,7 +2808,8 @@ window.printScheduleSheet=function(){
   // Date headers array
   const dates=DAYS_SHORT.map((_,i)=>{const d=new Date(mon);d.setDate(d.getDate()+i);return{day:DAYS_SHORT[i],date:d.toLocaleDateString('en-CA',{month:'short',day:'numeric'})};});
   const GARBAGE_DAYS=['THU','SUN'];
-  const thRow=dates.map(h=>`<th${GARBAGE_DAYS.includes(h.day)?' class="garbage-day"':''}><div class="dname">${h.day}</div><div class="ddate">${h.date}</div>${GARBAGE_DAYS.includes(h.day)?'<div class="gtag">🗑 CARDBOARD</div>':''}</th>`).join('');
+  const plainThRow=dates.map(h=>`<th><div class="dname">${h.day}</div><div class="ddate">${h.date}</div></th>`).join('');
+  const kitchenThRow=dates.map(h=>`<th${GARBAGE_DAYS.includes(h.day)?' class="garbage-day"':''}><div class="dname">${h.day}</div><div class="ddate">${h.date}</div>${GARBAGE_DAYS.includes(h.day)?'<div class="gtag">CARDBOARD<br>TRASH</div>':''}</th>`).join('');
 
   // Build rows for a set of sections — uses dynamic roster order
   const norm=n=>(n||'').toLowerCase().replace(/[\s.]/g,'');
@@ -2839,11 +2840,12 @@ window.printScheduleSheet=function(){
         if(row===0)html+=`<td class="sec-lbl" rowspan="${numRows}" style="color:${col};background:${bg};border-left:6px solid ${col}">${sec}</td>`;
         for(let di=0;di<7;di++){
           const shifts=getMatchingShifts(rowLabel,di);
+          const gcol=GARBAGE_DAYS.includes(DAYS_SHORT[di])?' garbage-col':'';
           if(shifts.length){
             const label=shifts.map(sh=>sh.time?`${sh.name} ${sh.time}`:sh.name).join(' / ');
-            html+=`<td class="cell filled"><span class="sname">${label}</span></td>`;
+            html+=`<td class="cell filled${gcol}"><span class="sname">${label}</span></td>`;
           }else{
-            html+=`<td class="cell empty"></td>`;
+            html+=`<td class="cell empty${gcol}"></td>`;
           }
         }
         html+=`</tr>`;
@@ -2929,8 +2931,10 @@ th.corner{background:#fff;border:none;width:80px}
 th{background:#f0f0f0;border:1px solid #ccc;border-bottom:2px solid #999;padding:8px 4px;text-align:center}
 .dname{font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#111}
 .ddate{font-size:12px;font-weight:600;color:#555;margin-top:2px}
-th.garbage-day{background:#fdf0dc;border-bottom:2px solid #b8722a}
-.gtag{font-size:9px;font-weight:800;color:#8a4a10;letter-spacing:.06em;margin-top:3px}
+th.garbage-day{background:#e8890c;border-bottom:3px solid #7a4400}
+th.garbage-day .dname,th.garbage-day .ddate{color:#fff}
+.gtag{font-size:14px;font-weight:900;color:#fff;letter-spacing:.04em;margin-top:4px;line-height:1.15;text-shadow:0 1px 1px rgba(0,0,0,.25)}
+td.garbage-col{background:#fdecd2 !important;border-left:2px solid #e8890c;border-right:2px solid #e8890c}
 
 /* Section label cell */
 .sec-lbl{font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;text-align:center;vertical-align:middle;padding:6px 3px;border:1px solid #ccc;border-bottom:2px solid #999}
@@ -2969,7 +2973,7 @@ tr.ampm-div span{font-size:11px;font-weight:700;color:#888;font-family:monospace
   <div class="wrap">
     <table>
       <colgroup><col class="col-lbl">${DAYS_SHORT.map(()=>'<col>').join('')}</colgroup>
-      <thead><tr><th class="corner"></th>${thRow}</tr></thead>
+      <thead><tr><th class="corner"></th>${kitchenThRow}</tr></thead>
       <tbody>${kitchenRows}</tbody>
     </table>
   </div>
@@ -2988,7 +2992,7 @@ tr.ampm-div span{font-size:11px;font-weight:700;color:#888;font-family:monospace
   <div class="wrap">
     <table>
       <colgroup><col class="col-lbl">${DAYS_SHORT.map(()=>'<col>').join('')}</colgroup>
-      <thead><tr><th class="corner"></th>${thRow}</tr></thead>
+      <thead><tr><th class="corner"></th>${plainThRow}</tr></thead>
       <tbody>${servingRows}</tbody>
     </table>
   </div>
