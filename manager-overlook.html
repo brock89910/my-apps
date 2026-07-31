@@ -2807,7 +2807,8 @@ window.printScheduleSheet=function(){
 
   // Date headers array
   const dates=DAYS_SHORT.map((_,i)=>{const d=new Date(mon);d.setDate(d.getDate()+i);return{day:DAYS_SHORT[i],date:d.toLocaleDateString('en-CA',{month:'short',day:'numeric'})};});
-  const thRow=dates.map(h=>`<th><div class="dname">${h.day}</div><div class="ddate">${h.date}</div></th>`).join('');
+  const GARBAGE_DAYS=['THU','SUN'];
+  const thRow=dates.map(h=>`<th${GARBAGE_DAYS.includes(h.day)?' class="garbage-day"':''}><div class="dname">${h.day}</div><div class="ddate">${h.date}</div>${GARBAGE_DAYS.includes(h.day)?'<div class="gtag">🗑 CARDBOARD</div>':''}</th>`).join('');
 
   // Build rows for a set of sections — uses dynamic roster order
   const norm=n=>(n||'').toLowerCase().replace(/[\s.]/g,'');
@@ -2928,6 +2929,8 @@ th.corner{background:#fff;border:none;width:80px}
 th{background:#f0f0f0;border:1px solid #ccc;border-bottom:2px solid #999;padding:8px 4px;text-align:center}
 .dname{font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#111}
 .ddate{font-size:12px;font-weight:600;color:#555;margin-top:2px}
+th.garbage-day{background:#fdf0dc;border-bottom:2px solid #b8722a}
+.gtag{font-size:9px;font-weight:800;color:#8a4a10;letter-spacing:.06em;margin-top:3px}
 
 /* Section label cell */
 .sec-lbl{font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;text-align:center;vertical-align:middle;padding:6px 3px;border:1px solid #ccc;border-bottom:2px solid #999}
