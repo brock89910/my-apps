@@ -2382,6 +2382,39 @@ function checkDoubleCooldown(all,slotMins,excludeId) {
   return 'ok';
 }
 
+/* ── GRILL ROTATION — round-robin 1→2→3→4→1..., derived from today's data
+   so it survives refreshes and works the same for every staff member.
+   "Opened" = the first slot time a grill got its first party of the day. ── */
+function getGrillOpenOrderToday(dateStr, slotMinsLimit, excludeId) {
+  const all = getAllResForDate(dateStr).filter(r=>!excludeId||r.id!==excludeId);
+  const firstUse = {};
+  for (const r of all) {
+    const t = timeToMinutes(r.slot);
+    if (t > slotMinsLimit) continue; // only grills already open by this slot set the rotation
+    for (const g of grillsUsedByRes(r)) {
+      const gn = Number(g);
+      if (firstUse[gn] === undefined || t < firstUse[gn]) firstUse[gn] = t;
+    }
+  }
+  return Object.entries(firstUse)
+    .sort((a, b) => a[1] - b[1])
+    .map(([g]) => Number(g));
+}
+
+function nextGrillRotationOrder(dateStr, slotMins, excludeId) {
+  const opened = getGrillOpenOrderToday(dateStr, slotMins, excludeId);
+  const lastOpened = opened.length ? opened[opened.length - 1] : 0;
+  const order = [];
+  for (let i = 1; i <= 4; i++) order.push(((lastOpened + i - 1) % 4) + 1);
+  return order;
+}
+
+function nextGrillPairOrder(dateStr, slotMins, excludeId) {
+  const rotation = nextGrillRotationOrder(dateStr, slotMins, excludeId);
+  const startsWithLowPair = rotation[0] === 1 || rotation[0] === 2;
+  return startsWithLowPair ? [[1,2],[3,4]] : [[3,4],[1,2]];
+}
+
 function autoAssignGrill(dateStr,slot,guests,chefs,excludeId) {
   const slotMins=timeToMinutes(slot);
   const all=getAllResForDate(dateStr).filter(r=>!excludeId||r.id!==excludeId);
@@ -2391,9 +2424,12 @@ function autoAssignGrill(dateStr,slot,guests,chefs,excludeId) {
     if (freeChefsAtSlot<2) return null;
     const cooldown=checkDoubleCooldown(all,slotMins,excludeId);
     if (cooldown==='blocked') return null;
-    const bookingsAtSlot=all.filter(r=>timeToMinutes(r.slot)===slotMins);
-    if (bookingsAtSlot.length>0) return null;
-    for (const [g1,g2] of GRILL_PAIRS) {
+    // NOTE: previously also rejected if ANY reservation existed at this exact
+    // slot anywhere in the restaurant, regardless of which grills it used.
+    // Removed — grill and chef availability are checked per-pair below, which
+    // is the only thing that should ever gate a double booking.
+    const pairOrder=nextGrillPairOrder(dateStr,slotMins,excludeId);
+    for (const [g1,g2] of pairOrder) {
       const b1=isGrillBlockedExcluding(dateStr,g1,slotMins,excludeId);
       const b2=isGrillBlockedExcluding(dateStr,g2,slotMins,excludeId);
       if (b1&&b1.reason!=='tight') continue;
@@ -2403,8 +2439,6 @@ function autoAssignGrill(dateStr,slot,guests,chefs,excludeId) {
     }
     return null;
   }
-  const doubleAtSlot=all.some(r=>timeToMinutes(r.slot)===slotMins&&(r.grill2||(r.guests||0)>=DOUBLE_GRILL_MIN_GUESTS));
-  const effectiveFreeChefs=doubleAtSlot?1:freeChefsAtSlot;
   const grillState=[];
   for (let g=1;g<=4;g++) {
     const blocked=isGrillBlockedExcluding(dateStr,g,slotMins,excludeId);
@@ -2419,7 +2453,11 @@ function autoAssignGrill(dateStr,slot,guests,chefs,excludeId) {
     grillState.push({g,blocked:isHardBlocked,isTight,chefBusy,hasDouble,groups,totalGuests,cap,room});
   }
   const grillsOpenedAtSlot=new Set(all.filter(r=>timeToMinutes(r.slot)===slotMins).flatMap(r=>grillsUsedByRes(r))).size;
-  const canOpenMoreGrills=grillsOpenedAtSlot<effectiveFreeChefs;
+  // Previously hardcoded to 1 free chef whenever any double was running at this
+  // slot, ignoring the real chef schedule. freeChefsAtSlot is already derived
+  // from CHEF_SCHEDULE and correctly accounts for chefs a double is using
+  // (each grill a double occupies is already marked committed), so use it directly.
+  const canOpenMoreGrills=grillsOpenedAtSlot<freeChefsAtSlot;
 
   // FIRST: try adding to an already-open grill (chef already there — always allowed)
 
@@ -2428,10 +2466,13 @@ function autoAssignGrill(dateStr,slot,guests,chefs,excludeId) {
     if (state.groups.length===0) continue; // grill not yet open at this slot
     if (state.room>=guests) return {grill:state.g,isDouble:false,tightTiming:state.isTight};
   }
-  // SECOND: try opening a new grill (requires a free chef)
+  // SECOND: try opening a new grill (requires a free chef), in round-robin order
   if (freeChefsAtSlot<1) return null; // no free chef to open a new grill
   if (canOpenMoreGrills) {
-    for (const state of grillState) {
+    const rotation=nextGrillRotationOrder(dateStr,slotMins,excludeId);
+    for (const g of rotation) {
+      const state=grillState.find(s=>s.g===g);
+      if (!state) continue;
       if (state.blocked||state.hasDouble||state.chefBusy) continue;
       if (state.groups.length>0) continue;
       if (getSingleGrillCap(0)>=guests) return {grill:state.g,isDouble:false,tightTiming:state.isTight};
