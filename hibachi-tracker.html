@@ -2459,10 +2459,15 @@ function autoAssignGrill(dateStr,slot,guests,chefs,excludeId) {
   // (each grill a double occupies is already marked committed), so use it directly.
   const canOpenMoreGrills=grillsOpenedAtSlot<freeChefsAtSlot;
 
-  // FIRST: try adding to an already-open grill (chef already there — always allowed)
-
+  // FIRST: try adding to an already-open grill (chef already there — always allowed).
+  // NOTE: deliberately ignores state.blocked here. "blocked" is computed from a
+  // DIFFERENT slot's booking on this same physical grill (still within its 90–120
+  // min hold window) — it exists to stop OPENING a fresh assignment on a grill
+  // that's still occupied. But state.groups.length>0 already proves this grill has
+  // real, current occupants at THIS exact slot — i.e. it already turned over —
+  // so a stale block echoing from an earlier/later slot must not veto adding to it.
   for (const state of grillState) {
-    if (state.blocked||state.hasDouble) continue;
+    if (state.hasDouble) continue;
     if (state.groups.length===0) continue; // grill not yet open at this slot
     if (state.room>=guests) return {grill:state.g,isDouble:false,tightTiming:state.isTight};
   }
