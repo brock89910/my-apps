@@ -4819,8 +4819,8 @@ const MANAGER_PIN_HASH_A='ed6757a399e37c0d2187b60c621deb5b4a152dc0a933a4d6135940
 const MANAGER_PIN_HASH_B='0bc0cfbf5519843daa9883b48fc41cc40a56ae51cc0b8f473084e31324cd6f18'; // nathanongame
 const BYPASS_LOCKOUT_HASH='168e204ed507530307d8ad02e65708a126e58979d0251b04e64b62100c6539cd'; // Funorange34 — bypass lockout only
 
-const LOGIN_MAX_ATTEMPTS = 3;
-const LOGIN_LOCKOUT_MS   = 60 * 60 * 1000; // 1 hour
+const LOGIN_MAX_ATTEMPTS = 5;
+const LOGIN_LOCKOUT_MS   = 60 * 1000; // 1 minute
 const LOGIN_STORAGE_KEY  = 'osaka_login_lock';
 
 function getLockState() {
@@ -4844,10 +4844,10 @@ function isLockedOut() {
   return s.lockedUntil && Date.now() < s.lockedUntil;
 }
 
-function getRemainingLockMinutes() {
+function getRemainingLockSeconds() {
   const s = getLockState();
   if (!s.lockedUntil) return 0;
-  return Math.ceil((s.lockedUntil - Date.now()) / 60000);
+  return Math.max(0, Math.ceil((s.lockedUntil - Date.now()) / 1000));
 }
 
 function recordFailedAttempt() {
@@ -4866,14 +4866,14 @@ function updateLockoutUI() {
   const err = document.getElementById('staffPinErr');
   if (!pin || !err) return;
   if (isLockedOut()) {
-    const mins = getRemainingLockMinutes();
+    const secs = getRemainingLockSeconds();
     pin.disabled = true;
     pin.placeholder = 'Device locked';
     if (btn) btn.disabled = true;
-    err.textContent = '⚠ Too many attempts — locked for ' + mins + ' min' + (mins !== 1 ? 's' : '');
+    err.textContent = '⚠ Too many attempts — locked for ' + secs + ' second' + (secs !== 1 ? 's' : '');
     err.style.color = '#e04040';
-    // Tick every 30s to update the countdown
-    setTimeout(updateLockoutUI, 30000);
+    // Tick every second to update the countdown
+    setTimeout(updateLockoutUI, 1000);
   } else if (getLockState().lockedUntil && Date.now() >= getLockState().lockedUntil) {
     // Lock just expired — clear it
     clearLockState();
