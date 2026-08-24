@@ -751,6 +751,11 @@ body::before {
   white-space: nowrap; letter-spacing: 0.04em;
 }
 
+/* Calendar/week-strip day marker for a date with an unfinished draft */
+.cal-day-draft {
+  animation: draftPulse 1.5s ease-in-out infinite;
+}
+
 /* ── SLOT CAP WIDGET ── */
 .cap-bar-wrap {
   height: 2px; background: var(--bg); border-radius: 2px; margin-top: 2px;
@@ -1786,11 +1791,17 @@ function renderCalGrid() {
     const isSel=thisKey===selKey, isToday=thisKey===todayKey, isInWeek=weekKeys.has(thisKey);
     const cacheEntry=weekDataCache[thisKey];
     const isAlert=!isSel&&(cacheEntry?.hasLargeGroup15||cacheEntry?.hasManyDining);
+    const draftsToday=activeDraftsByDate[thisKey];
+    const hasDraft=!!(draftsToday&&draftsToday.length);
     const cell = document.createElement('div');
     cell.style.cssText='display:flex;flex-direction:column;align-items:center;gap:1px;';
     const btn = document.createElement('button');
-    btn.style.cssText=`width:100%;padding:5px 2px 3px;border-radius:5px;border:none;cursor:pointer;font-family:var(--mono);font-size:0.72rem;font-weight:${isSel||isAlert?'700':'400'};background:${isSel?'var(--gold)':isAlert?'#f0f0f0':isToday?'rgba(196,158,84,0.14)':isInWeek?'rgba(196,158,84,0.05)':'transparent'};color:${isSel?'var(--bg)':isAlert?'#111':isToday?'var(--gold)':'var(--text)'};border:1px solid ${isSel?'var(--gold)':isAlert?'#999':isToday?'rgba(200,150,42,0.3)':isInWeek?'rgba(196,158,84,0.12)':'transparent'};`;
+    btn.style.cssText=`width:100%;padding:5px 2px 3px;border-radius:5px;border:none;cursor:pointer;font-family:var(--mono);font-size:0.72rem;font-weight:${isSel||isAlert||hasDraft?'700':'400'};background:${isSel?'var(--gold)':hasDraft?'rgba(42,143,224,0.16)':isAlert?'#f0f0f0':isToday?'rgba(196,158,84,0.14)':isInWeek?'rgba(196,158,84,0.05)':'transparent'};color:${isSel?'var(--bg)':hasDraft?'#2a8fe0':isAlert?'#111':isToday?'var(--gold)':'var(--text)'};border:1px solid ${isSel?'var(--gold)':hasDraft?'#2a8fe0':isAlert?'#999':isToday?'rgba(200,150,42,0.3)':isInWeek?'rgba(196,158,84,0.12)':'transparent'};`;
     btn.textContent=d;
+    if (hasDraft) {
+      btn.classList.add('cal-day-draft');
+      btn.title='Unfinished reservation: '+draftsToday.map(x=>(x.name||'(no name yet)')+' · '+(x.guests||'?')+'p').join(', ');
+    }
     btn.onclick=()=>pickDate(thisKey);
     cell.appendChild(btn);
     if (isInWeek && cacheEntry?.bookings>0) {
@@ -2601,16 +2612,22 @@ function renderWeekStrip() {
     const cache=weekDataCache[dk]||{};
     const isAlert=!isSel&&(cache.hasLargeGroup15||cache.hasManyDining);
     const na=cache.hasOverride||cache.hasLargeGroup;
+    const draftsToday=activeDraftsByDate[dk];
+    const hasDraft=!!(draftsToday&&draftsToday.length);
     const cell=document.createElement('button');
-    cell.style.cssText=`display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 10px;border-radius:8px;border:1px solid;cursor:pointer;min-width:48px;background:${isSel?'var(--gold)':isAlert?'#f0f0f0':isToday?'rgba(196,158,84,0.14)':'transparent'};border-color:${isSel?'var(--gold)':isAlert?'#999':isToday?'rgba(196,158,84,0.4)':'var(--border)'};transition:all 0.15s;`;
+    cell.style.cssText=`display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 10px;border-radius:8px;border:1px solid;cursor:pointer;min-width:48px;background:${isSel?'var(--gold)':hasDraft?'rgba(42,143,224,0.16)':isAlert?'#f0f0f0':isToday?'rgba(196,158,84,0.14)':'transparent'};border-color:${isSel?'var(--gold)':hasDraft?'#2a8fe0':isAlert?'#999':isToday?'rgba(196,158,84,0.4)':'var(--border)'};transition:all 0.15s;`;
+    if (hasDraft) {
+      cell.classList.add('cal-day-draft');
+      cell.title='Unfinished reservation: '+draftsToday.map(x=>(x.name||'(no name yet)')+' · '+(x.guests||'?')+'p').join(', ');
+    }
     const dl=document.createElement('div');
-    dl.style.cssText=`font-family:var(--mono);font-size:0.65rem;font-weight:700;letter-spacing:0.06em;color:${isSel?'var(--bg)':isAlert?'#111':isToday?'var(--gold)':'var(--text2)'}`;
+    dl.style.cssText=`font-family:var(--mono);font-size:0.65rem;font-weight:700;letter-spacing:0.06em;color:${isSel?'var(--bg)':hasDraft?'#2a8fe0':isAlert?'#111':isToday?'var(--gold)':'var(--text2)'}`;
     dl.textContent=label;
     const dd=document.createElement('div');
-    dd.style.cssText=`font-family:var(--serif);font-size:1.1rem;font-weight:${isSel||isToday||isAlert?'700':'500'};color:${isSel?'var(--bg)':isAlert?'#111':isToday?'var(--gold)':'var(--text)'}`;
+    dd.style.cssText=`font-family:var(--serif);font-size:1.1rem;font-weight:${isSel||isToday||isAlert||hasDraft?'700':'500'};color:${isSel?'var(--bg)':hasDraft?'#2a8fe0':isAlert?'#111':isToday?'var(--gold)':'var(--text)'}`;
     dd.textContent=d.getDate();
     const gl=document.createElement('div');
-    gl.style.cssText='font-family:var(--mono);font-size:0.72rem;font-weight:700;margin-top:2px;color:'+(isSel?'rgba(17,16,16,0.85)':isAlert?'#111':'var(--gold-light)');
+    gl.style.cssText='font-family:var(--mono);font-size:0.72rem;font-weight:700;margin-top:2px;color:'+(isSel?'rgba(17,16,16,0.85)':hasDraft?'#2a8fe0':isAlert?'#111':'var(--gold-light)');
     if (hasBkg && (isManager() || isToday || isSel)) {
       // Manager: always show tally. Staff: only today + selected day
       gl.innerHTML=guests+'p'+(na?'<span style="color:#e04040"> !</span>':'');
@@ -3561,6 +3578,7 @@ async function deleteResFromChooser(dk, id) {
   try {
     await logAudit('delete',(r?.name||'?')+' · '+(r?.guests||'?')+'p · '+displayTime(r?.slot||'00:00'),initials);
     await safeWrite(window._ref(window._db,`reservations/${dk}/${id}`),null,'remove');
+    if (r?.isDraft && window._db) { try { await window._remove(window._ref(window._db, `activeDrafts/${id}`)); } catch(e2) {} }
     closeModal();
   } catch(e) { _editErr('Error: '+e.message); }
 }
@@ -3579,6 +3597,30 @@ async function deleteResFromChooser(dk, id) {
 const DRAFT_POINTER_KEY = 'osaka_active_draft';
 const DRAFT_STALE_MS = 30 * 60 * 1000; // 30 min untouched = treated as abandoned
 
+// Lightweight global index of every currently-open draft, keyed by date, so
+// the calendar/week strip can flag "there's an unfinished reservation this
+// month" without scanning every day's reservations node.
+let activeDraftsByDate = {};
+let fbActiveDraftsListener = null;
+
+function subscribeActiveDrafts() {
+  if (!window._db) return;
+  if (fbActiveDraftsListener) fbActiveDraftsListener();
+  fbActiveDraftsListener = window._onValue(window._ref(window._db, 'activeDrafts'), snap => {
+    const data = snap.val() || {};
+    const byDate = {};
+    Object.values(data).forEach(d => {
+      if (!d || !d.date) return;
+      if (!byDate[d.date]) byDate[d.date] = [];
+      byDate[d.date].push(d);
+    });
+    activeDraftsByDate = byDate;
+    // Refresh whatever date-pickers are currently visible so the pulse is live
+    if (document.getElementById('calDropdown') && document.getElementById('calDropdown').style.display !== 'none') renderCalGrid();
+    renderWeekStrip();
+  });
+}
+
 function saveDraftPointer(dk, id) {
   try { localStorage.setItem(DRAFT_POINTER_KEY, JSON.stringify({ date: dk, id, ts: Date.now() })); } catch(e) {}
 }
@@ -3589,7 +3631,8 @@ function getDraftPointer() {
   try { return JSON.parse(localStorage.getItem(DRAFT_POINTER_KEY) || 'null'); } catch(e) { return null; }
 }
 
-// Writes/updates the current _sr working state as a live draft record.
+// Writes/updates the current _sr working state as a live draft record, and
+// mirrors a small pointer into activeDrafts/ so the calendar can flag the date.
 async function srSaveDraft() {
   if (!window._db) return; // best-effort — in-memory flow still continues
   const key = dateKey(currentDate);
@@ -3617,6 +3660,9 @@ async function srSaveDraft() {
       await window._set(window._ref(window._db, `reservations/${key}/${_sr.draftId}`), data);
     }
     saveDraftPointer(key, _sr.draftId);
+    await window._set(window._ref(window._db, `activeDrafts/${_sr.draftId}`), {
+      date: key, name: _sr.name || '', guests: _sr.guests || 0, slot: _sr.slot, updatedAt: Date.now()
+    });
   } catch(e) { console.warn('Draft autosave failed:', e.message); }
 }
 
@@ -3669,20 +3715,23 @@ async function resumeDraft(dk, id) {
 }
 
 // Removes drafts nobody ever finished (walked away, tablet died, etc.) so they
-// don't sit forever occupying a grill slot.
+// don't sit forever occupying a grill slot or pulsing on the calendar. Sweeps
+// every date that has an open draft, not just whatever day is on screen.
 async function cleanupStaleDrafts() {
   if (!window._db || appMode === 'guest') return;
-  const key = dateKey(currentDate);
-  const all = getAllResForDate(key);
   const now = Date.now();
-  for (const r of all) {
-    if (r.isDraft && r.draftUpdatedAt && (now - r.draftUpdatedAt) > DRAFT_STALE_MS) {
+  try {
+    const snap = await window._get(window._ref(window._db, 'activeDrafts'));
+    const data = snap.val() || {};
+    for (const [id, d] of Object.entries(data)) {
+      if (!d || !d.updatedAt || (now - d.updatedAt) <= DRAFT_STALE_MS) continue;
       try {
-        await window._remove(window._ref(window._db, `reservations/${key}/${r.id}`));
-        await logAudit('delete', 'AUTO-REMOVED abandoned draft — '+(r.name||'(unnamed)')+' · '+(r.guests||'?')+'p · '+displayTime(r.slot||'00:00'), 'AUTOSAVE');
+        await window._remove(window._ref(window._db, `reservations/${d.date}/${id}`));
+        await window._remove(window._ref(window._db, `activeDrafts/${id}`));
+        await logAudit('delete', 'AUTO-REMOVED abandoned draft — '+(d.name||'(unnamed)')+' · '+(d.guests||'?')+'p · '+displayTime(d.slot||'00:00'), 'AUTOSAVE');
       } catch(e) {}
     }
-  }
+  } catch(e) {}
 }
 setInterval(cleanupStaleDrafts, 5 * 60 * 1000);
 
@@ -4192,6 +4241,7 @@ async function srSave() {
     const grillStr=finalAssign.isDouble?'Grills '+finalAssign.grill+'+'+finalAssign.grill2:'Grill '+finalAssign.grill;
     await logAudit('create',_sr.name+' · '+_sr.guests+'p · '+displayTime(_sr.slot)+' · '+grillStr,initials);
     if (data.card) postToVault(key, newId, data);
+    if (_sr.draftId) { try { await window._remove(window._ref(window._db, `activeDrafts/${_sr.draftId}`)); } catch(e) {} }
     clearDraftPointer();
     closeModal();
   } catch(e) {
@@ -4235,6 +4285,7 @@ async function quickDeleteConfirm(dk, id) {
   try {
     await logAudit('delete', (r?.name||'?') + ' · ' + (r?.guests||'?') + 'p · ' + displayTime(r?.slot||'00:00'), initials);
     await safeWrite(window._ref(window._db, `reservations/${dk}/${id}`), null, 'remove');
+    if (r?.isDraft && window._db) { try { await window._remove(window._ref(window._db, `activeDrafts/${id}`)); } catch(e2) {} }
     closeModal();
   } catch(e) { if(errEl) errEl.textContent = 'Error: ' + e.message; }
 }
@@ -5184,6 +5235,8 @@ function startApp() {
   if (window._startVaultSweep) window._startVaultSweep();
   // Resume any unfinished draft reservation left behind by a refresh/crash
   setTimeout(checkForAbandonedDraft, 1500);
+  // Live index of all open drafts across every date, for the calendar pulse marker
+  subscribeActiveDrafts();
 }
 
 function getDisplayName(resId,realName,dateStr) {
