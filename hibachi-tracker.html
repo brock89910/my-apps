@@ -730,6 +730,27 @@ body::before {
   white-space: nowrap;
 }
 
+/* ── DRAFT (IN-PROGRESS AUTOSAVE) — bright blue, pulsing ── */
+.res-row.is-draft-row {
+  border-left-color: #2a8fe0 !important;
+  background: rgba(42,143,224,0.10) !important;
+  animation: draftPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes draftPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(42,143,224,0.0); }
+  50%      { box-shadow: 0 0 0 4px rgba(42,143,224,0.30); }
+}
+
+.draft-badge {
+  font-family: var(--mono); font-size: 0.58rem; font-weight: 700;
+  padding: 1px 7px; border-radius: 10px;
+  background: rgba(42,143,224,0.18); color: #2a8fe0;
+  border: 1px solid rgba(42,143,224,0.55);
+  animation: draftPulse 1.5s ease-in-out infinite;
+  white-space: nowrap; letter-spacing: 0.04em;
+}
+
 /* ── SLOT CAP WIDGET ── */
 .cap-bar-wrap {
   height: 2px; background: var(--bg); border-radius: 2px; margin-top: 2px;
@@ -2914,12 +2935,14 @@ function renderTimeSlots() {
           if (isOverride) row.classList.add('is-override');
           if (isLargeGroup) row.classList.add('is-large-group');
           if (isConfirmed) row.classList.add('is-confirmed');
+          if (r.isDraft) row.classList.add('is-draft-row');
           row.innerHTML='<button class="confirm-btn'+(isConfirmed?' confirmed':'')+'" title="'+(isConfirmed?'Confirmed by '+escHtml(r.confirmedBy||'?'):'Confirm reservation')+'" onclick="event.stopPropagation();openConfirmModal(\''+key+'\',\''+r.id+'\')">'+(isConfirmed?'✓':'○')+'</button>'
             +'<div class="res-row-name"><span style="color:'+(isLargeGroup?'inherit':'var(--gold)')+';font-weight:700;margin-right:6px">'+(r.guests||'')+'p</span><span>'+escHtml(displayName)+'</span>'
             +(r.isDouble?' <span style="font-size:0.58rem;color:var(--amber)">×2</span>':'')
             +(isLargeGroup?' <span class="large-group-badge">⚡</span>':'')
             // override/changed badges hidden from staff view
             +(r.holdUntil?' <span style="font-size:0.56rem;color:var(--amber);font-weight:600;background:rgba(196,158,84,0.12);border:1px solid rgba(200,150,42,0.3);padding:1px 5px;border-radius:2px">HOLD</span>':'')
+            +(r.isDraft?' <span class="draft-badge">● SAVING…</span>':'')
             +(r.cardCaptured?' <span title="Card on file" style="font-size:0.6rem;color:var(--green);opacity:0.8">💳</span>':'')
             +(r.noteType==='allergy'?' <span class="note-badge allergy" title="'+escHtml(r.noteText||r.notes||'')+'">ALLERGY</span>':'')
             +(r.noteType==='restriction'?' <span class="note-badge restriction" title="'+escHtml(r.noteText||r.notes||'')+'">REST.</span>':'')
@@ -2965,8 +2988,13 @@ function renderDining() {
 /* ── HIBACHI MODAL ── */
 function openHibachiModal(slot, editId) {
   const key=dateKey(currentDate);
-  // Editing an existing reservation requires staff password + initials
-  if (editId) { openEditAuthModal(slot, editId); return; }
+  if (editId) {
+    const existing = (reservations[key]||{})[editId];
+    if (existing && existing.isDraft) { resumeDraft(key, editId); return; }
+    // Editing an existing reservation requires staff password + initials
+    openEditAuthModal(slot, editId);
+    return;
+  }
   // Manager uses original full-form modal; all other accounts use stepped flow
   if (isManager()) { _openHibachiModalInner(slot, null); return; }
   openSteppedModal(slot);
@@ -3538,6 +3566,127 @@ async function deleteResFromChooser(dk, id) {
 }
 
 /* ══════════════════════════════════════════════
+   DRAFT RESERVATION AUTOSAVE
+   Persists the in-progress stepped reservation to
+   Firebase after every completed field, so a frozen
+   tablet, refresh, or accidental close never loses
+   guest info already entered. Renders as a bright
+   blue pulsing row (.is-draft-row) until finalized.
+   Card number/expiry are NEVER included in the draft
+   — those are only ever written once, at final save,
+   exactly as before.
+   ══════════════════════════════════════════════ */
+const DRAFT_POINTER_KEY = 'osaka_active_draft';
+const DRAFT_STALE_MS = 30 * 60 * 1000; // 30 min untouched = treated as abandoned
+
+function saveDraftPointer(dk, id) {
+  try { localStorage.setItem(DRAFT_POINTER_KEY, JSON.stringify({ date: dk, id, ts: Date.now() })); } catch(e) {}
+}
+function clearDraftPointer() {
+  try { localStorage.removeItem(DRAFT_POINTER_KEY); } catch(e) {}
+}
+function getDraftPointer() {
+  try { return JSON.parse(localStorage.getItem(DRAFT_POINTER_KEY) || 'null'); } catch(e) { return null; }
+}
+
+// Writes/updates the current _sr working state as a live draft record.
+async function srSaveDraft() {
+  if (!window._db) return; // best-effort — in-memory flow still continues
+  const key = dateKey(currentDate);
+  const data = {
+    isDraft: true,
+    name: _sr.name || '',
+    guests: _sr.guests || 0,
+    phone: _sr.phone || '',
+    slot: _sr.slot,
+    grill: _sr.assign ? _sr.assign.grill : null,
+    grill2: _sr.assign ? (_sr.assign.grill2 || null) : null,
+    isDouble: _sr.assign ? (_sr.assign.isDouble || false) : false,
+    noteType: _sr.noteType || '',
+    noteText: _sr.noteText || '',
+    notes: _sr.noteText || '',
+    draftBy: _sr.initials || null,
+    draftUpdatedAt: Date.now(),
+    updatedAt: Date.now()
+  };
+  try {
+    if (!_sr.draftId) {
+      const pushRef = await window._push(window._ref(window._db, `reservations/${key}`), data);
+      _sr.draftId = pushRef.key;
+    } else {
+      await window._set(window._ref(window._db, `reservations/${key}/${_sr.draftId}`), data);
+    }
+    saveDraftPointer(key, _sr.draftId);
+  } catch(e) { console.warn('Draft autosave failed:', e.message); }
+}
+
+// On login, checks whether a draft was left behind (crash/refresh) and offers to resume it.
+async function checkForAbandonedDraft() {
+  const ptr = getDraftPointer();
+  if (!ptr || !window._db) return;
+  try {
+    const snap = await window._get(window._ref(window._db, `reservations/${ptr.date}/${ptr.id}`));
+    const r = snap.val();
+    if (!r || !r.isDraft) { clearDraftPointer(); return; }
+    const resume = confirm('An unfinished reservation was found:\n\n'
+      + (r.name || '(no name yet)') + ' · ' + (r.guests || '?') + 'p · ' + (r.slot ? displayTime(r.slot) : '?')
+      + '\n\nResume it now?');
+    if (resume) {
+      const [y,m,d] = ptr.date.split('-').map(Number);
+      currentDate = new Date(y, m-1, d); currentDate.setHours(0,0,0,0);
+      renderDateHeader();
+      subscribeToDate();
+      setTimeout(() => resumeDraft(ptr.date, ptr.id), 400);
+    } else {
+      clearDraftPointer();
+    }
+  } catch(e) { clearDraftPointer(); }
+}
+
+// Reopens the stepped flow at the first incomplete field, using whatever was already saved.
+async function resumeDraft(dk, id) {
+  let r = (reservations[dk] || {})[id];
+  if (!r && window._db) {
+    try { const snap = await window._get(window._ref(window._db, `reservations/${dk}/${id}`)); r = snap.val(); } catch(e) {}
+  }
+  if (!r) { alert('That draft could not be found — it may have already been completed or removed.'); return; }
+  const dow = new Date(dk+'T00:00:00').getDay();
+  _sr = {
+    slot: r.slot, dow, slotMins: timeToMinutes(r.slot),
+    chefs: getChefsAtTime(dow, timeToMinutes(r.slot)),
+    needCard: cardRequired(r.guests||0, dk),
+    guests: r.guests || 0, name: r.name || '', phone: r.phone || '',
+    card: '', expiry: '', initials: '',
+    noteType: r.noteType || '', noteText: r.noteText || '',
+    assign: { grill: r.grill, grill2: r.grill2 || null, isDouble: r.isDouble || false },
+    draftId: id
+  };
+  if (!_sr.guests) return _srStep1();
+  if (!_sr.name)   return _srStep2();
+  if (!_sr.phone)  return _srStep3();
+  if (_sr.needCard) return _srStep4();
+  return _srStep6();
+}
+
+// Removes drafts nobody ever finished (walked away, tablet died, etc.) so they
+// don't sit forever occupying a grill slot.
+async function cleanupStaleDrafts() {
+  if (!window._db || appMode === 'guest') return;
+  const key = dateKey(currentDate);
+  const all = getAllResForDate(key);
+  const now = Date.now();
+  for (const r of all) {
+    if (r.isDraft && r.draftUpdatedAt && (now - r.draftUpdatedAt) > DRAFT_STALE_MS) {
+      try {
+        await window._remove(window._ref(window._db, `reservations/${key}/${r.id}`));
+        await logAudit('delete', 'AUTO-REMOVED abandoned draft — '+(r.name||'(unnamed)')+' · '+(r.guests||'?')+'p · '+displayTime(r.slot||'00:00'), 'AUTOSAVE');
+      } catch(e) {}
+    }
+  }
+}
+setInterval(cleanupStaleDrafts, 5 * 60 * 1000);
+
+/* ══════════════════════════════════════════════
    STEPPED RESERVATION FLOW — staff2 mode
    State held in _sr (stepped reservation) object
    ══════════════════════════════════════════════ */
@@ -3589,7 +3738,7 @@ function openSteppedModal(slot) {
   const chefs = getChefsAtTime(dow, slotMins);
   _sr = { slot, dow, slotMins, chefs, needCard: false,
           guests:0, name:'', phone:'', card:'', expiry:'', initials:'',
-          noteType:'', noteText:'' };
+          noteType:'', noteText:'', draftId:null };
   _srStep1();
 }
 
@@ -3634,7 +3783,7 @@ async function srNext1() {
   }
   // Check grill availability
   const key=dateKey(currentDate);
-  const assign=autoAssignGrill(key,_sr.slot,g,_sr.chefs,undefined);
+  const assign=autoAssignGrill(key,_sr.slot,g,_sr.chefs,_sr.draftId||undefined);
   if (!assign) {
     // No automatic availability — show override option (staff pw required)
     _srShowOverride(g);
@@ -3643,6 +3792,7 @@ async function srNext1() {
   _sr.guests=g;
   _sr.assign=assign;
   _sr.needCard=cardRequired(g,key);
+  await srSaveDraft();
   _srStep2();
 }
 
@@ -3694,6 +3844,7 @@ async function srApplyOverride(g) {
   _sr.isOverride=true;
   _sr.needCard=cardRequired(g,key);
   document.getElementById('srOverrideBlock')?.remove();
+  await srSaveDraft();
   _srStep2();
 }
 
@@ -3733,7 +3884,7 @@ async function submitForceAdd(slot) {
   const chefs = getChefsAtTime(dow, slotMins);
   _sr = { slot, dow, slotMins, chefs, needCard: false,
           guests:0, name:'', phone:'', card:'', expiry:'', initials:'',
-          noteType:'', noteText:'', forceOverride: true };
+          noteType:'', noteText:'', forceOverride: true, draftId:null };
   _srStep1Force();
 }
 
@@ -3754,7 +3905,7 @@ function _srStep1Force() {
   setTimeout(() => document.getElementById('srGuests')?.focus(), 80);
 }
 
-function srNext1Force() {
+async function srNext1Force() {
   const g = sanitizeGuests(document.getElementById('srGuests')?.value);
   if (!g || g < 1) return _srErr('Enter the number of guests.');
   const key = dateKey(currentDate);
@@ -3764,6 +3915,7 @@ function srNext1Force() {
   _sr.assign = { grill: 1, grill2: isDouble ? 2 : null, isDouble, overrideBooked: true };
   _sr.isOverride = true;
   _sr.needCard = cardRequired(g, key);
+  await srSaveDraft();
   _srStep2();
 }
 
@@ -3791,10 +3943,11 @@ function _srStep2() {
   setTimeout(()=>document.getElementById('srName')?.focus(),80);
 }
 
-function srNext2() {
+async function srNext2() {
   const n=sanitizeText(document.getElementById('srName')?.value,80);
   if (!n) return _srErr('Guest name is required.');
   _sr.name=n;
+  await srSaveDraft();
   _srStep3();
 }
 
@@ -3823,11 +3976,12 @@ function _srStep3() {
   setTimeout(()=>document.getElementById('srPhone')?.focus(),80);
 }
 
-function srNext3() {
+async function srNext3() {
   const raw=document.getElementById('srPhone')?.value.replace(/\D/g,'')||'';
   if (!raw||( raw.length!==7&&raw.length!==10)) return _srErr('Phone must be 7 digits (local) or 10 digits (with area code).');
   _sr.phoneRaw=raw;
   _sr.phone=raw.length===10?'('+raw.slice(0,3)+') '+raw.slice(3,6)+'-'+raw.slice(6):raw.slice(0,3)+'-'+raw.slice(3);
+  await srSaveDraft();
   if (_sr.needCard) { _srStep4(); } else { _srStep6(); }
 }
 
@@ -3932,10 +4086,11 @@ function _srStep6() {
   setTimeout(()=>document.getElementById('srInitials')?.focus(),80);
 }
 
-function srNext6() {
+async function srNext6() {
   const initials=sanitizeInitials(document.getElementById('srInitials')?.value||'');
   if (!initials) return _srErr('Your initials are required.');
   _sr.initials=initials;
+  await srSaveDraft();
   _srStep7();
 }
 
@@ -3999,7 +4154,7 @@ async function srSave() {
   // Use stored assign — re-verify only if not a manual override
   let finalAssign=_sr.assign;
   if (!_sr.isOverride) {
-    const freshAssign=autoAssignGrill(key,_sr.slot,_sr.guests,_sr.chefs,undefined);
+    const freshAssign=autoAssignGrill(key,_sr.slot,_sr.guests,_sr.chefs,_sr.draftId||undefined);
     if (!freshAssign) return _srErr('⚠ This slot was just filled. Please go back and choose another time.');
     finalAssign=freshAssign;
   }
@@ -4009,7 +4164,8 @@ async function srSave() {
     initials:_sr.initials, bookedOn:new Date().toISOString().slice(0,10),
     notes:_sr.noteText, noteType:_sr.noteType, noteText:_sr.noteText,
     slot:_sr.slot, grill:finalAssign.grill, grill2:finalAssign.grill2||null,
-    isDouble:finalAssign.isDouble||false, updatedAt:Date.now()
+    isDouble:finalAssign.isDouble||false, updatedAt:Date.now(),
+    isDraft:false, draftUpdatedAt:null, draftBy:null
   };
   if (_sr.isOverride) { data.overrideBooked=true; data.managerOverride=true; data.overrideType='too-many'; }
 
@@ -4019,15 +4175,29 @@ async function srSave() {
     data.holdUntil=dateKey(holdUntilDate);
   }
 
-  if (!window._db||!window._ref||!window._push) return _srErr('Firebase not ready. Please wait and try again.');
+  if (!window._db||!window._ref) return _srErr('Firebase not ready. Please wait and try again.');
+
+  // Submit-lock — prevents a stuck/laggy tap from firing this save multiple times
+  const _saveBtn=document.querySelector('#modalBody .btn-gold');
+  if (_saveBtn) { if (_saveBtn.dataset.locked==='1') return; _saveBtn.dataset.locked='1'; _saveBtn.style.opacity='0.6'; }
+
   try {
-    const pushRef = await window._push(window._ref(window._db,`reservations/${key}`),data);
-    const newId = pushRef.key;
+    let newId=_sr.draftId;
+    if (newId) {
+      await window._set(window._ref(window._db,`reservations/${key}/${newId}`),data);
+    } else {
+      const pushRef = await window._push(window._ref(window._db,`reservations/${key}`),data);
+      newId = pushRef.key;
+    }
     const grillStr=finalAssign.isDouble?'Grills '+finalAssign.grill+'+'+finalAssign.grill2:'Grill '+finalAssign.grill;
     await logAudit('create',_sr.name+' · '+_sr.guests+'p · '+displayTime(_sr.slot)+' · '+grillStr,initials);
     if (data.card) postToVault(key, newId, data);
+    clearDraftPointer();
     closeModal();
-  } catch(e) { _srErr('Error saving: '+e.message); }
+  } catch(e) {
+    if (_saveBtn) { _saveBtn.dataset.locked=''; _saveBtn.style.opacity=''; }
+    _srErr('Error saving: '+e.message);
+  }
 }
 
 
@@ -4542,7 +4712,7 @@ function closeModal() {
   _editorInitials = '';
   _efTightConfirmed = false;
 }
-function closeModalIfOutside(e) { if (e.target.id==='modalOverlay') closeModal(); }
+function closeModalIfOutside(e) { /* dead-zone tap is intentionally inert — close only via the ✕ button */ }
 
 async function moveReservation() {
   const me = document.getElementById('moveErr');
@@ -5012,6 +5182,8 @@ function startApp() {
   if (window._startSheetSyncInterval) window._startSheetSyncInterval();
   // Start 5-minute vault sweep (catches any cards that failed to vault on save)
   if (window._startVaultSweep) window._startVaultSweep();
+  // Resume any unfinished draft reservation left behind by a refresh/crash
+  setTimeout(checkForAbandonedDraft, 1500);
 }
 
 function getDisplayName(resId,realName,dateStr) {
