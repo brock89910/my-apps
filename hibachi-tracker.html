@@ -1695,6 +1695,61 @@ let chefDayOverrideData = {}; // dk -> {removedAt, initials} for banner display
 let fbChefOverrideListener = null;
 let exportUnlocked = false;
 
+/* ── NAV RACE DIAGNOSTICS ──
+   Detects/logs the "header moved but content didn't" bug: a new day-nav
+   firing before the previous date's Firebase snapshot has landed. Self-
+   reports to Firebase so it can be reviewed after the fact — no need to
+   catch it live on a tablet. Also self-heals by discarding any stale
+   snapshot that lands after a newer nav has already superseded it. */
+let navGen = 0;
+let pendingNavKey = null, pendingNavSince = null;
+let navRingBuffer = []; // last ~15 nav events, for context on any diagnostic push
+
+function getDeviceId() {
+  try {
+    let id = localStorage.getItem('hb_deviceId');
+    if (!id) { id = 'dev_' + Math.random().toString(36).slice(2, 10); localStorage.setItem('hb_deviceId', id); }
+    return id;
+  } catch (e) { return 'dev_unknown'; }
+}
+
+function navRingPush(entry) {
+  navRingBuffer.push(Object.assign({ ts: Date.now() }, entry));
+  if (navRingBuffer.length > 15) navRingBuffer.shift();
+}
+
+async function logNavRace(type, details) {
+  navRingPush({ type: 'DIAGNOSTIC_' + type, details });
+  const payload = {
+    type, ts: Date.now(), deviceId: getDeviceId(), ua: navigator.userAgent,
+    appMode: appMode, details: details || null, ring: navRingBuffer.slice()
+  };
+  if (window._db) {
+    try { await window._push(window._ref(window._db, 'diagnostics/navRace'), payload); } catch (e) {}
+  }
+  // Also send to the Apps Script sheet (same webhook used for the card vault),
+  // so this can be reviewed in a plain Google Sheet tab instead of Firebase console.
+  try {
+    const sheetUrl = localStorage.getItem('appsScriptUrl');
+    if (sheetUrl && sheetUrl.startsWith('https://script.google.com')) {
+      fetch(sheetUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ type: 'diagnostic', kind: 'navRace', diagType: type, payload })
+      }).catch(function(){});
+    }
+  } catch (e) {}
+}
+
+// Call at the TOP of changeDay()/pickDate(), before currentDate is reassigned.
+function navRaceCheckBeforeNav(fromKey, toKey) {
+  navRingPush({ type: 'navStart', fromKey, toKey });
+  if (pendingNavKey && pendingNavSince && pendingNavKey !== toKey) {
+    const gapMs = Date.now() - pendingNavSince;
+    logNavRace('overlapNav', { fromKey, toKey, stillWaitingOn: pendingNavKey, gapMs });
+  }
+}
+
 /* ── DATE UTILS ── */
 function dateKey(d) { const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
 
@@ -1748,7 +1803,10 @@ function generateTimeSlots(dow) {
 
 /* ── NAV ── */
 function changeDay(dir) {
+  const fromKey = dateKey(currentDate);
   currentDate = new Date(currentDate.getTime() + dir*86400000);
+  const toKey = dateKey(currentDate);
+  navRaceCheckBeforeNav(fromKey, toKey);
   renderDateHeader();
   subscribeToDate();
 }
@@ -1813,8 +1871,11 @@ function renderCalGrid() {
 
 function pickDate(val) {
   if (!val) return;
+  const fromKey = dateKey(currentDate);
   const [y,m,d]=val.split('-').map(Number);
   currentDate=new Date(y,m-1,d); currentDate.setHours(0,0,0,0);
+  const toKey = dateKey(currentDate);
+  navRaceCheckBeforeNav(fromKey, toKey);
   renderDateHeader();
   subscribeToDate();
   document.getElementById('calDropdown').style.display='none';
@@ -1881,8 +1942,19 @@ function subscribeToDate() {
   if (!window._db) return;
   const key = dateKey(currentDate);
   delete weekDataCache[key];
+  const myGen = ++navGen;
+  pendingNavKey = key; pendingNavSince = Date.now();
   if (fbListener) fbListener();
   fbListener=window._onValue(window._ref(window._db,`reservations/${key}`), snap=>{
+    // Guard: if a newer nav has fired since this listener was attached, this
+    // snapshot is stale/out-of-order — discard it instead of painting the
+    // wrong day, and self-report so it can be reviewed later.
+    if (myGen !== navGen) {
+      logNavRace('staleSnapshotDiscarded', { key, myGen, currentGen: navGen });
+      return;
+    }
+    if (pendingNavKey === key) { pendingNavSince = null; pendingNavKey = null; }
+    navRingPush({ type: 'snapshotLanded', key });
     reservations[key]=snap.val()||{}; scheduleRender();
   });
   if (fbDiningListener) fbDiningListener();
@@ -3678,8 +3750,10 @@ async function checkForAbandonedDraft() {
       + (r.name || '(no name yet)') + ' · ' + (r.guests || '?') + 'p · ' + (r.slot ? displayTime(r.slot) : '?')
       + '\n\nResume it now?');
     if (resume) {
+      const fromKey = dateKey(currentDate);
       const [y,m,d] = ptr.date.split('-').map(Number);
       currentDate = new Date(y, m-1, d); currentDate.setHours(0,0,0,0);
+      navRaceCheckBeforeNav(fromKey, dateKey(currentDate));
       renderDateHeader();
       subscribeToDate();
       setTimeout(() => resumeDraft(ptr.date, ptr.id), 400);
