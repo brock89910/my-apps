@@ -1718,14 +1718,14 @@ function navRingPush(entry) {
   if (navRingBuffer.length > 15) navRingBuffer.shift();
 }
 
-async function logNavRace(type, details) {
-  navRingPush({ type: 'DIAGNOSTIC_' + type, details });
+async function logDiagnostic(kind, type, details) {
+  navRingPush({ type: 'DIAGNOSTIC_' + kind + '_' + type, details });
   const payload = {
     type, ts: Date.now(), deviceId: getDeviceId(), ua: navigator.userAgent,
     appMode: appMode, details: details || null, ring: navRingBuffer.slice()
   };
   if (window._db) {
-    try { await window._push(window._ref(window._db, 'diagnostics/navRace'), payload); } catch (e) {}
+    try { await window._push(window._ref(window._db, 'diagnostics/' + kind), payload); } catch (e) {}
   }
   // Also send to the Apps Script sheet (same webhook used for the card vault),
   // so this can be reviewed in a plain Google Sheet tab instead of Firebase console.
@@ -1735,11 +1735,13 @@ async function logNavRace(type, details) {
       fetch(sheetUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ type: 'diagnostic', kind: 'navRace', diagType: type, payload })
+        body: JSON.stringify({ type: 'diagnostic', kind, diagType: type, payload })
       }).catch(function(){});
     }
   } catch (e) {}
 }
+// Back-compat alias — existing call sites for the date-nav race use this name.
+function logNavRace(type, details) { return logDiagnostic('navRace', type, details); }
 
 // Call at the TOP of changeDay()/pickDate(), before currentDate is reassigned.
 function navRaceCheckBeforeNav(fromKey, toKey) {
@@ -3506,6 +3508,7 @@ function _efCheckLargeGroup() {
 }
 
 // Save dispatcher — one focused write per field, never touching unrelated data.
+let _saveEditFieldMoveInFlight = false;
 async function saveEditField(field) {
   const key = dateKey(currentDate);
   const editId = _editingResId;
@@ -3573,15 +3576,24 @@ async function saveEditField(field) {
       if (!newSlot) return _editErr('No service available that day.');
       if (newDate===key && newSlot===r.slot) return _editErr('That matches the current date and time already.');
       if (!rateLimitCheck('write',20)) return _editErr('Too many actions too fast. Please wait a moment.');
-      const oldSnap=await window._get(window._ref(window._db,`reservations/${key}/${editId}`));
-      const guestData=oldSnap.val();
-      if (!guestData) { closeModal(); alert('Reservation not found — it may have been deleted.'); return; }
-      const updatedData=Object.assign({},guestData,{slot:newSlot,updatedAt:Date.now()});
-      await window._push(window._ref(window._db,`reservations/${newDate}`),updatedData);
-      await window._remove(window._ref(window._db,`reservations/${key}/${editId}`));
-      await logAudit('edit','MOVED — '+(guestData.name||'Guest')+' · '+(guestData.guests||'?')+'p · from '+key+' '+displayTime(r.slot)+' → '+newDate+' '+displayTime(newSlot),initials);
-      closeModal();
-      alert('✓ Reservation moved to '+newDate+' at '+displayTime(newSlot)+'.');
+      // Reentrancy guard: this branch pushes a NEW record at the destination
+      // and removes the old one — a double-tap here creates a duplicate at
+      // the new date, same failure mode as the Confirm Reservation bug.
+      if (_saveEditFieldMoveInFlight) return;
+      _saveEditFieldMoveInFlight = true;
+      try {
+        const oldSnap=await window._get(window._ref(window._db,`reservations/${key}/${editId}`));
+        const guestData=oldSnap.val();
+        if (!guestData) { closeModal(); alert('Reservation not found — it may have been deleted.'); return; }
+        const updatedData=Object.assign({},guestData,{slot:newSlot,updatedAt:Date.now()});
+        await window._push(window._ref(window._db,`reservations/${newDate}`),updatedData);
+        await window._remove(window._ref(window._db,`reservations/${key}/${editId}`));
+        await logAudit('edit','MOVED — '+(guestData.name||'Guest')+' · '+(guestData.guests||'?')+'p · from '+key+' '+displayTime(r.slot)+' → '+newDate+' '+displayTime(newSlot),initials);
+        closeModal();
+        alert('✓ Reservation moved to '+newDate+' at '+displayTime(newSlot)+'.');
+      } finally {
+        _saveEditFieldMoveInFlight = false;
+      }
 
     } else if (field==='name') {
       const name=sanitizeText(document.getElementById('efName').value,80);
@@ -4261,7 +4273,24 @@ function checkNoteWordLimit_sr() {
   if (words.length>10) { input.value=words.slice(0,10).join(' '); errEl.style.display='block'; setTimeout(()=>{errEl.style.display='none';},1800); }
 }
 
+let _srSaveInFlight = false;
 async function srSave() {
+  // Primary reentrancy guard — a plain top-level flag, checked and set
+  // synchronously before anything else. More robust than the DOM-attribute
+  // lock below, which depends on re-querying the same button node each call.
+  if (_srSaveInFlight) {
+    logDiagnostic('duplicateSubmit', 'blocked', { fn: 'srSave', name: _sr?.name||null, slot: _sr?.slot||null });
+    return;
+  }
+  _srSaveInFlight = true;
+  try {
+    return await _srSaveImpl();
+  } finally {
+    _srSaveInFlight = false;
+  }
+}
+
+async function _srSaveImpl() {
   // Initials already stored by srNext6() — srInitials input no longer exists on step 7
   const initials=_sr.initials||sanitizeInitials(document.getElementById('srInitials')?.value||'');
   if (!initials) return _srErr('Your initials are required.');
@@ -4531,7 +4560,26 @@ function showGrillAssignPreview(g,guests,existingGroups) {
   el.innerHTML='<span class="grill-assign-badge g'+g+'">'+grillLabel(g)+'</span>'+cn;
 }
 
+let _saveHibachiInFlight = false;
 async function saveHibachi(dk,editId) {
+  // Reentrancy lock: a frozen/laggy device can queue up two clicks on the
+  // Confirm button before the first write resolves. JS is single-threaded,
+  // so this flag is set synchronously before any `await` — the second call
+  // is guaranteed to see it and bail out immediately, before it can push a
+  // second duplicate reservation.
+  if (_saveHibachiInFlight) {
+    logDiagnostic('duplicateSubmit', 'blocked', { fn: 'saveHibachi', dk, editId: editId||null });
+    return;
+  }
+  _saveHibachiInFlight = true;
+  try {
+    return await _saveHibachiImpl(dk, editId);
+  } finally {
+    _saveHibachiInFlight = false;
+  }
+}
+
+async function _saveHibachiImpl(dk,editId) {
   const name    =sanitizeText(document.getElementById('fName').value, 80);
   const guests  =sanitizeGuests(document.getElementById('fGuests').value);
   const card    =document.getElementById('fCard')?.value.trim()||'';
@@ -4658,7 +4706,21 @@ async function saveHibachi(dk,editId) {
   } catch(e) { showErr('Firebase error: '+e.message); }
 }
 
+let _saveHibachiOverrideInFlight = false;
 async function saveHibachiOverride(dk,editId) {
+  if (_saveHibachiOverrideInFlight) {
+    logDiagnostic('duplicateSubmit', 'blocked', { fn: 'saveHibachiOverride', dk, editId: editId||null });
+    return;
+  }
+  _saveHibachiOverrideInFlight = true;
+  try {
+    return await _saveHibachiOverrideImpl(dk, editId);
+  } finally {
+    _saveHibachiOverrideInFlight = false;
+  }
+}
+
+async function _saveHibachiOverrideImpl(dk,editId) {
   const oeEl=document.getElementById('overrideErr');
   if (!isManager()) {
     const pwd=document.getElementById('overridePwd')?.value||'';
