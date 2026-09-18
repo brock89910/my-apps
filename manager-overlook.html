@@ -694,10 +694,9 @@ tr:hover td{background:rgba(232,160,32,.03)}
   <div class="pn" style="margin-top:0;border-top:none;border-radius:0 0 var(--r) var(--r)">
     <div class="pnh" style="margin-bottom:10px"><h3 style="font-size:.85rem">📊 Serving Hours — This Week</h3>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span class="ss-mode-note" style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3)">Based on actual clock-out data</span>
+        <span class="ss-mode-note" style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3)">Assumes every shift runs until 9:00pm</span>
         <div class="ss-mode-toggle">
-          <span class="ss-mode-btn on" data-mode="actual" onclick="setSSCloseMode('actual')">Actual</span>
-          <span class="ss-mode-btn" data-mode="nine" onclick="setSSCloseMode('nine')">Flat 9PM Close</span>
+          <span class="ss-mode-btn on" data-mode="nine" onclick="setSSCloseMode('nine')">Flat 9PM Close</span>
         </div>
       </div>
     </div>
@@ -977,10 +976,9 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <h3>Serving Staff Summary</h3>
 <p style="font-family:var(--font-mono);font-size:.62rem;color:var(--text3);margin-bottom:14px;text-transform:uppercase;letter-spacing:.07em">Total days & projected hours for serving staff — one week</p>
 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-  <span class="ss-mode-note" style="font-family:var(--font-mono);font-size:.62rem;color:var(--text3)">Based on actual clock-out data</span>
+  <span class="ss-mode-note" style="font-family:var(--font-mono);font-size:.62rem;color:var(--text3)">Assumes every shift runs until 9:00pm</span>
   <div class="ss-mode-toggle">
-    <span class="ss-mode-btn on" data-mode="actual" onclick="setSSCloseMode('actual')">Actual</span>
-    <span class="ss-mode-btn" data-mode="nine" onclick="setSSCloseMode('nine')">Flat 9PM Close</span>
+    <span class="ss-mode-btn on" data-mode="nine" onclick="setSSCloseMode('nine')">Flat 9PM Close</span>
   </div>
 </div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
@@ -3843,18 +3841,14 @@ window.downloadSchedulePng = function(){
   a.click();
 };
 
-// ── SHIFT HOURS — derived from actual clock-in/out data ──
-// DOW: 0=Mon,1=Tue,2=Wed,3=Thu,4=Fri,5=Sat,6=Sun
-// PM main (16:30–17:59): weekday→21:15, Fri→22:15, Sat→22:30, Sun→21:15
-// PM late (18:00+):      weekday→21:15, Fri→22:15, Sat→22:30, Sun→21:15
-// AM (<14:00) weekday:   out 14:00 (split) — flag unknown for Fri/Sat (can stay all day)
-// 11-2 slot:             always 3 hrs
-let ssCloseMode='actual'; // 'actual' = projected from real per-day clock-out data; 'nine' = flat 9:00pm close every day
+// ── SHIFT HOURS — flat 9:00pm close assumption for every shift, every day ──
+// 11-2 slot: always 3 hrs
+let ssCloseMode='nine'; // flat 9:00pm close every day (the only mode — "Actual" clock-out projection mode was removed)
 window.setSSCloseMode=function(mode){
   ssCloseMode=mode;
   document.querySelectorAll('.ss-mode-btn').forEach(b=>b.classList.toggle('on', b.dataset.mode===mode));
   document.querySelectorAll('.ss-mode-note').forEach(n=>{
-    n.textContent = mode==='nine' ? 'Assumes every shift runs until 9:00pm' : 'Based on actual clock-out data';
+    n.textContent='Assumes every shift runs until 9:00pm';
   });
   renderInlineServingSummary();
   if(document.getElementById('ss-week1')) renderServingSummary();
@@ -3862,10 +3856,6 @@ window.setSSCloseMode=function(mode){
 function ssShiftHours(timeStr, dayIdx, mode){
   mode = mode || ssCloseMode;
   const t=(timeStr||'').trim().toLowerCase();
-  const isFri=(dayIdx===4);
-  const isSat=(dayIdx===5);
-  const isSun=(dayIdx===6);
-  const isFriSat=isFri||isSat;
 
   // Named slots first
   if(t==='11-2'||t.startsWith('11-2')) return 3;
@@ -3890,38 +3880,12 @@ function ssShiftHours(timeStr, dayIdx, mode){
   }
 
   // ── FLAT 9PM CLOSE — every shift assumed to run until 21:00, every day, no day-of-week variation ──
-  if(mode==='nine'){
-    const ci=cinMin(t);
-    if(ci!==null){
-      const hrs=(21*60-ci)/60;
-      return Math.max(0.5, Math.round(hrs*4)/4); // round to nearest 0.25
-    }
-    return 3; // name-only fallback — flat 6–9 dinner shift
-  }
-
-  // ── ACTUAL CLOCK-OUT DATA (default) ──
-  // AM clock-ins (before 14:00): split shift structure
-  // Weekday AM → out ~14:00 = 3 hrs from 11
-  // Fri/Sat AM → unpredictable (could stay to close), use conservative 7 hrs
-  if(t==='11') return isFriSat ? 7 : 3;
-  if(t==='12') return isFriSat ? 6 : 2;
-
-  // PM clock-ins — use median clock-out from training data
-  // Close times: weekday≈21:15, Fri≈22:15, Sat≈22:30, Sun≈21:15
-  function closeMin(){ // returns close time in minutes from midnight
-    if(isFri) return 22*60+15;
-    if(isSat) return 22*60+30;
-    return 21*60+15; // Mon–Thu, Sun
-  }
-
   const ci=cinMin(t);
   if(ci!==null){
-    const hrs=(closeMin()-ci)/60;
+    const hrs=(21*60-ci)/60;
     return Math.max(0.5, Math.round(hrs*4)/4); // round to nearest 0.25
   }
-
-  // Fallback: name-only = standard PM dinner
-  return isFriSat ? 5 : 4;
+  return 3; // name-only fallback — flat 6–9 dinner shift
 }
 
 window.autoDetectSSRange=function(){
