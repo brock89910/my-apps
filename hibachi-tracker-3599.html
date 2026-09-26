@@ -1459,6 +1459,71 @@ body.ios-mode .btn-danger { background:var(--i-red-soft); border:0; border-radiu
 .i-toast { position:fixed; left:50%; bottom:calc(92px + env(safe-area-inset-bottom,0px)); transform:translate(-50%,20px); background:rgba(40,40,42,.94); color:#fff;
   padding:10px 16px; border-radius:12px; font-size:15px; opacity:0; pointer-events:none; transition:opacity .25s,transform .25s; z-index:600; max-width:88%; text-align:center; }
 .i-toast.on { opacity:1; transform:translate(-50%,0); }
+
+/* ── iOS v2: spacing fixes + full-screen focused booking steps ── */
+#iosApp button { padding:initial; }
+:where(#iosApp) button { padding:0; }
+.i-trow { padding:12px 16px !important; min-height:50px; }
+.i-trow + .i-trow::before { left:16px; }
+.i-item { padding:12px 16px !important; }
+.i-row { padding:10px 14px !important; }
+.i-day { padding:8px 0 7px !important; }
+.i-seg button { padding:0 !important; }
+.i-conf { padding:0 !important; }
+.i-pbtn, .i-cday, .i-calnav button, .i-stepper .ctl button { padding:0 !important; }
+.i-stepper .go { padding:6px 4px !important; }
+.i-caltoday { padding:8px 16px !important; }
+.i-fab, .i-tab { padding:0 !important; }
+.i-snav .l, .i-snav .r { padding:6px 0 !important; }
+.i-cap.full { background:var(--i-fill2); color:var(--i-label); }
+.i-stats { gap:10px; margin-bottom:20px; }
+.i-stat { padding:14px; }
+.i-stat b { font-size:28px; line-height:1.1; }
+.i-stat span { display:block; margin-top:2px; }
+.i-seg { margin-bottom:22px; }
+.i-shead { padding:0 4px 8px; }
+.i-slot { margin-bottom:26px; }
+.i-ghead { padding:2px 12px 7px; }
+.i-slot.double .i-ghead { padding-top:6px; }
+.i-legend { margin:-8px 4px 12px; }
+.i-tmcol { width:72px; gap:5px; }
+.i-ps { gap:4px; }
+
+/* full-screen booking sheet (date / party / time) */
+.i-sheet { height:100%; border-radius:0; box-shadow:none; }
+.i-grab { display:none; }
+.i-snav { height:52px; }
+
+/* existing modals become full-screen pages: nothing behind them */
+body.ios-mode .modal-overlay { background:var(--i-bg); animation:none; }
+body.ios-mode .modal-sheet { height:100%; max-height:100%; border-radius:0; box-shadow:none; max-width:640px; display:flex; flex-direction:column; animation:iSheetUp .32s cubic-bezier(.32,.72,0,1); }
+@keyframes iSheetUp { from{transform:translateY(24px);opacity:0} to{transform:none;opacity:1} }
+body.ios-mode .modal-handle { display:none; }
+body.ios-mode .modal-head { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; height:52px; padding:0 16px; flex:0 0 auto; }
+body.ios-mode .modal-title { grid-column:2; text-align:center; font-size:17px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:60vw; }
+body.ios-mode .modal-close { grid-column:3; justify-self:end; }
+#iosModalBack { grid-column:1; grid-row:1; justify-self:start; display:none; }
+body.ios-mode #iosModalBack { display:block; }
+body.ios-mode #iosModalBack .btn-outline { background:none !important; border:0 !important; padding:6px 0 !important; color:var(--i-accent) !important; font-size:17px !important; font-weight:400 !important; width:auto !important; flex:none !important; display:inline-flex; align-items:center; gap:4px; }
+body.ios-mode .modal-body { flex:1; overflow-y:auto; padding:8px 20px 32px; -webkit-overflow-scrolling:touch; }
+body.ios-mode .modal-body [style*="font-size:0.5"], body.ios-mode .modal-body [style*="font-size:0.6"] { font-size:13px !important; line-height:1.45 !important; }
+body.ios-mode .modal-body [style*="font-size:0.7"] { font-size:15px !important; }
+
+/* stepped reservation flow, tagged by iosDecorateModal() */
+body.ios-mode .i-sr-when { border:0 !important; padding:0 !important; margin:0 0 12px !important; gap:8px !important; }
+body.ios-mode .i-sr-when > div { font-family:var(--sans) !important; font-size:15px !important; font-weight:500 !important; color:var(--i-label2) !important; }
+body.ios-mode .i-sr-prog { gap:4px !important; margin:0 0 30px !important; }
+body.ios-mode .modal-body .i-sr-prog > div { font-size:0 !important; line-height:0 !important; overflow:hidden; height:4px; padding:0 !important; border:0 !important; border-radius:2px; background:var(--i-fill2); }
+body.ios-mode .modal-body .i-sr-prog > div[style*="solid var(--green)"], body.ios-mode .modal-body .i-sr-prog > div[style*="solid var(--gold)"] { background:var(--i-accent); }
+body.ios-mode .i-sr-sum { font-size:15px !important; color:var(--i-label2) !important; margin:0 0 6px !important; line-height:1.5 !important; }
+body.ios-mode .i-sr-sum * { font-size:15px !important; }
+body.ios-mode .i-sr-q { font-size:28px !important; font-weight:700 !important; color:var(--i-label) !important; margin:14px 0 16px !important; line-height:1.2; }
+body.ios-mode .i-sr-q + div { margin-top:-8px; }
+body.ios-mode .i-sr .form-input, body.ios-mode .i-sr .form-select { font-size:22px !important; padding:15px 16px !important; min-height:58px; }
+body.ios-mode .i-sr .form-textarea { font-size:17px !important; }
+body.ios-mode .i-sr-actions { margin-top:18px; gap:10px !important; }
+body.ios-mode .i-sr-actions .btn-gold { flex:1; min-height:54px; margin:0 !important; }
+body.ios-mode .i-sr #srErr { font-size:14px !important; margin:10px 2px 0 !important; }
 @media (prefers-reduced-motion: reduce) { #iosApp *, #iosApp *::before { animation:none !important; transition:none !important; } }
 </style>
 </head>
@@ -6311,9 +6376,12 @@ window._preloadAllReservations = preloadAllReservations;
     const g = S.book && S.book.party;
     if (!g) return;
     const k = dateKey(currentDate);
-    closeBook();
     whenLoaded(k, () => safe(() => {
       openSteppedModal(slot);
+      const sheet = $('iosBook'), scrim = $('iosScrim');
+      sheet.style.transition = 'none'; scrim.style.transition = 'none';
+      sheet.classList.remove('on'); scrim.classList.remove('on'); S.book = null;
+      setTimeout(() => { sheet.style.transition = ''; scrim.style.transition = ''; }, 60);
       const inp = $('srGuests');
       if (inp) { inp.value = g; srNext1(); }
     }));
@@ -6420,6 +6488,39 @@ window._preloadAllReservations = preloadAllReservations;
     const origH = renderDateHeader;
     window.renderDateHeader = renderDateHeader = function(){ const out = origH.apply(this, arguments); if (active()) safe(render); return out; };
   }
+
+  /* ── v2: full-screen, uncluttered booking steps (visual only; ids and onclicks untouched) ── */
+  function decorateModal(){
+    const body = $('modalBody'), head = document.querySelector('#modalOverlay .modal-head');
+    if (!body || !head) return;
+    let slot = $('iosModalBack');
+    if (!slot) { slot = document.createElement('div'); slot.id = 'iosModalBack'; head.insertBefore(slot, head.firstChild); }
+    slot.innerHTML = '';
+    body.classList.remove('i-sr');
+    if (!document.body.classList.contains('ios-mode')) return;
+    const kids = [...body.children];
+    const prog = kids.find(el => el.style && el.style.display==='flex' && el.children.length>=4 && /Name/.test(el.textContent) && /Note/.test(el.textContent));
+    if (!prog) return;
+    body.classList.add('i-sr');
+    const i = kids.indexOf(prog);
+    prog.classList.add('i-sr-prog');
+    if (i > 0) kids[i-1].classList.add('i-sr-when');
+    const sum = kids[i+1];
+    if (sum && !sum.classList.contains('form-row') && sum.id!=='srErr' && !sum.querySelector('button,input')) sum.classList.add('i-sr-sum');
+    body.querySelectorAll('.form-row > .form-label').forEach(l => l.classList.add('i-sr-q'));
+    body.querySelectorAll('.btn-gold').forEach(b => { b.textContent = b.textContent.replace(/\s*→\s*$/,''); });
+    const back = body.querySelector('.btn-outline');
+    const row = back && back.parentElement;
+    if (row && row !== body && row.querySelector('.btn-gold')) {
+      row.classList.add('i-sr-actions');
+      back.innerHTML = '<svg width="12" height="20" viewBox="0 0 12 20"><path d="M10 2 2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Back';
+      slot.appendChild(back);
+    }
+  }
+  (function(){
+    const body = $('modalBody');
+    if (body && window.MutationObserver) new MutationObserver(() => safe(decorateModal)).observe(body, {childList:true});
+  })();
 
   /* ── entry point, called from submitPin() for 3599 ── */
   if (typeof enterGuestMode === 'function') {
