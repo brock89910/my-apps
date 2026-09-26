@@ -1542,6 +1542,11 @@ body.ios-mode .i-sr #srErr { font-size:14px !important; margin:10px 2px 0 !impor
 .i-chip.sel { border-color:var(--i-accent) !important; color:var(--i-accent) !important; background:var(--i-accent-soft) !important; }
 .i-err { color:var(--i-red); font-size:14px; margin:4px 2px 8px; min-height:18px; }
 body.i-silent #modalOverlay { visibility:hidden !important; }
+
+/* ── v4: no stat cards; 8-day strip fits the width ── */
+#iosStats, #iosDStats { display:none !important; }
+.i-week { margin-bottom:18px; overflow-x:visible; }
+.i-day { flex:1 1 0; width:auto; min-width:0; }
 @media (prefers-reduced-motion: reduce) { #iosApp *, #iosApp *::before { animation:none !important; transition:none !important; } }
 </style>
 </head>
@@ -6269,10 +6274,9 @@ window._preloadAllReservations = preloadAllReservations;
   }
   function renderWeek(key, tk, elId, countFn){
     const w = $(elId||'iosWeek'), today = keyToDate(tk); countFn = countFn||dayGuests;
-    const selIn = key >= dateKey(addDays(today,-1)) && key <= dateKey(addDays(today,12));
-    const start = selIn ? addDays(today,-1) : addDays(currentDate,-3);
+    const start = today; // today + next 7 days
     let h = '';
-    for (let i=0;i<14;i++){
+    for (let i=0;i<8;i++){
       const d = addDays(start,i), k = dateKey(d), g = countFn(k);
       h += `<button type="button" class="i-day${k===key?' sel':''}${k===tk?' today':''}" data-day="${k}"><div class="dw">${WD[d.getDay()]}</div><div class="dn">${d.getDate()}</div><div class="dg">${g?g+'p':''}</div></button>`;
     }
