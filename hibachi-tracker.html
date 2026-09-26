@@ -1223,6 +1223,326 @@ body.staff2-mode .res-row-meta       { color: #2a2520 !important; font-weight: 7
 
 /* Scrollbar */
 body.staff2-mode ::-webkit-scrollbar-thumb { background: rgba(160,140,100,0.4); }
+
+/* ══════════════════════════════════════════════
+   iOS MODE (password 3599)
+   Everything below is scoped to body.ios-mode, so it can never
+   change how 1599 / 2599 / manager / guest look.
+   Legacy variables are re-pointed so the existing modals
+   (booking steps, edit, overrides, confirm, chef removal) adopt the iOS look.
+   ══════════════════════════════════════════════ */
+body.ios-mode {
+  --i-bg:#F2F2F7; --i-card:#FFFFFF; --i-label:#000000; --i-label2:rgba(60,60,67,.62); --i-label3:rgba(60,60,67,.3);
+  --i-sep:rgba(60,60,67,.18); --i-fill:rgba(120,120,128,.12); --i-fill2:rgba(120,120,128,.2);
+  --i-accent:#B8232B; --i-accent-soft:rgba(184,35,43,.1);
+  --i-green:#34C759; --i-green-text:#248A3D; --i-orange:#FF9500; --i-orange-text:#C77C02; --i-blue:#007AFF;
+  --i-indigo:#5856D6; --i-indigo-soft:rgba(88,86,214,.09); --i-red:#FF3B30; --i-red-soft:rgba(255,59,48,.12);
+  --i-bar:rgba(249,249,249,.88);
+  --bg:var(--i-bg); --bg2:var(--i-bg); --bg3:var(--i-card); --panel:var(--i-card); --lift:var(--i-fill);
+  --border:var(--i-sep); --border2:var(--i-sep);
+  --gold:var(--i-accent); --gold2:#8F1B21; --gold3:var(--i-accent-soft); --gold-light:var(--i-label);
+  --text:var(--i-label); --text2:rgba(60,60,67,.85); --text3:var(--i-label2);
+  --green:var(--i-green-text); --red:var(--i-red); --red-deep:#8A1A1A; --amber:var(--i-orange-text); --blue:var(--i-blue);
+  --r:12px;
+  --serif:-apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:var(--sans);
+  background:var(--i-bg); color:var(--i-label); font-size:17px;
+}
+@media (prefers-color-scheme: dark) {
+  body.ios-mode {
+    --i-bg:#000000; --i-card:#1C1C1E; --i-label:#FFFFFF; --i-label2:rgba(235,235,245,.62); --i-label3:rgba(235,235,245,.3);
+    --i-sep:rgba(84,84,88,.6); --i-fill:rgba(120,120,128,.24); --i-fill2:rgba(120,120,128,.36);
+    --i-accent:#E4484F; --i-accent-soft:rgba(228,72,79,.16);
+    --i-green-text:#30D158; --i-orange-text:#FF9F0A;
+    --i-indigo:#7D7AFF; --i-indigo-soft:rgba(94,92,230,.2); --i-red:#FF6961; --i-red-soft:rgba(255,69,58,.2);
+    --i-bar:rgba(22,22,24,.88);
+    --gold2:#FF6B70; --text2:rgba(235,235,245,.85);
+  }
+}
+body.ios-mode::before { display:none; }
+
+/* which UI is showing */
+#iosApp, #iosBackPill { display:none; }
+body.ios-mode:not(.ios-classic) #app { display:none !important; }
+body.ios-mode:not(.ios-classic) #iosApp { display:block; }
+body.ios-mode #loginScreen:not([style*="none"]) ~ #iosApp,
+body.ios-mode #loginScreen:not([style*="none"]) ~ #iosBackPill { display:none !important; }
+body.ios-mode.ios-classic #iosBackPill { display:block; }
+#iosBackPill { position:fixed; right:14px; bottom:calc(18px + env(safe-area-inset-bottom,0px)); z-index:450;
+  background:var(--i-accent); color:#fff; border:0; border-radius:22px; padding:11px 16px; font:600 15px var(--sans);
+  box-shadow:0 6px 20px rgba(0,0,0,.25); cursor:pointer; }
+
+/* ── existing modal, restyled as an iOS sheet ── */
+body.ios-mode .modal-overlay { background:rgba(0,0,0,.35); backdrop-filter:none; -webkit-backdrop-filter:none; }
+body.ios-mode .modal-sheet { background:var(--i-bg); border:0; border-radius:14px 14px 0 0; max-width:640px; margin:0 auto;
+  max-height:calc(100% - 12px); padding-bottom:env(safe-area-inset-bottom,0px); box-shadow:0 -8px 30px rgba(0,0,0,.15); }
+body.ios-mode .modal-handle { width:36px; height:5px; border-radius:3px; background:var(--i-fill2); margin-top:6px; }
+body.ios-mode .modal-head { border-bottom:0; padding:10px 16px 4px; }
+body.ios-mode .modal-title { font-size:17px; font-weight:600; letter-spacing:0; color:var(--i-label); }
+body.ios-mode .modal-close { width:30px; height:30px; border-radius:50%; background:var(--i-fill); border:0; color:var(--i-label2); font-size:13px; font-weight:700; }
+body.ios-mode .modal-body { padding:12px 16px 24px; }
+body.ios-mode .form-label { text-transform:none; letter-spacing:0; font-weight:500; color:var(--i-label2); font-size:13px; }
+body.ios-mode .form-input, body.ios-mode .form-select, body.ios-mode .form-textarea {
+  background:var(--i-card); border:1px solid transparent; border-radius:12px; padding:12px 14px; font-size:17px; color:var(--i-label); }
+body.ios-mode .form-input:focus, body.ios-mode .form-select:focus, body.ios-mode .form-textarea:focus {
+  background:var(--i-card); border-color:var(--i-accent); box-shadow:0 0 0 3px var(--i-accent-soft); }
+body.ios-mode .form-select option { background:var(--i-card); }
+body.ios-mode .btn-gold { background:var(--i-accent); color:#fff; border-radius:14px; text-transform:none; letter-spacing:0; font-size:17px; font-weight:600; min-height:50px; }
+body.ios-mode .btn-gold:active { background:var(--gold2); }
+body.ios-mode .btn-outline { background:var(--i-card); border:0; border-radius:14px; color:var(--i-accent); font-size:15px; font-weight:600; letter-spacing:0; }
+body.ios-mode .btn-danger { background:var(--i-red-soft); border:0; border-radius:14px; color:var(--i-red); text-transform:none; letter-spacing:0; font-size:15px; font-weight:600; padding:12px; }
+
+/* ── iOS shell ── */
+#iosApp { font-family:var(--sans); color:var(--i-label); -webkit-font-smoothing:antialiased; }
+#iosApp button { font:inherit; color:inherit; background:none; border:0; padding:0; cursor:pointer; }
+#iosApp :focus-visible { outline:3px solid var(--i-blue); outline-offset:2px; border-radius:8px; }
+.i-screen { display:none; padding:0 16px 120px; max-width:640px; margin:0 auto; position:relative; z-index:1; }
+.i-screen.on { display:block; }
+.i-nav { display:flex; justify-content:space-between; align-items:center; height:44px; }
+.i-link { color:var(--i-accent) !important; font-size:17px; }
+.i-live { font-size:12px; font-weight:600; color:var(--i-green-text); display:inline-flex; align-items:center; gap:6px; }
+.i-live::before { content:""; width:7px; height:7px; border-radius:50%; background:var(--i-green); }
+.i-live.off { color:var(--i-red); } .i-live.off::before { background:var(--i-red); }
+.i-title { font-size:34px; font-weight:700; letter-spacing:.2px; margin:2px 0; }
+.i-sub { color:var(--i-label2); font-size:15px; margin-bottom:14px; }
+
+.i-week { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; margin:0 -16px 14px; padding:2px 16px; }
+.i-week::-webkit-scrollbar { display:none; }
+.i-day { flex:0 0 auto; width:50px; padding:8px 0 6px; border-radius:14px; text-align:center; background:var(--i-card) !important; }
+.i-day .dw { font-size:12px; color:var(--i-label2); }
+.i-day .dn { font-size:20px; font-weight:600; margin-top:2px; }
+.i-day .dg { font-size:11px; font-weight:600; color:var(--i-label2); height:14px; margin-top:1px; }
+.i-day.sel { background:var(--i-accent) !important; color:#fff !important; }
+.i-day.sel .dw, .i-day.sel .dg { color:rgba(255,255,255,.85); }
+.i-day.today:not(.sel) .dn { color:var(--i-accent); }
+
+.i-banner { border-radius:12px; padding:12px 14px; font-size:15px; margin-bottom:12px; }
+.i-banner.bad { background:var(--i-red-soft); color:var(--i-red); font-weight:600; }
+.i-banner.warn { background:rgba(255,149,0,.14); color:var(--i-orange-text); }
+
+.i-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+.i-stat { background:var(--i-card); border-radius:14px; padding:12px; }
+.i-stat b { display:block; font-size:26px; font-weight:700; font-variant-numeric:tabular-nums; }
+.i-stat span { font-size:13px; color:var(--i-label2); }
+
+.i-seg { display:flex; background:var(--i-fill); border-radius:9px; padding:2px; margin-bottom:18px; }
+.i-seg button { flex:1; height:30px; border-radius:7px; font-size:14px !important; font-weight:600 !important; }
+.i-seg button.on { background:var(--i-card) !important; box-shadow:0 1px 4px rgba(0,0,0,.14); }
+
+.i-shead { display:flex; justify-content:space-between; align-items:center; padding:0 6px 6px; font-size:13px; color:var(--i-label2); gap:8px; }
+.i-shead strong { font-size:20px; font-weight:600; color:var(--i-label); }
+.i-caps { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.i-cap { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; padding:3px 8px; border-radius:20px; white-space:nowrap; background:var(--i-fill); color:var(--i-label2); }
+.i-cap.double { background:var(--i-indigo-soft); color:var(--i-indigo); }
+.i-cap.over { background:var(--i-red-soft); color:var(--i-red); }
+.i-cap.over::before { content:""; width:6px; height:6px; border-radius:50%; background:currentColor; animation:iBreathe 1.6s ease-in-out infinite; }
+.i-cap.full { background:var(--i-label); color:var(--i-bg); }
+.i-cap.blocked { background:var(--i-red-soft); color:var(--i-red); }
+@keyframes iBreathe { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.25;transform:scale(.6)} }
+
+.i-slot { margin-bottom:22px; }
+.i-slot.double { background:var(--i-indigo-soft); border-radius:16px; padding:8px 8px 1px; }
+.i-ghead { display:flex; justify-content:space-between; font-size:13px; font-weight:600; color:var(--i-label2); padding:4px 10px 6px; }
+.i-slot.double .i-ghead { color:var(--i-indigo); }
+.i-ghead.bad, .i-slot.double .i-ghead.bad { color:var(--i-red); }
+.i-group { background:var(--i-card); border-radius:12px; overflow:hidden; margin-bottom:8px; }
+
+.i-row { display:flex; align-items:center; gap:12px; width:100%; min-height:56px; padding:9px 12px 9px 14px; text-align:left; position:relative; cursor:pointer; }
+.i-row + .i-row::before { content:""; position:absolute; top:0; left:62px; right:0; height:.5px; background:var(--i-sep); }
+.i-row:active { background:var(--i-fill); }
+.i-row .main { flex:1; min-width:0; }
+.i-row .t1 { font-size:17px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.i-row .t2 { font-size:14px; color:var(--i-label2); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.i-row.soon { box-shadow:inset 3px 0 0 var(--i-green); }
+.i-row.draft { opacity:.6; }
+.i-party { flex:0 0 auto; width:36px; height:36px; border-radius:50%; background:var(--i-accent-soft); color:var(--i-accent); display:grid; place-items:center; font-weight:700; font-size:16px; font-variant-numeric:tabular-nums; }
+.i-party.dbl { background:var(--i-indigo-soft); color:var(--i-indigo); }
+.i-tags { display:flex; gap:4px; flex:0 0 auto; flex-wrap:wrap; justify-content:flex-end; max-width:44%; }
+.i-tag { font-size:11px; font-weight:700; padding:3px 6px; border-radius:6px; background:var(--i-fill); color:var(--i-label2); white-space:nowrap; }
+.i-tag.ok { background:rgba(52,199,89,.16); color:var(--i-green-text); }
+.i-tag.warn { background:rgba(255,149,0,.16); color:var(--i-orange-text); }
+.i-tag.bad { background:var(--i-red-soft); color:var(--i-red); }
+.i-conf { flex:0 0 auto; width:30px; height:30px; border-radius:50% !important; border:1.5px solid var(--i-label3) !important; color:var(--i-label3) !important; font-size:15px !important; font-weight:700 !important; display:grid; place-items:center; }
+.i-conf.done { background:var(--i-green) !important; border-color:var(--i-green) !important; color:#fff !important; }
+
+.i-trow { display:flex; align-items:center; gap:12px; width:100%; min-height:54px; padding:9px 14px; text-align:left; position:relative; }
+.i-trow + .i-trow::before { content:""; position:absolute; top:0; left:14px; right:0; height:.5px; background:var(--i-sep); }
+.i-trow:active:not(:disabled) { background:var(--i-fill); }
+.i-trow:disabled { opacity:.45; cursor:default; }
+.i-trow.double { background:var(--i-indigo-soft) !important; }
+.i-trow.sec { opacity:.55; }
+.i-tmcol { width:78px; flex:0 0 auto; display:flex; flex-direction:column; align-items:flex-start; gap:4px; }
+.i-tm { font-weight:600; font-size:17px; font-variant-numeric:tabular-nums; }
+.i-ps { flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; font-size:17px; font-variant-numeric:tabular-nums; line-height:1.35; }
+.i-ps b { font-weight:700; }
+.i-trow.zero .i-ps { color:var(--i-label3); }
+.i-gline.bad { color:var(--i-red); }
+.i-gn { display:inline-block; font-size:12px; font-weight:700; color:var(--i-indigo); min-width:46px; }
+.i-gline.bad .i-gn { color:var(--i-red); }
+.i-mini { flex:1; font-size:14px; color:var(--i-label2); font-variant-numeric:tabular-nums; }
+.i-st { text-align:right; font-size:15px; color:var(--i-label2); }
+.i-st.fit { color:var(--i-green-text); } .i-st.new { color:var(--i-blue); } .i-st.dbl { color:var(--i-indigo); } .i-st.no { color:var(--i-red); }
+.i-st small { display:block; font-size:12px; color:var(--i-orange-text); font-weight:600; }
+.i-chev { width:8px; height:13px; flex:0 0 auto; color:var(--i-label3); }
+.i-legend { display:flex; gap:14px; flex-wrap:wrap; font-size:13px; color:var(--i-label2); margin:-6px 0 14px; }
+.i-empty { text-align:center; color:var(--i-label2); padding:40px 20px; }
+.i-empty b { display:block; color:var(--i-label); font-size:20px; margin-bottom:6px; }
+
+.i-search { display:flex; align-items:center; gap:8px; background:var(--i-fill); border-radius:10px; padding:8px 10px; margin-bottom:18px; }
+.i-search input { flex:1; border:0; background:none; outline:none; font:17px var(--sans); color:var(--i-label); }
+.i-list { background:var(--i-card); border-radius:12px; overflow:hidden; margin-bottom:24px; }
+.i-item { display:flex; align-items:center; gap:12px; width:100%; min-height:50px; padding:10px 16px; text-align:left; position:relative; }
+.i-item + .i-item::before { content:""; position:absolute; top:0; left:16px; right:0; height:.5px; background:var(--i-sep); }
+.i-item:active { background:var(--i-fill); }
+.i-item .main { flex:1; }
+.i-item .t2 { font-size:13px; color:var(--i-label2); margin-top:1px; }
+.i-item.danger { color:var(--i-red) !important; justify-content:center; }
+.i-sechead { font-size:13px; color:var(--i-label2); padding:0 16px 6px; }
+
+.i-tabbar { position:fixed; left:0; right:0; bottom:0; z-index:300; background:var(--i-bar);
+  -webkit-backdrop-filter:saturate(180%) blur(20px); backdrop-filter:saturate(180%) blur(20px);
+  border-top:.5px solid var(--i-sep); padding-bottom:env(safe-area-inset-bottom,0px); }
+.i-tabbar .in { display:flex; justify-content:space-around; align-items:center; max-width:640px; margin:0 auto; height:56px; }
+.i-tab { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:10.5px !important; font-weight:500 !important; color:var(--i-label2) !important; width:72px; }
+.i-tab.on { color:var(--i-accent) !important; }
+.i-tab svg { width:26px; height:26px; }
+.i-fab { width:52px; height:52px; border-radius:50% !important; background:var(--i-accent) !important; color:#fff !important; display:grid; place-items:center; box-shadow:0 4px 14px rgba(184,35,43,.35); margin-top:-18px; }
+.i-fab svg { width:26px; height:26px; }
+
+.i-scrim { position:fixed; inset:0; background:rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:opacity .3s; z-index:390; }
+.i-scrim.on { opacity:1; pointer-events:auto; }
+.i-sheet { position:fixed; left:0; right:0; bottom:0; z-index:400; height:calc(100% - 12px); background:var(--i-bg); border-radius:14px 14px 0 0;
+  box-shadow:0 -8px 30px rgba(0,0,0,.15); transform:translateY(105%); transition:transform .38s cubic-bezier(.32,.72,0,1);
+  display:flex; flex-direction:column; max-width:640px; margin:0 auto; }
+.i-sheet.on { transform:none; }
+.i-grab { width:36px; height:5px; border-radius:3px; background:var(--i-fill2); margin:6px auto 0; flex:0 0 auto; }
+.i-snav { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; height:44px; padding:0 16px; flex:0 0 auto; }
+.i-snav .l { justify-self:start; color:var(--i-accent) !important; display:flex; align-items:center; gap:4px; }
+.i-snav .c { font-weight:600; font-size:15px; color:var(--i-label2); }
+.i-snav .r { justify-self:end; color:var(--i-accent) !important; }
+.i-prog { height:3px; background:var(--i-fill); margin:0 16px; border-radius:2px; overflow:hidden; flex:0 0 auto; }
+.i-prog i { display:block; height:100%; background:var(--i-accent); border-radius:2px; transition:width .35s ease; }
+.i-sbody { flex:1; overflow-y:auto; padding:18px 16px 24px; -webkit-overflow-scrolling:touch; }
+.i-q { font-size:28px; font-weight:700; margin:4px 0; }
+.i-hint { color:var(--i-label2); font-size:15px; margin-bottom:18px; }
+.i-in { animation:iIn .32s cubic-bezier(.32,.72,0,1); }
+.i-back { animation:iBack .32s cubic-bezier(.32,.72,0,1); }
+@keyframes iIn { from{opacity:0;transform:translateX(28px)} to{opacity:1;transform:none} }
+@keyframes iBack { from{opacity:0;transform:translateX(-28px)} to{opacity:1;transform:none} }
+
+.i-cal { background:var(--i-card); border-radius:16px; padding:14px 10px 10px; touch-action:pan-y; }
+.i-calhead { display:flex; justify-content:space-between; align-items:center; padding:0 8px 10px; }
+.i-caltitle { font-size:20px; font-weight:700; }
+.i-calnav { display:flex; gap:4px; }
+.i-calnav button { width:40px; height:40px; display:grid; place-items:center; color:var(--i-accent) !important; border-radius:20px !important; }
+.i-calnav button:disabled { color:var(--i-label3) !important; }
+.i-calwd { display:grid; grid-template-columns:repeat(7,1fr); text-align:center; font-size:12px; font-weight:600; color:var(--i-label2); padding-bottom:6px; }
+.i-calgrid { display:grid; grid-template-columns:repeat(7,1fr); row-gap:4px; }
+.i-cday { display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 0 2px !important; min-height:54px; }
+.i-cday .num { width:38px; height:38px; border-radius:50%; display:grid; place-items:center; font-size:19px; font-variant-numeric:tabular-nums; }
+.i-cday .cnt { font-size:11px; font-weight:600; color:var(--i-label2); height:13px; }
+.i-cday.today .num { color:var(--i-accent); font-weight:700; }
+.i-cday.sel .num { background:var(--i-accent); color:#fff; font-weight:700; }
+.i-cday:disabled .num { color:var(--i-label3); }
+.i-cday:disabled .cnt { opacity:.5; }
+.i-caltoday { display:block; margin:14px auto 0; color:var(--i-accent) !important; font-size:17px !important; padding:8px 16px !important; }
+.i-pgrid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.i-pbtn { aspect-ratio:1; background:var(--i-card) !important; border-radius:18px !important; font-size:28px !important; font-weight:700 !important; border:2px solid transparent !important; font-variant-numeric:tabular-nums; }
+.i-pbtn.sel { border-color:var(--i-accent) !important; background:var(--i-accent-soft) !important; color:var(--i-accent) !important; }
+.i-stepper { margin-top:14px; background:var(--i-card); border-radius:12px; display:flex; align-items:center; justify-content:space-between; padding:8px 16px; gap:10px; }
+.i-stepper .ctl { display:flex; background:var(--i-fill); border-radius:9px; overflow:hidden; }
+.i-stepper .ctl button { width:48px; height:34px; font-size:22px !important; }
+.i-stepper .go { color:var(--i-accent) !important; font-weight:600 !important; }
+.i-loading { text-align:center; color:var(--i-label2); padding:40px 0; }
+
+.i-toast { position:fixed; left:50%; bottom:calc(92px + env(safe-area-inset-bottom,0px)); transform:translate(-50%,20px); background:rgba(40,40,42,.94); color:#fff;
+  padding:10px 16px; border-radius:12px; font-size:15px; opacity:0; pointer-events:none; transition:opacity .25s,transform .25s; z-index:600; max-width:88%; text-align:center; }
+.i-toast.on { opacity:1; transform:translate(-50%,0); }
+
+/* ── iOS v2: spacing fixes + full-screen focused booking steps ── */
+#iosApp button { padding:initial; }
+:where(#iosApp) button { padding:0; }
+.i-trow { padding:12px 16px !important; min-height:50px; }
+.i-trow + .i-trow::before { left:16px; }
+.i-item { padding:12px 16px !important; }
+.i-row { padding:10px 14px !important; }
+.i-day { padding:8px 0 7px !important; }
+.i-seg button { padding:0 !important; }
+.i-conf { padding:0 !important; }
+.i-pbtn, .i-cday, .i-calnav button, .i-stepper .ctl button { padding:0 !important; }
+.i-stepper .go { padding:6px 4px !important; }
+.i-caltoday { padding:8px 16px !important; }
+.i-fab, .i-tab { padding:0 !important; }
+.i-snav .l, .i-snav .r { padding:6px 0 !important; }
+.i-cap.full { background:var(--i-fill2); color:var(--i-label); }
+.i-stats { gap:10px; margin-bottom:20px; }
+.i-stat { padding:14px; }
+.i-stat b { font-size:28px; line-height:1.1; }
+.i-stat span { display:block; margin-top:2px; }
+.i-seg { margin-bottom:22px; }
+.i-shead { padding:0 4px 8px; }
+.i-slot { margin-bottom:26px; }
+.i-ghead { padding:2px 12px 7px; }
+.i-slot.double .i-ghead { padding-top:6px; }
+.i-legend { margin:-8px 4px 12px; }
+.i-tmcol { width:72px; gap:5px; }
+.i-ps { gap:4px; }
+
+/* full-screen booking sheet (date / party / time) */
+.i-sheet { height:100%; border-radius:0; box-shadow:none; }
+.i-grab { display:none; }
+.i-snav { height:52px; }
+
+/* existing modals become full-screen pages: nothing behind them */
+body.ios-mode .modal-overlay { background:var(--i-bg); animation:none; }
+body.ios-mode .modal-sheet { height:100%; max-height:100%; border-radius:0; box-shadow:none; max-width:640px; display:flex; flex-direction:column; animation:iSheetUp .32s cubic-bezier(.32,.72,0,1); }
+@keyframes iSheetUp { from{transform:translateY(24px);opacity:0} to{transform:none;opacity:1} }
+body.ios-mode .modal-handle { display:none; }
+body.ios-mode .modal-head { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; height:52px; padding:0 16px; flex:0 0 auto; }
+body.ios-mode .modal-title { grid-column:2; text-align:center; font-size:17px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:60vw; }
+body.ios-mode .modal-close { grid-column:3; justify-self:end; }
+#iosModalBack { grid-column:1; grid-row:1; justify-self:start; display:none; }
+body.ios-mode #iosModalBack { display:block; }
+body.ios-mode #iosModalBack .btn-outline { background:none !important; border:0 !important; padding:6px 0 !important; color:var(--i-accent) !important; font-size:17px !important; font-weight:400 !important; width:auto !important; flex:none !important; display:inline-flex; align-items:center; gap:4px; }
+body.ios-mode .modal-body { flex:1; overflow-y:auto; padding:8px 20px 32px; -webkit-overflow-scrolling:touch; }
+body.ios-mode .modal-body [style*="font-size:0.5"], body.ios-mode .modal-body [style*="font-size:0.6"] { font-size:13px !important; line-height:1.45 !important; }
+body.ios-mode .modal-body [style*="font-size:0.7"] { font-size:15px !important; }
+
+/* stepped reservation flow, tagged by iosDecorateModal() */
+body.ios-mode .i-sr-when { border:0 !important; padding:0 !important; margin:0 0 12px !important; gap:8px !important; }
+body.ios-mode .i-sr-when > div { font-family:var(--sans) !important; font-size:15px !important; font-weight:500 !important; color:var(--i-label2) !important; }
+body.ios-mode .i-sr-prog { gap:4px !important; margin:0 0 30px !important; }
+body.ios-mode .modal-body .i-sr-prog > div { font-size:0 !important; line-height:0 !important; overflow:hidden; height:4px; padding:0 !important; border:0 !important; border-radius:2px; background:var(--i-fill2); }
+body.ios-mode .modal-body .i-sr-prog > div[style*="solid var(--green)"], body.ios-mode .modal-body .i-sr-prog > div[style*="solid var(--gold)"] { background:var(--i-accent); }
+body.ios-mode .i-sr-sum { font-size:15px !important; color:var(--i-label2) !important; margin:0 0 6px !important; line-height:1.5 !important; }
+body.ios-mode .i-sr-sum * { font-size:15px !important; }
+body.ios-mode .i-sr-q { font-size:28px !important; font-weight:700 !important; color:var(--i-label) !important; margin:14px 0 16px !important; line-height:1.2; }
+body.ios-mode .i-sr-q + div { margin-top:-8px; }
+body.ios-mode .i-sr .form-input, body.ios-mode .i-sr .form-select { font-size:22px !important; padding:15px 16px !important; min-height:58px; }
+body.ios-mode .i-sr .form-textarea { font-size:17px !important; }
+body.ios-mode .i-sr-actions { margin-top:18px; gap:10px !important; }
+body.ios-mode .i-sr-actions .btn-gold { flex:1; min-height:54px; margin:0 !important; }
+body.ios-mode .i-sr #srErr { font-size:14px !important; margin:10px 2px 0 !important; }
+
+/* ── v3: step-3 labels, pulsing add capsule, dining ── */
+.i-add { display:inline-block; margin-left:8px; padding:2px 9px; border-radius:11px; background:rgba(0,122,255,.13); color:var(--i-blue); font-weight:600; font-size:14px; animation:iPulse 1.8s ease-in-out infinite; white-space:nowrap; }
+@keyframes iPulse { 0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.5; transform:scale(.97)} }
+.i-trow.full { opacity:.5; }
+.i-st.grill { color:var(--i-label); font-weight:500; }
+.i-party.din { background:rgba(52,199,89,.15); color:var(--i-green-text); }
+.i-field { background:var(--i-card); border-radius:12px; overflow:hidden; margin-bottom:12px; }
+.i-field input, .i-field textarea { display:block; width:100%; border:0; outline:none; background:none; padding:16px; font:22px var(--sans); color:var(--i-label); }
+.i-field textarea { font-size:17px; min-height:110px; resize:none; }
+.i-btn { display:block; width:100%; min-height:54px; border-radius:14px !important; background:var(--i-accent) !important; color:#fff !important; font-weight:600 !important; font-size:17px !important; margin-top:6px; }
+.i-btn:disabled { opacity:.35; }
+.i-btn.ghost { background:none !important; color:var(--i-accent) !important; min-height:44px; }
+.i-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+.i-chip { padding:9px 14px !important; border-radius:20px !important; background:var(--i-card) !important; font-size:15px !important; font-weight:500 !important; border:1.5px solid transparent !important; }
+.i-chip.sel { border-color:var(--i-accent) !important; color:var(--i-accent) !important; background:var(--i-accent-soft) !important; }
+.i-err { color:var(--i-red); font-size:14px; margin:4px 2px 8px; min-height:18px; }
+body.i-silent #modalOverlay { visibility:hidden !important; }
+@media (prefers-reduced-motion: reduce) { #iosApp *, #iosApp *::before { animation:none !important; transition:none !important; } }
 </style>
 </head>
 <body>
@@ -1562,6 +1882,67 @@ body.staff2-mode ::-webkit-scrollbar-thumb { background: rgba(160,140,100,0.4); 
     <div class="modal-body" id="modalBody"></div>
   </div>
 </div>
+
+
+<!-- ════ iOS APP (password 3599) — same data and functions as staff, iOS screens ════ -->
+<div id="iosApp">
+  <main class="i-screen on" id="iosTodayScr" aria-label="Reservations">
+    <div class="i-nav"><span class="i-live" id="iosLive">Live</span><button class="i-link" id="iosGoToday" type="button">Today</button></div>
+    <h1 class="i-title" id="iosTitle">Today</h1>
+    <div class="i-sub" id="iosSub"></div>
+    <div class="i-week" id="iosWeek"></div>
+    <div id="iosBanners"></div>
+    <div class="i-stats" id="iosStats"></div>
+    <div class="i-seg" role="tablist"><button type="button" class="on" data-m="booked">Bookings</button><button type="button" data-m="all">All times</button></div>
+    <div id="iosSlots"></div>
+  </main>
+
+  <main class="i-screen" id="iosDiningScr" aria-label="Dining">
+    <div class="i-nav"><span></span><button class="i-link" id="iosDGoToday" type="button">Today</button></div>
+    <h1 class="i-title">Dining</h1>
+    <div class="i-sub" id="iosDSub"></div>
+    <div class="i-week" id="iosDWeek"></div>
+    <div class="i-stats" id="iosDStats" style="grid-template-columns:repeat(2,1fr)"></div>
+    <div id="iosDList"></div>
+  </main>
+
+  <main class="i-screen" id="iosSearchScr" aria-label="Search">
+    <div class="i-nav"></div>
+    <h1 class="i-title">Search</h1>
+    <div class="i-search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="color:var(--i-label2)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="iosQ" type="search" placeholder="Name or phone number" autocomplete="off">
+    </div>
+    <div id="iosResults"></div>
+  </main>
+
+  <main class="i-screen" id="iosMoreScr" aria-label="More">
+    <div class="i-nav"></div>
+    <h1 class="i-title">More</h1>
+    <div class="i-sub">Signed in as staff</div>
+    <div id="iosMoreBody"></div>
+  </main>
+
+  <nav class="i-tabbar" aria-label="Main">
+    <div class="in">
+      <button type="button" class="i-tab on" data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>Hibachi</button>
+      <button type="button" class="i-tab" data-tab="dining"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8M4.5 3v5a2.5 2.5 0 0 0 5 0V3M7 11v10M17 21V3c-2.2 1.2-3.5 3.6-3.5 6.5V13H17"/></svg>Dining</button>
+      <button type="button" class="i-fab" id="iosNewBtn" aria-label="New reservation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button type="button" class="i-tab" data-tab="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Search</button>
+      <button type="button" class="i-tab" data-tab="more"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg>More</button>
+    </div>
+  </nav>
+
+  <div class="i-scrim" id="iosScrim"></div>
+  <section class="i-sheet" id="iosBook" role="dialog" aria-modal="true" aria-label="New reservation">
+    <div class="i-grab"></div>
+    <div class="i-snav"><button type="button" class="l" id="iosBBack"></button><span class="c" id="iosBCount"></span><button type="button" class="r" id="iosBCancel">Cancel</button></div>
+    <div class="i-prog"><i id="iosBProg"></i></div>
+    <div class="i-sbody" id="iosBBody"></div>
+  </section>
+  <div class="i-toast" id="iosToast" role="status" aria-live="polite"></div>
+</div>
+<button type="button" id="iosBackPill" onclick="iosBackToIos()">Back to iOS view</button>
 
 <!-- ════ SCRIPT ════ -->
 <script>
@@ -5279,6 +5660,12 @@ async function submitPin() {
   }
 
   // Check valid passwords
+  document.body.classList.remove('ios-mode','ios-classic'); // iOS look only for 3599
+  if (h === '66849e29a8eb896b7e92bd83752a609d9b7106f7755561464df37c0bd9249781' && typeof window.enterIosMode === 'function') { // 3599 — staff, iOS look
+    clearLockState();
+    window.enterIosMode();
+    return;
+  }
   if (h === MANAGER_PIN_HASH_A || h === MANAGER_PIN_HASH_B) {
     clearLockState(); // successful login resets counter
     enterManagerMode();
@@ -5730,6 +6117,554 @@ async function preloadAllReservations() {
 }
 window._preloadAllReservations = preloadAllReservations;
 
+</script>
+
+<!-- ════ iOS MODE SCRIPT (password 3599) ════
+     Kept in its own <script> tag on purpose: if anything in here ever throws,
+     the main tracker script above keeps working for 1599 / 2599 / manager.
+     This block only READS app state and CALLS existing functions:
+     booking steps, overrides, passwords, edits, confirm, chef removal and
+     the daily sheet all run through the exact same code as staff mode. -->
+<script>
+(function(){
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const WD = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const MON = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const chev = '<svg class="i-chev" viewBox="0 0 8 13"><path d="M1 1l5.5 5.5L1 12" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+  const S = { tab:'today', view:'booked', book:null, bound:false };
+
+  const active = () => document.body.classList.contains('ios-mode') && !document.body.classList.contains('ios-classic');
+  const safe = (fn) => { try { return fn(); } catch (e) { console.error('[iOS mode]', e); } };
+  const esc = s => (typeof escHtml === 'function' ? escHtml(s) : String(s||''));
+  const todayKey = () => dateKey(new Date());
+  const keyToDate = k => { const [y,m,d] = k.split('-').map(Number); const x = new Date(y, m-1, d); x.setHours(0,0,0,0); return x; };
+  const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate()+n); x.setHours(0,0,0,0); return x; };
+  const ampm = slot => displayTime(slot) + (Number(slot.split(':')[0]) >= 12 ? ' PM' : ' AM');
+  const short = slot => displayTime(slot);
+
+  function toast(msg){ const t=$('iosToast'); if(!t) return; t.textContent=msg; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2400); }
+
+  /* ── data helpers (read-only) ── */
+  function diningGuests(dk){
+    return Object.values((typeof diningReservations!=='undefined' && diningReservations[dk])||{}).filter(r=>r&&r.time).reduce((a,r)=>a+(Number(r.guests)||0),0);
+  }
+  function dayGuests(dk){
+    const r = reservations[dk];
+    if (r) return Object.entries(r).filter(([id,v]) => id!=='__chefRemoved' && v && v.slot).reduce((a,[,v]) => a+(v.guests||0), 0);
+    const w = (typeof weekDataCache!=='undefined') ? weekDataCache[dk] : null;
+    return w ? (w.guests||0) : 0;
+  }
+  function slotsForDay(){
+    const dow = currentDate.getDay();
+    return generateTimeSlots(dow).filter(s => getChefsAtTime(dow, timeToMinutes(s)) > 0);
+  }
+  // Groups a slot's bookings by grill using the tracker's own grillsUsedByRes()
+  function grillGroups(key, slot){
+    const map = new Map();
+    getAllResForDate(key).filter(r => r.slot===slot).forEach(r => {
+      const nums = grillsUsedByRes(r).map(Number).filter(n => !isNaN(n) && n>0).sort((a,b)=>a-b);
+      const k = nums.join('+') || 'none';
+      if (!map.has(k)) map.set(k, { nums, members: [] });
+      map.get(k).members.push(r);
+    });
+    return [...map.values()].map(g => {
+      const load = g.members.reduce((a,r)=>a+(r.guests||0),0);
+      const double = g.nums.length > 1;
+      const limit = double ? DOUBLE_GRILL_SOLO_MAX : getSingleGrillCap(Math.max(0, g.members.length-1));
+      g.members.sort((a,b)=>(b.guests||0)-(a.guests||0));
+      return Object.assign(g, { load, double, limit, over: load > limit });
+    }).sort((a,b)=>(a.nums[0]||99)-(b.nums[0]||99));
+  }
+  const grillName = nums => !nums.length ? 'No grill' : nums.length>1 ? 'Grills '+nums.join(' + ') : 'Grill '+nums[0];
+  // Mirrors the "full / blocked" math in renderTimeSlots() exactly
+  function slotStatus(key, slot){
+    const dow = currentDate.getDay(), slotMins = timeToMinutes(slot), chefs = getChefsAtTime(dow, slotMins);
+    const allRecs = getAllResForDate(key).filter(r => r.slot===slot);
+    const blocked = !!(blockedSlots[key] && blockedSlots[key][slot.replace(':','_')]);
+    const grillsBooked = new Set(allRecs.flatMap(r => r.isDouble ? [r.grill, r.grill2] : [r.grill])).size;
+    const total = allRecs.reduce((s,r)=>s+(r.guests||0),0);
+    let defaultCap;
+    if (grillsBooked === 0) defaultCap = SINGLE_GRILL_CAP[1];
+    else defaultCap = Math.min(grillsBooked + (chefs > grillsBooked ? 1 : 0), chefs) * SINGLE_GRILL_CAP[2];
+    const manualCap = slotCaps[key] && slotCaps[key][slot.replace(':','_')];
+    const cap = (manualCap!==undefined && manualCap!==null) ? manualCap : defaultCap;
+    const remaining = Math.max(0, cap - total);
+    const canAddAny = !blocked && autoAssignGrill(key, slot, 1, chefs, null) !== null;
+    const full = !blocked && (remaining<=0 || (allRecs.length>0 && !canAddAny));
+    const hasDouble = allRecs.some(r => grillsUsedByRes(r).length > 1);
+    let secondary = false;
+    if (prefersHourlySlots(dow) && !allRecs.length) {
+      const halfBiased = getAllResForDate(key).some(r => r.slot && isHalfHourSlot(r.slot));
+      secondary = halfBiased ? !isHalfHourSlot(slot) : isHalfHourSlot(slot);
+    }
+    return { chefs, blocked, full, remaining, recs: allRecs, hasDouble, secondary };
+  }
+
+  /* ── TODAY ── */
+  function render(){
+    if (!active()) return;
+    const key = dateKey(currentDate), tk = todayKey();
+    const tomorrow = dateKey(addDays(new Date(), 1));
+    $('iosTitle').textContent = key===tk ? 'Today' : key===tomorrow ? 'Tomorrow' : currentDate.toLocaleDateString('en-CA',{weekday:'long'});
+    $('iosSub').textContent = currentDate.toLocaleDateString('en-CA',{weekday:'long', month:'long', day:'numeric', year:'numeric'});
+    const live = $('iosLive'); const up = !!window._fbReady; live.textContent = up ? 'Live' : 'Offline'; live.classList.toggle('off', !up);
+    renderWeek(key, tk);
+    renderBanners(key);
+    const all = getAllResForDate(key).filter(r => r.slot);
+    const guests = all.reduce((a,r)=>a+(r.guests||0),0);
+    $('iosStats').innerHTML = `<div class="i-stat"><b>${guests}</b><span>Guests</span></div><div class="i-stat"><b>${all.length}</b><span>Bookings</span></div><div class="i-stat"><b>${all.filter(r=>r.confirmed).length}</b><span>Confirmed</span></div>`;
+    const box = $('iosSlots');
+    const slots = slotsForDay();
+    if (!slots.length) { box.innerHTML = '<div class="i-empty"><b>Closed</b>No service scheduled for this day.</div>'; return; }
+    if (S.view === 'all') {
+      box.innerHTML = '<div class="i-legend"><span>Tap a time to book it</span></div><div class="i-group">' + slots.map(s => {
+        const st = slotStatus(key, s), gs = grillGroups(key, s);
+        let body;
+        if (!gs.length) body = '<span>0p</span>';
+        else if (gs.length===1 && !gs[0].double) body = '<span>'+psText(gs[0])+'</span>';
+        else body = gs.map(g => `<span class="i-gline${g.over?' bad':''}"><span class="i-gn">G${g.nums.join('+')}</span>${psText(g)}</span>`).join('');
+        const caps = capsHTML(st, gs) + (st.secondary && !st.blocked ? '<span class="i-cap">Off-peak</span>' : '');
+        const cls = (gs.length?'':' zero') + (st.hasDouble?' double':'') + (st.secondary?' sec':'');
+        return `<button type="button" class="i-trow${cls}" data-newslot="${s}"><span class="i-tmcol"><span class="i-tm">${short(s)}</span>${caps}</span><span class="i-ps">${body}</span>${chev}</button>`;
+      }).join('') + '</div>';
+      return;
+    }
+    const booked = slots.filter(s => all.some(r => r.slot===s));
+    if (!booked.length) { box.innerHTML = `<div class="i-empty"><b>No bookings</b>Tap + to add the first one.</div>`; return; }
+    const nowMins = new Date().getHours()*60 + new Date().getMinutes(), isToday = key===tk;
+    box.innerHTML = booked.map(s => {
+      const st = slotStatus(key, s), gs = grillGroups(key, s), tot = gs.reduce((a,g)=>a+g.load,0);
+      return `<div class="i-shead"><strong>${ampm(s)}</strong><span class="i-caps">${capsHTML(st, gs)}<span>${tot}p</span></span></div>`
+        + `<div class="i-slot${st.hasDouble?' double':''}">` + gs.map(g =>
+          `<div class="i-ghead${g.over?' bad':''}"><span>${grillName(g.nums)}</span><span>${g.double ? g.load+'p double' : g.load+' of '+g.limit}</span></div>`
+          + `<div class="i-group">${g.members.map(r => rowHTML(r, key, s, isToday, nowMins, g.double)).join('')}</div>`).join('') + '</div>';
+    }).join('');
+  }
+  const psText = g => g.members.length===1 ? `<b>${g.load}p</b>` : `${g.members.map(r=>(r.guests||0)+'p').join(' + ')} = <b>${g.load}p</b>`;
+  function capsHTML(st, gs){
+    let h = '';
+    if (st.blocked) h += '<span class="i-cap blocked">Blocked</span>';
+    if (st.hasDouble) h += '<span class="i-cap double">Double</span>';
+    if (gs.some(g=>g.over)) h += '<span class="i-cap over">Too full</span>';
+    else if (st.full) h += '<span class="i-cap full">Full</span>';
+    return h;
+  }
+  function rowHTML(r, key, slot, isToday, nowMins, dbl){
+    const t = timeToMinutes(r.slot), soon = isToday && nowMins>=t-10 && nowMins<=t+5;
+    const tags = [];
+    if (r.isDraft) tags.push('<span class="i-tag warn">Saving…</span>');
+    if (soon) tags.push('<span class="i-tag ok">Seat now</span>');
+    if (r.holdUntil) tags.push('<span class="i-tag warn">Hold</span>');
+    if (r.noteType==='allergy') tags.push('<span class="i-tag bad">Allergy</span>');
+    if (r.noteType==='restriction') tags.push('<span class="i-tag warn">Restriction</span>');
+    if (r.cardCaptured) tags.push('<span class="i-tag ok">Card</span>');
+    const name = getDisplayName(r.id, r.name, key);
+    const sub = [r.phone, r.initials].filter(Boolean).map(esc).join('  ');
+    return `<div class="i-row${soon?' soon':''}${r.isDraft?' draft':''}" role="button" tabindex="0" data-res="${esc(r.id)}" data-slot="${slot}">`
+      + `<span class="i-party${dbl?' dbl':''}">${r.guests||''}</span>`
+      + `<div class="main"><div class="t1">${esc(name)}</div><div class="t2">${sub||'&nbsp;'}</div></div>`
+      + `<span class="i-tags">${tags.join('')}</span>`
+      + `<button type="button" class="i-conf${r.confirmed?' done':''}" data-confirm="${esc(r.id)}" aria-label="${r.confirmed?'Confirmed by '+esc(r.confirmedBy||'?'):'Confirm reservation'}">${r.confirmed?'✓':''}</button></div>`;
+  }
+  function renderWeek(key, tk, elId, countFn){
+    const w = $(elId||'iosWeek'), today = keyToDate(tk); countFn = countFn||dayGuests;
+    const selIn = key >= dateKey(addDays(today,-1)) && key <= dateKey(addDays(today,12));
+    const start = selIn ? addDays(today,-1) : addDays(currentDate,-3);
+    let h = '';
+    for (let i=0;i<14;i++){
+      const d = addDays(start,i), k = dateKey(d), g = countFn(k);
+      h += `<button type="button" class="i-day${k===key?' sel':''}${k===tk?' today':''}" data-day="${k}"><div class="dw">${WD[d.getDay()]}</div><div class="dn">${d.getDate()}</div><div class="dg">${g?g+'p':''}</div></button>`;
+    }
+    w.innerHTML = h;
+    const s = w.querySelector('.sel'); if (s && !w._touched) s.scrollIntoView({inline:'center', block:'nearest'});
+  }
+  function renderBanners(key){
+    let h = '';
+    const off = $('dbOfflineBanner');
+    if (off && off.style.display === 'block') h += '<div class="i-banner bad">Database offline — reservations cannot be saved or loaded. Do not take reservations. Contact manager.</div>';
+    const cd = (typeof chefDayOverrideData!=='undefined') ? chefDayOverrideData[key] : null;
+    if (cd && cd.removed) h += `<div class="i-banner warn">1 chef removed for this day${cd.initials?' by '+esc(cd.initials):''}. Restore it from More.</div>`;
+    $('iosBanners').innerHTML = h;
+  }
+
+  /* ── go to a date using the tracker's own navigation ── */
+  function goDate(k){ if (k !== dateKey(currentDate)) pickDate(k); }
+  function whenLoaded(k, cb, waited){
+    waited = waited||0;
+    const loaded = dateKey(currentDate)===k && (typeof pendingNavKey==='undefined' || pendingNavKey!==k);
+    if (loaded || waited > 5000) return cb();
+    setTimeout(()=>whenLoaded(k, cb, waited+150), 150);
+  }
+
+  /* ── NEW RESERVATION: date → party → time, then hand off to the real stepped flow ── */
+  function startBooking(presetSlot, kind){
+    const tk = todayKey();
+    if (presetSlot && dateKey(currentDate) < tk) { toast('That day has passed. Pick another day.'); return; }
+    S.book = { kind: kind||'hibachi', preset: presetSlot||null, party: null, step: presetSlot ? 1 : 0, calMonth: null, dir: 'in', name:'', phone:'', notes:'', noteTag:'', time:null };
+    if (!presetSlot && dateKey(currentDate) < tk) goDate(tk);
+    $('iosScrim').classList.add('on'); $('iosBook').classList.add('on'); document.body.style.overflow='hidden';
+    renderBook();
+  }
+  function closeBook(){ $('iosScrim').classList.remove('on'); $('iosBook').classList.remove('on'); document.body.style.overflow=''; S.book=null; }
+  function renderBook(){
+    const B = S.book; if (!B) return;
+    const steps = B.kind==='dining' ? ['date','party','dtime','dname','dphone','dnotes'] : ['date','party','time'];
+    const total = B.kind==='dining' ? steps.length : steps.length+1; // hibachi continues in the tracker's own steps
+    $('iosBProg').style.width = ((B.step+1)/total*100)+'%';
+    $('iosBCount').textContent = (B.kind==='dining' ? 'Dining, ' : '') + `Step ${B.step+1} of ${total}`;
+    $('iosBBack').innerHTML = B.step>0 ? '<svg width="12" height="20" viewBox="0 0 12 20"><path d="M10 2 2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Back' : '';
+    const body = $('iosBBody');
+    body.className = 'i-sbody ' + (B.dir==='back' ? 'i-back' : 'i-in'); void body.offsetWidth; body.scrollTop = 0;
+    ({date:stepDate, party:stepParty, time:stepTime, dtime:stepDTime, dname:stepDName, dphone:stepDPhone, dnotes:stepDNotes})[steps[B.step]](body);
+  }
+  function go(step, dir){ S.book.step = step; S.book.dir = dir||'in'; renderBook(); }
+
+  function stepDate(el){
+    const B = S.book, tk = todayKey(), sel = dateKey(currentDate) < tk ? tk : dateKey(currentDate);
+    const now = new Date(), minMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    if (!B.calMonth) { const d = keyToDate(sel); B.calMonth = new Date(d.getFullYear(), d.getMonth(), 1); }
+    el.innerHTML = `<div class="i-q">What day?</div><div class="i-hint">Swipe or use the arrows to change months.</div>
+      <div class="i-cal" id="iosCal"><div class="i-calhead"><span class="i-caltitle" id="iosCalTitle"></span><span class="i-calnav">
+      <button type="button" id="iosCalPrev" aria-label="Previous month"><svg width="12" height="20" viewBox="0 0 12 20"><path d="M10 2 2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" id="iosCalNext" aria-label="Next month"><svg width="12" height="20" viewBox="0 0 12 20"><path d="m2 2 8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span></div>
+      <div class="i-calwd">${['S','M','T','W','T','F','S'].map(d=>'<span>'+d+'</span>').join('')}</div><div class="i-calgrid" id="iosCalGrid"></div></div>
+      <button type="button" class="i-caltoday" id="iosCalToday">Today</button>`;
+    const draw = dirn => {
+      const y = B.calMonth.getFullYear(), m = B.calMonth.getMonth();
+      $('iosCalTitle').textContent = MON[m]+' '+y;
+      $('iosCalPrev').disabled = B.calMonth <= minMonth;
+      const lead = new Date(y,m,1).getDay(), days = new Date(y,m+1,0).getDate();
+      let h = ''; for (let i=0;i<lead;i++) h += '<span></span>';
+      for (let d=1; d<=days; d++){
+        const k = dateKey(new Date(y,m,d)), past = k < tk, n = B.kind==='dining' ? diningGuests(k) : dayGuests(k);
+        h += `<button type="button" class="i-cday${k===sel?' sel':''}${k===tk?' today':''}" data-k="${k}" ${past?'disabled':''}><span class="num">${d}</span><span class="cnt">${n?n+'p':''}</span></button>`;
+      }
+      const g = $('iosCalGrid'); g.innerHTML = h; g.className = 'i-calgrid' + (dirn ? (dirn>0?' i-in':' i-back') : '');
+    };
+    const shift = n => { const t = new Date(B.calMonth.getFullYear(), B.calMonth.getMonth()+n, 1); if (t < minMonth) return; B.calMonth = t; draw(n); };
+    const pick = k => { el.querySelectorAll('.i-cday').forEach(x => x.classList.toggle('sel', x.dataset.k===k)); goDate(k); setTimeout(()=>go(1,'in'), 160); };
+    $('iosCalPrev').onclick = () => shift(-1);
+    $('iosCalNext').onclick = () => shift(1);
+    $('iosCalToday').onclick = () => { B.calMonth = new Date(minMonth); draw(0); pick(tk); };
+    $('iosCalGrid').onclick = e => { const b = e.target.closest('.i-cday'); if (b && !b.disabled) pick(b.dataset.k); };
+    const cal = $('iosCal'); let sx=null, sy=null;
+    cal.addEventListener('touchstart', e => { sx=e.touches[0].clientX; sy=e.touches[0].clientY; }, {passive:true});
+    cal.addEventListener('touchend', e => { if (sx===null) return; const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+      if (Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)*1.5) shift(dx<0?1:-1); sx=null; });
+    draw(0);
+  }
+
+  function stepParty(el){
+    const B = S.book;
+    const when = currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'});
+    let h = `<div class="i-q">How many guests?</div><div class="i-hint">${B.kind==='dining' ? 'Dining room, '+when : when+(B.preset?' at '+ampm(B.preset):'')+'. 15 or more gets a double grill; over 30 needs a manager password.'}</div><div class="i-pgrid">`;
+    for (let n=1;n<=12;n++) h += `<button type="button" class="i-pbtn${B.party===n?' sel':''}" data-n="${n}">${n}</button>`;
+    h += `</div><div class="i-stepper"><span>Larger party</span><b id="iosPv" style="font-size:20px">${B.party>12?B.party:''}</b><span class="ctl"><button type="button" id="iosPm" aria-label="Fewer">−</button><button type="button" id="iosPp" aria-label="More">+</button></span><button type="button" class="go" id="iosPgo">Next</button></div>`;
+    el.innerHTML = h;
+    const choose = n => { B.party = n; if (B.kind==='dining') return go(2,'in'); if (B.preset) handoff(B.preset); else go(2,'in'); };
+    el.querySelectorAll('.i-pbtn').forEach(b => b.onclick = () => choose(+b.dataset.n));
+    const upd = () => { $('iosPv').textContent = B.party>12 ? B.party : ''; el.querySelectorAll('.i-pbtn').forEach(b=>b.classList.toggle('sel', +b.dataset.n===B.party)); };
+    $('iosPp').onclick = () => { B.party = Math.min(B.kind==='dining' ? 99 : OVERRIDE_MAX_GUESTS, Math.max(13, (B.party||12)+1)); upd(); };
+    $('iosPm').onclick = () => { if (B.party>13) { B.party--; upd(); } };
+    $('iosPgo').onclick = () => { if (B.party>12) choose(B.party); else toast('Tap + to pick a party size over 12.'); };
+  }
+
+  function stepTime(el){
+    const B = S.book, k = dateKey(currentDate);
+    el.innerHTML = '<div class="i-loading">Loading times…</div>';
+    whenLoaded(k, () => { if (!S.book || S.book.step!==2) return; safe(()=>drawTimes(el, k)); });
+  }
+  function drawTimes(el, k){
+    const B = S.book, g = B.party;
+    let h = `<div class="i-q">What time?</div><div class="i-hint">${currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'})} for ${g}.</div><div class="i-group">`;
+    slotsForDay().forEach(s => {
+      const st = slotStatus(k, s), mins = timeToMinutes(s);
+      const have = st.recs.reduce((a,r)=>a+(r.guests||0),0);
+      let label, cls, tight = '', ok = false;
+      if (st.blocked) { label = 'Blocked'; cls = 'no'; }
+      else {
+        const a = autoAssignGrill(k, s, g, st.chefs, null);
+        if (!a) { label = 'Full'; cls = 'no'; }
+        else {
+          ok = true;
+          if (a.isDouble) { label = 'Grills '+a.grill+' + '+a.grill2; cls = 'dbl'; }
+          else { label = 'Grill '+a.grill; cls = 'grill'; }
+          if (a.tightTiming) tight = '<small>Tight timing</small>';
+        }
+      }
+      const mid = `${have}p` + (ok ? `<span class="i-add">+${g}p = ${have+g}p</span>` : '');
+      h += `<button type="button" class="i-trow${st.hasDouble?' double':''}${ok?'':' full'}" data-s="${s}" ${st.blocked?'disabled':''}><span class="i-tmcol"><span class="i-tm">${short(s)}</span></span><span class="i-mini">${mid}</span><span class="i-st ${cls}">${label}${tight}</span></button>`;
+    });
+    el.innerHTML = h + '</div>';
+    el.querySelectorAll('.i-trow').forEach(b => b.onclick = () => handoff(b.dataset.s));
+    const first = [...el.querySelectorAll('.i-trow')].find(b => b.dataset.s >= '17:00');
+    if (first) setTimeout(()=>first.scrollIntoView({block:'center'}), 60);
+  }
+
+  /* ── DINING booking steps (saved through the tracker's own saveDining) ── */
+  const DINING_TIMES = (() => { const t=[]; for (let h=11;h<=22;h++) for (let m=0;m<60;m+=30){ if(h===22&&m>0) break; t.push(String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')); } return t; })();
+  function diningAt(dk, t){ return Object.values((diningReservations[dk])||{}).filter(r=>r&&r.time===t); }
+  function stepDTime(el){
+    const B = S.book, k = dateKey(currentDate), g = B.party;
+    let h = `<div class="i-q">What time?</div><div class="i-hint">Dining room, ${currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'})} for ${g}.</div><div class="i-group">`;
+    DINING_TIMES.forEach(t => {
+      const have = diningAt(k,t).reduce((a,r)=>a+(Number(r.guests)||0),0), n = diningAt(k,t).length;
+      h += `<button type="button" class="i-trow${B.time===t?' sel':''}" data-t="${t}"><span class="i-tmcol"><span class="i-tm">${short(t)}</span></span><span class="i-mini">${have}p<span class="i-add">+${g}p = ${have+g}p</span></span><span class="i-st">${n?n+' table'+(n>1?'s':''):''}</span></button>`;
+    });
+    el.innerHTML = h + '</div>';
+    el.querySelectorAll('.i-trow').forEach(b => b.onclick = () => { B.time = b.dataset.t; go(3,'in'); });
+    const first = el.querySelector('.i-trow.sel') || [...el.querySelectorAll('.i-trow')].find(b => b.dataset.t >= '18:00');
+    if (first) setTimeout(()=>first.scrollIntoView({block:'center'}), 60);
+  }
+  const dSum = () => `<div class="i-hint">${S.book.party}p, ${ampm(S.book.time)}, ${currentDate.toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'})}${S.book.name?', '+esc(S.book.name):''}</div>`;
+  function stepDName(el){
+    const B = S.book;
+    el.innerHTML = `<div class="i-q">Guest name</div>${dSum()}<div class="i-field"><input id="iosDName" autocomplete="off" autocapitalize="words" placeholder="Last name or full name" value="${esc(B.name)}"></div><div class="i-err" id="iosDErr"></div><button type="button" class="i-btn" id="iosDNext">Continue</button>`;
+    const inp = $('iosDName'), nx = () => { const v = sanitizeText(inp.value, 80); if (!v) { $('iosDErr').textContent='Guest name is required.'; return; } B.name = v; go(4,'in'); };
+    $('iosDNext').onclick = nx; inp.onkeydown = e => { if (e.key==='Enter') { e.preventDefault(); nx(); } };
+    setTimeout(()=>inp.focus(), 340);
+  }
+  function stepDPhone(el){
+    const B = S.book;
+    el.innerHTML = `<div class="i-q">Phone number</div>${dSum()}<div class="i-field"><input id="iosDPhone" type="tel" inputmode="tel" placeholder="(506) 555-0100" value="${esc(B.phone)}"></div><div class="i-err"></div><button type="button" class="i-btn" id="iosDNext">Continue</button><button type="button" class="i-btn ghost" id="iosDSkip">No phone</button>`;
+    const inp = $('iosDPhone');
+    inp.oninput = () => fmtPhone(inp);
+    const nx = () => { B.phone = inp.value.trim(); go(5,'in'); };
+    $('iosDNext').onclick = nx; $('iosDSkip').onclick = () => { B.phone=''; go(5,'in'); };
+    inp.onkeydown = e => { if (e.key==='Enter') { e.preventDefault(); nx(); } };
+    setTimeout(()=>inp.focus(), 340);
+  }
+  function stepDNotes(el){
+    const B = S.book, tags = ['Allergy','Birthday','Anniversary','High chair','Window'];
+    el.innerHTML = `<div class="i-q">Any notes?</div>${dSum()}<div class="i-chips">${tags.map(t=>`<button type="button" class="i-chip${B.noteTag===t?' sel':''}" data-t="${t}">${t}</button>`).join('')}</div>
+      <div class="i-field"><textarea id="iosDNotes" placeholder="Allergies, preferences…">${esc(B.notes)}</textarea></div><div class="i-err" id="iosDErr"></div>
+      <button type="button" class="i-btn" id="iosDSave">Book table</button>`;
+    el.querySelectorAll('.i-chip').forEach(c => c.onclick = () => { B.noteTag = B.noteTag===c.dataset.t ? '' : c.dataset.t; el.querySelectorAll('.i-chip').forEach(x=>x.classList.toggle('sel', x.dataset.t===B.noteTag)); });
+    $('iosDNotes').oninput = e => { B.notes = e.target.value; };
+    $('iosDSave').onclick = () => safe(saveDiningIos);
+  }
+  // Fills the tracker's own dining form invisibly and calls saveDining(), so the write is identical to the classic screen.
+  async function saveDiningIos(){
+    const B = S.book, dk = dateKey(currentDate), btn = $('iosDSave');
+    if (btn) btn.disabled = true;
+    const notes = [B.noteTag, (B.notes||'').trim()].filter(Boolean).join(': ');
+    document.body.classList.add('i-silent');
+    try {
+      openDiningModal(null);
+      $('dName').value = B.name; $('dGuests').value = B.party; $('dTime').value = B.time;
+      $('dPhone').value = B.phone || ''; $('dNotes').value = notes;
+      await saveDining(dk, '');
+    } finally { document.body.classList.remove('i-silent'); }
+    const stillOpen = $('modalOverlay').style.display !== 'none';
+    const sheet = $('iosBook'), scrim = $('iosScrim');
+    sheet.style.transition='none'; scrim.style.transition='none';
+    const booked = { name:B.name, party:B.party, time:B.time };
+    closeBook(); if (stillOpen) document.body.style.overflow='hidden';
+    setTimeout(()=>{ sheet.style.transition=''; scrim.style.transition=''; }, 60);
+    if (stillOpen) return; // the classic form is now visible with its error message
+    switchTab('dining');
+    toast(`Booked ${booked.name}, ${booked.party}p at ${ampm(booked.time)}`);
+  }
+
+  /* ── DINING screen ── */
+  function renderDiningScr(){
+    if (!active() || S.tab!=='dining') return;
+    const key = dateKey(currentDate), tk = todayKey();
+    $('iosDSub').textContent = currentDate.toLocaleDateString('en-CA',{weekday:'long', month:'long', day:'numeric', year:'numeric'});
+    renderWeek(key, tk, 'iosDWeek', diningGuests);
+    const all = Object.entries(diningReservations[key]||{}).filter(([,r])=>r&&r.time).map(([id,r])=>Object.assign({id},r));
+    $('iosDStats').innerHTML = `<div class="i-stat"><b>${all.reduce((a,r)=>a+(Number(r.guests)||0),0)}</b><span>Guests</span></div><div class="i-stat"><b>${all.length}</b><span>Tables</span></div>`;
+    const box = $('iosDList');
+    if (!all.length) { box.innerHTML = '<div class="i-empty"><b>No dining reservations</b>Tap + to add one for this day.</div>'; return; }
+    const times = [...new Set(all.map(r=>r.time))].sort();
+    box.innerHTML = times.map(t => {
+      const rs = all.filter(r=>r.time===t).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+      return `<div class="i-shead"><strong>${ampm(t)}</strong><span>${rs.reduce((a,r)=>a+(Number(r.guests)||0),0)}p</span></div><div class="i-group" style="margin-bottom:22px">`
+        + rs.map(r => `<div class="i-row" role="button" tabindex="0" data-din="${esc(r.id)}"><span class="i-party din">${esc(r.guests)}</span><div class="main"><div class="t1">${esc(r.name||'Guest')}</div><div class="t2">${esc(r.phone||'')}${r.notes?(r.phone?'  ':'')+esc(r.notes):''}</div></div>${r.notes && /allerg/i.test(r.notes)?'<span class="i-tags"><span class="i-tag bad">Allergy</span></span>':''}${chev}</div>`).join('')
+        + '</div>';
+    }).join('');
+  }
+
+  // Hand off to the tracker's real stepped flow. srNext1() does the availability
+  // check, 30+ manager password, override/force book, draft save and card rules.
+  function handoff(slot){
+    const g = S.book && S.book.party;
+    if (!g) return;
+    const k = dateKey(currentDate);
+    whenLoaded(k, () => safe(() => {
+      openSteppedModal(slot);
+      const sheet = $('iosBook'), scrim = $('iosScrim');
+      sheet.style.transition = 'none'; scrim.style.transition = 'none';
+      sheet.classList.remove('on'); scrim.classList.remove('on'); S.book = null;
+      setTimeout(() => { sheet.style.transition = ''; scrim.style.transition = ''; }, 60);
+      const inp = $('srGuests');
+      if (inp) { inp.value = g; srNext1(); }
+    }));
+  }
+
+  /* ── SEARCH ── */
+  function renderSearch(){
+    const q = ($('iosQ').value||'').trim().toLowerCase(), qd = q.replace(/\D/g,'');
+    const box = $('iosResults');
+    if (!q) { box.innerHTML = ''; return; }
+    const tk = todayKey(), hits = [];
+    Object.keys(reservations).forEach(dk => {
+      Object.entries(reservations[dk]||{}).forEach(([id,r]) => {
+        if (id==='__chefRemoved' || !r || !r.slot) return;
+        const nm = (r.name||'').toLowerCase(), ph = String(r.phone||'').replace(/\D/g,'');
+        if (nm.includes(q) || (qd.length>=3 && ph.includes(qd))) hits.push({dk,id,r});
+      });
+    });
+    Object.keys(diningReservations||{}).forEach(dk => {
+      Object.entries(diningReservations[dk]||{}).forEach(([id,r]) => {
+        if (!r || !r.time) return;
+        const nm = (r.name||'').toLowerCase(), ph = String(r.phone||'').replace(/\D/g,'');
+        if (nm.includes(q) || (qd.length>=3 && ph.includes(qd))) hits.push({dk,id,r:Object.assign({},r,{slot:r.time}),dining:true});
+      });
+    });
+    hits.sort((a,b) => { const au=a.dk>=tk, bu=b.dk>=tk; if (au!==bu) return au?-1:1; return au ? (a.dk+a.r.slot).localeCompare(b.dk+b.r.slot) : (b.dk+b.r.slot).localeCompare(a.dk+a.r.slot); });
+    if (!hits.length) { box.innerHTML = '<div class="i-empty"><b>No matches</b>Check the spelling or try the last 4 digits of the phone.</div>'; return; }
+    box.innerHTML = '<div class="i-group">' + hits.slice(0,60).map(({dk,id,r,dining}) =>
+      `<div class="i-row" role="button" tabindex="0" data-open="${dk}|${esc(r.slot)}|${esc(id)}|${dining?'d':'h'}"><span class="i-party${dining?' din':''}">${r.guests||''}</span><div class="main"><div class="t1">${esc(r.name||'Guest')}</div><div class="t2">${keyToDate(dk).toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'})}, ${ampm(r.slot)}${r.phone?'  '+esc(r.phone):''}</div></div>${dining?'<span class="i-tag ok">Dining</span>':''}${dk<tk?'<span class="i-tag">Past</span>':''}</div>`
+    ).join('') + '</div>';
+  }
+  function openRes(dk, slot, id){
+    switchTab('today'); goDate(dk);
+    whenLoaded(dk, () => safe(() => openHibachiModal(slot, id)));
+  }
+
+  /* ── MORE ── */
+  function renderMore(){
+    const key = dateKey(currentDate), dstr = currentDate.toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'});
+    const chefOff = (typeof chefDayOverrides!=='undefined') && chefDayOverrides[key] > 0;
+    const item = (act, t1, t2, cls) => `<button type="button" class="i-item${cls?' '+cls:''}" data-act="${act}"><div class="main"><div>${t1}</div>${t2?'<div class="t2">'+t2+'</div>':''}</div>${cls?'':chev}</button>`;
+    $('iosMoreBody').innerHTML =
+      `<div class="i-sechead">For ${dstr}</div><div class="i-list">`
+      + item('print','Print daily sheet','Same sheet as the classic view')
+      + item(chefOff?'restoreChef':'removeChef', chefOff?'Restore chef for this day':'Remove a chef for this day', chefOff?'A chef is currently removed':'Password required')
+      + `</div><div class="i-list">`
+      + item('history','History','Opens the classic history screen')
+      + item('classic','Switch to classic view','Same account, original screens')
+      + `</div><div class="i-list">${item('signout','Sign out','', 'danger')}</div>`;
+  }
+  function moreAction(act){
+    if (act==='print') return printDailySheet();
+    if (act==='removeChef') return promptRemoveChef();
+    if (act==='restoreChef') return restoreChefForDay();
+    if (act==='history') return classic('history');
+    if (act==='classic') return classic('hibachi');
+    if (act==='signout') { document.body.classList.remove('ios-mode','ios-classic'); return window._firebaseLogout && window._firebaseLogout(); }
+  }
+  function classic(tab){ document.body.classList.add('ios-classic'); window.switchTab ? window.switchTab(tab) : null; window.scrollTo(0,0); }
+  window.iosBackToIos = function(){ document.body.classList.remove('ios-classic'); if (typeof window.switchTab==='function') window.switchTab('hibachi'); safe(render); };
+
+  /* ── tabs ── */
+  function switchTab(t){
+    S.tab = t;
+    document.querySelectorAll('#iosApp .i-tab').forEach(x => x.classList.toggle('on', x.dataset.tab===t));
+    ['today','dining','search','more'].forEach(n => $('ios'+n[0].toUpperCase()+n.slice(1)+'Scr').classList.toggle('on', n===t));
+    $('iosNewBtn').setAttribute('aria-label', t==='dining' ? 'New dining reservation' : 'New hibachi reservation');
+    if (t==='dining') safe(renderDiningScr);
+    window.scrollTo(0,0);
+    if (t==='more') safe(renderMore);
+    if (t==='search') setTimeout(()=>$('iosQ').focus(), 60);
+    if (t==='today') safe(render);
+  }
+
+  function bind(){
+    if (S.bound) return; S.bound = true;
+    document.querySelectorAll('#iosApp .i-tab').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
+    $('iosNewBtn').onclick = () => safe(()=>startBooking(null, S.tab==='dining' ? 'dining' : 'hibachi'));
+    $('iosDGoToday').onclick = () => { $('iosDWeek')._touched=false; goDate(todayKey()); };
+    $('iosDWeek').onclick = e => { const b = e.target.closest('[data-day]'); if (b) { $('iosDWeek')._touched=true; goDate(b.dataset.day); } };
+    $('iosDList').onclick = e => { const r = e.target.closest('[data-din]'); if (!r) return; const d = (diningReservations[dateKey(currentDate)]||{})[r.dataset.din]; if (d) safe(()=>openDiningModal(Object.assign({id:r.dataset.din}, d))); };
+    $('iosGoToday').onclick = () => { $('iosWeek')._touched=false; goDate(todayKey()); };
+    $('iosWeek').onclick = e => { const b = e.target.closest('[data-day]'); if (b) { $('iosWeek')._touched=true; goDate(b.dataset.day); } };
+    document.querySelectorAll('#iosApp .i-seg button').forEach(b => b.onclick = () => {
+      S.view = b.dataset.m; document.querySelectorAll('#iosApp .i-seg button').forEach(x=>x.classList.toggle('on', x===b)); safe(render); });
+    $('iosSlots').onclick = e => safe(() => {
+      const c = e.target.closest('[data-confirm]');
+      if (c) { e.stopPropagation(); return openConfirmModal(dateKey(currentDate), c.dataset.confirm); }
+      const r = e.target.closest('[data-res]');
+      if (r) return openHibachiModal(r.dataset.slot, r.dataset.res);
+      const n = e.target.closest('[data-newslot]');
+      if (n) { const st = slotStatus(dateKey(currentDate), n.dataset.newslot); if (st.blocked) return toast('This time is blocked by a manager.'); return startBooking(n.dataset.newslot); }
+    });
+    $('iosSlots').onkeydown = e => { if ((e.key==='Enter'||e.key===' ') && e.target.matches('[data-res]')) { e.preventDefault(); e.target.click(); } };
+    $('iosQ').oninput = () => safe(renderSearch);
+    $('iosResults').onclick = e => { const r = e.target.closest('[data-open]'); if (r) { const [dk,slot,id,kind] = r.dataset.open.split('|'); if (kind==='d') { switchTab('dining'); goDate(dk); whenLoaded(dk, () => safe(() => { const d=(diningReservations[dk]||{})[id]; if (d) openDiningModal(Object.assign({id}, d)); })); } else openRes(dk, slot, id); } };
+    $('iosMoreBody').onclick = e => { const b = e.target.closest('[data-act]'); if (b) safe(()=>moreAction(b.dataset.act)); };
+    $('iosBCancel').onclick = closeBook;
+    $('iosScrim').onclick = closeBook;
+    $('iosBBack').onclick = () => { const B=S.book; if (!B || B.step===0) return; if (B.preset && B.step===1) return closeBook(); go(B.step-1,'back'); };
+    document.addEventListener('keydown', e => { if (e.key==='Escape' && S.book) closeBook(); });
+    // keep the offline banner in sync with the tracker's own health check
+    const off = $('dbOfflineBanner');
+    if (off && window.MutationObserver) new MutationObserver(()=>safe(render)).observe(off, {attributes:true, attributeFilter:['style']});
+    setInterval(() => { if (active() && S.tab==='today') safe(render); }, 60000);
+  }
+
+  /* ── hook: whenever the tracker re-renders (Firebase update, day change), redraw iOS too ── */
+  if (typeof renderHibachi === 'function') {
+    const orig = renderHibachi;
+    window.renderHibachi = renderHibachi = function(){ const out = orig.apply(this, arguments); if (active()) safe(render); return out; };
+  }
+  if (typeof renderDining === 'function') {
+    const origD = renderDining;
+    window.renderDining = renderDining = function(){ const out = origD.apply(this, arguments); if (active()) safe(renderDiningScr); return out; };
+  }
+  if (typeof renderDateHeader === 'function') {
+    const origH = renderDateHeader;
+    window.renderDateHeader = renderDateHeader = function(){ const out = origH.apply(this, arguments); if (active()) { safe(render); safe(renderDiningScr); } return out; };
+  }
+
+  /* ── v2: full-screen, uncluttered booking steps (visual only; ids and onclicks untouched) ── */
+  function decorateModal(){
+    const body = $('modalBody'), head = document.querySelector('#modalOverlay .modal-head');
+    if (!body || !head) return;
+    let slot = $('iosModalBack');
+    if (!slot) { slot = document.createElement('div'); slot.id = 'iosModalBack'; head.insertBefore(slot, head.firstChild); }
+    slot.innerHTML = '';
+    body.classList.remove('i-sr');
+    if (!document.body.classList.contains('ios-mode')) return;
+    const kids = [...body.children];
+    const prog = kids.find(el => el.style && el.style.display==='flex' && el.children.length>=4 && /Name/.test(el.textContent) && /Note/.test(el.textContent));
+    if (!prog) return;
+    body.classList.add('i-sr');
+    const i = kids.indexOf(prog);
+    prog.classList.add('i-sr-prog');
+    if (i > 0) kids[i-1].classList.add('i-sr-when');
+    const sum = kids[i+1];
+    if (sum && !sum.classList.contains('form-row') && sum.id!=='srErr' && !sum.querySelector('button,input')) sum.classList.add('i-sr-sum');
+    body.querySelectorAll('.form-row > .form-label').forEach(l => l.classList.add('i-sr-q'));
+    body.querySelectorAll('.btn-gold').forEach(b => { b.textContent = b.textContent.replace(/\s*→\s*$/,''); });
+    const back = body.querySelector('.btn-outline');
+    const row = back && back.parentElement;
+    if (row && row !== body && row.querySelector('.btn-gold')) {
+      row.classList.add('i-sr-actions');
+      back.innerHTML = '<svg width="12" height="20" viewBox="0 0 12 20"><path d="M10 2 2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Back';
+      slot.appendChild(back);
+    }
+  }
+  (function(){
+    const body = $('modalBody');
+    if (body && window.MutationObserver) new MutationObserver(() => safe(decorateModal)).observe(body, {childList:true});
+  })();
+
+  /* ── entry point, called from submitPin() for 3599 ── */
+  if (typeof enterGuestMode === 'function') {
+    const origG = enterGuestMode;
+    window.enterGuestMode = enterGuestMode = function(){ document.body.classList.remove('ios-mode','ios-classic'); return origG.apply(this, arguments); };
+  }
+  window.enterIosMode = function(){
+    document.body.classList.add('ios-mode');
+    document.body.classList.remove('ios-classic');
+    enterStaffMode();           // identical to 1599: appMode='staff', startApp(), same permissions
+    safe(bind);
+    safe(()=>switchTab('today'));
+  };
+})();
 </script>
 </body>
 </html>
