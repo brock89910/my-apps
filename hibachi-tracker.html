@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-visual">
+<link rel="manifest" href="hibachi-manifest.json">
+<meta name="theme-color" content="#1c1a17">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" sizes="192x192" href="hibachi-icon-192.png">
+<link rel="apple-touch-icon" href="hibachi-icon-192.png">
 <meta name="google-site-verification" content="3yopg3yI0TkElAZWqJPdVB_QedQ5d65CFcSQ5BnfiZ8" />
 <title>Hibachi Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1494,6 +1500,67 @@ body.ios-mode .btn-danger { background:var(--i-red-soft); border:0; border-radiu
 .i-grab { display:none; }
 .i-snav { height:52px; }
 
+/* ── mode switch: classic header button (1599 + 3599-in-classic only) ── */
+#modeSwitchBtn { display:none; background:rgba(210,175,100,0.12); border:1px solid rgba(210,175,100,0.45); border-radius:5px; color:var(--gold);
+  font-family:var(--mono); font-size:0.58rem; letter-spacing:0.06em; padding:3px 9px; cursor:pointer; white-space:nowrap; font-weight:600; }
+body.staff-mode:not(.staff2-mode):not(.manager-mode) #modeSwitchBtn { display:inline-block; }
+body.ios-mode.ios-classic #iosBackPill { display:none !important; }   /* replaced by the header button (the old pill rode up with the keyboard) */
+/* iOS side of the switch: centred in the top bar */
+.i-nav3 { display:grid !important; grid-template-columns:1fr auto 1fr; }
+.i-nav3 > :last-child { justify-self:end; }
+.i-mode { font-size:13px !important; font-weight:600; color:var(--i-accent) !important; background:var(--i-fill) !important; border-radius:14px !important;
+  padding:5px 12px !important; line-height:1; }
+
+/* ── rows: large groups (15+) — same navy + white as classic ── */
+.i-row.big { background:#1e3a8a; color:#fff; }
+.i-row.big .t2 { color:#c7d7ff; }
+.i-row.big .i-party, .i-row.big .i-party.dbl { background:rgba(255,255,255,.18); color:#fff; }
+.i-row.big .i-conf:not(.done) { border-color:rgba(255,255,255,.55) !important; color:rgba(255,255,255,.55) !important; }
+.i-row.big.ovr { box-shadow:inset 4px 0 0 #e04040; }
+.i-row.big + .i-row::before, .i-row + .i-row.big::before { background:rgba(255,255,255,.18); }
+
+/* ── rows: note line ── */
+.i-row .t3 { display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600; margin-top:2px; min-width:0; color:var(--i-label2); }
+.i-row .t3 svg { flex:0 0 auto; width:14px; height:14px; }
+.i-row .t3 span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.i-row .t3.allergy { color:var(--i-red); }
+.i-row .t3.restriction { color:var(--i-orange-text); }
+.i-row.big .t3 { color:#c7d7ff; } .i-row.big .t3.allergy { color:#ffb3b3; } .i-row.big .t3.restriction { color:#ffd9a0; }
+
+/* ── rows: unfinished reservation (someone is still booking it) ── */
+@keyframes iDraft { 0%,100%{ box-shadow:inset 0 0 0 2px rgba(42,143,224,.9), inset 0 0 0 0 rgba(42,143,224,0); } 50%{ box-shadow:inset 0 0 0 2px rgba(42,143,224,.9), inset 0 0 22px 0 rgba(42,143,224,.35); } }
+@keyframes iDot { 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:.35; transform:scale(.7); } }
+.i-row.draft { opacity:1; color:var(--i-label);
+  background:repeating-linear-gradient(135deg, rgba(42,143,224,.10) 0 10px, rgba(42,143,224,.04) 10px 20px) !important;
+  animation:iDraft 1.6s ease-in-out infinite; }
+.i-row.draft .t1 { font-style:italic; }
+.i-row.draft .t2 { color:var(--i-label2); }
+.i-row.draft .i-party { background:transparent !important; color:#2a8fe0 !important; border:2px dashed #2a8fe0; }
+.i-tag.draft { background:#2a8fe0; color:#fff; display:inline-flex; align-items:center; gap:4px; }
+.i-tag.draft::before { content:""; width:6px; height:6px; border-radius:50%; background:#fff; animation:iDot 1.2s ease-in-out infinite; }
+/* date strip + jump calendar: a day with an unfinished reservation */
+.i-day { position:relative; }
+.i-day.draft { box-shadow:0 0 0 2px #2a8fe0; animation:iDayDraft 1.6s ease-in-out infinite; }
+@keyframes iDayDraft { 0%,100%{ box-shadow:0 0 0 2px rgba(42,143,224,.95); } 50%{ box-shadow:0 0 0 4px rgba(42,143,224,.35); } }
+.i-day.draft::after, .i-cday.draft .num::after { content:""; position:absolute; top:5px; right:6px; width:8px; height:8px; border-radius:50%; background:#2a8fe0; animation:iDot 1.2s ease-in-out infinite; }
+.i-cday.draft .num { position:relative; box-shadow:0 0 0 2px #2a8fe0; animation:iDayDraft 1.6s ease-in-out infinite; }
+.i-cday.draft .num::after { top:-2px; right:-2px; }
+.i-week { padding-top:4px !important; padding-bottom:4px !important; }
+
+/* ── swipe between days ── */
+.i-swl { animation:iSwL .26s cubic-bezier(.32,.72,0,1); }
+.i-swr { animation:iSwR .26s cubic-bezier(.32,.72,0,1); }
+@keyframes iSwL { from{ opacity:.3; transform:translateX(40px); } to{ opacity:1; transform:none; } }
+@keyframes iSwR { from{ opacity:.3; transform:translateX(-40px); } to{ opacity:1; transform:none; } }
+
+/* ── usage tally (More tab) ── */
+.i-usage { width:100%; border-collapse:collapse; font-size:15px; }
+.i-usage th { font-size:12px; font-weight:600; color:var(--i-label2); text-align:right; padding:10px 16px 4px; }
+.i-usage th:first-child { text-align:left; }
+.i-usage td { padding:10px 16px; text-align:right; font-variant-numeric:tabular-nums; border-top:.5px solid var(--i-sep); }
+.i-usage td:first-child { text-align:left; }
+.i-usage td b { font-weight:700; }
+
 /* tap the big title → month calendar popover to jump to any day */
 .i-jt { cursor:pointer; display:inline-flex !important; align-items:center; gap:8px; -webkit-tap-highlight-color:transparent; user-select:none; }
 .i-jt::after { content:""; width:14px; height:14px; margin-top:4px; background:var(--i-accent); transition:transform .25s;
@@ -1700,6 +1767,7 @@ body.i-silent #modalOverlay { visibility:hidden !important; }
             Last: <span id="lastBackupTime">Never</span>
           </div>
         </div>
+        <button type="button" id="modeSwitchBtn" onclick="iosModeSwitch('ios')" title="Switch to the iOS view">iOS view</button>
         <button onclick="window._firebaseLogout()"
           title="Sign out"
           style="background:transparent;border:1px solid var(--border);border-radius:5px;
@@ -1941,7 +2009,7 @@ body.i-silent #modalOverlay { visibility:hidden !important; }
 <!-- ════ iOS APP (password 3599) — same data and functions as staff, iOS screens ════ -->
 <div id="iosApp">
   <main class="i-screen on" id="iosTodayScr" aria-label="Reservations">
-    <div class="i-nav"><span class="i-live" id="iosLive">Live</span><button class="i-link" id="iosGoToday" type="button">Today</button></div>
+    <div class="i-nav i-nav3"><span class="i-live" id="iosLive">Live</span><button type="button" class="i-mode" onclick="iosModeSwitch('classic')">Classic view</button><button class="i-link" id="iosGoToday" type="button">Today</button></div>
     <h1 class="i-title i-jt" id="iosTitle" role="button" tabindex="0" aria-label="Choose a day to view">Today</h1>
     <div class="i-sub" id="iosSub"></div>
     <div class="i-week" id="iosWeek"></div>
@@ -1952,7 +2020,7 @@ body.i-silent #modalOverlay { visibility:hidden !important; }
   </main>
 
   <main class="i-screen" id="iosDiningScr" aria-label="Dining">
-    <div class="i-nav"><span></span><button class="i-link" id="iosDGoToday" type="button">Today</button></div>
+    <div class="i-nav i-nav3"><span></span><button type="button" class="i-mode" onclick="iosModeSwitch('classic')">Classic view</button><button class="i-link" id="iosDGoToday" type="button">Today</button></div>
     <h1 class="i-title i-jt" id="iosDTitle" role="button" tabindex="0" aria-label="Choose a day to view">Dining</h1>
     <div class="i-sub" id="iosDSub"></div>
     <div class="i-week" id="iosDWeek"></div>
@@ -6310,20 +6378,35 @@ window._preloadAllReservations = preloadAllReservations;
   function rowHTML(r, key, slot, isToday, nowMins, dbl){
     const t = timeToMinutes(r.slot), soon = isToday && nowMins>=t-10 && nowMins<=t+5;
     const tags = [];
-    if (r.isDraft) tags.push('<span class="i-tag warn">Saving…</span>');
-    if (soon) tags.push('<span class="i-tag ok">Seat now</span>');
+    if (r.isDraft) tags.push('<span class="i-tag draft">Booking…</span>');
+    if (soon && !r.isDraft) tags.push('<span class="i-tag ok">Seat now</span>');
     if (r.holdUntil) tags.push('<span class="i-tag warn">Hold</span>');
-    if (r.noteType==='allergy') tags.push('<span class="i-tag bad">Allergy</span>');
-    if (r.noteType==='restriction') tags.push('<span class="i-tag warn">Restriction</span>');
     if (r.cardCaptured) tags.push('<span class="i-tag ok">Card</span>');
     const name = getDisplayName(r.id, r.name, key);
     const sub = [r.phone, r.initials].filter(Boolean).map(esc).join('  ');
-    return `<div class="i-row${soon?' soon':''}${r.isDraft?' draft':''}" role="button" tabindex="0" data-res="${esc(r.id)}" data-slot="${slot}">`
+    const big = (r.guests||0) >= DOUBLE_GRILL_MIN_GUESTS, ovr = !!(r.managerOverride || r.overrideBooked);
+    return `<div class="i-row${soon?' soon':''}${r.isDraft?' draft':''}${big?' big':''}${big&&ovr?' ovr':''}" role="button" tabindex="0" data-res="${esc(r.id)}" data-slot="${slot}">`
       + `<span class="i-party${dbl?' dbl':''}">${r.guests||''}</span>`
-      + `<div class="main"><div class="t1">${esc(name)}</div><div class="t2">${sub||'&nbsp;'}</div></div>`
+      + `<div class="main"><div class="t1">${esc(name)}</div><div class="t2">${sub||'&nbsp;'}</div>${noteLine(r)}</div>`
       + `<span class="i-tags">${tags.join('')}</span>`
       + `<button type="button" class="i-conf${r.confirmed?' done':''}" data-confirm="${esc(r.id)}" aria-label="${r.confirmed?'Confirmed by '+esc(r.confirmedBy||'?'):'Confirm reservation'}">${r.confirmed?'✓':''}</button></div>`;
   }
+  const NOTE_ICON = {
+    allergy:'<svg viewBox="0 0 16 16"><path d="M8 1.6 15 14H1L8 1.6Z" fill="currentColor"/><path d="M8 6v3.6" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/><circle cx="8" cy="11.8" r="1" fill="#fff"/></svg>',
+    restriction:'<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.6 12.4 12.4 3.6" stroke="currentColor" stroke-width="1.8"/></svg>',
+    chef:'<svg viewBox="0 0 16 16"><path d="M4 9.5a3 3 0 0 1-.4-5.9A3.3 3.3 0 0 1 8 2a3.3 3.3 0 0 1 4.4 1.6A3 3 0 0 1 12 9.5V13H4V9.5Z" fill="currentColor"/></svg>',
+    table:'<svg viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="2.4" rx="1" fill="currentColor"/><path d="M3.5 6.4V13M12.5 6.4V13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    other:'<svg viewBox="0 0 16 16"><path d="M3 2h7l3 3v9H3V2Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M5.5 8h5M5.5 11h3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
+  };
+  function noteLine(r){
+    const t = r.noteType || (r.noteText || r.notes ? 'other' : '');
+    if (!t) return '';
+    const txt = r.noteText || r.notes || '';
+    const label = typeof noteTypeLabel==='function' ? noteTypeLabel(t) : t;
+    const show = txt ? (t==='other' ? txt : label+': '+txt) : label;
+    return `<div class="t3 ${esc(t)}">${NOTE_ICON[t]||NOTE_ICON.other}<span>${esc(show)}</span></div>`;
+  }
+  const hasDraft = k => typeof activeDraftsByDate!=='undefined' && activeDraftsByDate[k] && activeDraftsByDate[k].length;
   function renderWeek(key, tk, elId, countFn){
     const w = $(elId||'iosWeek'), today = keyToDate(tk); countFn = countFn||dayGuests;
     // 8 days (anchor + 7). Anchor = today by default; a day picked from the
@@ -6335,7 +6418,7 @@ window._preloadAllReservations = preloadAllReservations;
     let h = '';
     for (let i=0;i<8;i++){
       const d = addDays(start,i), k = dateKey(d), g = countFn(k);
-      h += `<button type="button" class="i-day${k===key?' sel':''}${k===tk?' today':''}" data-day="${k}"><div class="dw">${WD[d.getDay()]}</div><div class="dn">${d.getDate()}</div><div class="dg">${g?g+'p':''}</div></button>`;
+      h += `<button type="button" class="i-day${k===key?' sel':''}${k===tk?' today':''}${(!elId||elId==='iosWeek')&&hasDraft(k)?' draft':''}" data-day="${k}"><div class="dw">${WD[d.getDay()]}</div><div class="dn">${d.getDate()}</div><div class="dg">${g?g+'p':''}</div></button>`;
     }
     w.innerHTML = h;
     const s = w.querySelector('.sel'); if (s && !w._touched) s.scrollIntoView({inline:'center', block:'nearest'});
@@ -6377,7 +6460,7 @@ window._preloadAllReservations = preloadAllReservations;
       let h = ''; for (let i=0;i<lead;i++) h += '<span></span>';
       for (let d=1; d<=days; d++){
         const k = dateKey(new Date(y,m,d)), n = count(k);
-        h += `<button type="button" class="i-cday${k===sel?' sel':''}${k===tk?' today':''}${k<tk?' past':''}" data-k="${k}"><span class="num">${d}</span><span class="cnt">${n?n+'p':''}</span></button>`;
+        h += `<button type="button" class="i-cday${k===sel?' sel':''}${k===tk?' today':''}${k<tk?' past':''}${!dining&&hasDraft(k)?' draft':''}" data-k="${k}"><span class="num">${d}</span><span class="cnt">${n?n+'p':''}</span></button>`;
       }
       const g = $('iosJGrid'); g.innerHTML = h; g.className = 'i-calgrid' + (dirn ? (dirn>0?' i-in':' i-back') : '');
     };
@@ -6510,6 +6593,97 @@ window._preloadAllReservations = preloadAllReservations;
     new MutationObserver(() => { if (q) return; q = true; setTimeout(()=>{ q=false; safe(scanOverrides); }, 30); })
       .observe(document.body, { childList:true, subtree:true });
   })();
+
+  /* ── MODE SWITCH (1599 ⇄ iOS) + USAGE TALLY ──
+     Switching only flips the look. Both sides are appMode 'staff' with the same
+     permissions, data listeners and save functions, so nothing restarts. */
+  function usage(ev, extra){
+    try {
+      if (!window._db || !window._push) return;
+      const mode = document.body.classList.contains('ios-mode') && !document.body.classList.contains('ios-classic') ? 'ios' : 'classic';
+      window._push(window._ref(window._db, 'diagnostics/uiUsage'), Object.assign({ ev, mode, appMode: (typeof appMode!=='undefined'?appMode:null),
+        ts: Date.now(), deviceId: (typeof getDeviceId==='function'?getDeviceId():null) }, extra||{})).catch(()=>{});
+    } catch(e) {}
+  }
+  window.iosModeSwitch = function(to){
+    if (to === 'ios') {
+      const tab = (typeof activeTab!=='undefined' && activeTab==='dining') ? 'dining' : 'today';
+      document.body.classList.add('ios-mode'); document.body.classList.remove('ios-classic');
+      safe(bind); S.anchor = null; safe(()=>switchTab(tab));
+      usage('switch');
+    } else {
+      closeJump(); if (S.book) closeBook();
+      const tab = S.tab==='dining' ? 'dining' : 'hibachi';
+      document.body.classList.remove('ios-mode','ios-classic');
+      if (typeof window.switchTab==='function') safe(()=>window.switchTab(tab));
+      ['renderDateHeader','renderWeekStrip','renderTimeSlots','renderDining'].forEach(f => { if (typeof window[f]==='function') safe(()=>window[f]()); });
+      window.scrollTo(0,0);
+      usage('switch');
+    }
+  };
+  // 1599 sign-in / page load lands in classic → count an "open"
+  if (typeof enterStaffMode === 'function') {
+    const origS = enterStaffMode;
+    window.enterStaffMode = enterStaffMode = function(){
+      const r = origS.apply(this, arguments);
+      setTimeout(() => { if (!document.body.classList.contains('ios-mode') && appMode==='staff') usage('open'); }, 0);
+      return r;
+    };
+  }
+  // a finished stepped booking (1599 or 3599) → count which screen it came from
+  if (typeof srSave === 'function') {
+    const origSave = srSave;
+    window.srSave = srSave = async function(){
+      const wasDraft = typeof _sr!=='undefined' && _sr ? (_sr.name||'') : null;
+      const r = await origSave.apply(this, arguments);
+      try { if (wasDraft!==null && $('modalOverlay').style.display==='none' && appMode==='staff') usage('book'); } catch(e) {}
+      return r;
+    };
+  }
+  // live pulse on the iOS strip when a draft starts/finishes on any device
+  if (typeof renderWeekStrip === 'function') {
+    const origW = renderWeekStrip;
+    window.renderWeekStrip = renderWeekStrip = function(){
+      const r = origW.apply(this, arguments);
+      if (active() && S.tab==='today') safe(() => renderWeek(dateKey(currentDate), todayKey()));   // strip only — cheap
+      return r;
+    };
+  }
+  async function renderUsage(){
+    const box = $('iosUsage'); if (!box) return;
+    if (!window._db || !window._get) { box.innerHTML = '<div class="i-item"><div class="main t2">Offline</div></div>'; return; }
+    let rows = [];
+    try { const snap = await window._get(window._ref(window._db, 'diagnostics/uiUsage')); rows = Object.values(snap.val()||{}); }
+    catch(e) { box.innerHTML = '<div class="i-item"><div class="main t2">Could not load usage.</div></div>'; return; }
+    rows = rows.filter(x => x && x.appMode==='staff');
+    const wk = Date.now() - 7*864e5;
+    const n = (ev, mode, since) => rows.filter(x => x.ev===ev && x.mode===mode && (!since || x.ts>=since)).length;
+    const line = (label, ev) => `<tr><td>${label}</td><td><b>${n(ev,'ios',wk)}</b> / ${n(ev,'ios')}</td><td><b>${n(ev,'classic',wk)}</b> / ${n(ev,'classic')}</td></tr>`;
+    if (!$('iosUsage')) return;
+    $('iosUsage').innerHTML = `<table class="i-usage"><tr><th></th><th>iOS</th><th>Classic</th></tr>`
+      + line('Sign-ins', 'open') + line('Switched into', 'switch') + line('Bookings made', 'book')
+      + `</table><div class="i-item"><div class="main t2">Bold = last 7 days / all time. Switched into = taps on the switch that landed in that view.</div></div>`;
+  }
+
+  /* ── SWIPE between days (Today + Dining screens) ── */
+  function bindSwipe(scrId, bodyId){
+    const el = $(scrId); if (!el) return;
+    let sx=null, sy=null, st=0, ok=false;
+    el.addEventListener('touchstart', e => {
+      ok = e.touches.length===1 && !e.target.closest('.i-week, .i-seg, input, textarea, select');
+      if (!ok) return; sx=e.touches[0].clientX; sy=e.touches[0].clientY; st=Date.now();
+    }, {passive:true});
+    el.addEventListener('touchend', e => {
+      if (!ok || sx===null) return;
+      const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy; sx=null;
+      if (Date.now()-st > 700 || Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy)*2) return;
+      if (jumpOpen() || S.book || AL) return;
+      const dir = dx < 0 ? 1 : -1;
+      const b = $(bodyId); if (b) { b.classList.remove('i-swl','i-swr'); void b.offsetWidth; b.classList.add(dir>0?'i-swl':'i-swr'); }
+      ['iosWeek','iosDWeek'].forEach(id => { if ($(id)) $(id)._touched = false; });
+      goDate(dateKey(addDays(currentDate, dir)));
+    }, {passive:true});
+  }
 
   /* ── NEW RESERVATION: date → party → time, then hand off to the real stepped flow ── */
   function startBooking(presetSlot, kind){
@@ -6760,14 +6934,16 @@ window._preloadAllReservations = preloadAllReservations;
       + `</div><div class="i-list">`
       + item('history','History','Opens the classic history screen')
       + item('classic','Switch to classic view','Same account, original screens')
-      + `</div><div class="i-list">${item('signout','Sign out','', 'danger')}</div>`;
+      + `</div><div class="i-list">${item('signout','Sign out','', 'danger')}</div>`
+      + `<div class="i-sechead">iOS vs classic (1599) usage</div><div class="i-list" id="iosUsage"><div class="i-item"><div class="main t2">Loading…</div></div></div>`;
+    safe(renderUsage);
   }
   function moreAction(act){
     if (act==='print') return printDailySheet();
     if (act==='removeChef') return promptRemoveChef();
     if (act==='restoreChef') return restoreChefForDay();
     if (act==='history') return classic('history');
-    if (act==='classic') return classic('hibachi');
+    if (act==='classic') return window.iosModeSwitch('classic');
     if (act==='signout') { document.body.classList.remove('ios-mode','ios-classic'); return window._firebaseLogout && window._firebaseLogout(); }
   }
   function classic(tab){ document.body.classList.add('ios-classic'); window.switchTab ? window.switchTab(tab) : null; window.scrollTo(0,0); }
@@ -6798,6 +6974,7 @@ window._preloadAllReservations = preloadAllReservations;
       t.onclick = () => safe(() => jumpOpen() ? closeJump() : openJump(t));
       t.onkeydown = e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); t.click(); } }; });
     $('iosJumpScrim').onclick = closeJump;
+    bindSwipe('iosTodayScr', 'iosSlots'); bindSwipe('iosDiningScr', 'iosDList');
     $('iosWeek').onclick = e => { const b = e.target.closest('[data-day]'); if (b) { $('iosWeek')._touched=true; goDate(b.dataset.day); } };
     document.querySelectorAll('#iosApp .i-seg button').forEach(b => b.onclick = () => {
       S.view = b.dataset.m; document.querySelectorAll('#iosApp .i-seg button').forEach(x=>x.classList.toggle('on', x===b)); safe(render); });
@@ -6880,6 +7057,7 @@ window._preloadAllReservations = preloadAllReservations;
     window.enterGuestMode = enterGuestMode = function(){ document.body.classList.remove('ios-mode','ios-classic'); return origG.apply(this, arguments); };
   }
   window.enterIosMode = function(){
+    setTimeout(() => usage('open'), 0);
     document.body.classList.add('ios-mode');
     document.body.classList.remove('ios-classic');
     enterStaffMode();           // identical to 1599: appMode='staff', startApp(), same permissions
