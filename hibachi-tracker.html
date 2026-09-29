@@ -1134,106 +1134,9 @@ body.staff-mode .real-name { display: inline; }
 }
 
 /* ══════════════════════════════════════════════
-   STAFF2 MODE — CREAM / LIGHT THEME (password 2599)
-   Same palette as manager-overlook light theme.
-   All font weights bumped for readability.
-   ══════════════════════════════════════════════ */
-body.staff2-mode {
-  --bg:        #f5f2ec;
-  --bg2:       #ede9e0;
-  --bg3:       #e8e3d8;
-  --panel:     #f0ece4;
-  --lift:      #ddd8ce;
-  --border:    rgba(160,140,100,0.35);
-  --border2:   rgba(160,140,100,0.2);
-  --gold:      #9a6800;
-  --gold2:     #7a5200;
-  --gold3:     rgba(154,104,0,0.1);
-  --gold-light:#6a4400;
-  --text:      #2a2520;
-  --text2:     #5a5048;
-  --text3:     #8a8070;
-  --green:     #2a7a2a;
-  --red:       #c02020;
-  --red-deep:  #6a0a0a;
-  --amber:     #8a5800;
-  --blue:      #1a5a98;
-}
-
-/* Remove dark noise texture in staff2 mode */
-body.staff2-mode::before { display: none; }
-
-/* ── Thicker fonts everywhere ── */
-body.staff2-mode { font-weight: 500; }
-
-body.staff2-mode .app-title          { font-weight: 800; color: var(--gold); }
-body.staff2-mode .app-title-sub      { font-weight: 600; color: var(--text2); }
-body.staff2-mode .date-label         { font-weight: 800; }
-body.staff2-mode .date-sub           { font-weight: 600; }
-body.staff2-mode .tab-btn            { font-weight: 700; color: var(--text2); }
-body.staff2-mode .tab-btn.active     { color: var(--gold); border-bottom-color: var(--gold); }
-body.staff2-mode .time-label         { font-weight: 800; color: var(--gold); }
-body.staff2-mode .time-chef-info     { font-weight: 600; }
-body.staff2-mode .res-row-name       { font-weight: 700; }
-body.staff2-mode .res-row-meta       { font-weight: 600; }
-body.staff2-mode .res-row-badge      { font-weight: 700; }
-body.staff2-mode .modal-title        { font-weight: 800; color: var(--gold); }
-body.staff2-mode .form-label         { font-weight: 700; color: var(--text2); }
-body.staff2-mode .form-input,
-body.staff2-mode .form-select,
-body.staff2-mode .form-textarea      { font-weight: 600; color: var(--text); background: #fff; border-color: rgba(160,140,100,0.4); }
-body.staff2-mode .form-input:focus,
-body.staff2-mode .form-select:focus,
-body.staff2-mode .form-textarea:focus { background: #fff; border-color: rgba(154,104,0,0.5); }
-body.staff2-mode .btn-gold           { color: #fff; font-weight: 800; }
-body.staff2-mode .btn-danger         { font-weight: 700; }
-body.staff2-mode .btn-outline        { font-weight: 700; }
-body.staff2-mode .history-month-label{ font-weight: 800; color: var(--gold); }
-body.staff2-mode .history-entry      { font-weight: 600; background: var(--bg3); }
-body.staff2-mode .login-wordmark     { color: var(--gold); font-weight: 800; }
-body.staff2-mode .slot-empty,
-body.staff2-mode .empty-slot         { font-weight: 600; }
-body.staff2-mode .section-divider    { font-weight: 700; }
-body.staff2-mode .dining-name        { font-weight: 700; }
-body.staff2-mode .dining-detail      { font-weight: 600; }
-
-/* Borders & surfaces */
-body.staff2-mode .app-header         { background: var(--bg2); border-color: rgba(160,140,100,0.3); }
-body.staff2-mode .tab-bar            { background: var(--bg3); border-color: rgba(160,140,100,0.25); }
-body.staff2-mode .res-row            { background: var(--bg3); }
-body.staff2-mode .modal-sheet        { background: var(--bg2); }
-body.staff2-mode .modal-overlay      { background: rgba(80,70,60,0.45); }
-body.staff2-mode .modal-close        { background: var(--lift); border-color: rgba(160,140,100,0.35); }
-body.staff2-mode #calDropdown        { background: var(--bg2); }
-body.staff2-mode .db-offline-banner  { background: #8a1a1a; }
-
-/* ALL time slot headers go dark in staff2 mode */
-body.staff2-mode .time-header        { background: #2a2520 !important; border-color: rgba(255,255,255,0.06) !important; }
-body.staff2-mode .time-header .time-label      { color: #d4a843 !important; }
-body.staff2-mode .time-header .time-chef-info  { color: rgba(245,242,236,0.7) !important; }
-body.staff2-mode .time-header .slot-cap-label.plenty { color: #6ab86a !important; background: rgba(74,138,74,0.2) !important; border-color: rgba(74,138,74,0.4) !important; }
-body.staff2-mode .time-header .slot-cap-label.low    { color: #e87858 !important; background: rgba(208,72,40,0.2) !important; border-color: rgba(208,72,40,0.4) !important; }
-body.staff2-mode .time-header .slot-cap-label.none   { color: #e87858 !important; background: rgba(208,72,40,0.25) !important; border-color: rgba(208,72,40,0.5) !important; }
-body.staff2-mode .time-header .slot-cap-label.custom { color: #7ab4cc !important; background: rgba(58,122,184,0.2) !important; border-color: rgba(58,122,184,0.4) !important; }
-body.staff2-mode .time-header .time-add-btn    { background: rgba(212,168,67,0.15) !important; border-color: rgba(212,168,67,0.4) !important; color: #d4a843 !important; }
-body.staff2-mode .time-header .force-add-btn   { opacity: 0.9; }
-
-/* Swap guest count (#p) and name colors:
-   - First span inside res-row-name = "Np" count → dark/black (override inline gold color)
-   - Second span inside res-row-name = customer name → amber
-   - res-row-meta (phone, initials) → dark */
-body.staff2-mode .res-row-name span:first-child { color: #2a2520 !important; font-weight: 800; }
-body.staff2-mode .res-row-name span:nth-child(2) { color: #9a6800 !important; font-weight: 600; }
-body.staff2-mode .res-row-name       { font-weight: 700; }
-body.staff2-mode .res-row-meta       { color: #2a2520 !important; font-weight: 700; }
-
-/* Scrollbar */
-body.staff2-mode ::-webkit-scrollbar-thumb { background: rgba(160,140,100,0.4); }
-
-/* ══════════════════════════════════════════════
-   iOS MODE (password 3599)
+   iOS MODE (1599 → floating "iOS view" pill)
    Everything below is scoped to body.ios-mode, so it can never
-   change how 1599 / 2599 / manager / guest look.
+   change how classic 1599 / manager / guest look.
    Legacy variables are re-pointed so the existing modals
    (booking steps, edit, overrides, confirm, chef removal) adopt the iOS look.
    ══════════════════════════════════════════════ */
@@ -1511,13 +1414,17 @@ body.ios-mode .btn-danger { background:var(--i-red-soft); border:0; border-radiu
   letter-spacing:0; -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); box-shadow:0 2px 10px rgba(0,0,0,.18);
   -webkit-tap-highlight-color:transparent; transition:opacity .18s, transform .18s; }
 #modePill svg { width:14px; height:14px; }
+#modeNote { position:fixed; z-index:1100; top:calc(46px + env(safe-area-inset-top,0px)); left:50%; transform:translate(-50%,-6px); max-width:calc(100% - 32px);
+  background:rgba(28,28,30,.9); color:#fff; font:500 13px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; padding:8px 14px; border-radius:12px;
+  opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; text-align:center; }
+#modeNote.on { opacity:1; transform:translate(-50%,0); }
 body:not(.ios-mode) #modePill, body.ios-classic #modePill { box-shadow:0 0 0 1px rgba(210,175,100,.45), 0 2px 10px rgba(0,0,0,.3); }
 #modePill:active { transform:translateX(-50%) scale(.94); }
-body.staff-mode:not(.staff2-mode):not(.manager-mode) #modePill.can { display:inline-flex; }
+body.staff-mode:not(.manager-mode) #modePill.can { display:inline-flex; }
 /* always on — iOS full-screen forms get a strip of room at the top so the pill never covers their title / Back / ✕.
    (Classic forms are bottom sheets that stop 8% below the top, so the pill already sits in the dimmed gap.) */
-body.staff-mode:not(.staff2-mode):not(.manager-mode).ios-mode .modal-sheet,
-body.staff-mode:not(.staff2-mode):not(.manager-mode).ios-mode .i-sheet { padding-top:calc(40px + env(safe-area-inset-top,0px)); }
+body.staff-mode:not(.manager-mode).ios-mode .modal-sheet,
+body.staff-mode:not(.manager-mode).ios-mode .i-sheet { padding-top:calc(40px + env(safe-area-inset-top,0px)); }
 
 /* iOS: "More" tab dimmed and blurred — still there and tappable */
 .i-tab[data-tab="more"]:not(.on) { filter:blur(1.4px); opacity:.4; transition:filter .2s, opacity .2s; }
@@ -1527,8 +1434,8 @@ body.staff-mode:not(.staff2-mode):not(.manager-mode).ios-mode .i-sheet { padding
 #modeSwitchBtn { display:none; background:rgba(210,175,100,0.12); border:1px solid rgba(210,175,100,0.45); border-radius:5px; color:var(--gold);
   font-family:var(--mono); font-size:0.58rem; letter-spacing:0.06em; padding:3px 9px; cursor:pointer; white-space:nowrap; font-weight:600; }
 @media (max-width:599px){
-  body.staff-mode:not(.staff2-mode):not(.manager-mode):not(.ios-mode) #modeSwitchBtn,
-  body.staff-mode:not(.staff2-mode):not(.manager-mode).ios-classic #modeSwitchBtn { display:inline-block; }
+  body.staff-mode:not(.manager-mode):not(.ios-mode) #modeSwitchBtn,
+  body.staff-mode:not(.manager-mode).ios-classic #modeSwitchBtn { display:inline-block; }
   body:not(.ios-mode) #modePill, body.ios-classic #modePill { display:none !important; }
 }
 body.ios-mode.ios-classic #iosBackPill { display:none !important; }
@@ -2028,7 +1935,7 @@ body.i-silent #modalOverlay { visibility:hidden !important; }
 </div>
 
 
-<!-- ════ iOS APP (password 3599) — same data and functions as staff, iOS screens ════ -->
+<!-- ════ iOS APP (1599 via the view pill) — same data and functions as staff, iOS screens ════ -->
 <div id="iosApp">
   <main class="i-screen on" id="iosTodayScr" aria-label="Reservations">
     <div class="i-nav"><span class="i-live" id="iosLive">Live</span><button class="i-link" id="iosGoToday" type="button">Today</button></div>
@@ -4351,7 +4258,7 @@ async function cleanupStaleDrafts() {
 setInterval(cleanupStaleDrafts, 5 * 60 * 1000);
 
 /* ══════════════════════════════════════════════
-   STEPPED RESERVATION FLOW — staff2 mode
+   STEPPED RESERVATION FLOW — staff (1599)
    State held in _sr (stepped reservation) object
    ══════════════════════════════════════════════ */
 let _sr = {}; // stepped reservation working state
@@ -5700,7 +5607,6 @@ async function syncToSheet() {
 
 /* ── LOGIN & ACCESS MODE ── */
 const STAFF_PIN_HASH    ='8e57858ab42fef1ee804b572421beb315e9fb3bd562f10f2f1c9ccf0384e8d99'; // 1599 — staff
-const STAFF2_PIN_HASH   ='533099ac357e5586238f6be92e706eacb5dea6559fa61b979069c39c5efe8cee'; // 2599 — staff2
 const MANAGER_PIN_HASH_A='ed6757a399e37c0d2187b60c621deb5b4a152dc0a933a4d6135940ddc383f56b'; // g14022603
 const MANAGER_PIN_HASH_B='0bc0cfbf5519843daa9883b48fc41cc40a56ae51cc0b8f473084e31324cd6f18'; // nathanongame
 const BYPASS_LOCKOUT_HASH='168e204ed507530307d8ad02e65708a126e58979d0251b04e64b62100c6539cd'; // Funorange34 — bypass lockout only
@@ -5808,12 +5714,7 @@ async function submitPin() {
   }
 
   // Check valid passwords
-  document.body.classList.remove('ios-mode','ios-classic'); // iOS look only for 3599
-  if (h === '66849e29a8eb896b7e92bd83752a609d9b7106f7755561464df37c0bd9249781' && typeof window.enterIosMode === 'function') { // 3599 — staff, iOS look
-    clearLockState();
-    window.enterIosMode();
-    return;
-  }
+  document.body.classList.remove('ios-mode','ios-classic'); // reset; 1599 then opens in iOS (pill switches to classic)
   if (h === MANAGER_PIN_HASH_A || h === MANAGER_PIN_HASH_B) {
     clearLockState(); // successful login resets counter
     enterManagerMode();
@@ -5821,12 +5722,7 @@ async function submitPin() {
   }
   if (h === STAFF_PIN_HASH) {
     clearLockState();
-    enterStaffMode();
-    return;
-  }
-  if (h === STAFF2_PIN_HASH) {
-    clearLockState();
-    enterStaff2Mode();
+    if (typeof window.enterIosMode === 'function') window.enterIosMode(); else enterStaffMode();
     return;
   }
 
@@ -5850,20 +5746,11 @@ async function submitPin() {
 // Keep old name as alias
 async function submitStaffPin() { return submitPin(); }
 
-function enterStaff2Mode() {
-  appMode='staff2';
-  document.getElementById('loginScreen').style.display='none';
-  document.getElementById('app').style.display='';
-  document.body.classList.remove('guest-mode','manager-mode'); document.body.classList.add('staff-mode','staff2-mode');
-  const ind=document.getElementById('modeIndicator'); ind.className='staff'; ind.textContent='✓ Staff';
-  startApp();
-}
-
 function enterStaffMode() {
   appMode='staff';
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('app').style.display='';
-  document.body.classList.remove('guest-mode','manager-mode','staff2-mode'); document.body.classList.add('staff-mode');
+  document.body.classList.remove('guest-mode','manager-mode'); document.body.classList.add('staff-mode');
   const ind=document.getElementById('modeIndicator'); ind.className='staff'; ind.textContent='✓ Staff';
   startApp();
 }
@@ -6267,9 +6154,9 @@ window._preloadAllReservations = preloadAllReservations;
 
 </script>
 
-<!-- ════ iOS MODE SCRIPT (password 3599) ════
+<!-- ════ iOS MODE SCRIPT (1599 via the view pill) ════
      Kept in its own <script> tag on purpose: if anything in here ever throws,
-     the main tracker script above keeps working for 1599 / 2599 / manager.
+     the main tracker script above keeps working for 1599 / manager.
      This block only READS app state and CALLS existing functions:
      booking steps, overrides, passwords, edits, confirm, chef removal and
      the daily sheet all run through the exact same code as staff mode. -->
@@ -6280,7 +6167,7 @@ window._preloadAllReservations = preloadAllReservations;
   const WD = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const MON = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const chev = '<svg class="i-chev" viewBox="0 0 8 13"><path d="M1 1l5.5 5.5L1 12" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
-  const S = { tab:'today', view:'booked', book:null, bound:false, anchor:null };
+  const S = { tab:'today', view:'booked', book:null, bound:false, anchor:null, resume:null, pending:null };
 
   const active = () => document.body.classList.contains('ios-mode') && !document.body.classList.contains('ios-classic');
   const safe = (fn) => { try { return fn(); } catch (e) { console.error('[iOS mode]', e); } };
@@ -6628,15 +6515,79 @@ window._preloadAllReservations = preloadAllReservations;
         ts: Date.now(), deviceId: (typeof getDeviceId==='function'?getDeviceId():null) }, extra||{})).catch(()=>{});
     } catch(e) {}
   }
+  /* ── carry an in-progress booking across the switch ──
+     Hibachi: both views share the tracker's own step form (guests → name → phone → card …),
+     so if that form is open it simply stays open, same step, same typed values.
+     The iOS-only pre-steps (day / party / time) and the iOS dining steps are handed over
+     to their classic equivalents, and back again. */
+  const noteEl = () => { let n = $('modeNote'); if (!n) { n = document.createElement('div'); n.id = 'modeNote'; document.body.appendChild(n); } return n; };
+  function modeNote(msg){ const n = noteEl(); n.textContent = msg; n.classList.add('on'); clearTimeout(n._h); n._h = setTimeout(()=>n.classList.remove('on'), 4200); }
+  function openBookWith(st){
+    S.book = Object.assign({ kind:'hibachi', preset:null, party:null, step:0, calMonth:null, dir:'in', name:'', phone:'', notes:'', noteTag:'', time:null }, st, { dir:'in' });
+    $('iosScrim').classList.add('on'); $('iosBook').classList.add('on'); document.body.style.overflow='hidden';
+    renderBook();
+  }
+  function snapshotBook(){
+    const B = S.book; if (!B) return null;
+    const v = id => $(id) ? $(id).value : null;
+    const h = Object.assign({}, B, { date: dateKey(currentDate) });
+    if (v('iosDName') !== null) h.name = v('iosDName').trim();
+    if (v('iosDPhone') !== null) h.phone = v('iosDPhone').trim();
+    if (v('iosDNotes') !== null) h.notes = v('iosDNotes');
+    delete h.calMonth; return h;
+  }
+  function handToClassic(h){
+    if (h.kind === 'dining') {
+      if (typeof window.switchTab==='function') window.switchTab('dining');
+      if (h.step < 1) return;
+      openDiningModal(null);
+      if (h.party) $('dGuests').value = h.party;
+      if (h.time) { $('dTime').value = h.time; $('dTime').dataset.touched = '1'; }
+      if (h.name) $('dName').value = h.name;
+      if (h.phone) $('dPhone').value = h.phone;
+      const notes = [h.noteTag, (h.notes||'').trim()].filter(Boolean).join(': ');
+      if (notes) $('dNotes').value = notes;
+      return;
+    }
+    if (typeof window.switchTab==='function') window.switchTab('hibachi');
+    if (h.preset && h.step >= 1) {                       // time already picked → straight into the guests step
+      openSteppedModal(h.preset);
+      if (h.party && $('srGuests')) $('srGuests').value = h.party;
+      return;
+    }
+    S.resume = h;                                        // day / party chosen, no time yet
+    if (h.party) { S.pending = { party:h.party, date:h.date }; modeNote(`Party of ${h.party} kept — tap a time to continue`); }
+  }
+  function diningFormToIos(){
+    const btn = document.querySelector('#modalBody .btn-gold'), on = btn && btn.getAttribute('onclick') || '';
+    if (!$('dName') || !/saveDining\('[^']*',''\)/.test(on)) return false;        // only a NEW dining booking, never an edit
+    const party = parseInt($('dGuests').value,10) || null, time = $('dTime').dataset.touched ? $('dTime').value : null;
+    const name = $('dName').value.trim(), phone = $('dPhone').value.trim(), notes = $('dNotes').value;
+    const step = !party ? 1 : !time ? 2 : !name ? 3 : 4;
+    closeModal();
+    switchTab('dining');
+    openBookWith({ kind:'dining', party, time, name, phone, notes, step });
+    return true;
+  }
   window.iosModeSwitch = function(to){
     if (to === 'ios') {
       const tab = (typeof activeTab!=='undefined' && activeTab==='dining') ? 'dining' : 'today';
+      const cd = $('calDropdown'); if (cd) cd.style.display = 'none';
       document.body.classList.add('ios-mode'); document.body.classList.remove('ios-classic');
       safe(bind); S.anchor = null; safe(()=>switchTab(tab));
       usage('switch');
-      setTimeout(() => { safe(decorateModal); safe(scanOverrides); }, 30);   // open form → iOS look + iOS password alert
+      const formOpen = $('modalOverlay') && $('modalOverlay').style.display !== 'none';
+      if (formOpen) {
+        if (!safe(diningFormToIos)) setTimeout(() => { safe(decorateModal); safe(scanOverrides); }, 30);   // shared step form → same step, iOS look
+      } else if (S.resume && S.resume.date === dateKey(currentDate)) {
+        const r = S.resume; S.resume = null; S.pending = null;
+        safe(() => { if (r.kind!=='dining') switchTab('today'); openBookWith(r); });                          // back to the iOS step you left
+      }
+      S.resume = null; S.pending = null;
     } else {
-      closeJump(); if (S.book) closeBook();
+      closeJump();
+      const hand = S.book ? snapshotBook() : null;
+      if (S.book) closeBook();
       // an open iOS password alert → give the classic inline prompt back
       if (AL) { $('iosAlertScrim').classList.remove('on'); AL = null; }
       document.querySelectorAll('.i-proxied').forEach(e => e.classList.remove('i-proxied'));
@@ -6651,9 +6602,31 @@ window._preloadAllReservations = preloadAllReservations;
       ['renderDateHeader','renderWeekStrip','renderTimeSlots','renderDining'].forEach(f => { if (typeof window[f]==='function') safe(()=>window[f]()); });
       safe(decorateModal);
       window.scrollTo(0,0);
+      if (hand) safe(() => handToClassic(hand));
       usage('switch');
     }
   };
+  // classic: the kept party size fills the guests box when a time is tapped
+  if (typeof openSteppedModal === 'function') {
+    const origO = openSteppedModal;
+    window.openSteppedModal = openSteppedModal = function(){
+      const r = origO.apply(this, arguments);
+      try {
+        if (!active() && S.pending && S.pending.date === dateKey(currentDate) && $('srGuests') && !$('srGuests').value) $('srGuests').value = S.pending.party;
+      } catch(e) {}
+      if (!active()) { S.pending = null; S.resume = null; }
+      return r;
+    };
+  }
+  // classic dining form: remember whether the time was actually chosen (it defaults to 6:00)
+  if (typeof openDiningModal === 'function') {
+    const origD = openDiningModal;
+    window.openDiningModal = openDiningModal = function(){
+      const r = origD.apply(this, arguments);
+      try { const t = $('dTime'); if (t) t.addEventListener('change', () => { t.dataset.touched = '1'; }); } catch(e) {}
+      return r;
+    };
+  }
   // 1599 sign-in / page load lands in classic → count an "open"
   if (typeof enterStaffMode === 'function') {
     const origS = enterStaffMode;
@@ -6663,7 +6636,7 @@ window._preloadAllReservations = preloadAllReservations;
       return r;
     };
   }
-  // a finished stepped booking (1599 or 3599) → count which screen it came from
+  // a finished stepped booking (1599, either view) → count which screen it came from
   if (typeof srSave === 'function') {
     const origSave = srSave;
     window.srSave = srSave = async function(){
@@ -7077,6 +7050,17 @@ window._preloadAllReservations = preloadAllReservations;
     window.renderDateHeader = renderDateHeader = function(){ const out = origH.apply(this, arguments); if (active()) { safe(render); safe(renderDiningScr); } return out; };
   }
 
+  /* ── stepping Back (or switching view) shows what was already entered ──
+     Values come from the tracker's own _sr record; only empty boxes are filled, nothing is saved here. */
+  function prefillSteps(){
+    if (typeof _sr === 'undefined' || !_sr) return;
+    const put = (id, v) => { const el = $(id); if (el && !el.value && v !== undefined && v !== null && v !== '' && v !== 0) el.value = v; };
+    put('srGuests', _sr.guests); put('srName', _sr.name); put('srPhone', _sr.phone);
+    put('srCard', _sr.card); put('srExpiry', _sr.expiry); put('srInitials', _sr.initials);
+    put('srNoteText', _sr.noteText);
+    const nt = $('srNoteType'); if (nt && !nt.value && _sr.noteType) nt.value = _sr.noteType;
+  }
+
   /* ── v2: full-screen, uncluttered booking steps (visual only; ids and onclicks untouched) ── */
   function decorateModal(){
     const body = $('modalBody'), head = document.querySelector('#modalOverlay .modal-head');
@@ -7107,10 +7091,10 @@ window._preloadAllReservations = preloadAllReservations;
   }
   (function(){
     const body = $('modalBody');
-    if (body && window.MutationObserver) new MutationObserver(() => safe(decorateModal)).observe(body, {childList:true});
+    if (body && window.MutationObserver) new MutationObserver(() => { safe(prefillSteps); safe(decorateModal); }).observe(body, {childList:true});
   })();
 
-  /* ── entry point, called from submitPin() for 3599 ── */
+  /* ── entry point: 1599 sign-in opens here (iOS first) ── */
   if (typeof enterGuestMode === 'function') {
     const origG = enterGuestMode;
     window.enterGuestMode = enterGuestMode = function(){ document.body.classList.remove('ios-mode','ios-classic'); return origG.apply(this, arguments); };

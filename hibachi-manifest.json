@@ -1,8 +1,8 @@
 {
   "name": "Osaka Hibachi Reservations",
   "short_name": "Osaka Res",
-  "id": "./hibachi-tracker-3599.html",
-  "start_url": "./hibachi-tracker-3599.html",
+  "id": "./hibachi-tracker.html",
+  "start_url": "./hibachi-tracker.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
