@@ -550,6 +550,56 @@ tr:hover td{background:rgba(232,160,32,.03)}
   .topbar-left h2{font-size:1.35rem}
   .sch-tab{padding:8px 5px;font-size:.7rem}
 }
+/* ── HUMANITY TAB ── */
+.hum-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.hum-week{display:flex;align-items:center;gap:6px}
+.hum-week-lbl{font-family:var(--font-head);font-weight:700;font-size:1.1rem;min-width:180px;text-align:center}
+.hum-bar select{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:6px 8px;font-family:var(--font-body);font-size:.8rem;color:var(--text)}
+.hum-sum{margin-left:auto;font-size:.82rem;color:var(--text2)}
+.hum-sum b{color:var(--text)}
+.hum-pal{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r)}
+.hum-pal-hint{font-size:.8rem;color:var(--text2);margin-right:4px}
+.hum-tpl{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;padding:6px 12px;border-radius:6px;border:1px dashed var(--border2);background:var(--s2);font-size:.82rem;font-weight:600;color:var(--text)}
+.hum-tpl small{display:block;font-family:var(--font-mono);font-size:.62rem;color:var(--text3);font-weight:400}
+.hum-tpl:hover{border-color:var(--amber)}
+.hum-wrap{overflow:auto;max-height:calc(100vh - 250px);background:var(--surface);border:1px solid var(--border);border-radius:var(--r)}
+.hum-grid{border-collapse:separate;border-spacing:0;width:100%;min-width:960px}
+.hum-grid th,.hum-grid td{border-bottom:1px solid var(--border);border-right:1px solid var(--s3);vertical-align:top}
+.hum-grid thead th{background:var(--s2);padding:8px 6px;font-family:var(--font-head);font-size:.95rem;font-weight:700;text-align:center;position:sticky;top:0;z-index:3}
+.hum-grid thead th .d{display:block;font-family:var(--font-mono);font-size:.62rem;color:var(--text3);font-weight:400}
+.hum-grid thead th.today{color:var(--amber);box-shadow:inset 0 -3px 0 var(--amber)}
+.hum-grid .hum-name{position:sticky;left:0;background:var(--surface);z-index:2;padding:8px 10px;min-width:140px;text-align:left}
+.hum-grid thead .hum-name{z-index:4;background:var(--s2)}
+.hum-name b{display:block;font-size:.9rem;font-weight:600}
+.hum-name span{font-family:var(--font-mono);font-size:.64rem;color:var(--text3)}
+.hum-name span.over{color:var(--red)}
+.hum-grp td{background:var(--bg2);font-family:var(--font-head);font-weight:700;font-size:.82rem;padding:4px 10px;color:var(--text2);letter-spacing:.03em}
+.hum-grp td.hum-name{background:var(--bg2)}
+.hum-cell{min-width:112px;height:56px;padding:4px;cursor:pointer;transition:background .1s}
+.hum-cell:hover{background:var(--amber-g)}
+.hum-cell.off{background:repeating-linear-gradient(135deg,transparent 0 6px,var(--s2) 6px 12px)}
+.hum-cell.over{background:var(--amber-d);box-shadow:inset 0 0 0 2px var(--amber)}
+.hum-add{visibility:hidden;font-size:.72rem;color:var(--text3);text-align:center;padding-top:14px}
+.hum-cell:hover .hum-add{visibility:visible}
+.hum-shift{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;border-radius:5px;padding:4px 7px;margin-bottom:3px;border-left:4px solid;font-size:.78rem;line-height:1.25}
+.hum-shift:last-child{margin-bottom:0}
+.hum-shift b{display:block;font-weight:600}
+.hum-shift span{font-size:.66rem;opacity:.85}
+.hr-SERVICE{background:var(--service-d);border-color:var(--service);color:var(--service)}
+.hr-TEPPAN{background:var(--teppan-d);border-color:var(--teppan);color:var(--teppan)}
+.hr-SUSHI{background:var(--sushi-d);border-color:var(--sushi);color:var(--sushi)}
+.hr-KITCHEN{background:var(--kitchen-d);border-color:var(--kitchen);color:var(--kitchen)}
+.hum-ghost{position:fixed;pointer-events:none;z-index:500;opacity:.92;transform:rotate(-2deg);box-shadow:0 10px 28px rgba(0,0,0,.22);background-color:var(--surface)}
+.hum-src-drag{opacity:.3}
+body.hum-dragging,body.hum-dragging *{cursor:grabbing!important}
+.hum-tot td{background:var(--s2);font-size:.72rem;text-align:center;padding:6px 4px;color:var(--text2)}
+.hum-tot td.hum-name{background:var(--s2);font-weight:600;color:var(--text)}
+.hum-empty{padding:34px;text-align:center;color:var(--text2)}
+.hum-presets{display:flex;flex-wrap:wrap;gap:6px}
+.hum-presets button{background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:6px 10px;font-size:.78rem;cursor:pointer;color:var(--text)}
+.hum-presets button:hover{border-color:var(--amber);color:var(--amber)}
+.hum-m-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+@media(max-width:760px){.hum-week-lbl{min-width:0;font-size:1rem}.hum-sum{margin-left:0;width:100%}.hum-wrap{max-height:none}.hum-cell{min-width:104px}}
 </style>
 </head>
 <body>
@@ -557,7 +607,8 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <div class="brand"><div class="tag">System Active</div><h1>OVER<span>LOOK</span></h1><div class="sub">// OPERATIONS DASHBOARD</div></div>
 <nav>
 <div class="nav-sec">Overview</div>
-<div class="ni on" onclick="go('dashboard',this)"><span class="ico">◈</span><span class="lbl">Dashboard</span><span class="dot"></span></div>
+<div class="ni on" onclick="go('humanity',this)"><span class="ico">▥</span><span class="lbl">Humanity</span><span class="dot"></span></div>
+<div class="ni" onclick="go('dashboard',this)"><span class="ico">◈</span><span class="lbl">Dashboard</span><span class="dot"></span></div>
 <div class="nav-sec">Modules</div>
 <div class="ni" onclick="go('bills',this)"><span class="ico">▤</span><span class="lbl">Bill Tracking</span><span class="dot"></span></div>
 <div class="ni" onclick="go('schedule',this)"><span class="ico">▦</span><span class="lbl">Scheduling</span><span class="dot"></span></div>
@@ -570,8 +621,32 @@ tr:hover td{background:rgba(232,160,32,.03)}
 </aside>
 
 <main>
+<!-- HUMANITY -->
+<div class="pg on" id="pg-humanity">
+<div class="topbar"><div class="topbar-left"><div class="bc">OVERLOOK / HUMANITY</div><h2>Weekly schedule</h2></div>
+<div class="topbar-right" style="display:flex;gap:6px;flex-wrap:wrap">
+  <button class="btn bo bs" onclick="humCopyLastWeek()">Copy last week</button>
+  <button class="btn bo bs" onclick="humExport()">Copy hours for Sheets</button>
+  <button class="btn br bs" onclick="humClearWeek()">Clear week</button>
+</div></div>
+<div class="hum-bar">
+  <div class="hum-week">
+    <button class="btn bo bs" onclick="humShiftWeek(-1)" aria-label="Previous week">‹</button>
+    <div class="hum-week-lbl" id="hum-week-lbl">Loading…</div>
+    <button class="btn bo bs" onclick="humShiftWeek(1)" aria-label="Next week">›</button>
+    <button class="btn bo bs" onclick="humShiftWeek(0)">This week</button>
+  </div>
+  <select id="hum-role-filter" onchange="humSetFilter(this.value)" aria-label="Show position">
+    <option value="ALL">All positions</option><option value="SERVICE">Serving</option><option value="TEPPAN">Teppan</option><option value="SUSHI">Sushi</option><option value="KITCHEN">Kitchen</option>
+  </select>
+  <div class="hum-sum" id="hum-sum"></div>
+</div>
+<div class="hum-pal"><span class="hum-pal-hint">Drag a shift onto a day:</span><div id="hum-tpls" style="display:contents"></div><span class="hum-pal-hint" style="margin-left:auto">Tap an empty day to type custom times. Drag a shift to move it.</span></div>
+<div class="hum-wrap" id="hum-wrap"><table class="hum-grid" id="hum-grid"><tbody><tr><td class="hum-empty">Loading schedule…</td></tr></tbody></table></div>
+</div>
+
 <!-- DASHBOARD -->
-<div class="pg on" id="pg-dashboard">
+<div class="pg" id="pg-dashboard">
 <div class="topbar"><div class="topbar-left"><div class="bc">OVERLOOK / DASHBOARD</div><h2>Overview</h2></div><div class="topbar-right" id="d-date"></div></div>
 <div class="stats">
   <div class="sc"><div class="lb">Due This Week</div><div class="vl" id="d-due">—</div><div class="sb">Within 7 days</div></div>
@@ -1200,12 +1275,34 @@ tr:hover td{background:rgba(232,160,32,.03)}
   </div>
 </div>
 
+<!-- HUMANITY SHIFT MODAL -->
+<div class="mb" id="hum-modal"><div class="mo">
+  <h3 id="hum-m-title" style="font-family:var(--font-head);font-size:1.3rem;font-weight:700;margin-bottom:2px">Add shift</h3>
+  <div id="hum-m-sub" style="color:var(--text2);font-size:.86rem;margin-bottom:14px"></div>
+  <div class="fg"><label>Quick times</label><div class="hum-presets" id="hum-m-presets"></div></div>
+  <div class="hum-m-row">
+    <div class="fg"><label for="hum-m-start">Start</label><input type="time" id="hum-m-start" step="900" oninput="humModalHrs()"></div>
+    <div class="fg"><label for="hum-m-end">End</label><input type="time" id="hum-m-end" step="900" oninput="humModalHrs()"></div>
+  </div>
+  <div class="hum-m-row">
+    <div class="fg"><label for="hum-m-role">Position</label><select id="hum-m-role"><option value="SERVICE">Serving</option><option value="TEPPAN">Teppan</option><option value="SUSHI">Sushi</option><option value="KITCHEN">Kitchen</option></select></div>
+    <div class="fg"><label for="hum-m-note">Note</label><input id="hum-m-note" placeholder="Optional"></div>
+  </div>
+  <div id="hum-m-hrs" style="margin-top:12px;font-size:.84rem;color:var(--text2)"></div>
+  <div style="display:flex;gap:8px;margin-top:18px;align-items:center">
+    <button class="btn br bs" id="hum-m-del" onclick="humDelete()">Delete shift</button>
+    <span style="flex:1"></span>
+    <button class="btn bo" onclick="closeModal('hum-modal')">Cancel</button>
+    <button class="btn bg" onclick="humSave()">Save shift</button>
+  </div>
+</div></div>
 <div class="toast" id="toast"></div>
 <div class="drag-trash" id="drag-trash">🗑</div>
 
 <!-- MOBILE BOTTOM NAV -->
 <nav class="mobile-nav" id="mobile-nav">
-  <button class="mob-nav-btn on" onclick="go('dashboard',null,'mob-0')" id="mob-0"><span class="mn-ico">◈</span>Dash</button>
+  <button class="mob-nav-btn on" onclick="go('humanity',null,'mob-h')" id="mob-h"><span class="mn-ico">▥</span>Humanity</button>
+  <button class="mob-nav-btn" onclick="go('dashboard',null,'mob-0')" id="mob-0"><span class="mn-ico">◈</span>Dash</button>
   <button class="mob-nav-btn" onclick="go('bills',null,'mob-1')" id="mob-1"><span class="mn-ico">▤</span>Bills</button>
   <button class="mob-nav-btn" onclick="go('schedule',null,'mob-2')" id="mob-2"><span class="mn-ico">▦</span>Schedule</button>
   <button class="mob-nav-btn" onclick="go('employees',null,'mob-3')" id="mob-3"><span class="mn-ico">◉</span>Staff</button>
@@ -1217,7 +1314,7 @@ tr:hover td{background:rgba(232,160,32,.03)}
 <script>
 // These must be defined synchronously — module scripts are deferred and
 // inline onclick="go(...)" handlers fire before the module finishes loading.
-const MOB_NAV_MAP={dashboard:'mob-0',bills:'mob-1',schedule:'mob-2',employees:'mob-3',checklist:'mob-4',pricing:'mob-5',cleaning:'mob-6'};
+const MOB_NAV_MAP={humanity:'mob-h',dashboard:'mob-0',bills:'mob-1',schedule:'mob-2',employees:'mob-3',checklist:'mob-4',pricing:'mob-5',cleaning:'mob-6'};
 window.go=function(id,el,mobId){
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
@@ -1226,6 +1323,7 @@ window.go=function(id,el,mobId){
   if(el)el.classList.add('on');
   var mobBtn=document.getElementById(mobId||MOB_NAV_MAP[id]);if(mobBtn)mobBtn.classList.add('on');
   var m=document.querySelector('main');if(m)m.scrollTop=0;
+  if(id==='humanity'&&window.humRender)window.humRender();
 };
 window.switchSchTab=function(tab,el){
   document.querySelectorAll('.sch-tab').forEach(t=>t.classList.remove('on'));
@@ -1240,7 +1338,7 @@ window.copyEl=function(id){var el=document.getElementById(id);if(el)navigator.cl
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,addDoc,getDocs,deleteDoc,doc,updateDoc,setDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,collection,addDoc,getDocs,deleteDoc,doc,updateDoc,setDoc,query,where}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import{getDatabase,ref,get}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import{getAuth,signInAnonymously,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -1459,6 +1557,7 @@ async function boot(){
     ]);
   }
   buildCleaning();renderAll();updateResAuthUI();
+  humInit();
   // Also attempt a read immediately (works if rules allow public read, or if session already exists)
   window.loadReservations();
   // Price item modal live calc
@@ -1613,6 +1712,226 @@ All current Overlook data in Firebase will be fully replaced. This cannot be und
   }
 };
 
+
+// ═══════════ HUMANITY TAB ═══════════
+// Separate data: Firestore collection 'humShifts' {week:'YYYY-MM-DD' (Monday), empId, empName, day:0-6 (Mon-Sun), start:'HH:MM', end:'HH:MM', role, note}
+const HUM_ROLES=['SERVICE','TEPPAN','SUSHI','KITCHEN'];
+const HUM_ROLE_LBL={SERVICE:'Serving',TEPPAN:'Teppan',SUSHI:'Sushi',KITCHEN:'Kitchen'};
+const HUM_DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const HUM_TPL=[
+  {k:'lunch',n:'Lunch',s:'11:00',e:'16:00'},
+  {k:'dinner',n:'Dinner',s:'17:00',e:'21:30'},
+  {k:'double',n:'Double',s:'11:00',e:'21:30'},
+  {k:'close',n:'Late close',s:'17:00',e:'22:15'}
+];
+let humWeek=getMonday(new Date());
+const humCache={};
+let humRoleFilter='ALL';
+let humEdit=null;
+let humDrag=null,humJustDragged=false;
+
+const humEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function humKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function humToMin(t){if(!t)return null;const[h,m]=t.split(':').map(Number);return h*60+(m||0);}
+function humFmt(t){const m=humToMin(t);if(m==null)return'';let h=Math.floor(m/60)%24;const mm=m%60;const ap=h>=12?'p':'a';h=h%12||12;return h+(mm?':'+String(mm).padStart(2,'0'):'')+ap;}
+// Hours split: early 11:00–16:00, late 16:00–23:00
+function humSplit(s,e){let a=humToMin(s),b=humToMin(e);if(a==null||b==null)return{tot:0,early:0,late:0};if(b<=a)b+=1440;const ov=(x,y)=>Math.max(0,Math.min(b,y)-Math.max(a,x))/60;return{tot:(b-a)/60,early:ov(660,960),late:ov(960,1380)};}
+const humR=n=>Math.round(n*100)/100;
+function humShifts(){return humCache[humKey(humWeek)]||[];}
+function humRoleFor(emp){if(humRoleFilter!=='ALL'&&getEmpRoles(emp).includes(humRoleFilter))return humRoleFilter;const r=empPrimaryRole(emp);return HUM_ROLES.includes(r)?r:'SERVICE';}
+
+async function humLoad(weekDate,force){
+  const k=humKey(weekDate);
+  if(!force&&humCache[k])return humCache[k];
+  try{
+    const snap=await getDocs(query(collection(db,'humShifts'),where('week','==',k)));
+    humCache[k]=snap.docs.map(d=>({id:d.id,...d.data()}));
+  }catch(e){console.error(e);showToast('Could not load shifts — check connection');humCache[k]=humCache[k]||[];}
+  return humCache[k];
+}
+
+function humRows(all){
+  const sh=humShifts();const has=new Set(sh.map(s=>s.empId));
+  let emps=S.employees.filter(e=>!e.benched||has.has(e.id));
+  if(!all&&humRoleFilter!=='ALL')emps=emps.filter(e=>getEmpRoles(e).includes(humRoleFilter));
+  const ord=e=>{const i=HUM_ROLES.indexOf(empPrimaryRole(e));return i<0?9:i;};
+  return emps.sort((a,b)=>ord(a)-ord(b)||(a.name||'').localeCompare(b.name||''));
+}
+
+function humShiftHtml(s){
+  const r=HUM_ROLES.includes(s.role)?s.role:'SERVICE';
+  return`<div class="hum-shift hr-${r}" data-hdrag="shift" data-id="${s.id}"><b>${humFmt(s.start)} – ${humFmt(s.end)}</b><span>${HUM_ROLE_LBL[r]}, ${humR(humSplit(s.start,s.end).tot)}h${s.note?' — '+humEsc(s.note):''}</span></div>`;
+}
+
+function humRender(){
+  const el=document.getElementById('hum-grid');if(!el)return;
+  document.getElementById('hum-tpls').innerHTML=HUM_TPL.map(t=>`<div class="hum-tpl" data-hdrag="tpl" data-tpl="${t.k}">${t.n}<small>${humFmt(t.s)}–${humFmt(t.e)}</small></div>`).join('');
+  const dates=[...Array(7)].map((_,i)=>{const d=new Date(humWeek);d.setDate(d.getDate()+i);return d;});
+  const f=(d,o)=>d.toLocaleDateString('en-CA',o);
+  document.getElementById('hum-week-lbl').textContent=`${f(dates[0],{month:'short',day:'numeric'})} – ${f(dates[6],{month:'short',day:'numeric',year:'numeric'})}`;
+  const sh=humShifts();
+  let totH=0;sh.forEach(s=>totH+=humSplit(s.start,s.end).tot);
+  document.getElementById('hum-sum').innerHTML=`<b>${sh.length}</b> shifts, <b>${humR(totH)}</b> hours this week`;
+  if(!S.employees.length){el.innerHTML='<tbody><tr><td class="hum-empty">No staff yet. Add people on the Employees page and they will show up here.</td></tr></tbody>';return;}
+  const rows=humRows();
+  const todayK=humKey(new Date());
+  let h='<thead><tr><th class="hum-name">Staff</th>'+dates.map((d,i)=>`<th class="${humKey(d)===todayK?'today':''}">${HUM_DAYS[i]}<span class="d">${d.getMonth()+1}/${d.getDate()}</span></th>`).join('')+'</tr></thead><tbody>';
+  const dayTot=Array(7).fill(0),dayCnt=Array(7).fill(0);
+  let lastRole=null;
+  rows.forEach(emp=>{
+    const pr=HUM_ROLES.includes(empPrimaryRole(emp))?empPrimaryRole(emp):'SERVICE';
+    if(pr!==lastRole){h+=`<tr class="hum-grp"><td class="hum-name">${HUM_ROLE_LBL[pr]}</td><td colspan="7"></td></tr>`;lastRole=pr;}
+    const mine=sh.filter(s=>s.empId===emp.id);
+    let wk=0;mine.forEach(s=>wk+=humSplit(s.start,s.end).tot);
+    const over=emp.hourCap&&wk>emp.hourCap;
+    h+=`<tr><td class="hum-name"><b>${humEsc(emp.name)}</b><span class="${over?'over':''}">${humR(wk)}h${emp.hourCap?' of '+emp.hourCap+'h max':''}</span></td>`;
+    for(let i=0;i<7;i++){
+      const cs=mine.filter(s=>s.day===i).sort((a,b)=>humToMin(a.start)-humToMin(b.start));
+      cs.forEach(s=>dayTot[i]+=humSplit(s.start,s.end).tot);
+      if(cs.length)dayCnt[i]++;
+      const off=Array.isArray(emp.daysOff)&&emp.daysOff.includes(i);
+      h+=`<td class="hum-cell${off?' off':''}" data-emp="${emp.id}" data-day="${i}" onclick="humCellClick(event,this)"${off?' title="Usual day off"':''}>${cs.map(humShiftHtml).join('')||'<div class="hum-add">+ Add</div>'}</td>`;
+    }
+    h+='</tr>';
+  });
+  h+=`<tr class="hum-tot"><td class="hum-name">Day total</td>${dayTot.map((t,i)=>`<td>${dayCnt[i]} working<br>${humR(t)}h</td>`).join('')}</tr></tbody>`;
+  el.innerHTML=h;
+}
+window.humRender=humRender;
+
+async function humInit(){await humLoad(humWeek);humRender();}
+window.humShiftWeek=async function(n){
+  if(n===0)humWeek=getMonday(new Date());else{const d=new Date(humWeek);d.setDate(d.getDate()+7*n);humWeek=d;}
+  document.getElementById('hum-week-lbl').textContent='Loading…';
+  await humLoad(humWeek);humRender();
+};
+window.humSetFilter=function(v){humRoleFilter=v;humRender();};
+
+// ── Add / edit modal ──
+function humOpen(id,empId,day){
+  const s=id?humShifts().find(x=>x.id===id):null;
+  if(id&&!s)return;
+  const eId=s?s.empId:empId,dy=s?s.day:day;
+  const emp=S.employees.find(e=>e.id===eId)||{name:s?.empName||'Staff'};
+  humEdit={id:s?s.id:null,empId:eId,day:dy};
+  const d=new Date(humWeek);d.setDate(d.getDate()+dy);
+  document.getElementById('hum-m-title').textContent=s?'Edit shift':'Add shift';
+  document.getElementById('hum-m-sub').textContent=`${emp.name}, ${d.toLocaleDateString('en-CA',{weekday:'long',month:'short',day:'numeric'})}`;
+  document.getElementById('hum-m-presets').innerHTML=HUM_TPL.map(t=>`<button type="button" onclick="humPreset('${t.s}','${t.e}')">${t.n} ${humFmt(t.s)}–${humFmt(t.e)}</button>`).join('');
+  document.getElementById('hum-m-start').value=s?s.start:HUM_TPL[1].s;
+  document.getElementById('hum-m-end').value=s?s.end:HUM_TPL[1].e;
+  document.getElementById('hum-m-role').value=s?(s.role||'SERVICE'):humRoleFor(emp);
+  document.getElementById('hum-m-note').value=s?(s.note||''):'';
+  document.getElementById('hum-m-del').style.display=s?'':'none';
+  humModalHrs();openModal('hum-modal');
+}
+window.humPreset=function(a,b){document.getElementById('hum-m-start').value=a;document.getElementById('hum-m-end').value=b;humModalHrs();};
+window.humModalHrs=function(){
+  const x=humSplit(document.getElementById('hum-m-start').value,document.getElementById('hum-m-end').value);
+  document.getElementById('hum-m-hrs').textContent=x.tot?`${humR(x.tot)} hours: ${humR(x.early)} lunch (11–4), ${humR(x.late)} dinner (4–11)`:'';
+};
+window.humCellClick=function(e,td){if(humJustDragged||e.target.closest('.hum-shift'))return;humOpen(null,td.dataset.emp,+td.dataset.day);};
+window.humSave=async function(){
+  const start=document.getElementById('hum-m-start').value,end=document.getElementById('hum-m-end').value;
+  if(!start||!end){showToast('Enter a start and end time');return;}
+  if(start===end){showToast('End time must be different from start time');return;}
+  const data={start,end,role:document.getElementById('hum-m-role').value,note:document.getElementById('hum-m-note').value.trim()};
+  const k=humKey(humWeek),list=humCache[k]||(humCache[k]=[]);
+  try{
+    if(humEdit.id){await fsUp('humShifts',humEdit.id,data);Object.assign(list.find(s=>s.id===humEdit.id),data);showToast('Shift saved');}
+    else{const emp=S.employees.find(e=>e.id===humEdit.empId);const rec={week:k,empId:humEdit.empId,empName:emp?.name||'',day:humEdit.day,...data};rec.id=await fsAdd('humShifts',rec);list.push(rec);showToast('Shift added');}
+    closeModal('hum-modal');humRender();
+  }catch(e){console.error(e);showToast('Save failed — check connection');}
+};
+window.humDelete=async function(){
+  if(!humEdit?.id)return;
+  const k=humKey(humWeek);
+  try{await fsDel('humShifts',humEdit.id);humCache[k]=humCache[k].filter(s=>s.id!==humEdit.id);closeModal('hum-modal');humRender();showToast('Shift deleted');}
+  catch(e){console.error(e);showToast('Delete failed — check connection');}
+};
+
+// ── Drag and drop (mouse + touch via pointer events) ──
+document.addEventListener('pointerdown',e=>{
+  const src=e.target.closest('[data-hdrag]');if(!src||e.button>0)return;
+  humDrag={src,kind:src.dataset.hdrag,x0:e.clientX,y0:e.clientY,on:false,ghost:null,over:null};
+});
+document.addEventListener('pointermove',e=>{
+  const d=humDrag;if(!d)return;
+  if(!d.on){
+    if(Math.hypot(e.clientX-d.x0,e.clientY-d.y0)<6)return;
+    d.on=true;const r=d.src.getBoundingClientRect();d.ox=e.clientX-r.left;d.oy=e.clientY-r.top;
+    d.ghost=d.src.cloneNode(true);d.ghost.classList.add('hum-ghost');d.ghost.style.width=r.width+'px';document.body.appendChild(d.ghost);
+    if(d.kind==='shift')d.src.classList.add('hum-src-drag');
+    document.body.classList.add('hum-dragging');
+  }
+  e.preventDefault();
+  d.ghost.style.left=(e.clientX-d.ox)+'px';d.ghost.style.top=(e.clientY-d.oy)+'px';
+  const hit=document.elementFromPoint(e.clientX,e.clientY);
+  const cell=hit?hit.closest('.hum-cell'):null;
+  if(cell!==d.over){if(d.over)d.over.classList.remove('over');if(cell)cell.classList.add('over');d.over=cell;}
+  const w=document.getElementById('hum-wrap');if(w){const b=w.getBoundingClientRect();
+    if(e.clientX>b.right-40)w.scrollLeft+=14;else if(e.clientX<b.left+160&&e.clientX>b.left)w.scrollLeft-=14;
+    if(e.clientY>b.bottom-40)w.scrollTop+=14;else if(e.clientY<b.top+50&&e.clientY>b.top)w.scrollTop-=14;}
+},{passive:false});
+function humEndDrag(cancel){
+  const d=humDrag;if(!d)return;humDrag=null;
+  if(!d.on){if(!cancel&&d.kind==='shift')humOpen(d.src.dataset.id);else if(!cancel&&d.kind==='tpl')showToast('Hold and drag it onto someone\'s day');return;}
+  d.ghost.remove();d.src.classList.remove('hum-src-drag');document.body.classList.remove('hum-dragging');
+  if(d.over)d.over.classList.remove('over');
+  humJustDragged=true;setTimeout(()=>{humJustDragged=false;},60);
+  if(!cancel&&d.over)humDrop(d,d.over.dataset.emp,+d.over.dataset.day);
+}
+document.addEventListener('pointerup',()=>humEndDrag(false));
+document.addEventListener('pointercancel',()=>humEndDrag(true));
+
+async function humDrop(d,empId,day){
+  const k=humKey(humWeek),list=humCache[k]||(humCache[k]=[]);
+  const emp=S.employees.find(e=>e.id===empId);if(!emp)return;
+  if(d.kind==='shift'){
+    const s=list.find(x=>x.id===d.src.dataset.id);if(!s||(s.empId===empId&&s.day===day))return;
+    const prev={empId:s.empId,empName:s.empName,day:s.day};
+    Object.assign(s,{empId,empName:emp.name,day});humRender();
+    try{await fsUp('humShifts',s.id,{empId,empName:emp.name,day});showToast(`Moved to ${emp.name}, ${HUM_DAYS[day]}`);}
+    catch(e){Object.assign(s,prev);humRender();showToast('Move failed — check connection');}
+  }else{
+    const t=HUM_TPL.find(x=>x.k===d.src.dataset.tpl);if(!t)return;
+    const rec={week:k,empId,empName:emp.name,day,start:t.s,end:t.e,role:humRoleFor(emp),note:''};
+    try{rec.id=await fsAdd('humShifts',rec);list.push(rec);humRender();showToast(`${t.n} added for ${emp.name}, ${HUM_DAYS[day]}`);}
+    catch(e){console.error(e);showToast('Add failed — check connection');}
+  }
+}
+
+// ── Week actions ──
+window.humCopyLastWeek=async function(){
+  const prevD=new Date(humWeek);prevD.setDate(prevD.getDate()-7);
+  const prev=await humLoad(prevD,true);
+  if(!prev.length){showToast('Last week has no shifts to copy');return;}
+  const k=humKey(humWeek),cur=humCache[k]||(humCache[k]=[]);
+  if(cur.length&&!confirm(`This week already has ${cur.length} shifts. Add last week's ${prev.length} shifts on top?`))return;
+  try{
+    const recs=prev.map(s=>({week:k,empId:s.empId,empName:s.empName||'',day:s.day,start:s.start,end:s.end,role:s.role||'SERVICE',note:s.note||''}));
+    const ids=await Promise.all(recs.map(r=>fsAdd('humShifts',r)));
+    recs.forEach((r,i)=>{r.id=ids[i];cur.push(r);});humRender();showToast(`Copied ${recs.length} shifts from last week`);
+  }catch(e){console.error(e);await humLoad(humWeek,true);humRender();showToast('Copy stopped partway — check connection');}
+};
+window.humClearWeek=async function(){
+  const k=humKey(humWeek),cur=humCache[k]||[];
+  if(!cur.length){showToast('This week is already empty');return;}
+  if(!confirm(`Delete all ${cur.length} shifts for this week? This cannot be undone.`))return;
+  try{await Promise.all(cur.map(s=>fsDel('humShifts',s.id)));humCache[k]=[];humRender();showToast('Week cleared');}
+  catch(e){console.error(e);await humLoad(humWeek,true);humRender();showToast('Clear stopped partway — check connection');}
+};
+// Google Sheets paste: name, then Mon(early) Mon(late) … Sun(early) Sun(late)
+window.humExport=async function(){
+  const sh=humShifts();
+  const lines=humRows(true).map(emp=>{
+    const cols=[];
+    for(let i=0;i<7;i++){let e=0,l=0;sh.filter(s=>s.empId===emp.id&&s.day===i).forEach(s=>{const x=humSplit(s.start,s.end);e+=x.early;l+=x.late;});cols.push(humR(e),humR(l));}
+    return[emp.name,...cols].join('\t');
+  });
+  try{await navigator.clipboard.writeText(lines.join('\n'));showToast('Copied. Paste into Google Sheets');}
+  catch(e){showToast('Copy blocked by the browser');}
+};
 
 boot();
 
