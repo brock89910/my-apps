@@ -1434,9 +1434,9 @@ body.staff-mode:not(.manager-mode).ios-mode .i-sheet { padding-top:calc(40px + e
 #modeSwitchBtn { display:none; background:rgba(210,175,100,0.12); border:1px solid rgba(210,175,100,0.45); border-radius:5px; color:var(--gold);
   font-family:var(--mono); font-size:0.58rem; letter-spacing:0.06em; padding:3px 9px; cursor:pointer; white-space:nowrap; font-weight:600; }
 @media (max-width:599px){
-  body.staff-mode:not(.manager-mode):not(.ios-mode) #modeSwitchBtn,
-  body.staff-mode:not(.manager-mode).ios-classic #modeSwitchBtn { display:inline-block; }
-  body:not(.ios-mode) #modePill, body.ios-classic #modePill { display:none !important; }
+  /* phones, classic: header gets a strip on top so the pill sits above the title/badges (header is sticky, so it stays clear) */
+  body.staff-mode:not(.manager-mode):not(.ios-mode) .app-header,
+  body.staff-mode:not(.manager-mode).ios-classic .app-header { padding-top:calc(46px + env(safe-area-inset-top,0px)); }
 }
 body.ios-mode.ios-classic #iosBackPill { display:none !important; }
 
@@ -1481,6 +1481,54 @@ body.ios-mode.ios-classic #iosBackPill { display:none !important; }
 .i-swr { animation:iSwR .26s cubic-bezier(.32,.72,0,1); }
 @keyframes iSwL { from{ opacity:.3; transform:translateX(40px); } to{ opacity:1; transform:none; } }
 @keyframes iSwR { from{ opacity:.3; transform:translateX(-40px); } to{ opacity:1; transform:none; } }
+
+
+/* ── booking sheet: time slots as separate, taller cards ── */
+.i-group.i-tpick { background:transparent; overflow:visible; display:flex; flex-direction:column; gap:8px; }
+.i-tpick .i-trow { background:var(--i-card); border-radius:14px !important; min-height:64px; padding:14px 18px !important;
+  box-shadow:0 1px 2px rgba(0,0,0,.05); transition:transform .12s, background .12s; }
+.i-tpick .i-trow + .i-trow::before { display:none; }
+.i-tpick .i-trow:active:not(:disabled) { transform:scale(.98); background:var(--i-fill2); }
+.i-tpick .i-tm { font-size:20px; font-weight:700; }
+.i-tpick .i-trow[data-s$=":30"] .i-tm, .i-tpick .i-trow[data-t$=":30"] .i-tm { font-weight:500; color:var(--i-label2); }
+.i-tpick .i-trow[data-s$=":00"], .i-tpick .i-trow[data-t$=":00"] { box-shadow:inset 4px 0 0 var(--i-accent), 0 1px 2px rgba(0,0,0,.05); }
+.i-tpick .i-trow:disabled, .i-tpick .i-trow.full { background:transparent; box-shadow:inset 0 0 0 1px var(--i-sep); }
+.i-tpick .i-trow.double { box-shadow:inset 4px 0 0 var(--i-indigo), 0 1px 2px rgba(0,0,0,.05); }
+.i-tpick .i-trow.sel { box-shadow:inset 0 0 0 2px var(--i-accent); }
+
+/* ── iOS: edit an existing reservation (Settings-style grouped list) ── */
+body.ios-mode .edit-summary { border:0; margin:4px 0 18px; padding:0 4px; font-family:var(--sans); font-size:15px; color:var(--i-label2); line-height:1.35; }
+body.ios-mode .edit-summary .i-es-name { display:block; font-size:28px; font-weight:700; color:var(--i-label); margin-bottom:2px; }
+body.ios-mode .edit-list { gap:0; background:var(--i-card); border-radius:12px; overflow:hidden; margin-bottom:22px; }
+body.ios-mode .edit-opt { border:0 !important; border-radius:0 !important; background:transparent !important; padding:10px 14px 10px 14px !important;
+  min-height:52px; gap:12px; position:relative; font-family:var(--sans); }
+body.ios-mode .edit-opt + .edit-opt::before { content:""; position:absolute; top:0; left:56px; right:0; height:.5px; background:var(--i-sep); }
+body.ios-mode .edit-opt:active { background:var(--i-fill) !important; }
+body.ios-mode .edit-opt-icon { width:30px; height:30px; border-radius:8px; display:grid; place-items:center; font-size:0; color:#fff; }
+body.ios-mode .edit-opt-icon svg { width:18px; height:18px; }
+body.ios-mode .edit-opt-body { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+body.ios-mode .edit-opt-label { font-family:var(--sans); font-size:17px; font-weight:400; letter-spacing:0; text-transform:none; color:var(--i-label); white-space:nowrap; }
+body.ios-mode .edit-opt-value { font-size:17px; color:var(--i-label2); margin:0; text-align:right; max-width:62%; }
+body.ios-mode .edit-opt-chev { color:var(--i-label3); font-size:22px; font-weight:300; }
+body.ios-mode .edit-list ~ .btn-danger { background:var(--i-card) !important; color:var(--i-red) !important; border:0 !important; border-radius:12px !important;
+  font-family:var(--sans) !important; font-size:17px !important; font-weight:400 !important; letter-spacing:0 !important; height:50px; padding:0 !important; width:100%; margin-top:0 !important; }
+body.ios-mode .edit-list ~ .btn-danger:active { background:var(--i-fill) !important; }
+body.ios-mode .edit-flash { border:0; border-radius:12px; background:rgba(52,199,89,.14); color:var(--i-green-text); font-family:var(--sans); font-size:15px; font-weight:600; padding:10px 14px; }
+body.ios-mode .edit-back { font-family:var(--sans); font-size:17px; color:var(--i-accent); letter-spacing:0; }
+
+/* ── iOS: swipe a reservation left → Delete ── */
+.i-sw { position:relative; overflow:hidden; }
+.i-sw + .i-sw .i-row::before { content:""; position:absolute; top:0; left:62px; right:0; height:.5px; background:var(--i-sep); }
+.i-sw .i-row { transition:transform .25s cubic-bezier(.32,.72,0,1); touch-action:pan-y; z-index:1; }
+.i-sw.drag .i-row { transition:none; }
+.i-sw .i-row:not(.big):not(.draft) { background:var(--i-card); }
+.i-sw .i-row.draft { background-color:var(--i-card) !important; }
+.i-swdel { position:absolute; top:0; right:0; bottom:0; width:92px; border:0 !important; border-radius:0 !important; background:#ff3b30 !important;
+  color:#fff !important; font:600 16px/1 var(--sans) !important; display:none; align-items:center; justify-content:center; }
+.i-sw.drag .i-swdel, .i-sw.open .i-swdel { display:flex; }
+.i-sw.open .i-row { transform:translateX(-92px); }
+.i-ascrim { place-items:start center !important; padding-top:calc(14vh + env(safe-area-inset-top,0px)) !important; }   /* alerts sit high → the keyboard never covers them */
+.i-alert .aa button.del { color:#ff3b30 !important; }
 
 /* ── usage tally (More tab) ── */
 .i-usage { width:100%; border-collapse:collapse; font-size:15px; }
@@ -6295,11 +6343,12 @@ window._preloadAllReservations = preloadAllReservations;
     const name = getDisplayName(r.id, r.name, key);
     const sub = [r.phone, r.initials].filter(Boolean).map(esc).join('  ');
     const big = (r.guests||0) >= DOUBLE_GRILL_MIN_GUESTS, ovr = !!(r.managerOverride || r.overrideBooked);
-    return `<div class="i-row${soon?' soon':''}${r.isDraft?' draft':''}${big?' big':''}${big&&ovr?' ovr':''}" role="button" tabindex="0" data-res="${esc(r.id)}" data-slot="${slot}">`
+    return `<div class="i-sw" data-sw="${esc(r.id)}"><button type="button" class="i-swdel" data-del="${esc(r.id)}" tabindex="-1">Delete</button>`
+      + `<div class="i-row${soon?' soon':''}${r.isDraft?' draft':''}${big?' big':''}${big&&ovr?' ovr':''}" role="button" tabindex="0" data-res="${esc(r.id)}" data-slot="${slot}">`
       + `<span class="i-party${dbl?' dbl':''}">${r.guests||''}</span>`
       + `<div class="main"><div class="t1">${esc(name)}</div><div class="t2">${sub||'&nbsp;'}</div>${noteLine(r)}</div>`
       + `<span class="i-tags">${tags.join('')}</span>`
-      + `<button type="button" class="i-conf${r.confirmed?' done':''}" data-confirm="${esc(r.id)}" aria-label="${r.confirmed?'Confirmed by '+esc(r.confirmedBy||'?'):'Confirm reservation'}">${r.confirmed?'✓':''}</button></div>`;
+      + `<button type="button" class="i-conf${r.confirmed?' done':''}" data-confirm="${esc(r.id)}" aria-label="${r.confirmed?'Confirmed by '+esc(r.confirmedBy||'?'):'Confirm reservation'}">${r.confirmed?'✓':''}</button></div></div>`;
   }
   const NOTE_ICON = {
     allergy:'<svg viewBox="0 0 16 16"><path d="M8 1.6 15 14H1L8 1.6Z" fill="currentColor"/><path d="M8 6v3.6" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/><circle cx="8" cy="11.8" r="1" fill="#fff"/></svg>',
@@ -6578,7 +6627,7 @@ window._preloadAllReservations = preloadAllReservations;
       usage('switch');
       const formOpen = $('modalOverlay') && $('modalOverlay').style.display !== 'none';
       if (formOpen) {
-        if (!safe(diningFormToIos)) setTimeout(() => { safe(decorateModal); safe(scanOverrides); }, 30);   // shared step form → same step, iOS look
+        if (!safe(diningFormToIos)) setTimeout(() => { safe(decorateModal); safe(decorateEdit); safe(scanOverrides); }, 30);   // shared step form → same step, iOS look
       } else if (S.resume && S.resume.date === dateKey(currentDate)) {
         const r = S.resume; S.resume = null; S.pending = null;
         safe(() => { if (r.kind!=='dining') switchTab('today'); openBookWith(r); });                          // back to the iOS step you left
@@ -6600,7 +6649,7 @@ window._preloadAllReservations = preloadAllReservations;
       document.body.classList.remove('ios-mode','ios-classic');
       if (typeof window.switchTab==='function') safe(()=>window.switchTab(tab));
       ['renderDateHeader','renderWeekStrip','renderTimeSlots','renderDining'].forEach(f => { if (typeof window[f]==='function') safe(()=>window[f]()); });
-      safe(decorateModal);
+      safe(decorateModal); safe(decorateEdit);
       window.scrollTo(0,0);
       if (hand) safe(() => handToClassic(hand));
       usage('switch');
@@ -6702,7 +6751,7 @@ window._preloadAllReservations = preloadAllReservations;
     const el = $(scrId); if (!el) return;
     let sx=null, sy=null, st=0, ok=false;
     el.addEventListener('touchstart', e => {
-      ok = e.touches.length===1 && !e.target.closest('.i-week, .i-seg, input, textarea, select');
+      ok = e.touches.length===1 && !e.target.closest('.i-week, .i-seg, .i-sw, input, textarea, select');
       if (!ok) return; sx=e.touches[0].clientX; sy=e.touches[0].clientY; st=Date.now();
     }, {passive:true});
     el.addEventListener('touchend', e => {
@@ -6716,6 +6765,96 @@ window._preloadAllReservations = preloadAllReservations;
       goDate(dateKey(addDays(currentDate, dir)));
     }, {passive:true});
   }
+
+  /* ── SWIPE LEFT ON A RESERVATION → Delete (initials required) ── */
+  let SW = null;   // current drag
+  function closeSwipes(except){ document.querySelectorAll('#iosSlots .i-sw.open').forEach(x => { if (x!==except) x.classList.remove('open'); }); }
+  function bindRowSwipe(){
+    const box = $('iosSlots'); if (!box || box._sw) return; box._sw = true;
+    box.addEventListener('pointerdown', e => {
+      const w = e.target.closest('.i-sw'); if (!w || e.target.closest('.i-swdel, .i-conf')) return;
+      SW = { w, x:e.clientX, y:e.clientY, dx:0, on:false, open:w.classList.contains('open') };
+    });
+    box.addEventListener('pointermove', e => {
+      if (!SW) return;
+      const dx = e.clientX - SW.x, dy = e.clientY - SW.y;
+      if (!SW.on) { if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { SW = null; return; } if (Math.abs(dx) < 10) return; SW.on = true; closeSwipes(SW.w); SW.w.classList.add('drag'); }
+      SW.dx = dx;
+      const base = SW.open ? -92 : 0, x = Math.max(-140, Math.min(0, base + dx));
+      SW.w.querySelector('.i-row').style.transform = `translateX(${x}px)`;
+    });
+    const end = () => {
+      if (!SW) return; const d = SW; SW = null;
+      if (!d.on) return;
+      d.w.classList.remove('drag'); d.w.querySelector('.i-row').style.transform = '';
+      const x = (d.open ? -92 : 0) + d.dx;
+      d.w.classList.toggle('open', x < -46);
+      d.w._justSwiped = Date.now();
+    };
+    box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end);
+    // a swipe (or a tap on an open row) must not also open the reservation
+    box.addEventListener('click', e => {
+      const w = e.target.closest('.i-sw'); if (!w) { closeSwipes(); return; }
+      const del = e.target.closest('.i-swdel');
+      if (del) { e.stopPropagation(); e.preventDefault(); w.classList.remove('open'); return safe(()=>openDeleteAlert(dateKey(currentDate), del.dataset.del, false)); }
+      if (w._justSwiped && Date.now()-w._justSwiped < 400) { e.stopPropagation(); e.preventDefault(); return; }   // end of a drag, not a tap
+      if (w.classList.contains('open')) { e.stopPropagation(); e.preventDefault(); w.classList.remove('open'); }
+    }, true);
+    document.addEventListener('pointerdown', e => { if (!e.target.closest('#iosSlots .i-sw')) closeSwipes(); });
+  }
+
+  /* Delete alert: same write as the classic row ✕ (quickDeleteRes → initials → quickDeleteConfirm),
+     run behind the scenes so the audit log, draft clean-up and Sheet sync are identical. */
+  function openDeleteAlert(dk, id, fromChooser){
+    const r = (reservations[dk]||{})[id]; if (!r) return toast('That reservation is already gone.');
+    const when = keyToDate(dk).toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'});
+    const a = $('iosAlert');
+    a.innerHTML = `<div class="ab"><div class="at">Delete Reservation?</div>`
+      + `<div class="am">${esc(r.name||'Guest')} · ${r.guests||'?'} guests · ${esc(ampm(r.slot))}, ${when}. This can’t be undone.</div>`
+      + `<input type="text" id="iosDelIni" placeholder="Your initials" maxlength="4" autocomplete="off" autocapitalize="characters" enterkeyhint="done"><div class="ae" id="iosDelErr"></div></div>`
+      + `<div class="aa"><button type="button" id="iosDelNo">Cancel</button><button type="button" class="del" id="iosDelYes">Delete</button></div>`;
+    AL = { cfg:{ box:()=>null, cancel:()=>{} }, busy:false, del:true };
+    const shake = msg => { $('iosDelErr').textContent = msg; a.classList.remove('shake'); void a.offsetWidth; a.classList.add('shake'); };
+    const go = async () => {
+      if (!AL || AL.busy) return;
+      const ini = sanitizeInitials($('iosDelIni').value || '');
+      if (!ini) return shake('Initials required.');
+      AL.busy = true; $('iosDelYes').disabled = true;
+      document.body.classList.add('i-silent');
+      let err = '';
+      try {
+        quickDeleteRes(dk, id, r.name || 'Guest');
+        $('quickDelInitials').value = ini;
+        await quickDeleteConfirm(dk, id);
+        if ($('modalOverlay').style.display !== 'none') err = ($('quickDelErr')||{}).textContent || 'Could not delete.';
+      } catch(e) { err = e.message || 'Could not delete.'; }
+      document.body.classList.remove('i-silent');
+      if (err) {
+        if (fromChooser) safe(backToEditChooser); else safe(closeModal);
+        if (AL) { AL.busy = false; $('iosDelYes').disabled = false; shake(err); }
+        return;
+      }
+      $('iosAlertScrim').classList.remove('on'); AL = null;
+      toast(`Deleted ${r.name||'reservation'}`);
+    };
+    $('iosDelNo').onclick = () => { $('iosAlertScrim').classList.remove('on'); AL = null; };
+    $('iosDelYes').onclick = () => safe(go);
+    $('iosDelIni').onkeydown = e => { if (e.key==='Enter') { e.preventDefault(); safe(go); } };
+    $('iosAlertScrim').classList.add('on');
+    setTimeout(()=>$('iosDelIni').focus(), 60);
+  }
+  // Edit screen's Delete button → the same iOS alert (initials required)
+  (function(){
+    const body = $('modalBody'); if (!body) return;
+    body.addEventListener('click', e => {
+      if (!active()) return;
+      const b = e.target.closest('button'); const on = b && b.getAttribute('onclick') || '';
+      const m = on.match(/confirmDeleteFromChooser\('([^']+)','([^']+)'\)/);
+      if (!m) return;
+      e.stopImmediatePropagation(); e.preventDefault();
+      safe(() => openDeleteAlert(m[1], m[2], true));
+    }, true);
+  })();
 
   /* ── NEW RESERVATION: date → party → time, then hand off to the real stepped flow ── */
   function startBooking(presetSlot, kind){
@@ -6797,7 +6936,7 @@ window._preloadAllReservations = preloadAllReservations;
   }
   function drawTimes(el, k){
     const B = S.book, g = B.party;
-    let h = `<div class="i-q">What time?</div><div class="i-hint">${currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'})} for ${g}.</div><div class="i-group">`;
+    let h = `<div class="i-q">What time?</div><div class="i-hint">${currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'})} for ${g}.</div><div class="i-group i-tpick">`;
     slotsForDay().forEach(s => {
       const st = slotStatus(k, s), mins = timeToMinutes(s);
       const have = st.recs.reduce((a,r)=>a+(r.guests||0),0);
@@ -6827,7 +6966,7 @@ window._preloadAllReservations = preloadAllReservations;
   function diningAt(dk, t){ return Object.values((diningReservations[dk])||{}).filter(r=>r&&r.time===t); }
   function stepDTime(el){
     const B = S.book, k = dateKey(currentDate), g = B.party;
-    let h = `<div class="i-q">What time?</div><div class="i-hint">Dining room, ${currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'})} for ${g}.</div><div class="i-group">`;
+    let h = `<div class="i-q">What time?</div><div class="i-hint">Dining room, ${currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'})} for ${g}.</div><div class="i-group i-tpick">`;
     DINING_TIMES.forEach(t => {
       const have = diningAt(k,t).reduce((a,r)=>a+(Number(r.guests)||0),0), n = diningAt(k,t).length;
       h += `<button type="button" class="i-trow${B.time===t?' sel':''}" data-t="${t}"><span class="i-tmcol"><span class="i-tm">${short(t)}</span></span><span class="i-mini">${have}p<span class="i-add">+${g}p = ${have+g}p</span></span><span class="i-st">${n?n+' table'+(n>1?'s':''):''}</span></button>`;
@@ -7006,7 +7145,7 @@ window._preloadAllReservations = preloadAllReservations;
       t.onclick = () => safe(() => jumpOpen() ? closeJump() : openJump(t));
       t.onkeydown = e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); t.click(); } }; });
     $('iosJumpScrim').onclick = closeJump;
-    bindSwipe('iosTodayScr', 'iosSlots'); bindSwipe('iosDiningScr', 'iosDList');
+    bindSwipe('iosTodayScr', 'iosSlots'); bindSwipe('iosDiningScr', 'iosDList'); bindRowSwipe();
     $('iosWeek').onclick = e => { const b = e.target.closest('[data-day]'); if (b) { $('iosWeek')._touched=true; goDate(b.dataset.day); } };
     document.querySelectorAll('#iosApp .i-seg button').forEach(b => b.onclick = () => {
       S.view = b.dataset.m; document.querySelectorAll('#iosApp .i-seg button').forEach(x=>x.classList.toggle('on', x===b)); safe(render); });
@@ -7052,6 +7191,39 @@ window._preloadAllReservations = preloadAllReservations;
 
   /* ── stepping Back (or switching view) shows what was already entered ──
      Values come from the tracker's own _sr record; only empty boxes are filled, nothing is saved here. */
+  const EDIT_TILE = {
+    guests:['#AF52DE','<svg viewBox="0 0 20 20" fill="currentColor"><circle cx="7.5" cy="6.5" r="3"/><circle cx="14" cy="7.5" r="2.4"/><path d="M1.8 16.5c.4-3.2 2.8-5.2 5.7-5.2s5.3 2 5.7 5.2z"/><path d="M13.6 11.4c2.5 0 4.3 1.7 4.6 5.1h-4.4c-.2-2-1-3.7-2.3-4.8.6-.2 1.3-.3 2.1-.3z"/></svg>'],
+    slot:['#FF9500','<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 5.8V10l2.8 1.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'],
+    date:['#FF3B30','<svg viewBox="0 0 20 20"><rect x="3" y="4.2" width="14" height="12.8" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M3 8.3h14M7 2.6v3M13 2.6v3" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>'],
+    name:['#007AFF','<svg viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="7" r="3.6"/><path d="M3.2 17c.6-3.6 3.3-5.8 6.8-5.8s6.2 2.2 6.8 5.8z"/></svg>'],
+    phone:['#34C759','<svg viewBox="0 0 20 20" fill="currentColor"><path d="M6.2 2.8 8 6.6c.2.5.1 1-.3 1.4l-1.2 1.1a9.6 9.6 0 0 0 4.4 4.4l1.1-1.2c.4-.4.9-.5 1.4-.3l3.8 1.8c.5.2.7.8.5 1.3-.7 1.7-2.2 2.6-4 2.3C8.2 16.6 3.4 11.8 2.6 6.3c-.3-1.8.6-3.3 2.3-4 .5-.2 1.1 0 1.3.5z"/></svg>'],
+    card:['#5856D6','<svg viewBox="0 0 20 20"><rect x="2.2" y="4.5" width="15.6" height="11" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M2.2 8.3h15.6" stroke="currentColor" stroke-width="2.6"/></svg>'],
+    note:['#FFCC00','<svg viewBox="0 0 20 20"><path d="M4 2.8h8l4 4v10.4H4z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M7 10.5h6M7 13.8h4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>']
+  };
+  function decorateEdit(){
+    const body = $('modalBody'); if (!body) return;
+    const ios = active();
+    body.querySelectorAll('.edit-opt').forEach(b => {
+      const ic = b.querySelector('.edit-opt-icon'); if (!ic) return;
+      const f = ((b.getAttribute('onclick')||'').match(/openEditField\('([^']+)'\)/)||[])[1];
+      if (ic.dataset.orig === undefined) ic.dataset.orig = ic.innerHTML;
+      const t = EDIT_TILE[f];
+      if (ios && t) { ic.innerHTML = t[1]; ic.style.background = t[0]; }
+      else { ic.innerHTML = ic.dataset.orig; ic.style.background = ''; }
+    });
+    body.querySelectorAll('.edit-list ~ .btn-danger').forEach(d => {
+      if (d.dataset.orig === undefined) d.dataset.orig = d.textContent;
+      d.textContent = ios ? 'Delete Reservation' : d.dataset.orig;
+    });
+    const sum = body.querySelector('.edit-summary');
+    if (sum && body.querySelector('.edit-list')) {
+      if (sum.dataset.orig === undefined) sum.dataset.orig = sum.innerHTML;
+      if (ios) {
+        const r = (reservations[dateKey(currentDate)]||{})[_editingResId];
+        if (r) sum.innerHTML = `<span class="i-es-name">${esc(r.name||'Guest')}</span>${r.guests||'?'} guests · ${esc(ampm(r.slot))} · ${currentDate.toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'})}`;
+      } else sum.innerHTML = sum.dataset.orig;
+    }
+  }
   function prefillSteps(){
     if (typeof _sr === 'undefined' || !_sr) return;
     const put = (id, v) => { const el = $(id); if (el && !el.value && v !== undefined && v !== null && v !== '' && v !== 0) el.value = v; };
@@ -7091,7 +7263,7 @@ window._preloadAllReservations = preloadAllReservations;
   }
   (function(){
     const body = $('modalBody');
-    if (body && window.MutationObserver) new MutationObserver(() => { safe(prefillSteps); safe(decorateModal); }).observe(body, {childList:true});
+    if (body && window.MutationObserver) new MutationObserver(() => { safe(prefillSteps); safe(decorateModal); safe(decorateEdit); }).observe(body, {childList:true});
   })();
 
   /* ── entry point: 1599 sign-in opens here (iOS first) ── */
