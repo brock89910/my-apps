@@ -665,12 +665,12 @@ body.hum-dragging,body.hum-dragging *{cursor:grabbing!important}
 .hum-mode-btn:hover{background:rgba(0,122,255,.12)}
 .hum-mode-btn:active{opacity:.6}
 .hum-mode-ico{font-size:.9rem;line-height:1}
-.hum-grid.classic{table-layout:fixed}
-.hum-grid.classic .hum-corner{width:150px}
-.hum-grid.classic .hum-ccell{height:84px;vertical-align:top!important;padding:6px}
-.hum-grid.classic .hum-pos b{font-size:.98rem}
-.hum-grid.classic .hum-pos{vertical-align:top!important;padding-top:12px}
-.hum-grid.classic .hum-add{padding-top:18px}
+.hum-grid.stacked{table-layout:fixed}
+.hum-grid.stacked .hum-corner{width:150px}
+.hum-grid.stacked .hum-ccell{height:84px;vertical-align:top!important;padding:6px}
+.hum-grid.stacked .hum-pos b{font-size:.98rem}
+.hum-grid.stacked .hum-pos{vertical-align:top!important;padding-top:12px}
+.hum-grid.stacked .hum-add{padding-top:18px}
 .hum-chip{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;display:flex;align-items:baseline;justify-content:space-between;gap:6px;border-radius:8px;padding:5px 8px;margin-bottom:4px;font-size:.84rem;line-height:1.2;white-space:nowrap;overflow:hidden}
 .hum-chip:last-child{margin-bottom:0}
 .hum-chip b{font-weight:600;color:var(--i-l1);flex-shrink:0;max-width:70%;overflow:hidden;text-overflow:ellipsis}
@@ -678,6 +678,36 @@ body.hum-dragging,body.hum-dragging *{cursor:grabbing!important}
 .hum-person{font-weight:600}
 .hum-person.hs-SERVING{background:var(--i-serv-bg);color:var(--i-serv)}
 .hum-person.hs-KITCHEN{background:var(--i-kit-bg);color:var(--i-kit)}
+
+.hum-mode-chev{font-size:.8rem;margin-left:1px;opacity:.7;transform:translateY(-2px)}
+.hum-menu{position:fixed;z-index:600;width:260px;background:rgba(250,250,252,.92);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-radius:13px;box-shadow:0 12px 40px rgba(0,0,0,.2),0 0 0 .5px rgba(0,0,0,.08);overflow:hidden;animation:humPop .16s ease-out}
+@keyframes humPop{from{opacity:0;transform:scale(.94) translateY(-4px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.hum-menu{animation:none}}
+.hum-menu button{display:flex;align-items:center;gap:8px;width:100%;border:none;background:none;padding:10px 14px;text-align:left;cursor:pointer;border-bottom:.5px solid var(--i-sep);font-size:.95rem;color:var(--i-l1)}
+.hum-menu button:last-child{border-bottom:none}
+.hum-menu button:hover{background:rgba(0,0,0,.04)}
+.hm-check{width:16px;color:var(--i-blue);font-weight:600}
+.hm-txt{flex:1}.hm-txt small{display:block;font-size:.74rem;color:var(--i-l2)}
+.hm-ico{color:var(--i-l2)}
+.hum-grid.paper{table-layout:fixed}
+.hum-grid.paper .hum-corner{width:150px}
+.hum-grid.paper td.hum-pcell{height:50px;padding:3px;text-align:center;vertical-align:middle!important;background:#fff}
+.hum-grid.paper td.hum-pcell.empty{background:#f5f5f8}
+.hum-grid.paper td.hum-pcell.empty:hover{background:rgba(0,122,255,.06)}
+.hum-grid.paper td.hum-pcell.over{background:rgba(0,122,255,.12)}
+.hum-pcard{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;border-radius:8px;padding:4px 4px;line-height:1.15}
+.hum-pcard:hover{background:rgba(0,0,0,.04)}
+.hum-pcard b{display:block;font-size:.95rem;font-weight:700;color:var(--i-l1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hum-pcard span{display:block;font-size:.72rem;font-weight:500;color:var(--i-l2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hum-pcard.hum-ghost{background:#fff;text-align:center}
+.hum-grid.paper td.hum-band{vertical-align:top!important;padding:10px 12px;border-left:4px solid;background:#fff}
+.hum-band span{display:inline-block;font-size:.8rem;font-weight:700;color:#fff;padding:4px 10px;border-radius:999px}
+.pb-SUSHI{border-left-color:#0a84ff!important}.pb-SUSHI span{background:#0a84ff}
+.pb-KITCHEN{border-left-color:#b8860b!important}.pb-KITCHEN span{background:#b8860b}
+.pb-TEPPAN{border-left-color:#c0392b!important}.pb-TEPPAN span{background:#c0392b}
+.pb-SERVING{border-left-color:var(--i-serv)!important}.pb-SERVING span{background:var(--i-serv)}
+.hum-gap td{height:8px;padding:0;background:#f2f2f7;border-bottom:none}
+.hum-pm td{background:#f2f2f7;text-align:center;font-size:.74rem;font-weight:600;color:var(--i-l2);letter-spacing:.08em;padding:4px}
 </style>
 </head>
 <body>
@@ -1827,7 +1857,8 @@ let humTpls=HUM_DEFAULT_TPL.map(t=>({...t}));
 let humOrder={SERVING:[],KITCHEN:[]};
 let humEdit=null,humTplEdit=null;
 let humDrag=null,humJustDragged=false;
-let humMode='grid';try{if(localStorage.getItem('humMode')==='classic')humMode='classic';}catch(e){}
+const HUM_MODES=[{k:'grid',n:'Grid',ico:'▦',d:'One row per person'},{k:'stacked',n:'Stacked',ico:'☰',d:'Names listed under each position'},{k:'classic',n:'Classic',ico:'▤',d:'The printed schedule layout'}];
+let humMode='grid';try{const v=localStorage.getItem('humMode2');if(HUM_MODES.some(m=>m.k===v))humMode=v;else if(localStorage.getItem('humMode')==='classic')humMode='stacked';}catch(e){}
 let humSec='SERVING';try{const v=localStorage.getItem('humSec');if(v==='SERVING'||v==='KITCHEN')humSec=v;}catch(e){}
 
 const humEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1879,10 +1910,10 @@ function humShiftHtml(s){
 
 function humRender(){
   const el=document.getElementById('hum-grid');if(!el)return;
-  const classic=humMode==='classic';
-  document.getElementById('hum-tpl-new').hidden=classic;
-  document.getElementById('hum-pal-hint').textContent=classic?'Drag a person onto a day, then pick their shift.':'Drag a shift onto a day. Tap one to edit its hours.';
-  if(classic)document.getElementById('hum-tpls').innerHTML=humSecList(humSec,true).map(e=>`<div class="hum-tpl hum-person hs-${humSec}" data-hdrag="person" data-emp="${e.id}" role="button" tabindex="0">${humEsc(e.name)}</div>`).join('')||'<span class="hum-pal-hint" style="margin:0">No one in this section yet.</span>';
+  const people=humMode==='stacked'||(humMode==='classic'&&humSec==='SERVING');
+  document.getElementById('hum-tpl-new').hidden=people;
+  document.getElementById('hum-pal-hint').textContent=people?'Drag a person onto a day, then pick their shift.':'Drag a shift onto a day. Tap one to edit its hours.';
+  if(people)document.getElementById('hum-tpls').innerHTML=humSecList(humSec,true).map(e=>`<div class="hum-tpl hum-person hs-${humSec}" data-hdrag="person" data-emp="${e.id}" role="button" tabindex="0">${humEsc(e.name)}</div>`).join('')||'<span class="hum-pal-hint" style="margin:0">No one in this section yet.</span>';
   else document.getElementById('hum-tpls').innerHTML=humTpls.map(t=>`<div class="hum-tpl" data-hdrag="tpl" data-tpl="${t.id}" role="button" tabindex="0" aria-label="${humEsc(t.n)}, drag onto a day or tap to edit">${humEsc(t.n)}<small>${humFmt(t.s)}–${humFmt(t.e)}</small></div>`).join('');
   const dates=[...Array(7)].map((_,i)=>{const d=new Date(humWeek);d.setDate(d.getDate()+i);return d;});
   const f=(d,o)=>d.toLocaleDateString('en-CA',o);
@@ -1894,9 +1925,11 @@ function humRender(){
   document.querySelectorAll('#hum-sec-seg button').forEach(b=>b.classList.toggle('on',b.dataset.sec===humSec));
   if(!S.employees.length){el.innerHTML='<tbody><tr><td class="hum-empty">No staff yet. Add people on the Employees page and they will show up here.</td></tr></tbody>';return;}
   const todayK=humKey(new Date());
-  const corner=`<th class="hum-name hum-corner"><button class="hum-mode-btn" onclick="humToggleMode()" aria-label="Switch to ${classic?'grid':'classic'} view"><span class="hum-mode-ico" aria-hidden="true">${classic?'▦':'☰'}</span>${classic?'Grid view':'Classic view'}</button></th>`;
-  el.classList.toggle('classic',classic);
-  if(classic){humRenderClassic(el,dates,sh,todayK,corner);return;}
+  const cm=HUM_MODES.find(m=>m.k===humMode);
+  const corner=`<th class="hum-name hum-corner"><button class="hum-mode-btn" onclick="humModeMenu(this)" aria-haspopup="menu" aria-label="Change view, now ${cm.n}"><span class="hum-mode-ico" aria-hidden="true">${cm.ico}</span>${cm.n}<span class="hum-mode-chev" aria-hidden="true">⌄</span></button></th>`;
+  el.classList.toggle('stacked',humMode==='stacked');el.classList.toggle('paper',humMode==='classic');
+  if(humMode==='stacked'){humRenderClassic(el,dates,sh,todayK,corner);return;}
+  if(humMode==='classic'){humRenderPaper(el,dates,sh,todayK,corner);return;}
   let h='<thead><tr>'+corner+dates.map((d,i)=>`<th data-day="${i}" class="${humKey(d)===todayK?'today':''}">${HUM_DAYS[i]}<br><span class="d">${d.getDate()}</span></th>`).join('')+'</tr></thead><tbody>';
   [humSec].forEach(sec=>{
     const rows=humSecList(sec);
@@ -1952,9 +1985,61 @@ function humRenderClassic(el,dates,sh,todayK,corner){
     h+='</tr>';
   });
   h+=`<tr class="hum-tot"><td class="hum-name">${HUM_SEC_LBL[sec]} total</td>${dayTot.map((t,i)=>`<td>${dayCnt[i]} on, ${humR(t)}h</td>`).join('')}</tr></tbody>`;
-  el.innerHTML=h;el.classList.add('classic');
+  el.innerHTML=h;
 }
-window.humToggleMode=function(){humMode=humMode==='classic'?'grid':'classic';try{localStorage.setItem('humMode',humMode);}catch(e){}document.getElementById('hum-grid').classList.toggle('classic',humMode==='classic');humRender();};
+// Classic (printed schedule) view: Kitchen = Sushi / Kitchen / Teppan bands with one row per person;
+// Serving = day-shift names stacked on top, a PM divider, then evening names — name in bold, shift underneath.
+function humRenderPaper(el,dates,sh,todayK,corner){
+  const sec=humSec;const ord=humOrder[sec]||[];const ix=id=>{const i=ord.indexOf(id);return i<0?1e6:i;};
+  const empOf=id=>S.employees.find(e=>e.id===id);
+  const nameOf=s=>{const e=empOf(s.empId);return e?e.name:(s.empName||'?');};
+  const cellIn=s=>`<div class="hum-pcard" data-hdrag="shift" data-id="${s.id}" title="${humEsc(`${nameOf(s)}, ${humFmt(s.start)} – ${humFmt(s.end)}${s.note?', '+s.note:''}`)}"><b>${humEsc(nameOf(s))}</b><span>${humEsc(s.label||humFmt(s.start))}</span></div>`;
+  let h='<thead><tr>'+corner+dates.map((d,i)=>`<th data-day="${i}" class="${humKey(d)===todayK?'today':''}">${HUM_DAYS[i]}<br><span class="d">${d.getDate()}</span></th>`).join('')+'</tr></thead><tbody>';
+  const band=(label,first,n,cls)=>first?`<td class="hum-name hum-band ${cls}" rowspan="${n}"><span>${label}</span></td>`:'';
+  const secShifts=sh.filter(s=>s.sec===sec);
+  if(sec==='KITCHEN'){
+    ['SUSHI','KITCHEN','TEPPAN'].forEach(p=>{
+      const ids=new Set();
+      humSecList(sec).filter(e=>humPosOf(e,sec)===p).forEach(e=>ids.add(e.id));
+      secShifts.forEach(s=>{const e=empOf(s.empId);if(e&&humPosOf(e,sec)===p)ids.add(e.id);});
+      const rows=[...ids].map(empOf).filter(Boolean).sort((a,b)=>ix(a.id)-ix(b.id)||(a.name||'').localeCompare(b.name||''));
+      if(!rows.length)return;
+      rows.forEach((emp,ri)=>{
+        h+=`<tr data-row data-emp="${emp.id}">${band(HUM_POS_LBL[p],ri===0,rows.length,'pb-'+p)}`;
+        for(let i=0;i<7;i++){
+          const cs=secShifts.filter(s=>s.empId===emp.id&&s.day===i).sort((a,b)=>humToMin(a.start)-humToMin(b.start));
+          h+=`<td class="hum-cell hum-pcell${cs.length?'':' empty'}" data-emp="${emp.id}" data-day="${i}" data-sec="${sec}" onclick="humCellClick(event,this)" aria-label="${humEsc(emp.name)}, ${HUM_DAYS[i]}">${cs.map(cellIn).join('')}</td>`;
+        }
+        h+='</tr>';
+      });
+      h+=`<tr class="hum-gap"><td colspan="8"></td></tr>`;
+    });
+  }else{
+    const by=(pm)=>dates.map((_,i)=>secShifts.filter(s=>s.day===i&&(humToMin(s.start)>=960)===pm).sort((a,b)=>humToMin(a.start)-humToMin(b.start)||ix(a.empId)-ix(b.empId)));
+    const am=by(false),pm=by(true);
+    const amN=Math.max(2,...am.map(a=>a.length))+0,pmN=Math.max(3,...pm.map(a=>a.length));
+    const block=(cols,n,first)=>{for(let r=0;r<n;r++){
+      h+=`<tr data-row>${first&&r===0?`<td class="hum-name hum-band pb-SERVING" rowspan="${amN+pmN+1}"><span>Serving</span></td>`:''}`;
+      for(let i=0;i<7;i++){const s=cols[i][r];h+=`<td class="hum-cell hum-pcell${s?'':' empty'}" data-day="${i}" data-sec="${sec}" onclick="humCellClick(event,this)">${s?cellIn(s):''}</td>`;}
+      h+='</tr>';}};
+    block(am,amN,true);
+    h+=`<tr class="hum-pm"><td colspan="7">PM</td></tr>`;
+    block(pm,pmN,false);
+  }
+  let tot=Array(7).fill(0),cnt=Array(7).fill(0);secShifts.forEach(s=>{tot[s.day]+=humSplit(s.start,s.end).tot;cnt[s.day]++;});
+  h+=`<tr class="hum-tot"><td class="hum-name">${HUM_SEC_LBL[sec]} total</td>${tot.map((t,i)=>`<td>${cnt[i]} on, ${humR(t)}h</td>`).join('')}</tr></tbody>`;
+  el.innerHTML=h;
+}
+window.humModeMenu=function(btn){
+  document.querySelectorAll('.hum-menu').forEach(m=>m.remove());
+  const r=btn.getBoundingClientRect();const m=document.createElement('div');
+  m.className='hum-menu ios-sheet';m.setAttribute('role','menu');
+  m.innerHTML=HUM_MODES.map(x=>`<button role="menuitemradio" aria-checked="${x.k===humMode}" onclick="humSetMode('${x.k}')"><span class="hm-check">${x.k===humMode?'✓':''}</span><span class="hm-txt">${x.n}<small>${x.d}</small></span><span class="hm-ico">${x.ico}</span></button>`).join('');
+  m.style.left=Math.max(8,Math.min(r.left,innerWidth-268))+'px';m.style.top=(r.bottom+6)+'px';
+  document.body.appendChild(m);
+  setTimeout(()=>{const close=e=>{if(!m.contains(e.target)){m.remove();document.removeEventListener('pointerdown',close);}};document.addEventListener('pointerdown',close);},0);
+};
+window.humSetMode=function(k){document.querySelectorAll('.hum-menu').forEach(m=>m.remove());humMode=k;try{localStorage.setItem('humMode2',k);}catch(e){}humRender();};
 window.humSetSec=function(sec){humSec=sec;try{localStorage.setItem('humSec',sec);}catch(e){}humRender();};
 window.humView=function(v){
   document.getElementById('hum-view-grid').hidden=v!=='grid';
