@@ -659,6 +659,25 @@ body.hum-dragging,body.hum-dragging *{cursor:grabbing!important}
   .mb.open:has(.ios-sheet){align-items:flex-end}
   .mo.ios-sheet{width:100%;max-width:none;border-radius:14px 14px 0 0;max-height:92vh}
 }
+
+.hum-corner{vertical-align:middle!important}
+.hum-mode-btn{display:inline-flex;align-items:center;gap:6px;border:none;background:var(--i-fill);color:var(--i-blue);font-size:.8rem;font-weight:600;padding:7px 11px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:background .15s}
+.hum-mode-btn:hover{background:rgba(0,122,255,.12)}
+.hum-mode-btn:active{opacity:.6}
+.hum-mode-ico{font-size:.9rem;line-height:1}
+.hum-grid.classic{table-layout:fixed}
+.hum-grid.classic .hum-corner{width:150px}
+.hum-grid.classic .hum-ccell{height:84px;vertical-align:top!important;padding:6px}
+.hum-grid.classic .hum-pos b{font-size:.98rem}
+.hum-grid.classic .hum-pos{vertical-align:top!important;padding-top:12px}
+.hum-grid.classic .hum-add{padding-top:18px}
+.hum-chip{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;display:flex;align-items:baseline;justify-content:space-between;gap:6px;border-radius:8px;padding:5px 8px;margin-bottom:4px;font-size:.84rem;line-height:1.2;white-space:nowrap;overflow:hidden}
+.hum-chip:last-child{margin-bottom:0}
+.hum-chip b{font-weight:600;color:var(--i-l1);flex-shrink:0;max-width:70%;overflow:hidden;text-overflow:ellipsis}
+.hum-chip span{font-size:.74rem;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.hum-person{font-weight:600}
+.hum-person.hs-SERVING{background:var(--i-serv-bg);color:var(--i-serv)}
+.hum-person.hs-KITCHEN{background:var(--i-kit-bg);color:var(--i-kit)}
 </style>
 </head>
 <body>
@@ -699,7 +718,7 @@ body.hum-dragging,body.hum-dragging *{cursor:grabbing!important}
     <button class="ios-pill red" onclick="humClearWeek()">Clear week</button>
     <div class="ios-sum" id="hum-sum"></div>
   </div>
-  <div class="ios-card hum-pal"><div id="hum-tpls" style="display:contents"></div><button class="hum-tpl-new" onclick="humTplOpen(null)">+ New shift</button><span class="hum-pal-hint">Drag a shift onto a day. Tap one to edit its hours.</span></div>
+  <div class="ios-card hum-pal"><div id="hum-tpls" style="display:contents"></div><button class="hum-tpl-new" id="hum-tpl-new" onclick="humTplOpen(null)">+ New shift</button><span class="hum-pal-hint" id="hum-pal-hint">Drag a shift onto a day. Tap one to edit its hours.</span></div>
   <div class="ios-card hum-wrap" id="hum-wrap"><table class="hum-grid" id="hum-grid"><tbody><tr><td class="hum-empty">Loading schedule…</td></tr></tbody></table></div>
 </div>
 <div id="hum-view-order" hidden>
@@ -1346,6 +1365,7 @@ body.hum-dragging,body.hum-dragging *{cursor:grabbing!important}
   <div class="ios-nav"><button onclick="closeModal('hum-modal')">Cancel</button><h3 id="hum-m-title">New shift</h3><button class="done" onclick="humSave()">Save</button></div>
   <div class="ios-sheet-body">
     <div class="ios-sheet-sub" id="hum-m-sub"></div>
+    <div id="hum-m-who-wrap" hidden><div class="ios-group-lbl">Who</div><div class="ios-chips" id="hum-m-who"></div></div>
     <div class="ios-chips" id="hum-m-presets"></div>
     <div class="ios-group">
       <div class="ios-row"><label for="hum-m-start">Starts</label><input type="time" id="hum-m-start" step="900" oninput="humModalHrs()"></div>
@@ -1807,6 +1827,7 @@ let humTpls=HUM_DEFAULT_TPL.map(t=>({...t}));
 let humOrder={SERVING:[],KITCHEN:[]};
 let humEdit=null,humTplEdit=null;
 let humDrag=null,humJustDragged=false;
+let humMode='grid';try{if(localStorage.getItem('humMode')==='classic')humMode='classic';}catch(e){}
 let humSec='SERVING';try{const v=localStorage.getItem('humSec');if(v==='SERVING'||v==='KITCHEN')humSec=v;}catch(e){}
 
 const humEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1858,7 +1879,11 @@ function humShiftHtml(s){
 
 function humRender(){
   const el=document.getElementById('hum-grid');if(!el)return;
-  document.getElementById('hum-tpls').innerHTML=humTpls.map(t=>`<div class="hum-tpl" data-hdrag="tpl" data-tpl="${t.id}" role="button" tabindex="0" aria-label="${humEsc(t.n)}, drag onto a day or tap to edit">${humEsc(t.n)}<small>${humFmt(t.s)}–${humFmt(t.e)}</small></div>`).join('');
+  const classic=humMode==='classic';
+  document.getElementById('hum-tpl-new').hidden=classic;
+  document.getElementById('hum-pal-hint').textContent=classic?'Drag a person onto a day, then pick their shift.':'Drag a shift onto a day. Tap one to edit its hours.';
+  if(classic)document.getElementById('hum-tpls').innerHTML=humSecList(humSec,true).map(e=>`<div class="hum-tpl hum-person hs-${humSec}" data-hdrag="person" data-emp="${e.id}" role="button" tabindex="0">${humEsc(e.name)}</div>`).join('')||'<span class="hum-pal-hint" style="margin:0">No one in this section yet.</span>';
+  else document.getElementById('hum-tpls').innerHTML=humTpls.map(t=>`<div class="hum-tpl" data-hdrag="tpl" data-tpl="${t.id}" role="button" tabindex="0" aria-label="${humEsc(t.n)}, drag onto a day or tap to edit">${humEsc(t.n)}<small>${humFmt(t.s)}–${humFmt(t.e)}</small></div>`).join('');
   const dates=[...Array(7)].map((_,i)=>{const d=new Date(humWeek);d.setDate(d.getDate()+i);return d;});
   const f=(d,o)=>d.toLocaleDateString('en-CA',o);
   document.getElementById('hum-week-lbl').textContent=`${f(dates[0],{month:'short',day:'numeric'})} – ${f(dates[6],{month:'short',day:'numeric'})}`;
@@ -1869,7 +1894,10 @@ function humRender(){
   document.querySelectorAll('#hum-sec-seg button').forEach(b=>b.classList.toggle('on',b.dataset.sec===humSec));
   if(!S.employees.length){el.innerHTML='<tbody><tr><td class="hum-empty">No staff yet. Add people on the Employees page and they will show up here.</td></tr></tbody>';return;}
   const todayK=humKey(new Date());
-  let h='<thead><tr><th class="hum-name"></th>'+dates.map((d,i)=>`<th data-day="${i}" class="${humKey(d)===todayK?'today':''}">${HUM_DAYS[i]}<br><span class="d">${d.getDate()}</span></th>`).join('')+'</tr></thead><tbody>';
+  const corner=`<th class="hum-name hum-corner"><button class="hum-mode-btn" onclick="humToggleMode()" aria-label="Switch to ${classic?'grid':'classic'} view"><span class="hum-mode-ico" aria-hidden="true">${classic?'▦':'☰'}</span>${classic?'Grid view':'Classic view'}</button></th>`;
+  el.classList.toggle('classic',classic);
+  if(classic){humRenderClassic(el,dates,sh,todayK,corner);return;}
+  let h='<thead><tr>'+corner+dates.map((d,i)=>`<th data-day="${i}" class="${humKey(d)===todayK?'today':''}">${HUM_DAYS[i]}<br><span class="d">${d.getDate()}</span></th>`).join('')+'</tr></thead><tbody>';
   [humSec].forEach(sec=>{
     const rows=humSecList(sec);
     const dayTot=Array(7).fill(0),dayCnt=Array(7).fill(0);
@@ -1877,7 +1905,7 @@ function humRender(){
       const mine=sh.filter(s=>s.empId===emp.id&&s.sec===sec);
       const wk=empHrs[emp.id]||0;const over=emp.hourCap&&wk>emp.hourCap;
       const sub=`${humR(wk)}h${emp.hourCap?' of '+emp.hourCap:''}${sec==='KITCHEN'&&humKitchenSub(emp)?', '+humKitchenSub(emp):''}`;
-      h+=`<tr data-emp="${emp.id}"><td class="hum-name"><b>${humEsc(emp.name)}</b><span class="${over?'over':''}">${sub}</span></td>`;
+      h+=`<tr data-row data-emp="${emp.id}"><td class="hum-name"><b>${humEsc(emp.name)}</b><span class="${over?'over':''}">${sub}</span></td>`;
       for(let i=0;i<7;i++){
         const cs=mine.filter(s=>s.day===i).sort((a,b)=>humToMin(a.start)-humToMin(b.start));
         cs.forEach(s=>dayTot[i]+=humSplit(s.start,s.end).tot);if(cs.length)dayCnt[i]++;
@@ -1900,6 +1928,33 @@ function humRenderOrder(){
     el.innerHTML=list.length?list.map((e,i)=>`<div class="hum-ord-row" data-id="${e.id}"><span class="hum-ord-n">${i+1}</span><div class="hum-ord-name">${humEsc(e.name)}${sec==='KITCHEN'&&humKitchenSub(e)?`<small>${humKitchenSub(e)}</small>`:''}</div><span class="hum-ord-h" data-hdrag="order" aria-label="Drag to reorder ${humEsc(e.name)}">≡</span></div>`).join(''):`<div class="hum-ord-empty">Nobody has this position yet. Set positions on the Employees page.</div>`;
   });
 }
+// Classic view: days across, positions down, each day lists names with their shift (like the paper schedule)
+function humPosOf(emp,sec){if(sec==='SERVING')return'SERVING';const r=getEmpRoles(emp).find(x=>HUM_KITCHEN_ROLES.includes(x));return r||'KITCHEN';}
+const HUM_POS_LBL={SERVING:'Serving',TEPPAN:'Teppan',SUSHI:'Sushi',KITCHEN:'Kitchen'};
+function humRenderClassic(el,dates,sh,todayK,corner){
+  const sec=humSec;const pos=sec==='SERVING'?['SERVING']:['TEPPAN','SUSHI','KITCHEN'];
+  const ord=humOrder[sec]||[];const ix=id=>{const i=ord.indexOf(id);return i<0?1e6:i;};
+  const empOf=id=>S.employees.find(e=>e.id===id);
+  let h='<thead><tr>'+corner+dates.map((d,i)=>`<th data-day="${i}" class="${humKey(d)===todayK?'today':''}">${HUM_DAYS[i]}<br><span class="d">${d.getDate()}</span></th>`).join('')+'</tr></thead><tbody>';
+  const dayTot=Array(7).fill(0),dayCnt=Array(7).fill(0);
+  pos.forEach(p=>{
+    h+=`<tr data-row><td class="hum-name hum-pos"><b>${HUM_POS_LBL[p]}</b></td>`;
+    for(let i=0;i<7;i++){
+      const cs=sh.filter(s=>s.sec===sec&&s.day===i&&humPosOf(empOf(s.empId)||{roles:[]},sec)===p)
+        .sort((a,b)=>humToMin(a.start)-humToMin(b.start)||ix(a.empId)-ix(b.empId));
+      cs.forEach(s=>{dayTot[i]+=humSplit(s.start,s.end).tot;dayCnt[i]++;});
+      h+=`<td class="hum-cell hum-ccell" data-day="${i}" data-sec="${sec}" onclick="humCellClick(event,this)">${cs.map(s=>{
+        const e=empOf(s.empId);const nm=e?e.name:(s.empName||'?');
+        const tag=s.label||`${humFmt(s.start)}–${humFmt(s.end)}`;
+        return`<div class="hum-chip hs-${sec}" data-hdrag="shift" data-id="${s.id}" title="${humEsc(`${nm}, ${humFmt(s.start)} – ${humFmt(s.end)}${s.note?', '+s.note:''}`)}"><b>${humEsc(nm)}</b><span>${humEsc(tag)}</span></div>`;
+      }).join('')||'<div class="hum-add">+</div>'}</td>`;
+    }
+    h+='</tr>';
+  });
+  h+=`<tr class="hum-tot"><td class="hum-name">${HUM_SEC_LBL[sec]} total</td>${dayTot.map((t,i)=>`<td>${dayCnt[i]} on, ${humR(t)}h</td>`).join('')}</tr></tbody>`;
+  el.innerHTML=h;el.classList.add('classic');
+}
+window.humToggleMode=function(){humMode=humMode==='classic'?'grid':'classic';try{localStorage.setItem('humMode',humMode);}catch(e){}document.getElementById('hum-grid').classList.toggle('classic',humMode==='classic');humRender();};
 window.humSetSec=function(sec){humSec=sec;try{localStorage.setItem('humSec',sec);}catch(e){}humRender();};
 window.humView=function(v){
   document.getElementById('hum-view-grid').hidden=v!=='grid';
@@ -1925,17 +1980,21 @@ window.humShiftWeek=async function(n){
 function humOpen(id,empId,day,sec){
   const s=id?humShifts().find(x=>x.id===id):null;if(id&&!s)return;
   const eId=s?s.empId:empId,dy=s?s.day:day,sc=s?s.sec:sec;
-  const emp=S.employees.find(e=>e.id===eId)||{name:s?.empName||'Staff'};
+  const emp=S.employees.find(e=>e.id===eId)||{name:s?.empName||''};
   humEdit={id:s?s.id:null,empId:eId,day:dy,sec:sc};
+  document.getElementById('hum-m-who-wrap').hidden=!!eId;
+  if(!eId)humWhoRender();
   const d=new Date(humWeek);d.setDate(d.getDate()+dy);
   document.getElementById('hum-m-title').textContent=s?'Edit shift':'New shift';
-  document.getElementById('hum-m-sub').textContent=`${emp.name}, ${HUM_SEC_LBL[sc]}, ${d.toLocaleDateString('en-CA',{weekday:'long',month:'short',day:'numeric'})}`;
+  document.getElementById('hum-m-sub').textContent=`${emp.name?emp.name+', ':''}${HUM_SEC_LBL[sc]}, ${d.toLocaleDateString('en-CA',{weekday:'long',month:'short',day:'numeric'})}`;
   document.getElementById('hum-m-start').value=s?s.start:humTpls[0]?.s||'11:00';
   document.getElementById('hum-m-end').value=s?s.end:humTpls[0]?.e||'16:00';
   document.getElementById('hum-m-note').value=s?(s.note||''):'';
   document.getElementById('hum-m-del').style.display=s?'':'none';
   humModalHrs();openModal('hum-modal');
 }
+function humWhoRender(){document.getElementById('hum-m-who').innerHTML=humSecList(humEdit.sec,true).map(e=>`<button type="button" class="${humEdit.empId===e.id?'on':''}" onclick="humPickWho('${e.id}')">${humEsc(e.name)}</button>`).join('');}
+window.humPickWho=function(id){humEdit.empId=id;humWhoRender();};
 window.humPreset=function(id){const t=humTpls.find(x=>x.id===id);if(!t)return;document.getElementById('hum-m-start').value=t.s;document.getElementById('hum-m-end').value=t.e;humModalHrs();};
 window.humModalHrs=function(){
   const a=document.getElementById('hum-m-start').value,b=document.getElementById('hum-m-end').value;
@@ -1946,6 +2005,7 @@ window.humModalHrs=function(){
 window.humCellClick=function(e,td){if(humJustDragged||e.target.closest('.hum-shift'))return;humOpen(null,td.dataset.emp,+td.dataset.day,td.dataset.sec);};
 window.humSave=async function(){
   const start=document.getElementById('hum-m-start').value,end=document.getElementById('hum-m-end').value;
+  if(!humEdit.empId){showToast('Pick who is working');return;}
   if(!start||!end){showToast('Enter a start and end time');return;}
   if(start===end){showToast('End time must be different from start time');return;}
   const data={start,end,label:humLabelFor(start,end),note:document.getElementById('hum-m-note').value.trim()};
@@ -1998,7 +2058,7 @@ function humHitCell(x,y){
   const w=document.getElementById('hum-wrap');if(!w)return null;
   const wb=w.getBoundingClientRect();
   if(x<wb.left-30||x>wb.right+30||y<wb.top-30||y>wb.bottom+30)return null;
-  const rows=[...w.querySelectorAll('tbody tr[data-emp]')];if(!rows.length)return null;
+  const rows=[...w.querySelectorAll('tbody tr[data-row]')];if(!rows.length)return null;
   let row=null,rd=1e9;
   for(const r of rows){const b=r.getBoundingClientRect();const d=y<b.top?b.top-y:y>b.bottom?y-b.bottom:0;if(d<rd){rd=d;row=r;}if(d===0)break;}
   let col=null,cd=1e9;
@@ -2052,14 +2112,14 @@ function humEndDrag(cancel){
   if(d.raf)cancelAnimationFrame(d.raf);
   if(!d.on){
     if(cancel)return;
-    if(d.kind==='shift')humOpen(d.src.dataset.id);else if(d.kind==='tpl')humTplOpen(d.src.dataset.tpl);
+    if(d.kind==='shift')humOpen(d.src.dataset.id);else if(d.kind==='tpl')humTplOpen(d.src.dataset.tpl);else if(d.kind==='person')showToast('Drag them onto a day');
     return;
   }
   d.ghost.remove();d.src.classList.remove('hum-src-drag');document.body.classList.remove('hum-dragging');
   if(d.over)d.over.classList.remove('over');
   humJustDragged=true;setTimeout(()=>{humJustDragged=false;},60);
   if(d.kind==='order'){humOrderDrop(d.src.parentElement);return;}
-  if(!cancel&&d.over)humDrop(d,d.over.dataset.emp,+d.over.dataset.day,d.over.dataset.sec);
+  if(!cancel&&d.over){const s=d.kind==='shift'?humShifts().find(x=>x.id===d.src.dataset.id):null;const emp=d.over.dataset.emp||(d.kind==='person'?d.src.dataset.emp:s&&s.empId);if(d.kind==='person')humOpen(null,emp,+d.over.dataset.day,d.over.dataset.sec);else if(emp)humDrop(d,emp,+d.over.dataset.day,d.over.dataset.sec);}
 }
 document.addEventListener('pointerup',()=>humEndDrag(false));
 document.addEventListener('pointercancel',()=>humEndDrag(true));
