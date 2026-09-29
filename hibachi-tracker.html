@@ -1500,16 +1500,31 @@ body.ios-mode .btn-danger { background:var(--i-red-soft); border:0; border-radiu
 .i-grab { display:none; }
 .i-snav { height:52px; }
 
-/* ── mode switch: classic header button (1599 + 3599-in-classic only) ── */
+/* ── mode switch: ONE floating pill, top centre ("island" spot) ──
+   Top-anchored, so an on-screen keyboard (which covers the bottom half and
+   slides focused inputs up to just above itself) never reaches it. Hidden
+   while any form, sheet, calendar or alert is open, so it never sits on a
+   modal's title / Back / ✕ and nobody switches mid-booking. */
+#modePill { position:fixed; z-index:450; top:calc(8px + env(safe-area-inset-top,0px)); left:50%; transform:translateX(-50%);
+  display:none; align-items:center; gap:6px; height:30px; padding:0 13px 0 11px; border-radius:15px; border:0; cursor:pointer;
+  background:rgba(28,28,30,.86); color:#fff; font:600 13px/1 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+  letter-spacing:0; -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); box-shadow:0 2px 10px rgba(0,0,0,.18);
+  -webkit-tap-highlight-color:transparent; transition:opacity .18s, transform .18s; }
+#modePill svg { width:14px; height:14px; }
+body:not(.ios-mode) #modePill, body.ios-classic #modePill { box-shadow:0 0 0 1px rgba(210,175,100,.45), 0 2px 10px rgba(0,0,0,.3); }
+#modePill:active { transform:translateX(-50%) scale(.94); }
+body.staff-mode:not(.staff2-mode):not(.manager-mode) #modePill.can { display:inline-flex; }
+body.mp-busy #modePill { opacity:0; pointer-events:none; }
+/* classic on phone widths: the header centre is taken by the title/badges, so the
+   switch docks into the (sticky, keyboard-proof) header instead */
 #modeSwitchBtn { display:none; background:rgba(210,175,100,0.12); border:1px solid rgba(210,175,100,0.45); border-radius:5px; color:var(--gold);
   font-family:var(--mono); font-size:0.58rem; letter-spacing:0.06em; padding:3px 9px; cursor:pointer; white-space:nowrap; font-weight:600; }
-body.staff-mode:not(.staff2-mode):not(.manager-mode) #modeSwitchBtn { display:inline-block; }
-body.ios-mode.ios-classic #iosBackPill { display:none !important; }   /* replaced by the header button (the old pill rode up with the keyboard) */
-/* iOS side of the switch: centred in the top bar */
-.i-nav3 { display:grid !important; grid-template-columns:1fr auto 1fr; }
-.i-nav3 > :last-child { justify-self:end; }
-.i-mode { font-size:13px !important; font-weight:600; color:var(--i-accent) !important; background:var(--i-fill) !important; border-radius:14px !important;
-  padding:5px 12px !important; line-height:1; }
+@media (max-width:599px){
+  body.staff-mode:not(.staff2-mode):not(.manager-mode):not(.ios-mode) #modeSwitchBtn,
+  body.staff-mode:not(.staff2-mode):not(.manager-mode).ios-classic #modeSwitchBtn { display:inline-block; }
+  body:not(.ios-mode) #modePill, body.ios-classic #modePill { display:none !important; }
+}
+body.ios-mode.ios-classic #iosBackPill { display:none !important; }
 
 /* ── rows: large groups (15+) — same navy + white as classic ── */
 .i-row.big { background:#1e3a8a; color:#fff; }
@@ -1767,7 +1782,7 @@ body.i-silent #modalOverlay { visibility:hidden !important; }
             Last: <span id="lastBackupTime">Never</span>
           </div>
         </div>
-        <button type="button" id="modeSwitchBtn" onclick="iosModeSwitch('ios')" title="Switch to the iOS view">iOS view</button>
+        <button type="button" id="modeSwitchBtn" onclick="iosModeSwitch('ios')" title="Switch to the iOS view">iOS view</button><!-- phone-width classic only; tablets use the floating pill -->
         <button onclick="window._firebaseLogout()"
           title="Sign out"
           style="background:transparent;border:1px solid var(--border);border-radius:5px;
@@ -2009,7 +2024,7 @@ body.i-silent #modalOverlay { visibility:hidden !important; }
 <!-- ════ iOS APP (password 3599) — same data and functions as staff, iOS screens ════ -->
 <div id="iosApp">
   <main class="i-screen on" id="iosTodayScr" aria-label="Reservations">
-    <div class="i-nav i-nav3"><span class="i-live" id="iosLive">Live</span><button type="button" class="i-mode" onclick="iosModeSwitch('classic')">Classic view</button><button class="i-link" id="iosGoToday" type="button">Today</button></div>
+    <div class="i-nav"><span class="i-live" id="iosLive">Live</span><button class="i-link" id="iosGoToday" type="button">Today</button></div>
     <h1 class="i-title i-jt" id="iosTitle" role="button" tabindex="0" aria-label="Choose a day to view">Today</h1>
     <div class="i-sub" id="iosSub"></div>
     <div class="i-week" id="iosWeek"></div>
@@ -2020,7 +2035,7 @@ body.i-silent #modalOverlay { visibility:hidden !important; }
   </main>
 
   <main class="i-screen" id="iosDiningScr" aria-label="Dining">
-    <div class="i-nav i-nav3"><span></span><button type="button" class="i-mode" onclick="iosModeSwitch('classic')">Classic view</button><button class="i-link" id="iosDGoToday" type="button">Today</button></div>
+    <div class="i-nav"><span></span><button class="i-link" id="iosDGoToday" type="button">Today</button></div>
     <h1 class="i-title i-jt" id="iosDTitle" role="button" tabindex="0" aria-label="Choose a day to view">Dining</h1>
     <div class="i-sub" id="iosDSub"></div>
     <div class="i-week" id="iosDWeek"></div>
@@ -2068,6 +2083,7 @@ body.i-silent #modalOverlay { visibility:hidden !important; }
   <div class="i-toast" id="iosToast" role="status" aria-live="polite"></div>
 </div>
 <button type="button" id="iosBackPill" onclick="iosBackToIos()">Back to iOS view</button>
+<button type="button" id="modePill" aria-label="Switch view"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 5.5h9l-2.5-2.5M13.5 10.5h-9l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="modePillTxt">iOS view</span></button>
 
 <!-- ════ SCRIPT ════ -->
 <script>
@@ -6664,6 +6680,32 @@ window._preloadAllReservations = preloadAllReservations;
       + line('Sign-ins', 'open') + line('Switched into', 'switch') + line('Bookings made', 'book')
       + `</table><div class="i-item"><div class="main t2">Bold = last 7 days / all time. Switched into = taps on the switch that landed in that view.</div></div>`;
   }
+
+  /* ── floating mode pill: label + hide while anything is open ── */
+  (function(){
+    const pill = $('modePill'); if (!pill) return;
+    const inIos = () => document.body.classList.contains('ios-mode') && !document.body.classList.contains('ios-classic');
+    pill.onclick = () => window.iosModeSwitch(inIos() ? 'classic' : 'ios');
+    function sync(){
+      const ios = inIos();
+      $('modePillTxt').textContent = ios ? 'Classic view' : 'iOS view';
+      const login = $('loginScreen'), mo = $('modalOverlay');
+      const signedIn = !(login && login.style.display !== 'none' && login.offsetParent !== null);
+      pill.classList.toggle('can', signedIn);
+      const busy = (mo && mo.style.display && mo.style.display !== 'none')
+        || ['iosBook','iosJump'].some(id => $(id) && $(id).classList.contains('on'))
+        || ($('iosAlertScrim') && $('iosAlertScrim').classList.contains('on'))
+        || ($('calDropdown') && $('calDropdown').style.display && $('calDropdown').style.display !== 'none');
+      document.body.classList.toggle('mp-busy', !!busy);
+    }
+    window._modePillSync = sync;
+    if (window.MutationObserver) {
+      const mo = new MutationObserver(() => sync());
+      ['modalOverlay','loginScreen','iosBook','iosJump','iosAlertScrim','calDropdown'].forEach(id => { const el=$(id); if (el) mo.observe(el, {attributes:true, attributeFilter:['style','class']}); });
+      new MutationObserver(m => { if (m.some(x => x.attributeName==='class')) sync(); }).observe(document.body, {attributes:true, attributeFilter:['class']});
+    }
+    sync();
+  })();
 
   /* ── SWIPE between days (Today + Dining screens) ── */
   function bindSwipe(scrId, bodyId){
