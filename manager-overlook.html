@@ -550,56 +550,113 @@ tr:hover td{background:rgba(232,160,32,.03)}
   .topbar-left h2{font-size:1.35rem}
   .sch-tab{padding:8px 5px;font-size:.7rem}
 }
-/* ── HUMANITY TAB ── */
-.hum-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.hum-week{display:flex;align-items:center;gap:6px}
-.hum-week-lbl{font-family:var(--font-head);font-weight:700;font-size:1.1rem;min-width:180px;text-align:center}
-.hum-bar select{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:6px 8px;font-family:var(--font-body);font-size:.8rem;color:var(--text)}
-.hum-sum{margin-left:auto;font-size:.82rem;color:var(--text2)}
-.hum-sum b{color:var(--text)}
-.hum-pal{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r)}
-.hum-pal-hint{font-size:.8rem;color:var(--text2);margin-right:4px}
-.hum-tpl{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;padding:6px 12px;border-radius:6px;border:1px dashed var(--border2);background:var(--s2);font-size:.82rem;font-weight:600;color:var(--text)}
-.hum-tpl small{display:block;font-family:var(--font-mono);font-size:.62rem;color:var(--text3);font-weight:400}
-.hum-tpl:hover{border-color:var(--amber)}
-.hum-wrap{overflow:auto;max-height:calc(100vh - 250px);background:var(--surface);border:1px solid var(--border);border-radius:var(--r)}
-.hum-grid{border-collapse:separate;border-spacing:0;width:100%;min-width:960px}
-.hum-grid th,.hum-grid td{border-bottom:1px solid var(--border);border-right:1px solid var(--s3);vertical-align:top}
-.hum-grid thead th{background:var(--s2);padding:8px 6px;font-family:var(--font-head);font-size:.95rem;font-weight:700;text-align:center;position:sticky;top:0;z-index:3}
-.hum-grid thead th .d{display:block;font-family:var(--font-mono);font-size:.62rem;color:var(--text3);font-weight:400}
-.hum-grid thead th.today{color:var(--amber);box-shadow:inset 0 -3px 0 var(--amber)}
-.hum-grid .hum-name{position:sticky;left:0;background:var(--surface);z-index:2;padding:8px 10px;min-width:140px;text-align:left}
-.hum-grid thead .hum-name{z-index:4;background:var(--s2)}
-.hum-name b{display:block;font-size:.9rem;font-weight:600}
-.hum-name span{font-family:var(--font-mono);font-size:.64rem;color:var(--text3)}
-.hum-name span.over{color:var(--red)}
-.hum-grp td{background:var(--bg2);font-family:var(--font-head);font-weight:700;font-size:.82rem;padding:4px 10px;color:var(--text2);letter-spacing:.03em}
-.hum-grp td.hum-name{background:var(--bg2)}
-.hum-cell{min-width:112px;height:56px;padding:4px;cursor:pointer;transition:background .1s}
-.hum-cell:hover{background:var(--amber-g)}
-.hum-cell.off{background:repeating-linear-gradient(135deg,transparent 0 6px,var(--s2) 6px 12px)}
-.hum-cell.over{background:var(--amber-d);box-shadow:inset 0 0 0 2px var(--amber)}
-.hum-add{visibility:hidden;font-size:.72rem;color:var(--text3);text-align:center;padding-top:14px}
+/* ── HUMANITY TAB (iOS style) ── */
+.ios,.ios-sheet{--i-bg:#f2f2f7;--i-card:#fff;--i-fill:rgba(118,118,128,.12);--i-sep:rgba(60,60,67,.18);--i-l1:#1c1c1e;--i-l2:rgba(60,60,67,.64);--i-l3:rgba(60,60,67,.34);--i-blue:#007aff;--i-red:#ff3b30;--i-serv:#5856d6;--i-serv-bg:rgba(88,86,214,.12);--i-kit:#d97000;--i-kit-bg:rgba(255,149,0,.16);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;color:var(--i-l1);-webkit-font-smoothing:antialiased}
+main:has(#pg-humanity.on){background:#f2f2f7}
+.ios h2,.ios h3,.ios th,.ios td,.ios-sheet h3{font-family:inherit;text-transform:none;letter-spacing:normal}
+.ios-sheet-body{padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
+.ios button,.ios-sheet button,.ios-sheet input{font-family:inherit}
+.ios button:focus-visible,.ios-sheet button:focus-visible{outline:2px solid var(--i-blue);outline-offset:2px}
+.ios-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.ios-kicker{font-size:.84rem;color:var(--i-l2);font-weight:500;margin-bottom:2px}
+.ios-title{font-size:2.1rem;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.ios-seg{display:inline-flex;background:var(--i-fill);border-radius:9px;padding:2px}
+.ios-seg button{border:none;background:none;padding:6px 16px;border-radius:7px;font-size:.86rem;font-weight:500;color:var(--i-l1);cursor:pointer;min-width:120px;transition:background .15s}
+.ios-seg button.on{background:#fff;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04)}
+.ios-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.ios-step{display:inline-flex;align-items:center;background:var(--i-card);border-radius:10px;box-shadow:0 0 0 .5px var(--i-sep)}
+.ios-step button{border:none;background:none;color:var(--i-blue);font-size:1.3rem;width:40px;height:36px;cursor:pointer}
+.ios-step span{font-size:.95rem;font-weight:600;padding:0 4px;min-width:170px;text-align:center}
+.ios-pill{border:none;background:var(--i-card);color:var(--i-blue);font-size:.86rem;font-weight:500;padding:8px 14px;border-radius:999px;cursor:pointer;box-shadow:0 0 0 .5px var(--i-sep)}
+.ios-pill:active{opacity:.55}
+.ios-pill.red{color:var(--i-red)}
+.ios-sum{margin-left:auto;font-size:.86rem;color:var(--i-l2)}
+.ios-sum b{color:var(--i-l1);font-weight:600}
+.ios-card{background:var(--i-card);border-radius:14px;box-shadow:0 0 0 .5px var(--i-sep);margin-bottom:12px}
+.hum-pal{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px}
+.hum-tpl{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;padding:7px 12px;border-radius:10px;background:var(--i-fill);font-size:.88rem;font-weight:600;line-height:1.2}
+.hum-tpl small{display:block;font-size:.74rem;color:var(--i-l2);font-weight:400}
+.hum-tpl-new{border:1.5px dashed var(--i-l3);background:none;color:var(--i-blue);font-size:.88rem;font-weight:500;padding:9px 12px;border-radius:10px;cursor:pointer}
+.hum-pal-hint{font-size:.8rem;color:var(--i-l2);margin-left:auto;padding-right:4px}
+.hum-wrap{overflow:auto;max-height:calc(100vh - 300px);border-radius:14px}
+.hum-grid{border-collapse:separate;border-spacing:0;width:100%;min-width:940px}
+.hum-grid th,.hum-grid td{border-bottom:.5px solid var(--i-sep);vertical-align:top}
+.hum-grid td+td,.hum-grid th+th{border-left:.5px solid var(--i-sep)}
+.hum-grid thead th{background:rgba(249,249,251,.94);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);padding:8px 6px;font-size:.76rem;font-weight:600;color:var(--i-l2);text-align:center;position:sticky;top:0;z-index:3}
+.hum-grid thead th .d{display:inline-block;font-size:1.05rem;color:var(--i-l1);font-weight:600;margin-top:2px;min-width:30px;padding:1px 6px;border-radius:999px}
+.hum-grid thead th.today{color:var(--i-red)}
+.hum-grid thead th.today .d{background:var(--i-red);color:#fff}
+.hum-grid .hum-name{position:sticky;left:0;background:var(--i-card);z-index:2;padding:9px 12px;min-width:140px;text-align:left}
+.hum-grid thead .hum-name{z-index:4;background:rgba(249,249,251,.97);vertical-align:bottom}
+.hum-name b{display:block;font-size:.93rem;font-weight:600}
+.hum-name span{font-size:.75rem;color:var(--i-l2)}
+.hum-name span.over{color:var(--i-red);font-weight:600}
+.hum-sec td,.hum-grid .hum-sec td.hum-name{background:#f7f7fa;padding:12px 12px 6px;font-size:1.02rem;font-weight:700}
+.hum-sec .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:1px}
+.hum-cell{min-width:108px;height:58px;padding:4px;cursor:pointer}
+.hum-cell:hover{background:rgba(0,122,255,.04)}
+.hum-cell.off{background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(118,118,128,.08) 6px 12px)}
+.hum-cell.over{background:rgba(0,122,255,.1);box-shadow:inset 0 0 0 2px var(--i-blue)}
+.hum-add{visibility:hidden;font-size:1.3rem;color:var(--i-blue);text-align:center;padding-top:10px;font-weight:300}
 .hum-cell:hover .hum-add{visibility:visible}
-.hum-shift{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;border-radius:5px;padding:4px 7px;margin-bottom:3px;border-left:4px solid;font-size:.78rem;line-height:1.25}
+.hum-shift{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;border-radius:8px;padding:5px 8px 5px 12px;margin-bottom:3px;font-size:.8rem;line-height:1.25;position:relative}
 .hum-shift:last-child{margin-bottom:0}
-.hum-shift b{display:block;font-weight:600}
-.hum-shift span{font-size:.66rem;opacity:.85}
-.hr-SERVICE{background:var(--service-d);border-color:var(--service);color:var(--service)}
-.hr-TEPPAN{background:var(--teppan-d);border-color:var(--teppan);color:var(--teppan)}
-.hr-SUSHI{background:var(--sushi-d);border-color:var(--sushi);color:var(--sushi)}
-.hr-KITCHEN{background:var(--kitchen-d);border-color:var(--kitchen);color:var(--kitchen)}
-.hum-ghost{position:fixed;pointer-events:none;z-index:500;opacity:.92;transform:rotate(-2deg);box-shadow:0 10px 28px rgba(0,0,0,.22);background-color:var(--surface)}
+.hum-shift::before{content:'';position:absolute;left:4px;top:5px;bottom:5px;width:3px;border-radius:2px;background:currentColor}
+.hum-shift b{display:block;font-weight:600;color:var(--i-l1)}
+.hum-shift span{font-size:.72rem}
+.hs-SERVING{background:var(--i-serv-bg);color:var(--i-serv)}
+.hs-KITCHEN{background:var(--i-kit-bg);color:var(--i-kit)}
+.hum-ghost{position:fixed;pointer-events:none;z-index:500;transform:scale(1.04);box-shadow:0 12px 32px rgba(0,0,0,.22);opacity:.97;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",system-ui,sans-serif}
 .hum-src-drag{opacity:.3}
 body.hum-dragging,body.hum-dragging *{cursor:grabbing!important}
-.hum-tot td{background:var(--s2);font-size:.72rem;text-align:center;padding:6px 4px;color:var(--text2)}
-.hum-tot td.hum-name{background:var(--s2);font-weight:600;color:var(--text)}
-.hum-empty{padding:34px;text-align:center;color:var(--text2)}
-.hum-presets{display:flex;flex-wrap:wrap;gap:6px}
-.hum-presets button{background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:6px 10px;font-size:.78rem;cursor:pointer;color:var(--text)}
-.hum-presets button:hover{border-color:var(--amber);color:var(--amber)}
-.hum-m-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-@media(max-width:760px){.hum-week-lbl{min-width:0;font-size:1rem}.hum-sum{margin-left:0;width:100%}.hum-wrap{max-height:none}.hum-cell{min-width:104px}}
+.hum-tot td,.hum-grid .hum-tot td.hum-name{background:#fbfbfd;font-size:.74rem;text-align:center;padding:6px 4px;color:var(--i-l2)}
+.hum-grid .hum-tot td.hum-name{text-align:left;padding-left:12px;font-weight:600;color:var(--i-l1)}
+.hum-empty{padding:34px;text-align:center;color:var(--i-l2)}
+.hum-ord{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:840px}
+.hum-ord h3{font-size:1.2rem;font-weight:700;padding:0 4px 8px;display:flex;align-items:center;gap:8px}
+.hum-ord h3 .dot{width:10px;height:10px;border-radius:50%}
+.hum-ord h3 button{margin-left:auto;border:none;background:none;color:var(--i-blue);font-size:.86rem;cursor:pointer}
+.hum-ord-list{padding-left:14px}
+.hum-ord-list{overflow:hidden}
+.hum-ord-row{display:flex;align-items:center;gap:12px;padding:6px 4px 6px 0;border-bottom:.5px solid var(--i-sep);min-height:52px}
+.hum-ord-row.hum-ghost{background:#fff;padding-left:14px}
+.hum-ord-row:last-child{border-bottom:none}
+.hum-ord-n{width:22px;font-size:.86rem;color:var(--i-l2);text-align:right;font-variant-numeric:tabular-nums}
+.hum-ord-name{flex:1;font-size:.96rem}
+.hum-ord-name small{display:block;font-size:.76rem;color:var(--i-l2)}
+.hum-ord-h{touch-action:none;cursor:grab;width:44px;height:40px;display:flex;align-items:center;justify-content:center;color:var(--i-l3);font-size:1.35rem}
+.hum-ord-foot{font-size:.8rem;color:var(--i-l2);padding:0 4px 10px}
+.hum-ord-empty{padding:16px 0;color:var(--i-l2);font-size:.9rem}
+.mo.ios-sheet{border:none;border-radius:14px;padding:0;max-width:420px;background:#f2f2f7;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow-y:auto}
+.ios-nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:12px 14px;background:rgba(249,249,251,.96);border-bottom:.5px solid var(--i-sep);position:sticky;top:0;z-index:1}
+.ios-nav h3{font-size:1rem;font-weight:600;text-align:center}
+.ios-nav button{border:none;background:none;color:var(--i-blue);font-size:1rem;cursor:pointer;padding:4px;justify-self:start}
+.ios-nav button.done{font-weight:600;justify-self:end}
+.ios-sheet-body{padding:14px 16px 20px}
+.ios-sheet-sub{font-size:.86rem;color:var(--i-l2);margin:0 4px 12px}
+.ios-group-lbl{font-size:.8rem;color:var(--i-l2);margin:0 4px 6px}
+.ios-group{background:#fff;border-radius:12px;margin-bottom:16px;overflow:hidden}
+.ios-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;min-height:46px;border-bottom:.5px solid var(--i-sep);font-size:.96rem}
+.ios-row:last-child{border-bottom:none}
+.ios-row label{flex-shrink:0}
+.ios-row input{border:none;background:none;text-align:right;font-size:.96rem;color:var(--i-l1);outline:none;flex:1;min-width:0;padding:10px 0}
+.ios-row input::placeholder{color:var(--i-l3)}
+.ios-row input[type=time]{background:var(--i-fill);border-radius:7px;padding:5px 8px;flex:0 0 auto;text-align:center}
+.ios-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+.ios-chips button{border:none;background:#fff;border-radius:999px;padding:7px 12px;font-size:.84rem;cursor:pointer;color:var(--i-l1);box-shadow:0 0 0 .5px var(--i-sep)}
+.ios-chips button.on{background:var(--i-blue);color:#fff}
+.ios-note{font-size:.82rem;color:var(--i-l2);margin:-8px 4px 16px}
+.ios-destructive{width:100%;border:none;background:#fff;color:var(--i-red);font-size:1rem;padding:13px;border-radius:12px;cursor:pointer}
+@media(max-width:760px){
+  .ios-title{font-size:1.8rem}
+  .ios-seg{width:100%}.ios-seg button{flex:1;min-width:0}
+  .ios-step span{min-width:0}
+  .ios-sum,.hum-pal-hint{margin-left:0;width:100%}
+  .hum-wrap{max-height:none}
+  .hum-ord{grid-template-columns:1fr}
+  .mb.open:has(.ios-sheet){align-items:flex-end}
+  .mo.ios-sheet{width:100%;max-width:none;border-radius:14px 14px 0 0;max-height:92vh}
+}
 </style>
 </head>
 <body>
@@ -622,27 +679,33 @@ body.hum-dragging,body.hum-dragging *{cursor:grabbing!important}
 
 <main>
 <!-- HUMANITY -->
-<div class="pg on" id="pg-humanity">
-<div class="topbar"><div class="topbar-left"><div class="bc">OVERLOOK / HUMANITY</div><h2>Weekly schedule</h2></div>
-<div class="topbar-right" style="display:flex;gap:6px;flex-wrap:wrap">
-  <button class="btn bo bs" onclick="humCopyLastWeek()">Copy last week</button>
-  <button class="btn bo bs" onclick="humExport()">Copy hours for Sheets</button>
-  <button class="btn br bs" onclick="humClearWeek()">Clear week</button>
-</div></div>
-<div class="hum-bar">
-  <div class="hum-week">
-    <button class="btn bo bs" onclick="humShiftWeek(-1)" aria-label="Previous week">‹</button>
-    <div class="hum-week-lbl" id="hum-week-lbl">Loading…</div>
-    <button class="btn bo bs" onclick="humShiftWeek(1)" aria-label="Next week">›</button>
-    <button class="btn bo bs" onclick="humShiftWeek(0)">This week</button>
+<div class="pg on ios" id="pg-humanity">
+<div class="ios-head">
+  <div><div class="ios-kicker">Osaka Hibachi</div><h2 class="ios-title">Humanity</h2></div>
+  <div class="ios-seg" role="tablist">
+    <button role="tab" class="on" id="hum-seg-grid" onclick="humView('grid')">Schedule</button>
+    <button role="tab" id="hum-seg-order" onclick="humView('order')">Name order</button>
   </div>
-  <select id="hum-role-filter" onchange="humSetFilter(this.value)" aria-label="Show position">
-    <option value="ALL">All positions</option><option value="SERVICE">Serving</option><option value="TEPPAN">Teppan</option><option value="SUSHI">Sushi</option><option value="KITCHEN">Kitchen</option>
-  </select>
-  <div class="hum-sum" id="hum-sum"></div>
 </div>
-<div class="hum-pal"><span class="hum-pal-hint">Drag a shift onto a day:</span><div id="hum-tpls" style="display:contents"></div><span class="hum-pal-hint" style="margin-left:auto">Tap an empty day to type custom times. Drag a shift to move it.</span></div>
-<div class="hum-wrap" id="hum-wrap"><table class="hum-grid" id="hum-grid"><tbody><tr><td class="hum-empty">Loading schedule…</td></tr></tbody></table></div>
+<div id="hum-view-grid">
+  <div class="ios-bar">
+    <div class="ios-step"><button onclick="humShiftWeek(-1)" aria-label="Previous week">‹</button><span id="hum-week-lbl">Loading…</span><button onclick="humShiftWeek(1)" aria-label="Next week">›</button></div>
+    <button class="ios-pill" onclick="humShiftWeek(0)">Today</button>
+    <button class="ios-pill" onclick="humCopyLastWeek()">Copy last week</button>
+    <button class="ios-pill" onclick="humExport()">Copy hours for Sheets</button>
+    <button class="ios-pill red" onclick="humClearWeek()">Clear week</button>
+    <div class="ios-sum" id="hum-sum"></div>
+  </div>
+  <div class="ios-card hum-pal"><div id="hum-tpls" style="display:contents"></div><button class="hum-tpl-new" onclick="humTplOpen(null)">+ New shift</button><span class="hum-pal-hint">Drag a shift onto a day. Tap one to edit its hours.</span></div>
+  <div class="ios-card hum-wrap" id="hum-wrap"><table class="hum-grid" id="hum-grid"><tbody><tr><td class="hum-empty">Loading schedule…</td></tr></tbody></table></div>
+</div>
+<div id="hum-view-order" hidden>
+  <p class="hum-ord-foot">Drag the handle to set the order names appear in the schedule. Changes save right away.</p>
+  <div class="hum-ord">
+    <div><h3><span class="dot" style="background:var(--i-serv)"></span>Serving<button onclick="humOrderReset('SERVING')">Sort A–Z</button></h3><div class="ios-card hum-ord-list" id="hum-ord-SERVING" data-sec="SERVING"></div></div>
+    <div><h3><span class="dot" style="background:var(--i-kit)"></span>Kitchen<button onclick="humOrderReset('KITCHEN')">Sort A–Z</button></h3><div class="ios-card hum-ord-list" id="hum-ord-KITCHEN" data-sec="KITCHEN"></div></div>
+  </div>
+</div>
 </div>
 
 <!-- DASHBOARD -->
@@ -1275,25 +1338,32 @@ body.hum-dragging,body.hum-dragging *{cursor:grabbing!important}
   </div>
 </div>
 
-<!-- HUMANITY SHIFT MODAL -->
-<div class="mb" id="hum-modal"><div class="mo">
-  <h3 id="hum-m-title" style="font-family:var(--font-head);font-size:1.3rem;font-weight:700;margin-bottom:2px">Add shift</h3>
-  <div id="hum-m-sub" style="color:var(--text2);font-size:.86rem;margin-bottom:14px"></div>
-  <div class="fg"><label>Quick times</label><div class="hum-presets" id="hum-m-presets"></div></div>
-  <div class="hum-m-row">
-    <div class="fg"><label for="hum-m-start">Start</label><input type="time" id="hum-m-start" step="900" oninput="humModalHrs()"></div>
-    <div class="fg"><label for="hum-m-end">End</label><input type="time" id="hum-m-end" step="900" oninput="humModalHrs()"></div>
+<!-- HUMANITY SHIFT SHEET -->
+<div class="mb" id="hum-modal"><div class="mo ios-sheet">
+  <div class="ios-nav"><button onclick="closeModal('hum-modal')">Cancel</button><h3 id="hum-m-title">New shift</h3><button class="done" onclick="humSave()">Save</button></div>
+  <div class="ios-sheet-body">
+    <div class="ios-sheet-sub" id="hum-m-sub"></div>
+    <div class="ios-chips" id="hum-m-presets"></div>
+    <div class="ios-group">
+      <div class="ios-row"><label for="hum-m-start">Starts</label><input type="time" id="hum-m-start" step="900" oninput="humModalHrs()"></div>
+      <div class="ios-row"><label for="hum-m-end">Ends</label><input type="time" id="hum-m-end" step="900" oninput="humModalHrs()"></div>
+      <div class="ios-row"><label for="hum-m-note">Note</label><input id="hum-m-note" placeholder="Optional"></div>
+    </div>
+    <div class="ios-note" id="hum-m-hrs"></div>
+    <button class="ios-destructive" id="hum-m-del" onclick="humDelete()">Delete shift</button>
   </div>
-  <div class="hum-m-row">
-    <div class="fg"><label for="hum-m-role">Position</label><select id="hum-m-role"><option value="SERVICE">Serving</option><option value="TEPPAN">Teppan</option><option value="SUSHI">Sushi</option><option value="KITCHEN">Kitchen</option></select></div>
-    <div class="fg"><label for="hum-m-note">Note</label><input id="hum-m-note" placeholder="Optional"></div>
-  </div>
-  <div id="hum-m-hrs" style="margin-top:12px;font-size:.84rem;color:var(--text2)"></div>
-  <div style="display:flex;gap:8px;margin-top:18px;align-items:center">
-    <button class="btn br bs" id="hum-m-del" onclick="humDelete()">Delete shift</button>
-    <span style="flex:1"></span>
-    <button class="btn bo" onclick="closeModal('hum-modal')">Cancel</button>
-    <button class="btn bg" onclick="humSave()">Save shift</button>
+</div></div>
+<!-- HUMANITY SHIFT TEMPLATE SHEET -->
+<div class="mb" id="hum-tpl-modal"><div class="mo ios-sheet">
+  <div class="ios-nav"><button onclick="closeModal('hum-tpl-modal')">Cancel</button><h3 id="hum-t-title">New shift</h3><button class="done" onclick="humTplSave()">Save</button></div>
+  <div class="ios-sheet-body">
+    <div class="ios-group">
+      <div class="ios-row"><label for="hum-t-name">Name</label><input id="hum-t-name" placeholder="e.g. Brunch" maxlength="18"></div>
+      <div class="ios-row"><label for="hum-t-start">Starts</label><input type="time" id="hum-t-start" step="900"></div>
+      <div class="ios-row"><label for="hum-t-end">Ends</label><input type="time" id="hum-t-end" step="900"></div>
+    </div>
+    <div class="ios-note">This shift appears in the bar above the schedule, ready to drag onto anyone's day.</div>
+    <button class="ios-destructive" id="hum-t-del" onclick="humTplDelete()">Delete shift</button>
   </div>
 </div></div>
 <div class="toast" id="toast"></div>
@@ -1714,20 +1784,25 @@ All current Overlook data in Firebase will be fully replaced. This cannot be und
 
 
 // ═══════════ HUMANITY TAB ═══════════
-// Separate data: Firestore collection 'humShifts' {week:'YYYY-MM-DD' (Monday), empId, empName, day:0-6 (Mon-Sun), start:'HH:MM', end:'HH:MM', role, note}
-const HUM_ROLES=['SERVICE','TEPPAN','SUSHI','KITCHEN'];
-const HUM_ROLE_LBL={SERVICE:'Serving',TEPPAN:'Teppan',SUSHI:'Sushi',KITCHEN:'Kitchen'};
+// Data (separate from the classic scheduler):
+//   humShifts   {week:'YYYY-MM-DD' Monday, empId, empName, day:0-6 Mon-Sun, sec:'SERVING'|'KITCHEN', start, end, label, note}
+//   humSettings/templates {list:[{id,n,s,e}]}   humSettings/order {SERVING:[empId], KITCHEN:[empId]}
+const HUM_SECS=['SERVING','KITCHEN'];
+const HUM_SEC_LBL={SERVING:'Serving',KITCHEN:'Kitchen'};
+const HUM_SEC_COLOR={SERVING:'var(--i-serv)',KITCHEN:'var(--i-kit)'};
+const HUM_KITCHEN_ROLES=['TEPPAN','SUSHI','KITCHEN'];
 const HUM_DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-const HUM_TPL=[
-  {k:'lunch',n:'Lunch',s:'11:00',e:'16:00'},
-  {k:'dinner',n:'Dinner',s:'17:00',e:'21:30'},
-  {k:'double',n:'Double',s:'11:00',e:'21:30'},
-  {k:'close',n:'Late close',s:'17:00',e:'22:15'}
+const HUM_DEFAULT_TPL=[
+  {id:'t1',n:'Lunch',s:'11:00',e:'16:00'},
+  {id:'t2',n:'Dinner',s:'17:00',e:'21:30'},
+  {id:'t3',n:'Double',s:'11:00',e:'21:30'},
+  {id:'t4',n:'Late close',s:'17:00',e:'22:15'}
 ];
 let humWeek=getMonday(new Date());
 const humCache={};
-let humRoleFilter='ALL';
-let humEdit=null;
+let humTpls=HUM_DEFAULT_TPL.map(t=>({...t}));
+let humOrder={SERVING:[],KITCHEN:[]};
+let humEdit=null,humTplEdit=null;
 let humDrag=null,humJustDragged=false;
 
 const humEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1738,164 +1813,245 @@ function humFmt(t){const m=humToMin(t);if(m==null)return'';let h=Math.floor(m/60
 function humSplit(s,e){let a=humToMin(s),b=humToMin(e);if(a==null||b==null)return{tot:0,early:0,late:0};if(b<=a)b+=1440;const ov=(x,y)=>Math.max(0,Math.min(b,y)-Math.max(a,x))/60;return{tot:(b-a)/60,early:ov(660,960),late:ov(960,1380)};}
 const humR=n=>Math.round(n*100)/100;
 function humShifts(){return humCache[humKey(humWeek)]||[];}
-function humRoleFor(emp){if(humRoleFilter!=='ALL'&&getEmpRoles(emp).includes(humRoleFilter))return humRoleFilter;const r=empPrimaryRole(emp);return HUM_ROLES.includes(r)?r:'SERVICE';}
+function humSecOfRole(r){r=(r||'').toUpperCase();return(r==='SERVICE'||r==='SERVING')?'SERVING':'KITCHEN';}
+function humEmpSecs(emp){const r=getEmpRoles(emp);const out=[];if(r.includes('SERVICE'))out.push('SERVING');if(r.some(x=>HUM_KITCHEN_ROLES.includes(x))||!out.length)out.push('KITCHEN');return out;}
+function humKitchenSub(emp){const r=getEmpRoles(emp).filter(x=>HUM_KITCHEN_ROLES.includes(x));return r.map(x=>x[0]+x.slice(1).toLowerCase()).join(', ');}
+function humLabelFor(s,e){const t=humTpls.find(t=>t.s===s&&t.e===e);return t?t.n:'';}
 
 async function humLoad(weekDate,force){
   const k=humKey(weekDate);
   if(!force&&humCache[k])return humCache[k];
   try{
     const snap=await getDocs(query(collection(db,'humShifts'),where('week','==',k)));
-    humCache[k]=snap.docs.map(d=>({id:d.id,...d.data()}));
+    humCache[k]=snap.docs.map(d=>{const x={id:d.id,...d.data()};x.sec=x.sec||humSecOfRole(x.role);return x;});
   }catch(e){console.error(e);showToast('Could not load shifts — check connection');humCache[k]=humCache[k]||[];}
   return humCache[k];
 }
+async function humLoadSettings(){
+  try{
+    const docs=await fsGet('humSettings');
+    const t=docs.find(d=>d.id==='templates');if(t&&Array.isArray(t.list)&&t.list.length)humTpls=t.list;
+    const o=docs.find(d=>d.id==='order');if(o)humOrder={SERVING:o.SERVING||[],KITCHEN:o.KITCHEN||[]};
+  }catch(e){console.error(e);}
+}
+const humSaveTpls=()=>setDoc(doc(db,'humSettings','templates'),{list:humTpls,_ts:Date.now()});
+const humSaveOrder=()=>setDoc(doc(db,'humSettings','order'),{...humOrder,_ts:Date.now()});
 
-function humRows(all){
-  const sh=humShifts();const has=new Set(sh.map(s=>s.empId));
-  let emps=S.employees.filter(e=>!e.benched||has.has(e.id));
-  if(!all&&humRoleFilter!=='ALL')emps=emps.filter(e=>getEmpRoles(e).includes(humRoleFilter));
-  const ord=e=>{const i=HUM_ROLES.indexOf(empPrimaryRole(e));return i<0?9:i;};
-  return emps.sort((a,b)=>ord(a)-ord(b)||(a.name||'').localeCompare(b.name||''));
+// People in a section, in saved order (unsorted newcomers go last, A–Z)
+function humSecList(sec,rosterOnly){
+  const has=new Set(rosterOnly?[]:humShifts().filter(s=>s.sec===sec).map(s=>s.empId));
+  const emps=S.employees.filter(e=>(!e.benched&&humEmpSecs(e).includes(sec))||has.has(e.id));
+  const ord=humOrder[sec]||[];const ix=e=>{const i=ord.indexOf(e.id);return i<0?1e6:i;};
+  return emps.sort((a,b)=>ix(a)-ix(b)||(a.name||'').localeCompare(b.name||''));
 }
 
 function humShiftHtml(s){
-  const r=HUM_ROLES.includes(s.role)?s.role:'SERVICE';
-  return`<div class="hum-shift hr-${r}" data-hdrag="shift" data-id="${s.id}"><b>${humFmt(s.start)} – ${humFmt(s.end)}</b><span>${HUM_ROLE_LBL[r]}, ${humR(humSplit(s.start,s.end).tot)}h${s.note?' — '+humEsc(s.note):''}</span></div>`;
+  const hrs=humR(humSplit(s.start,s.end).tot);
+  return`<div class="hum-shift hs-${s.sec}" data-hdrag="shift" data-id="${s.id}"><b>${humFmt(s.start)} – ${humFmt(s.end)}</b><span>${s.label?humEsc(s.label)+', ':''}${hrs}h${s.note?' — '+humEsc(s.note):''}</span></div>`;
 }
 
 function humRender(){
   const el=document.getElementById('hum-grid');if(!el)return;
-  document.getElementById('hum-tpls').innerHTML=HUM_TPL.map(t=>`<div class="hum-tpl" data-hdrag="tpl" data-tpl="${t.k}">${t.n}<small>${humFmt(t.s)}–${humFmt(t.e)}</small></div>`).join('');
+  document.getElementById('hum-tpls').innerHTML=humTpls.map(t=>`<div class="hum-tpl" data-hdrag="tpl" data-tpl="${t.id}" role="button" tabindex="0" aria-label="${humEsc(t.n)}, drag onto a day or tap to edit">${humEsc(t.n)}<small>${humFmt(t.s)}–${humFmt(t.e)}</small></div>`).join('');
   const dates=[...Array(7)].map((_,i)=>{const d=new Date(humWeek);d.setDate(d.getDate()+i);return d;});
   const f=(d,o)=>d.toLocaleDateString('en-CA',o);
-  document.getElementById('hum-week-lbl').textContent=`${f(dates[0],{month:'short',day:'numeric'})} – ${f(dates[6],{month:'short',day:'numeric',year:'numeric'})}`;
+  document.getElementById('hum-week-lbl').textContent=`${f(dates[0],{month:'short',day:'numeric'})} – ${f(dates[6],{month:'short',day:'numeric'})}`;
   const sh=humShifts();
-  let totH=0;sh.forEach(s=>totH+=humSplit(s.start,s.end).tot);
-  document.getElementById('hum-sum').innerHTML=`<b>${sh.length}</b> shifts, <b>${humR(totH)}</b> hours this week`;
+  const empHrs={};let totH=0;
+  sh.forEach(s=>{const h=humSplit(s.start,s.end).tot;totH+=h;empHrs[s.empId]=(empHrs[s.empId]||0)+h;});
+  document.getElementById('hum-sum').innerHTML=`<b>${sh.length}</b> shifts, <b>${humR(totH)}</b> hours`;
   if(!S.employees.length){el.innerHTML='<tbody><tr><td class="hum-empty">No staff yet. Add people on the Employees page and they will show up here.</td></tr></tbody>';return;}
-  const rows=humRows();
   const todayK=humKey(new Date());
-  let h='<thead><tr><th class="hum-name">Staff</th>'+dates.map((d,i)=>`<th class="${humKey(d)===todayK?'today':''}">${HUM_DAYS[i]}<span class="d">${d.getMonth()+1}/${d.getDate()}</span></th>`).join('')+'</tr></thead><tbody>';
-  const dayTot=Array(7).fill(0),dayCnt=Array(7).fill(0);
-  let lastRole=null;
-  rows.forEach(emp=>{
-    const pr=HUM_ROLES.includes(empPrimaryRole(emp))?empPrimaryRole(emp):'SERVICE';
-    if(pr!==lastRole){h+=`<tr class="hum-grp"><td class="hum-name">${HUM_ROLE_LBL[pr]}</td><td colspan="7"></td></tr>`;lastRole=pr;}
-    const mine=sh.filter(s=>s.empId===emp.id);
-    let wk=0;mine.forEach(s=>wk+=humSplit(s.start,s.end).tot);
-    const over=emp.hourCap&&wk>emp.hourCap;
-    h+=`<tr><td class="hum-name"><b>${humEsc(emp.name)}</b><span class="${over?'over':''}">${humR(wk)}h${emp.hourCap?' of '+emp.hourCap+'h max':''}</span></td>`;
-    for(let i=0;i<7;i++){
-      const cs=mine.filter(s=>s.day===i).sort((a,b)=>humToMin(a.start)-humToMin(b.start));
-      cs.forEach(s=>dayTot[i]+=humSplit(s.start,s.end).tot);
-      if(cs.length)dayCnt[i]++;
-      const off=Array.isArray(emp.daysOff)&&emp.daysOff.includes(i);
-      h+=`<td class="hum-cell${off?' off':''}" data-emp="${emp.id}" data-day="${i}" onclick="humCellClick(event,this)"${off?' title="Usual day off"':''}>${cs.map(humShiftHtml).join('')||'<div class="hum-add">+ Add</div>'}</td>`;
-    }
-    h+='</tr>';
+  let h='<thead><tr><th class="hum-name"></th>'+dates.map((d,i)=>`<th class="${humKey(d)===todayK?'today':''}">${HUM_DAYS[i]}<br><span class="d">${d.getDate()}</span></th>`).join('')+'</tr></thead><tbody>';
+  HUM_SECS.forEach(sec=>{
+    const rows=humSecList(sec);
+    h+=`<tr class="hum-sec"><td class="hum-name"><span class="dot" style="background:${HUM_SEC_COLOR[sec]}"></span>${HUM_SEC_LBL[sec]}</td><td colspan="7"></td></tr>`;
+    const dayTot=Array(7).fill(0),dayCnt=Array(7).fill(0);
+    rows.forEach(emp=>{
+      const mine=sh.filter(s=>s.empId===emp.id&&s.sec===sec);
+      const wk=empHrs[emp.id]||0;const over=emp.hourCap&&wk>emp.hourCap;
+      const sub=`${humR(wk)}h${emp.hourCap?' of '+emp.hourCap:''}${sec==='KITCHEN'&&humKitchenSub(emp)?', '+humKitchenSub(emp):''}`;
+      h+=`<tr><td class="hum-name"><b>${humEsc(emp.name)}</b><span class="${over?'over':''}">${sub}</span></td>`;
+      for(let i=0;i<7;i++){
+        const cs=mine.filter(s=>s.day===i).sort((a,b)=>humToMin(a.start)-humToMin(b.start));
+        cs.forEach(s=>dayTot[i]+=humSplit(s.start,s.end).tot);if(cs.length)dayCnt[i]++;
+        const off=Array.isArray(emp.daysOff)&&emp.daysOff.includes(i);
+        h+=`<td class="hum-cell${off?' off':''}" data-emp="${emp.id}" data-day="${i}" data-sec="${sec}" onclick="humCellClick(event,this)"${off?' title="Usual day off"':''}>${cs.map(humShiftHtml).join('')||'<div class="hum-add">+</div>'}</td>`;
+      }
+      h+='</tr>';
+    });
+    if(!rows.length)h+=`<tr><td class="hum-name" style="color:var(--i-l2);font-size:.85rem">Nobody in ${HUM_SEC_LBL[sec]} yet</td><td colspan="7"></td></tr>`;
+    h+=`<tr class="hum-tot"><td class="hum-name">${HUM_SEC_LBL[sec]} total</td>${dayTot.map((t,i)=>`<td>${dayCnt[i]} on, ${humR(t)}h</td>`).join('')}</tr>`;
   });
-  h+=`<tr class="hum-tot"><td class="hum-name">Day total</td>${dayTot.map((t,i)=>`<td>${dayCnt[i]} working<br>${humR(t)}h</td>`).join('')}</tr></tbody>`;
-  el.innerHTML=h;
+  el.innerHTML=h+'</tbody>';
 }
-window.humRender=humRender;
+window.humRender=function(){humRender();humRenderOrder();};
 
-async function humInit(){await humLoad(humWeek);humRender();}
+function humRenderOrder(){
+  HUM_SECS.forEach(sec=>{
+    const el=document.getElementById('hum-ord-'+sec);if(!el)return;
+    const list=humSecList(sec,true);
+    el.innerHTML=list.length?list.map((e,i)=>`<div class="hum-ord-row" data-id="${e.id}"><span class="hum-ord-n">${i+1}</span><div class="hum-ord-name">${humEsc(e.name)}${sec==='KITCHEN'&&humKitchenSub(e)?`<small>${humKitchenSub(e)}</small>`:''}</div><span class="hum-ord-h" data-hdrag="order" aria-label="Drag to reorder ${humEsc(e.name)}">≡</span></div>`).join(''):`<div class="hum-ord-empty">Nobody has this position yet. Set positions on the Employees page.</div>`;
+  });
+}
+window.humView=function(v){
+  document.getElementById('hum-view-grid').hidden=v!=='grid';
+  document.getElementById('hum-view-order').hidden=v!=='order';
+  document.getElementById('hum-seg-grid').classList.toggle('on',v==='grid');
+  document.getElementById('hum-seg-order').classList.toggle('on',v==='order');
+  if(v==='order')humRenderOrder();else humRender();
+};
+window.humOrderReset=async function(sec){
+  humOrder[sec]=humSecList(sec,true).sort((a,b)=>(a.name||'').localeCompare(b.name||'')).map(e=>e.id);
+  humRenderOrder();humRender();
+  try{await humSaveOrder();showToast(`${HUM_SEC_LBL[sec]} sorted A–Z`);}catch(e){showToast('Save failed — check connection');}
+};
+
+async function humInit(){await Promise.all([humLoadSettings(),humLoad(humWeek)]);humRender();humRenderOrder();}
 window.humShiftWeek=async function(n){
   if(n===0)humWeek=getMonday(new Date());else{const d=new Date(humWeek);d.setDate(d.getDate()+7*n);humWeek=d;}
   document.getElementById('hum-week-lbl').textContent='Loading…';
   await humLoad(humWeek);humRender();
 };
-window.humSetFilter=function(v){humRoleFilter=v;humRender();};
 
-// ── Add / edit modal ──
-function humOpen(id,empId,day){
-  const s=id?humShifts().find(x=>x.id===id):null;
-  if(id&&!s)return;
-  const eId=s?s.empId:empId,dy=s?s.day:day;
+// ── Shift sheet ──
+function humOpen(id,empId,day,sec){
+  const s=id?humShifts().find(x=>x.id===id):null;if(id&&!s)return;
+  const eId=s?s.empId:empId,dy=s?s.day:day,sc=s?s.sec:sec;
   const emp=S.employees.find(e=>e.id===eId)||{name:s?.empName||'Staff'};
-  humEdit={id:s?s.id:null,empId:eId,day:dy};
+  humEdit={id:s?s.id:null,empId:eId,day:dy,sec:sc};
   const d=new Date(humWeek);d.setDate(d.getDate()+dy);
-  document.getElementById('hum-m-title').textContent=s?'Edit shift':'Add shift';
-  document.getElementById('hum-m-sub').textContent=`${emp.name}, ${d.toLocaleDateString('en-CA',{weekday:'long',month:'short',day:'numeric'})}`;
-  document.getElementById('hum-m-presets').innerHTML=HUM_TPL.map(t=>`<button type="button" onclick="humPreset('${t.s}','${t.e}')">${t.n} ${humFmt(t.s)}–${humFmt(t.e)}</button>`).join('');
-  document.getElementById('hum-m-start').value=s?s.start:HUM_TPL[1].s;
-  document.getElementById('hum-m-end').value=s?s.end:HUM_TPL[1].e;
-  document.getElementById('hum-m-role').value=s?(s.role||'SERVICE'):humRoleFor(emp);
+  document.getElementById('hum-m-title').textContent=s?'Edit shift':'New shift';
+  document.getElementById('hum-m-sub').textContent=`${emp.name}, ${HUM_SEC_LBL[sc]}, ${d.toLocaleDateString('en-CA',{weekday:'long',month:'short',day:'numeric'})}`;
+  document.getElementById('hum-m-start').value=s?s.start:humTpls[0]?.s||'11:00';
+  document.getElementById('hum-m-end').value=s?s.end:humTpls[0]?.e||'16:00';
   document.getElementById('hum-m-note').value=s?(s.note||''):'';
   document.getElementById('hum-m-del').style.display=s?'':'none';
   humModalHrs();openModal('hum-modal');
 }
-window.humPreset=function(a,b){document.getElementById('hum-m-start').value=a;document.getElementById('hum-m-end').value=b;humModalHrs();};
+window.humPreset=function(id){const t=humTpls.find(x=>x.id===id);if(!t)return;document.getElementById('hum-m-start').value=t.s;document.getElementById('hum-m-end').value=t.e;humModalHrs();};
 window.humModalHrs=function(){
-  const x=humSplit(document.getElementById('hum-m-start').value,document.getElementById('hum-m-end').value);
-  document.getElementById('hum-m-hrs').textContent=x.tot?`${humR(x.tot)} hours: ${humR(x.early)} lunch (11–4), ${humR(x.late)} dinner (4–11)`:'';
+  const a=document.getElementById('hum-m-start').value,b=document.getElementById('hum-m-end').value;
+  document.getElementById('hum-m-presets').innerHTML=humTpls.map(t=>`<button type="button" class="${t.s===a&&t.e===b?'on':''}" onclick="humPreset('${t.id}')">${humEsc(t.n)}</button>`).join('');
+  const x=humSplit(a,b);
+  document.getElementById('hum-m-hrs').textContent=x.tot?`${humR(x.tot)} hours: ${humR(x.early)} before 4pm, ${humR(x.late)} after 4pm`:'';
 };
-window.humCellClick=function(e,td){if(humJustDragged||e.target.closest('.hum-shift'))return;humOpen(null,td.dataset.emp,+td.dataset.day);};
+window.humCellClick=function(e,td){if(humJustDragged||e.target.closest('.hum-shift'))return;humOpen(null,td.dataset.emp,+td.dataset.day,td.dataset.sec);};
 window.humSave=async function(){
   const start=document.getElementById('hum-m-start').value,end=document.getElementById('hum-m-end').value;
   if(!start||!end){showToast('Enter a start and end time');return;}
   if(start===end){showToast('End time must be different from start time');return;}
-  const data={start,end,role:document.getElementById('hum-m-role').value,note:document.getElementById('hum-m-note').value.trim()};
+  const data={start,end,label:humLabelFor(start,end),note:document.getElementById('hum-m-note').value.trim()};
   const k=humKey(humWeek),list=humCache[k]||(humCache[k]=[]);
   try{
     if(humEdit.id){await fsUp('humShifts',humEdit.id,data);Object.assign(list.find(s=>s.id===humEdit.id),data);showToast('Shift saved');}
-    else{const emp=S.employees.find(e=>e.id===humEdit.empId);const rec={week:k,empId:humEdit.empId,empName:emp?.name||'',day:humEdit.day,...data};rec.id=await fsAdd('humShifts',rec);list.push(rec);showToast('Shift added');}
+    else{const emp=S.employees.find(e=>e.id===humEdit.empId);const rec={week:k,empId:humEdit.empId,empName:emp?.name||'',day:humEdit.day,sec:humEdit.sec,...data};rec.id=await fsAdd('humShifts',rec);list.push(rec);showToast('Shift added');}
     closeModal('hum-modal');humRender();
   }catch(e){console.error(e);showToast('Save failed — check connection');}
 };
 window.humDelete=async function(){
-  if(!humEdit?.id)return;
-  const k=humKey(humWeek);
+  if(!humEdit?.id)return;const k=humKey(humWeek);
   try{await fsDel('humShifts',humEdit.id);humCache[k]=humCache[k].filter(s=>s.id!==humEdit.id);closeModal('hum-modal');humRender();showToast('Shift deleted');}
   catch(e){console.error(e);showToast('Delete failed — check connection');}
 };
 
+// ── Shift template sheet (your own drag-on shifts) ──
+window.humTplOpen=function(id){
+  const t=id?humTpls.find(x=>x.id===id):null;humTplEdit=t?t.id:null;
+  document.getElementById('hum-t-title').textContent=t?'Edit shift':'New shift';
+  document.getElementById('hum-t-name').value=t?t.n:'';
+  document.getElementById('hum-t-start').value=t?t.s:'11:00';
+  document.getElementById('hum-t-end').value=t?t.e:'16:00';
+  document.getElementById('hum-t-del').style.display=t?'':'none';
+  openModal('hum-tpl-modal');setTimeout(()=>document.getElementById('hum-t-name').focus(),50);
+};
+window.humTplSave=async function(){
+  const n=document.getElementById('hum-t-name').value.trim(),s=document.getElementById('hum-t-start').value,e=document.getElementById('hum-t-end').value;
+  if(!n){showToast('Give the shift a name');return;}
+  if(!s||!e||s===e){showToast('Enter a start and end time');return;}
+  const before=humTpls.map(t=>({...t}));
+  if(humTplEdit)Object.assign(humTpls.find(t=>t.id===humTplEdit),{n,s,e});
+  else humTpls.push({id:'t'+Date.now().toString(36),n,s,e});
+  humTpls.sort((a,b)=>humToMin(a.s)-humToMin(b.s)||humToMin(a.e)-humToMin(b.e));
+  try{await humSaveTpls();closeModal('hum-tpl-modal');humRender();showToast(humTplEdit?'Shift updated':`${n} added to your shifts`);}
+  catch(err){humTpls=before;console.error(err);showToast('Save failed — check connection');}
+};
+window.humTplDelete=async function(){
+  if(!humTplEdit)return;const t=humTpls.find(x=>x.id===humTplEdit);
+  if(!confirm(`Remove "${t.n}" from your shifts? Shifts already on the schedule stay.`))return;
+  const before=humTpls;humTpls=humTpls.filter(x=>x.id!==humTplEdit);
+  try{await humSaveTpls();closeModal('hum-tpl-modal');humRender();showToast('Shift removed');}
+  catch(err){humTpls=before;showToast('Delete failed — check connection');}
+};
+
 // ── Drag and drop (mouse + touch via pointer events) ──
 document.addEventListener('pointerdown',e=>{
-  const src=e.target.closest('[data-hdrag]');if(!src||e.button>0)return;
-  humDrag={src,kind:src.dataset.hdrag,x0:e.clientX,y0:e.clientY,on:false,ghost:null,over:null};
+  const h=e.target.closest('[data-hdrag]');if(!h||e.button>0)return;
+  const kind=h.dataset.hdrag;const src=kind==='order'?h.closest('.hum-ord-row'):h;
+  humDrag={src,kind,x0:e.clientX,y0:e.clientY,on:false,ghost:null,over:null};
+  if(kind==='order')e.preventDefault();
 });
 document.addEventListener('pointermove',e=>{
   const d=humDrag;if(!d)return;
   if(!d.on){
     if(Math.hypot(e.clientX-d.x0,e.clientY-d.y0)<6)return;
     d.on=true;const r=d.src.getBoundingClientRect();d.ox=e.clientX-r.left;d.oy=e.clientY-r.top;
-    d.ghost=d.src.cloneNode(true);d.ghost.classList.add('hum-ghost');d.ghost.style.width=r.width+'px';document.body.appendChild(d.ghost);
-    if(d.kind==='shift')d.src.classList.add('hum-src-drag');
+    d.ghost=d.src.cloneNode(true);d.ghost.classList.add('hum-ghost');d.ghost.style.width=r.width+'px';
+    if(d.kind==='order')d.ghost.style.borderRadius='12px';
+    document.body.appendChild(d.ghost);
+    if(d.kind!=='tpl')d.src.classList.add('hum-src-drag');
     document.body.classList.add('hum-dragging');
   }
   e.preventDefault();
   d.ghost.style.left=(e.clientX-d.ox)+'px';d.ghost.style.top=(e.clientY-d.oy)+'px';
+  if(d.kind==='order'){
+    const list=d.src.parentElement;
+    const sib=[...list.children].filter(c=>c!==d.src).find(c=>{const b=c.getBoundingClientRect();return e.clientY<b.top+b.height/2;});
+    if(sib){if(sib!==d.src.nextSibling)list.insertBefore(d.src,sib);}else if(list.lastElementChild!==d.src)list.appendChild(d.src);
+    return;
+  }
   const hit=document.elementFromPoint(e.clientX,e.clientY);
   const cell=hit?hit.closest('.hum-cell'):null;
   if(cell!==d.over){if(d.over)d.over.classList.remove('over');if(cell)cell.classList.add('over');d.over=cell;}
   const w=document.getElementById('hum-wrap');if(w){const b=w.getBoundingClientRect();
     if(e.clientX>b.right-40)w.scrollLeft+=14;else if(e.clientX<b.left+160&&e.clientX>b.left)w.scrollLeft-=14;
-    if(e.clientY>b.bottom-40)w.scrollTop+=14;else if(e.clientY<b.top+50&&e.clientY>b.top)w.scrollTop-=14;}
+    if(e.clientY>b.bottom-40)w.scrollTop+=14;else if(e.clientY<b.top+60&&e.clientY>b.top)w.scrollTop-=14;}
 },{passive:false});
 function humEndDrag(cancel){
   const d=humDrag;if(!d)return;humDrag=null;
-  if(!d.on){if(!cancel&&d.kind==='shift')humOpen(d.src.dataset.id);else if(!cancel&&d.kind==='tpl')showToast('Hold and drag it onto someone\'s day');return;}
+  if(!d.on){
+    if(cancel)return;
+    if(d.kind==='shift')humOpen(d.src.dataset.id);else if(d.kind==='tpl')humTplOpen(d.src.dataset.tpl);
+    return;
+  }
   d.ghost.remove();d.src.classList.remove('hum-src-drag');document.body.classList.remove('hum-dragging');
   if(d.over)d.over.classList.remove('over');
   humJustDragged=true;setTimeout(()=>{humJustDragged=false;},60);
-  if(!cancel&&d.over)humDrop(d,d.over.dataset.emp,+d.over.dataset.day);
+  if(d.kind==='order'){humOrderDrop(d.src.parentElement);return;}
+  if(!cancel&&d.over)humDrop(d,d.over.dataset.emp,+d.over.dataset.day,d.over.dataset.sec);
 }
 document.addEventListener('pointerup',()=>humEndDrag(false));
 document.addEventListener('pointercancel',()=>humEndDrag(true));
 
-async function humDrop(d,empId,day){
+async function humOrderDrop(list){
+  const sec=list.dataset.sec;const ids=[...list.querySelectorAll('.hum-ord-row')].map(r=>r.dataset.id);
+  const rest=(humOrder[sec]||[]).filter(id=>!ids.includes(id));
+  humOrder[sec]=[...ids,...rest];
+  humRenderOrder();humRender();
+  try{await humSaveOrder();}catch(e){console.error(e);showToast('Order not saved — check connection');}
+}
+async function humDrop(d,empId,day,sec){
   const k=humKey(humWeek),list=humCache[k]||(humCache[k]=[]);
   const emp=S.employees.find(e=>e.id===empId);if(!emp)return;
   if(d.kind==='shift'){
-    const s=list.find(x=>x.id===d.src.dataset.id);if(!s||(s.empId===empId&&s.day===day))return;
-    const prev={empId:s.empId,empName:s.empName,day:s.day};
-    Object.assign(s,{empId,empName:emp.name,day});humRender();
-    try{await fsUp('humShifts',s.id,{empId,empName:emp.name,day});showToast(`Moved to ${emp.name}, ${HUM_DAYS[day]}`);}
+    const s=list.find(x=>x.id===d.src.dataset.id);if(!s||(s.empId===empId&&s.day===day&&s.sec===sec))return;
+    const prev={empId:s.empId,empName:s.empName,day:s.day,sec:s.sec};
+    Object.assign(s,{empId,empName:emp.name,day,sec});humRender();
+    try{await fsUp('humShifts',s.id,{empId,empName:emp.name,day,sec});showToast(`Moved to ${emp.name}, ${HUM_DAYS[day]}`);}
     catch(e){Object.assign(s,prev);humRender();showToast('Move failed — check connection');}
   }else{
-    const t=HUM_TPL.find(x=>x.k===d.src.dataset.tpl);if(!t)return;
-    const rec={week:k,empId,empName:emp.name,day,start:t.s,end:t.e,role:humRoleFor(emp),note:''};
+    const t=humTpls.find(x=>x.id===d.src.dataset.tpl);if(!t)return;
+    const rec={week:k,empId,empName:emp.name,day,sec,start:t.s,end:t.e,label:t.n,note:''};
     try{rec.id=await fsAdd('humShifts',rec);list.push(rec);humRender();showToast(`${t.n} added for ${emp.name}, ${HUM_DAYS[day]}`);}
     catch(e){console.error(e);showToast('Add failed — check connection');}
   }
@@ -1909,7 +2065,7 @@ window.humCopyLastWeek=async function(){
   const k=humKey(humWeek),cur=humCache[k]||(humCache[k]=[]);
   if(cur.length&&!confirm(`This week already has ${cur.length} shifts. Add last week's ${prev.length} shifts on top?`))return;
   try{
-    const recs=prev.map(s=>({week:k,empId:s.empId,empName:s.empName||'',day:s.day,start:s.start,end:s.end,role:s.role||'SERVICE',note:s.note||''}));
+    const recs=prev.map(s=>({week:k,empId:s.empId,empName:s.empName||'',day:s.day,sec:s.sec,start:s.start,end:s.end,label:s.label||'',note:s.note||''}));
     const ids=await Promise.all(recs.map(r=>fsAdd('humShifts',r)));
     recs.forEach((r,i)=>{r.id=ids[i];cur.push(r);});humRender();showToast(`Copied ${recs.length} shifts from last week`);
   }catch(e){console.error(e);await humLoad(humWeek,true);humRender();showToast('Copy stopped partway — check connection');}
@@ -1921,12 +2077,13 @@ window.humClearWeek=async function(){
   try{await Promise.all(cur.map(s=>fsDel('humShifts',s.id)));humCache[k]=[];humRender();showToast('Week cleared');}
   catch(e){console.error(e);await humLoad(humWeek,true);humRender();showToast('Clear stopped partway — check connection');}
 };
-// Google Sheets paste: name, then Mon(early) Mon(late) … Sun(early) Sun(late)
+// Google Sheets paste: name, then Mon(early) Mon(late) … Sun(early) Sun(late); Serving order first, then Kitchen
 window.humExport=async function(){
-  const sh=humShifts();
-  const lines=humRows(true).map(emp=>{
+  const sh=humShifts();const seen=new Set();const people=[];
+  HUM_SECS.forEach(sec=>humSecList(sec).forEach(e=>{if(!seen.has(e.id)){seen.add(e.id);people.push(e);}}));
+  const lines=people.map(emp=>{
     const cols=[];
-    for(let i=0;i<7;i++){let e=0,l=0;sh.filter(s=>s.empId===emp.id&&s.day===i).forEach(s=>{const x=humSplit(s.start,s.end);e+=x.early;l+=x.late;});cols.push(humR(e),humR(l));}
+    for(let i=0;i<7;i++){let a=0,b=0;sh.filter(s=>s.empId===emp.id&&s.day===i).forEach(s=>{const x=humSplit(s.start,s.end);a+=x.early;b+=x.late;});cols.push(humR(a),humR(b));}
     return[emp.name,...cols].join('\t');
   });
   try{await navigator.clipboard.writeText(lines.join('\n'));showToast('Copied. Paste into Google Sheets');}
