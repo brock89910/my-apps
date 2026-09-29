@@ -590,23 +590,25 @@ main:has(#pg-humanity.on){background:#f2f2f7}
 .hum-grid thead .hum-name{z-index:4;background:rgba(249,249,251,.97);vertical-align:bottom}
 .hum-name b{display:block;font-size:.93rem;font-weight:600}
 .hum-name span{font-size:.75rem;color:var(--i-l2)}
+.hum-grid tbody .hum-name{padding-top:5px;padding-bottom:5px;vertical-align:middle}
+.ios-seg.sec button{min-width:96px}
+.ios-seg.sec button[data-sec=SERVING].on{color:var(--i-serv)}
+.ios-seg.sec button[data-sec=KITCHEN].on{color:var(--i-kit)}
 .hum-name span.over{color:var(--i-red);font-weight:600}
 .hum-sec td,.hum-grid .hum-sec td.hum-name{background:#f7f7fa;padding:12px 12px 6px;font-size:1.02rem;font-weight:700}
 .hum-sec .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:1px}
-.hum-cell{min-width:108px;height:58px;padding:4px;cursor:pointer}
+.hum-cell{min-width:100px;height:44px;padding:4px;cursor:pointer;vertical-align:middle!important;transition:background .12s,box-shadow .12s}
 .hum-cell:hover{background:rgba(0,122,255,.04)}
 .hum-cell.off{background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(118,118,128,.08) 6px 12px)}
 .hum-cell.over{background:rgba(0,122,255,.1);box-shadow:inset 0 0 0 2px var(--i-blue)}
-.hum-add{visibility:hidden;font-size:1.3rem;color:var(--i-blue);text-align:center;padding-top:10px;font-weight:300}
+.hum-add{visibility:hidden;font-size:1.2rem;color:var(--i-blue);text-align:center;font-weight:300;line-height:1}
 .hum-cell:hover .hum-add{visibility:visible}
-.hum-shift{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;border-radius:8px;padding:5px 8px 5px 12px;margin-bottom:3px;font-size:.8rem;line-height:1.25;position:relative}
+.hum-shift{touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;border-radius:8px;padding:6px 8px;margin-bottom:3px;font-size:.84rem;font-weight:600;line-height:1.2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hum-shift:last-child{margin-bottom:0}
-.hum-shift::before{content:'';position:absolute;left:4px;top:5px;bottom:5px;width:3px;border-radius:2px;background:currentColor}
-.hum-shift b{display:block;font-weight:600;color:var(--i-l1)}
-.hum-shift span{font-size:.72rem}
+.hum-shift i{font-style:normal;margin-left:4px;opacity:.6}
 .hs-SERVING{background:var(--i-serv-bg);color:var(--i-serv)}
 .hs-KITCHEN{background:var(--i-kit-bg);color:var(--i-kit)}
-.hum-ghost{position:fixed;pointer-events:none;z-index:500;transform:scale(1.04);box-shadow:0 12px 32px rgba(0,0,0,.22);opacity:.97;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",system-ui,sans-serif}
+.hum-ghost{position:fixed;pointer-events:none;z-index:500;will-change:transform;box-shadow:0 12px 32px rgba(0,0,0,.22);opacity:.97;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",system-ui,sans-serif}
 .hum-src-drag{opacity:.3}
 body.hum-dragging,body.hum-dragging *{cursor:grabbing!important}
 .hum-tot td,.hum-grid .hum-tot td.hum-name{background:#fbfbfd;font-size:.74rem;text-align:center;padding:6px 4px;color:var(--i-l2)}
@@ -689,6 +691,7 @@ body.hum-dragging,body.hum-dragging *{cursor:grabbing!important}
 </div>
 <div id="hum-view-grid">
   <div class="ios-bar">
+    <div class="ios-seg sec" id="hum-sec-seg" role="tablist" aria-label="Section"><button data-sec="SERVING" onclick="humSetSec('SERVING')">Serving</button><button data-sec="KITCHEN" onclick="humSetSec('KITCHEN')">Kitchen</button></div>
     <div class="ios-step"><button onclick="humShiftWeek(-1)" aria-label="Previous week">‹</button><span id="hum-week-lbl">Loading…</span><button onclick="humShiftWeek(1)" aria-label="Next week">›</button></div>
     <button class="ios-pill" onclick="humShiftWeek(0)">Today</button>
     <button class="ios-pill" onclick="humCopyLastWeek()">Copy last week</button>
@@ -1804,6 +1807,7 @@ let humTpls=HUM_DEFAULT_TPL.map(t=>({...t}));
 let humOrder={SERVING:[],KITCHEN:[]};
 let humEdit=null,humTplEdit=null;
 let humDrag=null,humJustDragged=false;
+let humSec='SERVING';try{const v=localStorage.getItem('humSec');if(v==='SERVING'||v==='KITCHEN')humSec=v;}catch(e){}
 
 const humEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function humKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -1847,7 +1851,9 @@ function humSecList(sec,rosterOnly){
 
 function humShiftHtml(s){
   const hrs=humR(humSplit(s.start,s.end).tot);
-  return`<div class="hum-shift hs-${s.sec}" data-hdrag="shift" data-id="${s.id}"><b>${humFmt(s.start)} – ${humFmt(s.end)}</b><span>${s.label?humEsc(s.label)+', ':''}${hrs}h${s.note?' — '+humEsc(s.note):''}</span></div>`;
+  const name=s.label||`${humFmt(s.start)}–${humFmt(s.end)}`;
+  const tip=`${humFmt(s.start)} – ${humFmt(s.end)}, ${hrs}h${s.note?', '+s.note:''}`;
+  return`<div class="hum-shift hs-${s.sec}" data-hdrag="shift" data-id="${s.id}" title="${humEsc(tip)}">${humEsc(name)}${s.note?'<i>•</i>':''}</div>`;
 }
 
 function humRender(){
@@ -1857,21 +1863,21 @@ function humRender(){
   const f=(d,o)=>d.toLocaleDateString('en-CA',o);
   document.getElementById('hum-week-lbl').textContent=`${f(dates[0],{month:'short',day:'numeric'})} – ${f(dates[6],{month:'short',day:'numeric'})}`;
   const sh=humShifts();
-  const empHrs={};let totH=0;
-  sh.forEach(s=>{const h=humSplit(s.start,s.end).tot;totH+=h;empHrs[s.empId]=(empHrs[s.empId]||0)+h;});
-  document.getElementById('hum-sum').innerHTML=`<b>${sh.length}</b> shifts, <b>${humR(totH)}</b> hours`;
+  const empHrs={};let secH=0,secN=0;
+  sh.forEach(s=>{const h=humSplit(s.start,s.end).tot;empHrs[s.empId]=(empHrs[s.empId]||0)+h;if(s.sec===humSec){secH+=h;secN++;}});
+  document.getElementById('hum-sum').innerHTML=`${HUM_SEC_LBL[humSec]}: <b>${secN}</b> shifts, <b>${humR(secH)}</b> hours`;
+  document.querySelectorAll('#hum-sec-seg button').forEach(b=>b.classList.toggle('on',b.dataset.sec===humSec));
   if(!S.employees.length){el.innerHTML='<tbody><tr><td class="hum-empty">No staff yet. Add people on the Employees page and they will show up here.</td></tr></tbody>';return;}
   const todayK=humKey(new Date());
-  let h='<thead><tr><th class="hum-name"></th>'+dates.map((d,i)=>`<th class="${humKey(d)===todayK?'today':''}">${HUM_DAYS[i]}<br><span class="d">${d.getDate()}</span></th>`).join('')+'</tr></thead><tbody>';
-  HUM_SECS.forEach(sec=>{
+  let h='<thead><tr><th class="hum-name"></th>'+dates.map((d,i)=>`<th data-day="${i}" class="${humKey(d)===todayK?'today':''}">${HUM_DAYS[i]}<br><span class="d">${d.getDate()}</span></th>`).join('')+'</tr></thead><tbody>';
+  [humSec].forEach(sec=>{
     const rows=humSecList(sec);
-    h+=`<tr class="hum-sec"><td class="hum-name"><span class="dot" style="background:${HUM_SEC_COLOR[sec]}"></span>${HUM_SEC_LBL[sec]}</td><td colspan="7"></td></tr>`;
     const dayTot=Array(7).fill(0),dayCnt=Array(7).fill(0);
     rows.forEach(emp=>{
       const mine=sh.filter(s=>s.empId===emp.id&&s.sec===sec);
       const wk=empHrs[emp.id]||0;const over=emp.hourCap&&wk>emp.hourCap;
       const sub=`${humR(wk)}h${emp.hourCap?' of '+emp.hourCap:''}${sec==='KITCHEN'&&humKitchenSub(emp)?', '+humKitchenSub(emp):''}`;
-      h+=`<tr><td class="hum-name"><b>${humEsc(emp.name)}</b><span class="${over?'over':''}">${sub}</span></td>`;
+      h+=`<tr data-emp="${emp.id}"><td class="hum-name"><b>${humEsc(emp.name)}</b><span class="${over?'over':''}">${sub}</span></td>`;
       for(let i=0;i<7;i++){
         const cs=mine.filter(s=>s.day===i).sort((a,b)=>humToMin(a.start)-humToMin(b.start));
         cs.forEach(s=>dayTot[i]+=humSplit(s.start,s.end).tot);if(cs.length)dayCnt[i]++;
@@ -1894,6 +1900,7 @@ function humRenderOrder(){
     el.innerHTML=list.length?list.map((e,i)=>`<div class="hum-ord-row" data-id="${e.id}"><span class="hum-ord-n">${i+1}</span><div class="hum-ord-name">${humEsc(e.name)}${sec==='KITCHEN'&&humKitchenSub(e)?`<small>${humKitchenSub(e)}</small>`:''}</div><span class="hum-ord-h" data-hdrag="order" aria-label="Drag to reorder ${humEsc(e.name)}">≡</span></div>`).join(''):`<div class="hum-ord-empty">Nobody has this position yet. Set positions on the Employees page.</div>`;
   });
 }
+window.humSetSec=function(sec){humSec=sec;try{localStorage.setItem('humSec',sec);}catch(e){}humRender();};
 window.humView=function(v){
   document.getElementById('hum-view-grid').hidden=v!=='grid';
   document.getElementById('hum-view-order').hidden=v!=='order';
@@ -1985,40 +1992,64 @@ window.humTplDelete=async function(){
 };
 
 // ── Drag and drop (mouse + touch via pointer events) ──
+// Forgiving targeting: the drop cell is the nearest row (by height) and nearest day column (by width)
+// to the centre of the dragged card, so it snaps without needing to hit a cell exactly.
+function humHitCell(x,y){
+  const w=document.getElementById('hum-wrap');if(!w)return null;
+  const wb=w.getBoundingClientRect();
+  if(x<wb.left-30||x>wb.right+30||y<wb.top-30||y>wb.bottom+30)return null;
+  const rows=[...w.querySelectorAll('tbody tr[data-emp]')];if(!rows.length)return null;
+  let row=null,rd=1e9;
+  for(const r of rows){const b=r.getBoundingClientRect();const d=y<b.top?b.top-y:y>b.bottom?y-b.bottom:0;if(d<rd){rd=d;row=r;}if(d===0)break;}
+  let col=null,cd=1e9;
+  for(const th of w.querySelectorAll('thead th[data-day]')){const b=th.getBoundingClientRect();const d=x<b.left?b.left-x:x>b.right?x-b.right:0;if(d<cd){cd=d;col=th.dataset.day;}if(d===0)break;}
+  return col==null?null:row.querySelector(`td[data-day="${col}"]`);
+}
+function humMoveGhost(){
+  const d=humDrag;if(!d||!d.on){if(d)d.raf=0;return;}
+  d.raf=0;
+  d.ghost.style.transform=`translate3d(${d.x-d.ox}px,${d.y-d.oy}px,0) scale(1.04)`;
+  if(d.kind==='order'){
+    const list=d.src.parentElement;
+    const sib=[...list.children].filter(c=>c!==d.src).find(c=>{const b=c.getBoundingClientRect();return d.y<b.top+b.height/2;});
+    if(sib){if(sib!==d.src.nextSibling)list.insertBefore(d.src,sib);}else if(list.lastElementChild!==d.src)list.appendChild(d.src);
+    return;
+  }
+  const cx=d.x-d.ox+d.gw/2,cy=d.y-d.oy+d.gh/2;
+  const cell=humHitCell(cx,cy);
+  if(cell!==d.over){if(d.over)d.over.classList.remove('over');if(cell)cell.classList.add('over');d.over=cell;}
+  // gentle auto-scroll only at the very edges of the grid
+  const w=document.getElementById('hum-wrap');if(w){const b=w.getBoundingClientRect(),m=36;let sx=0,sy=0;
+    if(d.x>b.right-m)sx=(d.x-(b.right-m))/3;else if(d.x<b.left+m&&d.x>b.left-m)sx=-((b.left+m)-d.x)/3;
+    if(d.y>b.bottom-m)sy=(d.y-(b.bottom-m))/3;else if(d.y<b.top+m&&d.y>b.top-m)sy=-((b.top+m)-d.y)/3;
+    if(sx||sy){w.scrollLeft+=sx;w.scrollTop+=sy;d.raf=requestAnimationFrame(humMoveGhost);}}
+}
 document.addEventListener('pointerdown',e=>{
   const h=e.target.closest('[data-hdrag]');if(!h||e.button>0)return;
   const kind=h.dataset.hdrag;const src=kind==='order'?h.closest('.hum-ord-row'):h;
-  humDrag={src,kind,x0:e.clientX,y0:e.clientY,on:false,ghost:null,over:null};
+  humDrag={src,kind,x0:e.clientX,y0:e.clientY,x:e.clientX,y:e.clientY,on:false,ghost:null,over:null,raf:0};
   if(kind==='order')e.preventDefault();
 });
 document.addEventListener('pointermove',e=>{
   const d=humDrag;if(!d)return;
+  d.x=e.clientX;d.y=e.clientY;
   if(!d.on){
-    if(Math.hypot(e.clientX-d.x0,e.clientY-d.y0)<6)return;
-    d.on=true;const r=d.src.getBoundingClientRect();d.ox=e.clientX-r.left;d.oy=e.clientY-r.top;
-    d.ghost=d.src.cloneNode(true);d.ghost.classList.add('hum-ghost');d.ghost.style.width=r.width+'px';
+    if(Math.abs(d.x-d.x0)+Math.abs(d.y-d.y0)<4)return;
+    d.on=true;const r=d.src.getBoundingClientRect();
+    d.ox=d.x0-r.left;d.oy=d.y0-r.top;d.gw=r.width;d.gh=r.height;
+    d.ghost=d.src.cloneNode(true);d.ghost.classList.add('hum-ghost');d.ghost.removeAttribute('title');
+    d.ghost.style.width=r.width+'px';d.ghost.style.left='0';d.ghost.style.top='0';
     if(d.kind==='order')d.ghost.style.borderRadius='12px';
     document.body.appendChild(d.ghost);
     if(d.kind!=='tpl')d.src.classList.add('hum-src-drag');
     document.body.classList.add('hum-dragging');
   }
   e.preventDefault();
-  d.ghost.style.left=(e.clientX-d.ox)+'px';d.ghost.style.top=(e.clientY-d.oy)+'px';
-  if(d.kind==='order'){
-    const list=d.src.parentElement;
-    const sib=[...list.children].filter(c=>c!==d.src).find(c=>{const b=c.getBoundingClientRect();return e.clientY<b.top+b.height/2;});
-    if(sib){if(sib!==d.src.nextSibling)list.insertBefore(d.src,sib);}else if(list.lastElementChild!==d.src)list.appendChild(d.src);
-    return;
-  }
-  const hit=document.elementFromPoint(e.clientX,e.clientY);
-  const cell=hit?hit.closest('.hum-cell'):null;
-  if(cell!==d.over){if(d.over)d.over.classList.remove('over');if(cell)cell.classList.add('over');d.over=cell;}
-  const w=document.getElementById('hum-wrap');if(w){const b=w.getBoundingClientRect();
-    if(e.clientX>b.right-40)w.scrollLeft+=14;else if(e.clientX<b.left+160&&e.clientX>b.left)w.scrollLeft-=14;
-    if(e.clientY>b.bottom-40)w.scrollTop+=14;else if(e.clientY<b.top+60&&e.clientY>b.top)w.scrollTop-=14;}
+  if(!d.raf)d.raf=requestAnimationFrame(humMoveGhost);
 },{passive:false});
 function humEndDrag(cancel){
   const d=humDrag;if(!d)return;humDrag=null;
+  if(d.raf)cancelAnimationFrame(d.raf);
   if(!d.on){
     if(cancel)return;
     if(d.kind==='shift')humOpen(d.src.dataset.id);else if(d.kind==='tpl')humTplOpen(d.src.dataset.tpl);
