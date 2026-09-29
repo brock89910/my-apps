@@ -1495,12 +1495,12 @@ body.ios-mode .btn-danger { background:var(--i-red-soft); border:0; border-radiu
 .i-snav { height:52px; }
 
 /* tap the big title → month calendar popover to jump to any day */
-#iosTitle { cursor:pointer; display:inline-flex; align-items:center; gap:8px; -webkit-tap-highlight-color:transparent; user-select:none; }
-#iosTitle::after { content:""; width:14px; height:14px; margin-top:4px; background:var(--i-accent); transition:transform .25s;
+.i-jt { cursor:pointer; display:inline-flex !important; align-items:center; gap:8px; -webkit-tap-highlight-color:transparent; user-select:none; }
+.i-jt::after { content:""; width:14px; height:14px; margin-top:4px; background:var(--i-accent); transition:transform .25s;
   -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M2 5l5 5 5-5' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
           mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M2 5l5 5 5-5' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
-#iosTitle.open::after { transform:rotate(180deg); }
-#iosTitle:active { opacity:.6; }
+.i-jt.open::after { transform:rotate(180deg); }
+.i-jt:active { opacity:.6; }
 .i-jscrim { position:fixed; inset:0; z-index:392; background:rgba(0,0,0,.18); opacity:0; pointer-events:none; transition:opacity .2s; }
 .i-jscrim.on { opacity:1; pointer-events:auto; }
 .i-jump { position:fixed; z-index:393; left:50%; width:min(360px, calc(100% - 24px)); transform:translateX(-50%) scale(.92); transform-origin:top left;
@@ -1509,6 +1509,39 @@ body.ios-mode .btn-danger { background:var(--i-red-soft); border:0; border-radiu
 .i-jump .i-cal { box-shadow:0 12px 40px rgba(0,0,0,.22); }
 .i-jump .i-cday.past .num { color:var(--i-label2); }
 .i-jump .i-caltoday { margin:6px auto 0; }
+
+/* iOS alert for manager-password overrides (drives the tracker's own prompt underneath) */
+.i-proxied { display:none !important; }
+.i-ascrim { position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,.4); display:grid; place-items:center; padding:20px;
+  opacity:0; pointer-events:none; transition:opacity .2s; }
+.i-ascrim.on { opacity:1; pointer-events:auto; }
+.i-alert { width:280px; max-width:100%; border-radius:14px; overflow:hidden; text-align:center; color:var(--i-label);
+  background:rgba(246,246,246,.94); -webkit-backdrop-filter:blur(30px) saturate(1.8); backdrop-filter:blur(30px) saturate(1.8);
+  transform:scale(1.12); transition:transform .28s cubic-bezier(.32,.72,0,1); font-family:var(--sans); }
+@media (prefers-color-scheme: dark) { .i-alert { background:rgba(37,37,37,.94); } }
+.i-ascrim.on .i-alert { transform:none; }
+.i-alert .ab { padding:19px 16px 16px; }
+.i-alert .at { font-size:17px; font-weight:600; line-height:1.3; }
+.i-alert .am { font-size:13px; line-height:1.38; margin-top:3px; }
+.i-alert .aseg { display:flex; background:var(--i-fill); border-radius:9px; padding:2px; margin-top:14px; }
+.i-alert .aseg button { flex:1; height:30px; border-radius:7px !important; font-size:13px; font-weight:500; color:var(--i-label) !important; background:transparent !important; border:0 !important; }
+.i-alert .aseg button.on { background:var(--i-card) !important; font-weight:600; box-shadow:0 1px 4px rgba(0,0,0,.14); }
+.i-alert input { width:100%; box-sizing:border-box; margin-top:14px; height:32px; padding:0 8px; font-size:15px; text-align:left;
+  border:.5px solid var(--i-sep); border-radius:7px; background:var(--i-card); color:var(--i-label); outline:none; font-family:inherit; }
+.i-alert input:focus { outline:none !important; box-shadow:none !important; border-color:var(--i-sep) !important; }
+.i-alert .aseg button { font-size:13px !important; font-family:var(--sans) !important; letter-spacing:0 !important; }
+.i-alert .aa button { font-size:17px !important; font-family:var(--sans) !important; letter-spacing:0 !important; }
+.i-alert .ae { font-size:13px; color:var(--i-red); margin-top:8px; min-height:0; }
+.i-alert .ae:empty { display:none; }
+.i-alert .aa { display:flex; border-top:.5px solid var(--i-sep); }
+.i-alert .aa button { flex:1; height:44px; font-size:17px; color:var(--i-accent) !important; background:transparent !important; border:0 !important; border-radius:0 !important; padding:0 !important; }
+.i-alert .aa button + button { border-left:.5px solid var(--i-sep) !important; font-weight:600; }
+.i-alert .aa button:active { background:var(--i-fill) !important; }
+.i-alert .aa button:disabled { opacity:.4; }
+.i-alert.shake { animation:iShake .4s; }
+@keyframes iShake { 0%,100%{transform:none} 20%{transform:translateX(-10px)} 40%{transform:translateX(9px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(4px)} }
+.i-ovbtn { display:block; width:100%; margin-top:8px; height:40px; border-radius:10px !important; background:var(--i-fill) !important; border:0 !important;
+  color:var(--i-accent) !important; font-size:15px; font-weight:600; font-family:var(--sans); }
 
 /* existing modals become full-screen pages: nothing behind them */
 body.ios-mode .modal-overlay { background:var(--i-bg); animation:none; }
@@ -1540,6 +1573,29 @@ body.ios-mode .i-sr .form-textarea { font-size:17px !important; }
 body.ios-mode .i-sr-actions { margin-top:18px; gap:10px !important; }
 body.ios-mode .i-sr-actions .btn-gold { flex:1; min-height:54px; margin:0 !important; }
 body.ios-mode .i-sr #srErr { font-size:14px !important; margin:10px 2px 0 !important; }
+
+/* ── v3: step-3 labels, pulsing add capsule, dining ── */
+.i-add { display:inline-block; margin-left:8px; padding:2px 9px; border-radius:11px; background:rgba(0,122,255,.13); color:var(--i-blue); font-weight:600; font-size:14px; animation:iPulse 1.8s ease-in-out infinite; white-space:nowrap; }
+@keyframes iPulse { 0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.5; transform:scale(.97)} }
+.i-trow.full { opacity:.5; }
+.i-st.grill { color:var(--i-label); font-weight:500; }
+.i-party.din { background:rgba(52,199,89,.15); color:var(--i-green-text); }
+.i-field { background:var(--i-card); border-radius:12px; overflow:hidden; margin-bottom:12px; }
+.i-field input, .i-field textarea { display:block; width:100%; border:0; outline:none; background:none; padding:16px; font:22px var(--sans); color:var(--i-label); }
+.i-field textarea { font-size:17px; min-height:110px; resize:none; }
+.i-btn { display:block; width:100%; min-height:54px; border-radius:14px !important; background:var(--i-accent) !important; color:#fff !important; font-weight:600 !important; font-size:17px !important; margin-top:6px; }
+.i-btn:disabled { opacity:.35; }
+.i-btn.ghost { background:none !important; color:var(--i-accent) !important; min-height:44px; }
+.i-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+.i-chip { padding:9px 14px !important; border-radius:20px !important; background:var(--i-card) !important; font-size:15px !important; font-weight:500 !important; border:1.5px solid transparent !important; }
+.i-chip.sel { border-color:var(--i-accent) !important; color:var(--i-accent) !important; background:var(--i-accent-soft) !important; }
+.i-err { color:var(--i-red); font-size:14px; margin:4px 2px 8px; min-height:18px; }
+body.i-silent #modalOverlay { visibility:hidden !important; }
+
+/* ── v4: no stat cards; 8-day strip fits the width ── */
+#iosStats, #iosDStats { display:none !important; }
+.i-week { margin-bottom:18px; overflow-x:visible; }
+.i-day { flex:1 1 0; width:auto; min-width:0; }
 @media (prefers-reduced-motion: reduce) { #iosApp *, #iosApp *::before { animation:none !important; transition:none !important; } }
 </style>
 </head>
@@ -1886,13 +1942,22 @@ body.ios-mode .i-sr #srErr { font-size:14px !important; margin:10px 2px 0 !impor
 <div id="iosApp">
   <main class="i-screen on" id="iosTodayScr" aria-label="Reservations">
     <div class="i-nav"><span class="i-live" id="iosLive">Live</span><button class="i-link" id="iosGoToday" type="button">Today</button></div>
-    <h1 class="i-title" id="iosTitle" role="button" tabindex="0" aria-label="Choose a day to view">Today</h1>
+    <h1 class="i-title i-jt" id="iosTitle" role="button" tabindex="0" aria-label="Choose a day to view">Today</h1>
     <div class="i-sub" id="iosSub"></div>
     <div class="i-week" id="iosWeek"></div>
     <div id="iosBanners"></div>
     <div class="i-stats" id="iosStats"></div>
     <div class="i-seg" role="tablist"><button type="button" class="on" data-m="booked">Bookings</button><button type="button" data-m="all">All times</button></div>
     <div id="iosSlots"></div>
+  </main>
+
+  <main class="i-screen" id="iosDiningScr" aria-label="Dining">
+    <div class="i-nav"><span></span><button class="i-link" id="iosDGoToday" type="button">Today</button></div>
+    <h1 class="i-title i-jt" id="iosDTitle" role="button" tabindex="0" aria-label="Choose a day to view">Dining</h1>
+    <div class="i-sub" id="iosDSub"></div>
+    <div class="i-week" id="iosDWeek"></div>
+    <div class="i-stats" id="iosDStats" style="grid-template-columns:repeat(2,1fr)"></div>
+    <div id="iosDList"></div>
   </main>
 
   <main class="i-screen" id="iosSearchScr" aria-label="Search">
@@ -1914,11 +1979,11 @@ body.ios-mode .i-sr #srErr { font-size:14px !important; margin:10px 2px 0 !impor
 
   <nav class="i-tabbar" aria-label="Main">
     <div class="in">
-      <button type="button" class="i-tab on" data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>Today</button>
-      <button type="button" class="i-tab" data-tab="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Search</button>
+      <button type="button" class="i-tab on" data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>Hibachi</button>
+      <button type="button" class="i-tab" data-tab="dining"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8M4.5 3v5a2.5 2.5 0 0 0 5 0V3M7 11v10M17 21V3c-2.2 1.2-3.5 3.6-3.5 6.5V13H17"/></svg>Dining</button>
       <button type="button" class="i-fab" id="iosNewBtn" aria-label="New reservation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button type="button" class="i-tab" data-tab="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Search</button>
       <button type="button" class="i-tab" data-tab="more"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg>More</button>
-      <span style="width:72px" aria-hidden="true"></span>
     </div>
   </nav>
 
@@ -1931,6 +1996,7 @@ body.ios-mode .i-sr #srErr { font-size:14px !important; margin:10px 2px 0 !impor
   </section>
   <div class="i-jscrim" id="iosJumpScrim"></div>
   <div class="i-jump" id="iosJump" role="dialog" aria-modal="true" aria-label="Pick a day to view"></div>
+  <div class="i-ascrim" id="iosAlertScrim"><div class="i-alert" id="iosAlert" role="alertdialog" aria-modal="true"></div></div>
   <div class="i-toast" id="iosToast" role="status" aria-live="polite"></div>
 </div>
 <button type="button" id="iosBackPill" onclick="iosBackToIos()">Back to iOS view</button>
@@ -6123,7 +6189,7 @@ window._preloadAllReservations = preloadAllReservations;
   const WD = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const MON = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const chev = '<svg class="i-chev" viewBox="0 0 8 13"><path d="M1 1l5.5 5.5L1 12" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
-  const S = { tab:'today', view:'booked', book:null, bound:false };
+  const S = { tab:'today', view:'booked', book:null, bound:false, anchor:null };
 
   const active = () => document.body.classList.contains('ios-mode') && !document.body.classList.contains('ios-classic');
   const safe = (fn) => { try { return fn(); } catch (e) { console.error('[iOS mode]', e); } };
@@ -6137,6 +6203,9 @@ window._preloadAllReservations = preloadAllReservations;
   function toast(msg){ const t=$('iosToast'); if(!t) return; t.textContent=msg; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2400); }
 
   /* ── data helpers (read-only) ── */
+  function diningGuests(dk){
+    return Object.values((typeof diningReservations!=='undefined' && diningReservations[dk])||{}).filter(r=>r&&r.time).reduce((a,r)=>a+(Number(r.guests)||0),0);
+  }
   function dayGuests(dk){
     const r = reservations[dk];
     if (r) return Object.entries(r).filter(([id,v]) => id!=='__chefRemoved' && v && v.slot).reduce((a,[,v]) => a+(v.guests||0), 0);
@@ -6255,13 +6324,17 @@ window._preloadAllReservations = preloadAllReservations;
       + `<span class="i-tags">${tags.join('')}</span>`
       + `<button type="button" class="i-conf${r.confirmed?' done':''}" data-confirm="${esc(r.id)}" aria-label="${r.confirmed?'Confirmed by '+esc(r.confirmedBy||'?'):'Confirm reservation'}">${r.confirmed?'✓':''}</button></div>`;
   }
-  function renderWeek(key, tk){
-    const w = $('iosWeek'), today = keyToDate(tk);
-    const selIn = key >= dateKey(addDays(today,-1)) && key <= dateKey(addDays(today,12));
-    const start = selIn ? addDays(today,-1) : addDays(currentDate,-3);
+  function renderWeek(key, tk, elId, countFn){
+    const w = $(elId||'iosWeek'), today = keyToDate(tk); countFn = countFn||dayGuests;
+    // 8 days (anchor + 7). Anchor = today by default; a day picked from the
+    // title calendar becomes the anchor; tapping a day inside the strip keeps it.
+    let a = S.anchor || tk;
+    if (key < a || key > dateKey(addDays(keyToDate(a), 7))) a = key;
+    S.anchor = a;
+    const start = keyToDate(a);
     let h = '';
-    for (let i=0;i<14;i++){
-      const d = addDays(start,i), k = dateKey(d), g = dayGuests(k);
+    for (let i=0;i<8;i++){
+      const d = addDays(start,i), k = dateKey(d), g = countFn(k);
       h += `<button type="button" class="i-day${k===key?' sel':''}${k===tk?' today':''}" data-day="${k}"><div class="dw">${WD[d.getDay()]}</div><div class="dn">${d.getDate()}</div><div class="dg">${g?g+'p':''}</div></button>`;
     }
     w.innerHTML = h;
@@ -6286,10 +6359,11 @@ window._preloadAllReservations = preloadAllReservations;
   }
 
   /* ── JUMP CALENDAR: tap the big title to view any day (past or future) ── */
-  let jumpMonth = null;
-  function openJump(){
-    const p = $('iosJump'), t = $('iosTitle');
+  let jumpMonth = null, jumpFrom = null;
+  function openJump(titleEl){
+    const p = $('iosJump'), dining = titleEl.id === 'iosDTitle', count = dining ? diningGuests : dayGuests;
     const sel = dateKey(currentDate), tk = todayKey();
+    jumpFrom = titleEl;
     jumpMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
     p.innerHTML = `<div class="i-cal" id="iosJCal"><div class="i-calhead"><span class="i-caltitle" id="iosJTitle"></span><span class="i-calnav">
       <button type="button" id="iosJPrev" aria-label="Previous month"><svg width="12" height="20" viewBox="0 0 12 20"><path d="M10 2 2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -6302,13 +6376,18 @@ window._preloadAllReservations = preloadAllReservations;
       const lead = new Date(y,m,1).getDay(), days = new Date(y,m+1,0).getDate();
       let h = ''; for (let i=0;i<lead;i++) h += '<span></span>';
       for (let d=1; d<=days; d++){
-        const k = dateKey(new Date(y,m,d)), n = dayGuests(k);
+        const k = dateKey(new Date(y,m,d)), n = count(k);
         h += `<button type="button" class="i-cday${k===sel?' sel':''}${k===tk?' today':''}${k<tk?' past':''}" data-k="${k}"><span class="num">${d}</span><span class="cnt">${n?n+'p':''}</span></button>`;
       }
       const g = $('iosJGrid'); g.innerHTML = h; g.className = 'i-calgrid' + (dirn ? (dirn>0?' i-in':' i-back') : '');
     };
     const shift = n => { jumpMonth = new Date(jumpMonth.getFullYear(), jumpMonth.getMonth()+n, 1); draw(n); };
-    const pick = k => { $('iosWeek')._touched = false; closeJump(); goDate(k); };
+    const pick = k => {
+      S.anchor = k;                                   // picked day starts the 8-day strip
+      ['iosWeek','iosDWeek'].forEach(id => { if ($(id)) $(id)._touched = false; });
+      closeJump();
+      if (k === dateKey(currentDate)) safe(dining ? renderDiningScr : render); else goDate(k);
+    };
     $('iosJPrev').onclick = () => shift(-1);
     $('iosJNext').onclick = () => shift(1);
     $('iosJToday').onclick = () => pick(tk);
@@ -6318,22 +6397,125 @@ window._preloadAllReservations = preloadAllReservations;
     cal.addEventListener('touchend', e => { if (sx===null) return; const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
       if (Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)*1.5) shift(dx<0?1:-1); sx=null; });
     draw(0);
-    // drop the popover just under the title
-    const r = t.getBoundingClientRect();
+    const r = titleEl.getBoundingClientRect();
     p.style.top = Math.max(8, Math.min(r.bottom + 8, window.innerHeight - 440)) + 'px';
-    t.classList.add('open'); $('iosJumpScrim').classList.add('on'); p.classList.add('on');
+    titleEl.classList.add('open'); $('iosJumpScrim').classList.add('on'); p.classList.add('on');
   }
   function closeJump(){
     const p = $('iosJump'); if (!p || !p.classList.contains('on')) return;
-    p.classList.remove('on'); $('iosJumpScrim').classList.remove('on'); $('iosTitle').classList.remove('open');
+    p.classList.remove('on'); $('iosJumpScrim').classList.remove('on');
+    if (jumpFrom) jumpFrom.classList.remove('open');
   }
   const jumpOpen = () => $('iosJump') && $('iosJump').classList.contains('on');
 
+  /* ── iOS ALERT for manager-password overrides ──
+     The tracker's own prompt is still built by the same functions and stays in
+     the page (hidden). The alert only copies the password / grill pair into it
+     and presses its own button, so every check and save is unchanged. */
+  const OVR = [
+    { pwd:'srOverridePwd', box:()=>$('srOverrideBlock'), err:'srOverrideErr', pair:'srOverridePair',
+      title:()=>'No Room at ' + ((typeof _sr!=='undefined' && _sr && _sr.slot) ? ampm(_sr.slot) : 'This Time'),
+      msg:'All grills or chefs are taken. A manager can book it anyway on a grill pair.', ok:'Book Anyway',
+      submit:c=>{ const b=c.querySelector('button'); b&&b.click(); }, cancel:c=>c&&c.remove() },
+    { pwd:'fLargeGroupPwd', box:()=>$('fLargeGroupPwd')&&$('fLargeGroupPwd').parentElement, err:'srErr',
+      title:()=>'Manager Approval', msg:'Parties over 30 need a manager password.', ok:'Approve',
+      submit:()=>srNext1(), cancel:c=>{ c&&c.remove(); const e=$('srErr'); if(e){e.style.display='none';e.textContent='';} } },
+    { pwd:'forceAddPwd', box:()=>null, err:'forceAddErr',
+      title:()=>'Force Add', msg:'This time is full. Enter the manager password to add a reservation anyway.', ok:'Unlock',
+      submit:()=>{ const b=document.querySelector('#modalBody .btn-gold'); b&&b.click(); }, cancel:()=>closeModal() },
+    { pwd:'overridePwd', box:()=>$('overridePwd')&&$('overridePwd').closest('.err-banner'), err:'overrideErr', pair:'overridePair',
+      title:()=>'No Automatic Room', msg:'Book anyway if a grill pair is physically free.', ok:'Book Anyway',
+      submit:c=>{ const b=c.querySelector('button'); b&&b.click(); }, cancel:c=>c&&c.remove() },
+    { pwd:'efOverridePwd', box:()=>$('efOverridePwd')&&$('efOverridePwd').closest('.warn-banner'), err:'efOverrideErr', pair:'efOverridePair',
+      title:()=>'No Automatic Room', msg:'Book anyway if a grill pair is physically free.', ok:'Book Anyway',
+      submit:c=>{ const b=c.querySelector('button'); b&&b.click(); }, cancel:c=>c&&c.remove() },
+    // Card-hold block has other choices (add card / hold), so only its password row
+    // is swapped for a button that opens the alert.
+    { pwd:'noCardOverridePwd', row:true, box:()=>$('noCardOverridePwd')&&$('noCardOverridePwd').parentElement, err:'noCardOverrideErr',
+      title:()=>'Skip Card', msg:'Book without a card on file. Manager password required.', ok:'Skip Card',
+      submit:c=>{ const b=c.querySelector('button'); b&&b.click(); }, cancel:()=>{} },
+  ];
+  let AL = null;   // current alert state
+  function scanOverrides(){
+    if (!active() || AL) return;
+    for (const cfg of OVR){
+      const inp = $(cfg.pwd);
+      if (!inp || inp.dataset.iosAlert) continue;
+      inp.dataset.iosAlert = '1';
+      const box = cfg.box();
+      if (cfg.row && box){
+        box.classList.add('i-proxied');
+        const b = document.createElement('button'); b.type='button'; b.className='i-ovbtn'; b.textContent='Manager override…';
+        b.onclick = () => showAlert(cfg);
+        box.after(b);
+        const e = $(cfg.err); if (e) e.classList.add('i-proxied');
+        continue;
+      }
+      showAlert(cfg); return;
+    }
+  }
+  function showAlert(cfg){
+    const inp = $(cfg.pwd); if (!inp) return;
+    const box = cfg.box();
+    if (box && !cfg.row) box.classList.add('i-proxied');
+    if (cfg.err === 'srErr') { const e=$('srErr'); if (e) e.style.display='none'; }
+    const sel = cfg.pair && $(cfg.pair);
+    const opts = sel ? [...sel.options].map(o=>({v:o.value, t:o.textContent.replace(/Grills?\s*/,'Grills ').replace(/\s*\+\s*/,' + ')})) : [];
+    const a = $('iosAlert');
+    a.innerHTML = `<div class="ab"><div class="at">${esc(cfg.title())}</div><div class="am">${esc(cfg.msg)}</div>`
+      + (opts.length ? `<div class="aseg">${opts.map(o=>`<button type="button" data-v="${esc(o.v)}" class="${o.v===sel.value?'on':''}">${esc(o.t)}</button>`).join('')}</div>` : '')
+      + `<input type="password" id="iosAlertPwd" placeholder="Manager password" autocomplete="off" enterkeyhint="done"><div class="ae" id="iosAlertErr"></div></div>`
+      + `<div class="aa"><button type="button" id="iosAlertNo">Cancel</button><button type="button" id="iosAlertYes">${esc(cfg.ok)}</button></div>`;
+    AL = { cfg, busy:false };
+    a.querySelectorAll('.aseg button').forEach(b => b.onclick = () => { a.querySelectorAll('.aseg button').forEach(x=>x.classList.toggle('on', x===b)); if (sel) sel.value = b.dataset.v; });
+    $('iosAlertNo').onclick = () => { const c = cfg.box(); hideAlert(); safe(()=>cfg.cancel(c)); };
+    $('iosAlertYes').onclick = () => safe(submitAlert);
+    $('iosAlertPwd').onkeydown = e => { if (e.key==='Enter') { e.preventDefault(); safe(submitAlert); } };
+    $('iosAlertScrim').classList.add('on');
+    setTimeout(()=>$('iosAlertPwd').focus(), 60);
+  }
+  function hideAlert(){ $('iosAlertScrim').classList.remove('on'); AL = null; setTimeout(()=>{ if (!AL) $('iosAlert').innerHTML=''; }, 250); setTimeout(scanOverrides, 50); }
+  function submitAlert(){
+    if (!AL || AL.busy) return;
+    const cfg = AL.cfg, inp = $(cfg.pwd), pw = $('iosAlertPwd').value;
+    if (!inp) return hideAlert();
+    if (!pw) { $('iosAlertErr').textContent = 'Enter the manager password.'; return; }
+    inp.value = pw;
+    const err = $(cfg.err); if (err) { err.textContent=''; if (cfg.err!=='srErr') err.style.display='none'; }
+    AL.busy = true; $('iosAlertYes').disabled = true; $('iosAlertErr').textContent = '';
+    const c = cfg.box();
+    cfg.submit(c || document);
+    const t0 = Date.now();
+    (function wait(){
+      if (!AL) return;
+      const still = $(cfg.pwd), modalGone = $('modalOverlay') && $('modalOverlay').style.display==='none';
+      const next = OVR.some(o => o !== cfg && $(o.pwd) && !$(o.pwd).dataset.iosAlert);   // e.g. 30+ approved, then slot full
+      if (!still || !document.body.contains(still) || modalGone || next) return hideAlert();   // accepted
+      const e = $(cfg.err);
+      const bad = e && e.textContent.trim();
+      if (bad || Date.now()-t0 > 4000) {                                                   // rejected
+        AL.busy = false; $('iosAlertYes').disabled = false;
+        $('iosAlertErr').textContent = bad ? 'Incorrect password.' : 'Couldn\'t check the password. Try again.';
+        if (e) { e.textContent=''; if (cfg.err==='srErr') e.style.display='none'; }
+        const pi = $('iosAlertPwd'); pi.value=''; pi.focus();
+        const a = $('iosAlert'); a.classList.remove('shake'); void a.offsetWidth; a.classList.add('shake');
+        return;
+      }
+      setTimeout(wait, 80);
+    })();
+  }
+  (function(){
+    if (!window.MutationObserver) return;
+    let q = false;
+    new MutationObserver(() => { if (q) return; q = true; setTimeout(()=>{ q=false; safe(scanOverrides); }, 30); })
+      .observe(document.body, { childList:true, subtree:true });
+  })();
+
   /* ── NEW RESERVATION: date → party → time, then hand off to the real stepped flow ── */
-  function startBooking(presetSlot){
+  function startBooking(presetSlot, kind){
     const tk = todayKey();
     if (presetSlot && dateKey(currentDate) < tk) { toast('That day has passed. Pick another day.'); return; }
-    S.book = { preset: presetSlot||null, party: null, step: presetSlot ? 1 : 0, calMonth: null, dir: 'in' };
+    S.book = { kind: kind||'hibachi', preset: presetSlot||null, party: null, step: presetSlot ? 1 : 0, calMonth: null, dir: 'in', name:'', phone:'', notes:'', noteTag:'', time:null };
     if (!presetSlot && dateKey(currentDate) < tk) goDate(tk);
     $('iosScrim').classList.add('on'); $('iosBook').classList.add('on'); document.body.style.overflow='hidden';
     renderBook();
@@ -6341,13 +6523,14 @@ window._preloadAllReservations = preloadAllReservations;
   function closeBook(){ $('iosScrim').classList.remove('on'); $('iosBook').classList.remove('on'); document.body.style.overflow=''; S.book=null; }
   function renderBook(){
     const B = S.book; if (!B) return;
-    const steps = ['date','party','time'], total = 3;
-    $('iosBProg').style.width = ((B.step+1)/(total+1)*100)+'%';
-    $('iosBCount').textContent = `Step ${B.step+1} of ${total+1}`;
+    const steps = B.kind==='dining' ? ['date','party','dtime','dname','dphone','dnotes'] : ['date','party','time'];
+    const total = B.kind==='dining' ? steps.length : steps.length+1; // hibachi continues in the tracker's own steps
+    $('iosBProg').style.width = ((B.step+1)/total*100)+'%';
+    $('iosBCount').textContent = (B.kind==='dining' ? 'Dining, ' : '') + `Step ${B.step+1} of ${total}`;
     $('iosBBack').innerHTML = B.step>0 ? '<svg width="12" height="20" viewBox="0 0 12 20"><path d="M10 2 2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Back' : '';
     const body = $('iosBBody');
     body.className = 'i-sbody ' + (B.dir==='back' ? 'i-back' : 'i-in'); void body.offsetWidth; body.scrollTop = 0;
-    ({date:stepDate, party:stepParty, time:stepTime})[steps[B.step]](body);
+    ({date:stepDate, party:stepParty, time:stepTime, dtime:stepDTime, dname:stepDName, dphone:stepDPhone, dnotes:stepDNotes})[steps[B.step]](body);
   }
   function go(step, dir){ S.book.step = step; S.book.dir = dir||'in'; renderBook(); }
 
@@ -6368,7 +6551,7 @@ window._preloadAllReservations = preloadAllReservations;
       const lead = new Date(y,m,1).getDay(), days = new Date(y,m+1,0).getDate();
       let h = ''; for (let i=0;i<lead;i++) h += '<span></span>';
       for (let d=1; d<=days; d++){
-        const k = dateKey(new Date(y,m,d)), past = k < tk, n = dayGuests(k);
+        const k = dateKey(new Date(y,m,d)), past = k < tk, n = B.kind==='dining' ? diningGuests(k) : dayGuests(k);
         h += `<button type="button" class="i-cday${k===sel?' sel':''}${k===tk?' today':''}" data-k="${k}" ${past?'disabled':''}><span class="num">${d}</span><span class="cnt">${n?n+'p':''}</span></button>`;
       }
       const g = $('iosCalGrid'); g.innerHTML = h; g.className = 'i-calgrid' + (dirn ? (dirn>0?' i-in':' i-back') : '');
@@ -6388,14 +6571,15 @@ window._preloadAllReservations = preloadAllReservations;
 
   function stepParty(el){
     const B = S.book;
-    let h = `<div class="i-q">How many guests?</div><div class="i-hint">${currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'})}${B.preset?' at '+ampm(B.preset):''}. 15 or more gets a double grill; over 30 needs a manager password.</div><div class="i-pgrid">`;
+    const when = currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'});
+    let h = `<div class="i-q">How many guests?</div><div class="i-hint">${B.kind==='dining' ? 'Dining room, '+when : when+(B.preset?' at '+ampm(B.preset):'')+'. 15 or more gets a double grill; over 30 needs a manager password.'}</div><div class="i-pgrid">`;
     for (let n=1;n<=12;n++) h += `<button type="button" class="i-pbtn${B.party===n?' sel':''}" data-n="${n}">${n}</button>`;
     h += `</div><div class="i-stepper"><span>Larger party</span><b id="iosPv" style="font-size:20px">${B.party>12?B.party:''}</b><span class="ctl"><button type="button" id="iosPm" aria-label="Fewer">−</button><button type="button" id="iosPp" aria-label="More">+</button></span><button type="button" class="go" id="iosPgo">Next</button></div>`;
     el.innerHTML = h;
-    const choose = n => { B.party = n; if (B.preset) handoff(B.preset); else go(2,'in'); };
+    const choose = n => { B.party = n; if (B.kind==='dining') return go(2,'in'); if (B.preset) handoff(B.preset); else go(2,'in'); };
     el.querySelectorAll('.i-pbtn').forEach(b => b.onclick = () => choose(+b.dataset.n));
     const upd = () => { $('iosPv').textContent = B.party>12 ? B.party : ''; el.querySelectorAll('.i-pbtn').forEach(b=>b.classList.toggle('sel', +b.dataset.n===B.party)); };
-    $('iosPp').onclick = () => { B.party = Math.min(OVERRIDE_MAX_GUESTS, Math.max(13, (B.party||12)+1)); upd(); };
+    $('iosPp').onclick = () => { B.party = Math.min(B.kind==='dining' ? 99 : OVERRIDE_MAX_GUESTS, Math.max(13, (B.party||12)+1)); upd(); };
     $('iosPm').onclick = () => { if (B.party>13) { B.party--; upd(); } };
     $('iosPgo').onclick = () => { if (B.party>12) choose(B.party); else toast('Tap + to pick a party size over 12.'); };
   }
@@ -6407,29 +6591,113 @@ window._preloadAllReservations = preloadAllReservations;
   }
   function drawTimes(el, k){
     const B = S.book, g = B.party;
-    let h = `<div class="i-q">What time?</div><div class="i-hint">${currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'})} for ${g}. The middle column shows each grill already booked.</div>
-      <div class="i-legend"><span style="color:var(--i-green-text)">Joins a grill already cooking</span><span style="color:var(--i-blue)">Opens a new grill</span><span style="color:var(--i-indigo)">Double grill</span></div><div class="i-group">`;
+    let h = `<div class="i-q">What time?</div><div class="i-hint">${currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'})} for ${g}.</div><div class="i-group">`;
     slotsForDay().forEach(s => {
-      const st = slotStatus(k, s), gs = grillGroups(k, s), mins = timeToMinutes(s);
-      const now = gs.length ? gs.map(x=>x.load+'p').join(' | ') : '0p';
-      let label, cls, tight = '';
+      const st = slotStatus(k, s), mins = timeToMinutes(s);
+      const have = st.recs.reduce((a,r)=>a+(r.guests||0),0);
+      let label, cls, tight = '', ok = false;
       if (st.blocked) { label = 'Blocked'; cls = 'no'; }
       else {
         const a = autoAssignGrill(k, s, g, st.chefs, null);
-        if (!a) { label = 'Full, needs override'; cls = 'no'; }
+        if (!a) { label = 'Full'; cls = 'no'; }
         else {
-          if (a.isDouble) { label = 'Opens Grills '+a.grill+' + '+a.grill2; cls = 'dbl'; }
-          else if (getGroupsAtGrillAtSlot(k, a.grill, mins, null).length) { label = 'Joins Grill '+a.grill; cls = 'fit'; }
-          else { label = 'Opens Grill '+a.grill; cls = 'new'; }
+          ok = true;
+          if (a.isDouble) { label = 'Grills '+a.grill+' + '+a.grill2; cls = 'dbl'; }
+          else { label = 'Grill '+a.grill; cls = 'grill'; }
           if (a.tightTiming) tight = '<small>Tight timing</small>';
         }
       }
-      h += `<button type="button" class="i-trow${st.hasDouble?' double':''}${st.secondary?' sec':''}" data-s="${s}" ${st.blocked?'disabled':''}><span class="i-tmcol"><span class="i-tm">${short(s)}</span>${st.secondary?'<span class="i-cap">Off-peak</span>':''}</span><span class="i-mini">${now}</span><span class="i-st ${cls}">${label}${tight}</span></button>`;
+      const mid = `${have}p` + (ok ? `<span class="i-add">+${g}p = ${have+g}p</span>` : '');
+      h += `<button type="button" class="i-trow${st.hasDouble?' double':''}${ok?'':' full'}" data-s="${s}" ${st.blocked?'disabled':''}><span class="i-tmcol"><span class="i-tm">${short(s)}</span></span><span class="i-mini">${mid}</span><span class="i-st ${cls}">${label}${tight}</span></button>`;
     });
     el.innerHTML = h + '</div>';
     el.querySelectorAll('.i-trow').forEach(b => b.onclick = () => handoff(b.dataset.s));
     const first = [...el.querySelectorAll('.i-trow')].find(b => b.dataset.s >= '17:00');
     if (first) setTimeout(()=>first.scrollIntoView({block:'center'}), 60);
+  }
+
+  /* ── DINING booking steps (saved through the tracker's own saveDining) ── */
+  const DINING_TIMES = (() => { const t=[]; for (let h=11;h<=22;h++) for (let m=0;m<60;m+=30){ if(h===22&&m>0) break; t.push(String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')); } return t; })();
+  function diningAt(dk, t){ return Object.values((diningReservations[dk])||{}).filter(r=>r&&r.time===t); }
+  function stepDTime(el){
+    const B = S.book, k = dateKey(currentDate), g = B.party;
+    let h = `<div class="i-q">What time?</div><div class="i-hint">Dining room, ${currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'})} for ${g}.</div><div class="i-group">`;
+    DINING_TIMES.forEach(t => {
+      const have = diningAt(k,t).reduce((a,r)=>a+(Number(r.guests)||0),0), n = diningAt(k,t).length;
+      h += `<button type="button" class="i-trow${B.time===t?' sel':''}" data-t="${t}"><span class="i-tmcol"><span class="i-tm">${short(t)}</span></span><span class="i-mini">${have}p<span class="i-add">+${g}p = ${have+g}p</span></span><span class="i-st">${n?n+' table'+(n>1?'s':''):''}</span></button>`;
+    });
+    el.innerHTML = h + '</div>';
+    el.querySelectorAll('.i-trow').forEach(b => b.onclick = () => { B.time = b.dataset.t; go(3,'in'); });
+    const first = el.querySelector('.i-trow.sel') || [...el.querySelectorAll('.i-trow')].find(b => b.dataset.t >= '18:00');
+    if (first) setTimeout(()=>first.scrollIntoView({block:'center'}), 60);
+  }
+  const dSum = () => `<div class="i-hint">${S.book.party}p, ${ampm(S.book.time)}, ${currentDate.toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'})}${S.book.name?', '+esc(S.book.name):''}</div>`;
+  function stepDName(el){
+    const B = S.book;
+    el.innerHTML = `<div class="i-q">Guest name</div>${dSum()}<div class="i-field"><input id="iosDName" autocomplete="off" autocapitalize="words" placeholder="Last name or full name" value="${esc(B.name)}"></div><div class="i-err" id="iosDErr"></div><button type="button" class="i-btn" id="iosDNext">Continue</button>`;
+    const inp = $('iosDName'), nx = () => { const v = sanitizeText(inp.value, 80); if (!v) { $('iosDErr').textContent='Guest name is required.'; return; } B.name = v; go(4,'in'); };
+    $('iosDNext').onclick = nx; inp.onkeydown = e => { if (e.key==='Enter') { e.preventDefault(); nx(); } };
+    setTimeout(()=>inp.focus(), 340);
+  }
+  function stepDPhone(el){
+    const B = S.book;
+    el.innerHTML = `<div class="i-q">Phone number</div>${dSum()}<div class="i-field"><input id="iosDPhone" type="tel" inputmode="tel" placeholder="(506) 555-0100" value="${esc(B.phone)}"></div><div class="i-err"></div><button type="button" class="i-btn" id="iosDNext">Continue</button><button type="button" class="i-btn ghost" id="iosDSkip">No phone</button>`;
+    const inp = $('iosDPhone');
+    inp.oninput = () => fmtPhone(inp);
+    const nx = () => { B.phone = inp.value.trim(); go(5,'in'); };
+    $('iosDNext').onclick = nx; $('iosDSkip').onclick = () => { B.phone=''; go(5,'in'); };
+    inp.onkeydown = e => { if (e.key==='Enter') { e.preventDefault(); nx(); } };
+    setTimeout(()=>inp.focus(), 340);
+  }
+  function stepDNotes(el){
+    const B = S.book, tags = ['Allergy','Birthday','Anniversary','High chair','Window'];
+    el.innerHTML = `<div class="i-q">Any notes?</div>${dSum()}<div class="i-chips">${tags.map(t=>`<button type="button" class="i-chip${B.noteTag===t?' sel':''}" data-t="${t}">${t}</button>`).join('')}</div>
+      <div class="i-field"><textarea id="iosDNotes" placeholder="Allergies, preferences…">${esc(B.notes)}</textarea></div><div class="i-err" id="iosDErr"></div>
+      <button type="button" class="i-btn" id="iosDSave">Book table</button>`;
+    el.querySelectorAll('.i-chip').forEach(c => c.onclick = () => { B.noteTag = B.noteTag===c.dataset.t ? '' : c.dataset.t; el.querySelectorAll('.i-chip').forEach(x=>x.classList.toggle('sel', x.dataset.t===B.noteTag)); });
+    $('iosDNotes').oninput = e => { B.notes = e.target.value; };
+    $('iosDSave').onclick = () => safe(saveDiningIos);
+  }
+  // Fills the tracker's own dining form invisibly and calls saveDining(), so the write is identical to the classic screen.
+  async function saveDiningIos(){
+    const B = S.book, dk = dateKey(currentDate), btn = $('iosDSave');
+    if (btn) btn.disabled = true;
+    const notes = [B.noteTag, (B.notes||'').trim()].filter(Boolean).join(': ');
+    document.body.classList.add('i-silent');
+    try {
+      openDiningModal(null);
+      $('dName').value = B.name; $('dGuests').value = B.party; $('dTime').value = B.time;
+      $('dPhone').value = B.phone || ''; $('dNotes').value = notes;
+      await saveDining(dk, '');
+    } finally { document.body.classList.remove('i-silent'); }
+    const stillOpen = $('modalOverlay').style.display !== 'none';
+    const sheet = $('iosBook'), scrim = $('iosScrim');
+    sheet.style.transition='none'; scrim.style.transition='none';
+    const booked = { name:B.name, party:B.party, time:B.time };
+    closeBook(); if (stillOpen) document.body.style.overflow='hidden';
+    setTimeout(()=>{ sheet.style.transition=''; scrim.style.transition=''; }, 60);
+    if (stillOpen) return; // the classic form is now visible with its error message
+    switchTab('dining');
+    toast(`Booked ${booked.name}, ${booked.party}p at ${ampm(booked.time)}`);
+  }
+
+  /* ── DINING screen ── */
+  function renderDiningScr(){
+    if (!active() || S.tab!=='dining') return;
+    const key = dateKey(currentDate), tk = todayKey();
+    $('iosDSub').textContent = currentDate.toLocaleDateString('en-CA',{weekday:'long', month:'long', day:'numeric', year:'numeric'});
+    renderWeek(key, tk, 'iosDWeek', diningGuests);
+    const all = Object.entries(diningReservations[key]||{}).filter(([,r])=>r&&r.time).map(([id,r])=>Object.assign({id},r));
+    $('iosDStats').innerHTML = `<div class="i-stat"><b>${all.reduce((a,r)=>a+(Number(r.guests)||0),0)}</b><span>Guests</span></div><div class="i-stat"><b>${all.length}</b><span>Tables</span></div>`;
+    const box = $('iosDList');
+    if (!all.length) { box.innerHTML = '<div class="i-empty"><b>No dining reservations</b>Tap + to add one for this day.</div>'; return; }
+    const times = [...new Set(all.map(r=>r.time))].sort();
+    box.innerHTML = times.map(t => {
+      const rs = all.filter(r=>r.time===t).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+      return `<div class="i-shead"><strong>${ampm(t)}</strong><span>${rs.reduce((a,r)=>a+(Number(r.guests)||0),0)}p</span></div><div class="i-group" style="margin-bottom:22px">`
+        + rs.map(r => `<div class="i-row" role="button" tabindex="0" data-din="${esc(r.id)}"><span class="i-party din">${esc(r.guests)}</span><div class="main"><div class="t1">${esc(r.name||'Guest')}</div><div class="t2">${esc(r.phone||'')}${r.notes?(r.phone?'  ':'')+esc(r.notes):''}</div></div>${r.notes && /allerg/i.test(r.notes)?'<span class="i-tags"><span class="i-tag bad">Allergy</span></span>':''}${chev}</div>`).join('')
+        + '</div>';
+    }).join('');
   }
 
   // Hand off to the tracker's real stepped flow. srNext1() does the availability
@@ -6462,10 +6730,17 @@ window._preloadAllReservations = preloadAllReservations;
         if (nm.includes(q) || (qd.length>=3 && ph.includes(qd))) hits.push({dk,id,r});
       });
     });
+    Object.keys(diningReservations||{}).forEach(dk => {
+      Object.entries(diningReservations[dk]||{}).forEach(([id,r]) => {
+        if (!r || !r.time) return;
+        const nm = (r.name||'').toLowerCase(), ph = String(r.phone||'').replace(/\D/g,'');
+        if (nm.includes(q) || (qd.length>=3 && ph.includes(qd))) hits.push({dk,id,r:Object.assign({},r,{slot:r.time}),dining:true});
+      });
+    });
     hits.sort((a,b) => { const au=a.dk>=tk, bu=b.dk>=tk; if (au!==bu) return au?-1:1; return au ? (a.dk+a.r.slot).localeCompare(b.dk+b.r.slot) : (b.dk+b.r.slot).localeCompare(a.dk+a.r.slot); });
     if (!hits.length) { box.innerHTML = '<div class="i-empty"><b>No matches</b>Check the spelling or try the last 4 digits of the phone.</div>'; return; }
-    box.innerHTML = '<div class="i-group">' + hits.slice(0,60).map(({dk,id,r}) =>
-      `<div class="i-row" role="button" tabindex="0" data-open="${dk}|${esc(r.slot)}|${esc(id)}"><span class="i-party">${r.guests||''}</span><div class="main"><div class="t1">${esc(r.name||'Guest')}</div><div class="t2">${keyToDate(dk).toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'})}, ${ampm(r.slot)}${r.phone?'  '+esc(r.phone):''}</div></div>${dk<tk?'<span class="i-tag">Past</span>':''}</div>`
+    box.innerHTML = '<div class="i-group">' + hits.slice(0,60).map(({dk,id,r,dining}) =>
+      `<div class="i-row" role="button" tabindex="0" data-open="${dk}|${esc(r.slot)}|${esc(id)}|${dining?'d':'h'}"><span class="i-party${dining?' din':''}">${r.guests||''}</span><div class="main"><div class="t1">${esc(r.name||'Guest')}</div><div class="t2">${keyToDate(dk).toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'})}, ${ampm(r.slot)}${r.phone?'  '+esc(r.phone):''}</div></div>${dining?'<span class="i-tag ok">Dining</span>':''}${dk<tk?'<span class="i-tag">Past</span>':''}</div>`
     ).join('') + '</div>';
   }
   function openRes(dk, slot, id){
@@ -6483,7 +6758,6 @@ window._preloadAllReservations = preloadAllReservations;
       + item('print','Print daily sheet','Same sheet as the classic view')
       + item(chefOff?'restoreChef':'removeChef', chefOff?'Restore chef for this day':'Remove a chef for this day', chefOff?'A chef is currently removed':'Password required')
       + `</div><div class="i-list">`
-      + item('dining','Dining reservations','Opens the classic dining screen')
       + item('history','History','Opens the classic history screen')
       + item('classic','Switch to classic view','Same account, original screens')
       + `</div><div class="i-list">${item('signout','Sign out','', 'danger')}</div>`;
@@ -6492,7 +6766,6 @@ window._preloadAllReservations = preloadAllReservations;
     if (act==='print') return printDailySheet();
     if (act==='removeChef') return promptRemoveChef();
     if (act==='restoreChef') return restoreChefForDay();
-    if (act==='dining') return classic('dining');
     if (act==='history') return classic('history');
     if (act==='classic') return classic('hibachi');
     if (act==='signout') { document.body.classList.remove('ios-mode','ios-classic'); return window._firebaseLogout && window._firebaseLogout(); }
@@ -6504,7 +6777,9 @@ window._preloadAllReservations = preloadAllReservations;
   function switchTab(t){
     S.tab = t; closeJump();
     document.querySelectorAll('#iosApp .i-tab').forEach(x => x.classList.toggle('on', x.dataset.tab===t));
-    ['today','search','more'].forEach(n => $('ios'+n[0].toUpperCase()+n.slice(1)+'Scr').classList.toggle('on', n===t));
+    ['today','dining','search','more'].forEach(n => $('ios'+n[0].toUpperCase()+n.slice(1)+'Scr').classList.toggle('on', n===t));
+    $('iosNewBtn').setAttribute('aria-label', t==='dining' ? 'New dining reservation' : 'New hibachi reservation');
+    if (t==='dining') safe(renderDiningScr);
     window.scrollTo(0,0);
     if (t==='more') safe(renderMore);
     if (t==='search') setTimeout(()=>$('iosQ').focus(), 60);
@@ -6514,10 +6789,14 @@ window._preloadAllReservations = preloadAllReservations;
   function bind(){
     if (S.bound) return; S.bound = true;
     document.querySelectorAll('#iosApp .i-tab').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
-    $('iosNewBtn').onclick = () => safe(()=>startBooking(null));
-    $('iosGoToday').onclick = () => { $('iosWeek')._touched=false; goDate(todayKey()); };
-    $('iosTitle').onclick = () => safe(() => jumpOpen() ? closeJump() : openJump());
-    $('iosTitle').onkeydown = e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); $('iosTitle').click(); } };
+    $('iosNewBtn').onclick = () => safe(()=>startBooking(null, S.tab==='dining' ? 'dining' : 'hibachi'));
+    $('iosDGoToday').onclick = () => { $('iosDWeek')._touched=false; S.anchor = todayKey(); goDate(todayKey()); safe(renderDiningScr); };
+    $('iosDWeek').onclick = e => { const b = e.target.closest('[data-day]'); if (b) { $('iosDWeek')._touched=true; goDate(b.dataset.day); } };
+    $('iosDList').onclick = e => { const r = e.target.closest('[data-din]'); if (!r) return; const d = (diningReservations[dateKey(currentDate)]||{})[r.dataset.din]; if (d) safe(()=>openDiningModal(Object.assign({id:r.dataset.din}, d))); };
+    $('iosGoToday').onclick = () => { $('iosWeek')._touched=false; S.anchor = todayKey(); goDate(todayKey()); safe(render); };
+    ['iosTitle','iosDTitle'].forEach(id => { const t = $(id); if (!t) return;
+      t.onclick = () => safe(() => jumpOpen() ? closeJump() : openJump(t));
+      t.onkeydown = e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); t.click(); } }; });
     $('iosJumpScrim').onclick = closeJump;
     $('iosWeek').onclick = e => { const b = e.target.closest('[data-day]'); if (b) { $('iosWeek')._touched=true; goDate(b.dataset.day); } };
     document.querySelectorAll('#iosApp .i-seg button').forEach(b => b.onclick = () => {
@@ -6532,12 +6811,16 @@ window._preloadAllReservations = preloadAllReservations;
     });
     $('iosSlots').onkeydown = e => { if ((e.key==='Enter'||e.key===' ') && e.target.matches('[data-res]')) { e.preventDefault(); e.target.click(); } };
     $('iosQ').oninput = () => safe(renderSearch);
-    $('iosResults').onclick = e => { const r = e.target.closest('[data-open]'); if (r) { const [dk,slot,id] = r.dataset.open.split('|'); openRes(dk, slot, id); } };
+    $('iosResults').onclick = e => { const r = e.target.closest('[data-open]'); if (r) { const [dk,slot,id,kind] = r.dataset.open.split('|'); if (kind==='d') { switchTab('dining'); goDate(dk); whenLoaded(dk, () => safe(() => { const d=(diningReservations[dk]||{})[id]; if (d) openDiningModal(Object.assign({id}, d)); })); } else openRes(dk, slot, id); } };
     $('iosMoreBody').onclick = e => { const b = e.target.closest('[data-act]'); if (b) safe(()=>moreAction(b.dataset.act)); };
     $('iosBCancel').onclick = closeBook;
     $('iosScrim').onclick = closeBook;
     $('iosBBack').onclick = () => { const B=S.book; if (!B || B.step===0) return; if (B.preset && B.step===1) return closeBook(); go(B.step-1,'back'); };
-    document.addEventListener('keydown', e => { if (e.key==='Escape' && jumpOpen()) return closeJump(); if (e.key==='Escape' && S.book) closeBook(); });
+    document.addEventListener('keydown', e => {
+      if (e.key!=='Escape') return;
+      if (AL) return $('iosAlertNo').click();
+      if (jumpOpen()) return closeJump();
+      if (S.book) closeBook(); });
     // keep the offline banner in sync with the tracker's own health check
     const off = $('dbOfflineBanner');
     if (off && window.MutationObserver) new MutationObserver(()=>safe(render)).observe(off, {attributes:true, attributeFilter:['style']});
@@ -6549,9 +6832,13 @@ window._preloadAllReservations = preloadAllReservations;
     const orig = renderHibachi;
     window.renderHibachi = renderHibachi = function(){ const out = orig.apply(this, arguments); if (active()) safe(render); return out; };
   }
+  if (typeof renderDining === 'function') {
+    const origD = renderDining;
+    window.renderDining = renderDining = function(){ const out = origD.apply(this, arguments); if (active()) safe(renderDiningScr); return out; };
+  }
   if (typeof renderDateHeader === 'function') {
     const origH = renderDateHeader;
-    window.renderDateHeader = renderDateHeader = function(){ const out = origH.apply(this, arguments); if (active()) safe(render); return out; };
+    window.renderDateHeader = renderDateHeader = function(){ const out = origH.apply(this, arguments); if (active()) { safe(render); safe(renderDiningScr); } return out; };
   }
 
   /* ── v2: full-screen, uncluttered booking steps (visual only; ids and onclicks untouched) ── */
