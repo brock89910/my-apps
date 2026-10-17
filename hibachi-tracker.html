@@ -2080,7 +2080,8 @@ const DOUBLE_GRILL_MIN_GUESTS    = 15;
 const DOUBLE_GRILL_BLOCK_MINUTES = 120;
 const DOUBLE_GRILL_WARN_MINUTES  = 150;
 const OVERRIDE_MAX_GUESTS        = 42;
-const LARGE_GROUP_PASSWORD_MIN   = 30;
+const LARGE_GROUP_PASSWORD_MIN   = 25; // parties of 25+ need the over-24 password
+const PWD_HASH_OVER24 = '25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117'; // 2017040334 — parties over 24
 const WARN_GUESTS                = 10;
 const COOK_BLOCK_MINUTES         = 60;
 const SEAT_BLOCK_MINUTES         = 90;
@@ -3916,8 +3917,8 @@ function openEditField(field) {
   if (field==='guests') {
     body.innerHTML = _editFieldHeader('Party Size')
       + '<div class="form-row"><label class="form-label">Number of Guests *</label>'
-      + '<input class="form-input" id="efGuests" type="number" min="1" max="'+DOUBLE_GRILL_SOLO_MAX+'" value="'+(r.guests||'')+'" oninput="_efCheckLargeGroup()"></div>'
-      + '<div id="efLargePwdRow" style="display:none" class="form-row"><label class="form-label">Manager Password ('+LARGE_GROUP_PASSWORD_MIN+'+ guests)</label>'
+      + '<input class="form-input" id="efGuests" type="number" min="1" max="'+OVERRIDE_MAX_GUESTS+'" value="'+(r.guests||'')+'" oninput="_efCheckLargeGroup()"></div>'
+      + '<div id="efLargePwdRow" style="display:none" class="form-row"><label class="form-label">Override Password (over 24 guests)</label>'
       + '<input class="form-input" id="efLargePwd" type="password" placeholder="Enter password" style="letter-spacing:0.2em"></div>'
       + errDiv + saveBtn();
     setTimeout(_efCheckLargeGroup,0);
@@ -4006,11 +4007,11 @@ async function saveEditField(field) {
     if (field==='guests') {
       const guests = sanitizeGuests(document.getElementById('efGuests').value);
       if (!guests || guests<1) return _editErr('Party size must be at least 1.');
-      if (guests>DOUBLE_GRILL_SOLO_MAX) return _editErr('Maximum party size is '+DOUBLE_GRILL_SOLO_MAX+' for standard booking.');
+      if (guests>OVERRIDE_MAX_GUESTS) return _editErr('Maximum party size is '+OVERRIDE_MAX_GUESTS+'.');
       if (guests>=LARGE_GROUP_PASSWORD_MIN && !isManager()) {
         const pwd=document.getElementById('efLargePwd')?.value||'';
-        const ok=await checkPassword(pwd,PWD_HASH_LARGE);
-        if (!ok) { _efCheckLargeGroup(); return _editErr('Groups of '+LARGE_GROUP_PASSWORD_MIN+'+ require manager password.'); }
+        const ok=await checkPassword(pwd,PWD_HASH_OVER24);
+        if (!ok) { _efCheckLargeGroup(); return _editErr('Maximum is 24 guests. Over 24 requires the override password.'); }
       }
       const dow=currentDate.getDay(), slotMins=timeToMinutes(r.slot);
       const chefs=getChefsAtTime(dow,slotMins);
@@ -4382,22 +4383,22 @@ function _srStep1() {
 async function srNext1() {
   const g = sanitizeGuests(document.getElementById('srGuests')?.value);
   if (!g||g<1) return _srErr('Enter the number of guests.');
-  if (g>30 && !isManager()) {
+  if (g>=LARGE_GROUP_PASSWORD_MIN && !isManager()) {
     const pwd=document.getElementById('fLargeGroupPwd')?.value||'';
-    const ok=await checkPassword(pwd,PWD_HASH_LARGE);
+    const ok=await checkPassword(pwd,PWD_HASH_OVER24);
     if (!ok) {
       if (!document.getElementById('fLargeGroupPwd')) {
         const err=document.getElementById('srErr');
         err.style.display='block';
         err.textContent='';
         const div=document.createElement('div');div.style.cssText='margin-bottom:10px';
-        div.innerHTML='<label class="form-label">Manager Password (required for 30+ guests)</label>'
+        div.innerHTML='<label class="form-label">Override Password (required for over 24 guests)</label>'
           +'<input class="form-input" id="fLargeGroupPwd" type="password" placeholder="Enter password" style="letter-spacing:0.2em"'
           +' onkeydown="if(event.key===\'Enter\'){event.preventDefault();srNext1()}">';
         err.parentNode.insertBefore(div,err);
         document.getElementById('fLargeGroupPwd').focus();
       }
-      return _srErr('Groups of 30+ require manager approval.');
+      return _srErr('Maximum is 24 guests. Over 24 requires the override password.');
     }
   }
   // Check grill availability
@@ -4881,7 +4882,7 @@ function showLargeGroupPwdField() {
   if (document.getElementById('fLargeGroupPwd')) return;
   const err=document.getElementById('formErr');
   const div=document.createElement('div'); div.style.cssText='margin-bottom:10px';
-  div.innerHTML='<label class="form-label">Manager Password (required for 30+ guests)</label>'
+  div.innerHTML='<label class="form-label">Override Password (required for over 24 guests)</label>'
     +'<input class="form-input" id="fLargeGroupPwd" type="password" placeholder="Enter password" style="letter-spacing:0.2em" onkeydown="if(event.key===\'Enter\'){event.preventDefault();document.querySelector(\'.btn-gold\').click()}">';
   err.parentNode.insertBefore(div,err);
   document.getElementById('fLargeGroupPwd').focus();
@@ -5085,14 +5086,14 @@ async function _saveHibachiImpl(dk,editId) {
   }
   if (!name)               return showErr('Guest name is required.');
   if (!guests||guests<1)   return showErr('Party size must be at least 1.');
-  if (guests>DOUBLE_GRILL_SOLO_MAX) return showErr('Maximum party size is '+DOUBLE_GRILL_SOLO_MAX+' for standard booking.');
+  if (guests>OVERRIDE_MAX_GUESTS) return showErr('Maximum party size is '+OVERRIDE_MAX_GUESTS+'.');
   if (!initials)           return showErr('Staff initials are required.');
   if (!phone||(phone.length!==7&&phone.length!==10)) return showErr('Phone must be 7 digits (local) or 10 digits (with area code).');
 
   if (guests>=LARGE_GROUP_PASSWORD_MIN && !isManager()) {
     const pwd=document.getElementById('fLargeGroupPwd')?.value||'';
-    const ok=await checkPassword(pwd,PWD_HASH_LARGE);
-    if (!ok) { showLargeGroupPwdField(); return showErr('⚠ Groups of 30 require manager approval.'); }
+    const ok=await checkPassword(pwd,PWD_HASH_OVER24);
+    if (!ok) { showLargeGroupPwdField(); return showErr('⚠ Maximum is 24 guests. Over 24 requires the override password.'); }
   }
 
   if (cardRequired(guests,dk)) {
@@ -6460,7 +6461,7 @@ window._preloadAllReservations = preloadAllReservations;
       msg:'All grills or chefs are taken. A manager can book it anyway on a grill pair.', ok:'Book Anyway',
       submit:c=>{ const b=c.querySelector('button'); b&&b.click(); }, cancel:c=>c&&c.remove() },
     { pwd:'fLargeGroupPwd', box:()=>$('fLargeGroupPwd')&&$('fLargeGroupPwd').parentElement, err:'srErr',
-      title:()=>'Manager Approval', msg:'Parties over 30 need a manager password.', ok:'Approve',
+      title:()=>'Over 24 Guests', msg:'Maximum is 24 guests. Enter the override password to book a larger party.', ok:'Approve',
       submit:()=>srNext1(), cancel:c=>{ c&&c.remove(); const e=$('srErr'); if(e){e.style.display='none';e.textContent='';} } },
     { pwd:'forceAddPwd', box:()=>null, err:'forceAddErr',
       title:()=>'Force Add', msg:'This time is full. Enter the manager password to add a reservation anyway.', ok:'Unlock',
@@ -6917,7 +6918,7 @@ window._preloadAllReservations = preloadAllReservations;
   function stepParty(el){
     const B = S.book;
     const when = currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'});
-    let h = `<div class="i-q">How many guests?</div><div class="i-hint">${B.kind==='dining' ? 'Dining room, '+when : when+(B.preset?' at '+ampm(B.preset):'')+'. 15 or more gets a double grill; over 30 needs a manager password.'}</div><div class="i-pgrid">`;
+    let h = `<div class="i-q">How many guests?</div><div class="i-hint">${B.kind==='dining' ? 'Dining room, '+when : when+(B.preset?' at '+ampm(B.preset):'')+'. 15 or more gets a double grill; over 24 needs the override password.'}</div><div class="i-pgrid">`;
     for (let n=1;n<=12;n++) h += `<button type="button" class="i-pbtn${B.party===n?' sel':''}" data-n="${n}">${n}</button>`;
     h += `</div><div class="i-stepper"><span>Larger party</span><b id="iosPv" style="font-size:20px">${B.party>12?B.party:''}</b><span class="ctl"><button type="button" id="iosPm" aria-label="Fewer">−</button><button type="button" id="iosPp" aria-label="More">+</button></span><button type="button" class="go" id="iosPgo">Next</button></div>`;
     el.innerHTML = h;
