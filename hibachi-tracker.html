@@ -964,6 +964,22 @@ body::before {
 }
 .large-group-badge { font-family: var(--mono); font-size: 0.6rem; white-space: nowrap; }
 
+/* ── HOLIDAY CLOSED DAY (Dec 25 / Jan 1) ── */
+.closed-day { padding:64px 24px 48px; text-align:center; }
+.closed-day-title { font-family:var(--serif); font-size:2.4rem; font-weight:700; color:var(--gold-light); letter-spacing:0.08em; line-height:1; }
+.closed-day-name { font-family:var(--mono); font-size:0.75rem; font-weight:500; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-top:10px; }
+.closed-day-rule { width:48px; height:1px; background:linear-gradient(90deg,transparent,var(--gold2),transparent); margin:22px auto 0; }
+.closed-day-msg { font-family:var(--sans); font-size:0.95rem; color:var(--text2); margin:20px auto 0; max-width:340px; line-height:1.6; }
+.closed-warn { text-align:left; max-width:440px; margin:30px auto 0; background:rgba(200,150,42,0.08); border:1px solid rgba(200,150,42,0.3);
+  border-radius:var(--r); padding:12px 14px; font-family:var(--mono); font-size:0.7rem; color:var(--amber); line-height:1.6; }
+.closed-warn b { display:block; font-size:0.75rem; margin-bottom:2px; }
+.closed-warn-row { display:flex; justify-content:space-between; gap:10px; width:100%; margin-top:8px; padding:9px 11px; background:var(--bg3);
+  border:1px solid var(--border); border-radius:var(--r); color:var(--text); font-family:var(--sans); font-size:0.85rem; cursor:pointer; text-align:left; }
+.closed-warn-row span:last-child { color:var(--text2); font-family:var(--mono); font-size:0.72rem; white-space:nowrap; }
+.i-closed { padding:56px 20px 30px !important; }
+.i-closed b { font-size:30px !important; }
+.i-closed .ic-name { color:var(--i-accent); font-weight:600; font-size:15px; margin-bottom:10px; }
+
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -2240,6 +2256,35 @@ function navRaceCheckBeforeNav(fromKey, toKey) {
 /* ── DATE UTILS ── */
 function dateKey(d) { const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
 
+/* ── HOLIDAY CLOSURES — every year: Dec 25 (Christmas Day) and Jan 1 (New Year's Day) ──
+   On these dates the day shows a "Closed" page, and no reservation can be
+   created on, or moved/changed into, that date (hibachi or dining). */
+const CLOSED_DAYS = { '12-25':'Christmas Day', '01-01':"New Year's Day" };
+function closedDayName(d) { if (!d) return null; const k = typeof d==='string' ? d : dateKey(d); return CLOSED_DAYS[k.slice(5,10)] || null; }
+function isClosedDate(d) { return !!closedDayName(d); }
+function closedMsg(d) { return 'Closed for '+(closedDayName(d)||'the holiday')+' — reservations cannot be made on this date.'; }
+function openDiningById(dk, id) { const r=(diningReservations[dk]||{})[id]; if (r) openDiningModal(Object.assign({id}, r)); }
+function closedPageHtml(dk) {
+  const name = closedDayName(dk);
+  let warn = '';
+  if (appMode !== 'guest') {
+    const hib = getAllResForDate(dk).filter(r=>r.slot).sort((a,b)=>(a.slot||'').localeCompare(b.slot||''));
+    const din = Object.entries(diningReservations[dk]||{}).filter(([,r])=>r&&r.time).map(([id,r])=>Object.assign({id},r));
+    const n = hib.length + din.length;
+    if (n) {
+      warn = '<div class="closed-warn"><b>⚠ '+n+' reservation'+(n!==1?'s':'')+' still on this date</b>'
+        + 'Booked before the closure. Tap one to move it to another day (Date) or delete it.'
+        + hib.map(r=>'<button type="button" class="closed-warn-row" onclick="openHibachiModal(\''+r.slot+'\',\''+r.id+'\')"><span>'+escHtml(r.name||'Guest')+' · '+(r.guests||'?')+'p</span><span>Hibachi '+displayTime(r.slot)+'</span></button>').join('')
+        + din.map(r=>'<button type="button" class="closed-warn-row" onclick="openDiningById(\''+dk+'\',\''+r.id+'\')"><span>'+escHtml(r.name||'Guest')+' · '+(r.guests||'?')+'p</span><span>Dining '+displayTime(r.time)+'</span></button>').join('')
+        + '</div>';
+    }
+  }
+  return '<div class="closed-day"><div class="closed-day-title">Closed</div>'
+    + '<div class="closed-day-name">'+escHtml(name)+'</div><div class="closed-day-rule"></div>'
+    + '<div class="closed-day-msg">Osaka Hibachi is closed today. No reservations can be made for this date.</div>'
+    + warn + '</div>';
+}
+
 function formatDateLabel(d) {
   return d.toLocaleDateString('en-CA', { month:'short', day:'numeric', year:'numeric' });
 }
@@ -2347,6 +2392,7 @@ function renderCalGrid() {
       btn.classList.add('cal-day-draft');
       btn.title='Unfinished reservation: '+draftsToday.map(x=>(x.name||'(no name yet)')+' · '+(x.guests||'?')+'p').join(', ');
     }
+    if (isClosedDate(thisKey) && !isSel) { btn.style.textDecoration='line-through'; btn.style.opacity='0.5'; btn.title='Closed — '+closedDayName(thisKey); }
     btn.onclick=()=>pickDate(thisKey);
     cell.appendChild(btn);
     if (isInWeek && cacheEntry?.bookings>0) {
@@ -3007,6 +3053,7 @@ function nextGrillPairOrder(dateStr, slotMins, excludeId) {
 }
 
 function autoAssignGrill(dateStr,slot,guests,chefs,excludeId) {
+  if (isClosedDate(dateStr)) return null;
   const slotMins=timeToMinutes(slot);
   const all=getAllResForDate(dateStr).filter(r=>!excludeId||r.id!==excludeId);
   const chefsCommitted=getChefsCommittedAtSlot(all,slotMins);
@@ -3195,6 +3242,7 @@ function renderWeekStrip() {
     } else {
       gl.textContent='';
     }
+    if (isClosedDate(dk)) { gl.textContent='Closed'; gl.style.fontSize='0.55rem'; gl.style.letterSpacing='0.04em'; }
     cell.appendChild(dl); cell.appendChild(dd); cell.appendChild(gl);
     cell.onclick=()=>pickDate(dk);
     strip.appendChild(cell);
@@ -3204,7 +3252,7 @@ function renderWeekStrip() {
   pb.style.cssText='flex-shrink:0;margin:5px 8px 5px 4px;padding:5px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;font-family:var(--mono);font-size:0.6rem;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap;letter-spacing:0.04em;align-self:center';
   pb.textContent='Daily Sheet';
   pb.onclick=printDailySheet;
-  if (appMode==='guest') pb.style.display='none';
+  if (appMode==='guest' || isClosedDate(currentDate)) pb.style.display='none';
 
   const dk_now=dateKey(currentDate);
   const chefRemoved=chefDayOverrides[dk_now]>0;
@@ -3216,7 +3264,7 @@ function renderWeekStrip() {
   rcb.textContent=chefRemoved?'Chef Off ✓':'Remove Chef';
   rcb.title=chefRemoved?'1 chef removed today — click to restore':'Remove latest chef for today only';
   rcb.onclick=chefRemoved?restoreChefForDay:promptRemoveChef;
-  if (appMode==='guest') rcb.style.display='none';
+  if (appMode==='guest' || isClosedDate(currentDate)) rcb.style.display='none';
 
   stripWrap.appendChild(strip);
   stripWrap.appendChild(rcb);
@@ -3356,6 +3404,7 @@ function renderHibachi() {
     document.getElementById('weekStrip').style.display='';
     loadWeekData();
     renderChefRemovedBanner();
+    if (isClosedDate(currentDate)) document.getElementById('chefRemovedBanner').style.display='none';
   }
   renderTimeSlots();
   if (appMode==='guest') {
@@ -3367,6 +3416,7 @@ function renderHibachi() {
 function renderTimeSlots() {
   const container=document.getElementById('timeSlots');
   container.innerHTML='';
+  if (isClosedDate(currentDate)) { container.innerHTML=closedPageHtml(dateKey(currentDate)); return; }
   const dow=currentDate.getDay();
   const slots=generateTimeSlots(dow);
   const key=dateKey(currentDate);
@@ -3545,6 +3595,9 @@ function renderDining() {
   const key=dateKey(currentDate);
   const list=document.getElementById('diningList');
   list.innerHTML='';
+  const _dfab=document.querySelector('#view-dining .fab');
+  if (_dfab) _dfab.style.display=isClosedDate(currentDate)?'none':'';
+  if (isClosedDate(currentDate)) { list.innerHTML=closedPageHtml(key); return; }
   const all=Object.entries(diningReservations[key]||{});
   if (!all.length) { list.innerHTML='<div class="empty-slot">No dining room reservations for this day.</div>'; return; }
   all.sort(([,a],[,b])=>{const ta=a.time||'99:99',tb=b.time||'99:99';return ta!==tb?ta.localeCompare(tb):(a.name||'').localeCompare(b.name||'');});
@@ -3564,6 +3617,7 @@ function renderDining() {
 /* ── HIBACHI MODAL ── */
 function openHibachiModal(slot, editId) {
   const key=dateKey(currentDate);
+  if (!editId && isClosedDate(key)) { alert(closedMsg(key)); return; }
   if (editId) {
     const existing = (reservations[key]||{})[editId];
     if (existing && existing.isDraft) { resumeDraft(key, editId); return; }
@@ -3622,6 +3676,7 @@ async function submitEditAuth(slot, editId) {
 
 function _openHibachiModalInner(slot, editId) {
   const key=dateKey(currentDate);
+  if (!editId && isClosedDate(key)) { alert(closedMsg(key)); return; }
   const dow=currentDate.getDay();
   const slotMins=slot?timeToMinutes(slot):0;
   const chefs=getChefsAtTime(dow,slotMins);
@@ -3824,6 +3879,7 @@ async function saveEditFieldOverride(field) {
   const r = (reservations[key]||{})[editId];
   const oeEl = document.getElementById('efOverrideErr');
   if (!r) { closeModal(); alert('Reservation not found.'); return; }
+  if (isClosedDate(key)) { if(oeEl){oeEl.textContent='✕ '+closedMsg(key);oeEl.style.display='block';} return; }
   if (!isManager()) {
     const pwd = document.getElementById('efOverridePwd')?.value || '';
     const ok = await checkPassword(pwd, PWD_HASH_LARGE);
@@ -3980,6 +4036,7 @@ function _refreshDateSlotOptions() {
   const sel = document.getElementById('efDateSlot');
   if (!dateVal || !sel) return;
   const cur = sel.value;
+  if (isClosedDate(dateVal)) { sel.innerHTML = '<option value="">Closed — '+closedDayName(dateVal)+'</option>'; return; }
   const dow = new Date(dateVal+'T00:00:00').getDay();
   const opts = generateTimeSlots(dow).map(s=>'<option value="'+s+'"'+(s===cur?' selected':'')+'>'+displayTime(s)+'</option>').join('');
   sel.innerHTML = opts || '<option value="">No service this day</option>';
@@ -4002,6 +4059,7 @@ async function saveEditField(field) {
   const initials = _editorInitials || 'STAFF';
   const errEl = document.getElementById('editFieldErr');
   if (errEl) errEl.innerHTML = '';
+  if ((field==='guests'||field==='slot') && isClosedDate(key)) return _editErr(closedMsg(key)+' Use Date to move this reservation first.');
 
   try {
     if (field==='guests') {
@@ -4058,6 +4116,7 @@ async function saveEditField(field) {
       const newDate=document.getElementById('efDate').value;
       const newSlot=document.getElementById('efDateSlot').value;
       if (!newDate) return _editErr('Please choose a date.');
+      if (isClosedDate(newDate)) return _editErr('Closed on '+closedDayName(newDate)+' — choose another date.');
       if (!newSlot) return _editErr('No service available that day.');
       if (newDate===key && newSlot===r.slot) return _editErr('That matches the current date and time already.');
       if (!rateLimitCheck('write',20)) return _editErr('Too many actions too fast. Please wait a moment.');
@@ -4205,6 +4264,7 @@ function getDraftPointer() {
 async function srSaveDraft() {
   if (!window._db) return; // best-effort — in-memory flow still continues
   const key = dateKey(currentDate);
+  if (isClosedDate(key)) return; // never write drafts onto a closed date
   const data = {
     isDraft: true,
     name: _sr.name || '',
@@ -4262,6 +4322,7 @@ async function checkForAbandonedDraft() {
 
 // Reopens the stepped flow at the first incomplete field, using whatever was already saved.
 async function resumeDraft(dk, id) {
+  if (isClosedDate(dk)) { alert(closedMsg(dk)+' This unfinished draft will be cleared automatically.'); return; }
   let r = (reservations[dk] || {})[id];
   if (!r && window._db) {
     try { const snap = await window._get(window._ref(window._db, `reservations/${dk}/${id}`)); r = snap.val(); } catch(e) {}
@@ -4353,6 +4414,7 @@ function _srContinueBtn(label, fn) {
 }
 
 function openSteppedModal(slot) {
+  if (isClosedDate(currentDate)) { alert(closedMsg(currentDate)); return; }
   const dow = currentDate.getDay();
   const slotMins = timeToMinutes(slot);
   const chefs = getChefsAtTime(dow, slotMins);
@@ -4470,6 +4532,7 @@ async function srApplyOverride(g) {
 
 /* ── FORCE ADD (full slot override — pw: 0709) ── */
 function openForceAddModal(slot) {
+  if (isClosedDate(currentDate)) { alert(closedMsg(currentDate)); return; }
   document.getElementById('modalTitle').textContent = 'Force Add — ' + displayTime(slot);
   document.getElementById('modalBody').innerHTML =
     '<div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.18);border-radius:var(--r);padding:12px 13px;margin-bottom:14px">'
@@ -4787,6 +4850,7 @@ async function _srSaveImpl() {
   if (noteTextEl) _sr.noteText=sanitizeText(noteTextEl.value,120);
 
   const key=dateKey(currentDate);
+  if (isClosedDate(key)) return _srErr(closedMsg(key));
 
   // Use stored assign — re-verify only if not a manual override
   let finalAssign=_sr.assign;
@@ -5065,6 +5129,7 @@ async function saveHibachi(dk,editId) {
 }
 
 async function _saveHibachiImpl(dk,editId) {
+  if (isClosedDate(dk)) return showErr(closedMsg(dk)+(editId?' Move this reservation to another date instead.':''));
   const name    =sanitizeText(document.getElementById('fName').value, 80);
   const guests  =sanitizeGuests(document.getElementById('fGuests').value);
   const card    =document.getElementById('fCard')?.value.trim()||'';
@@ -5207,6 +5272,7 @@ async function saveHibachiOverride(dk,editId) {
 
 async function _saveHibachiOverrideImpl(dk,editId) {
   const oeEl=document.getElementById('overrideErr');
+  if (isClosedDate(dk)) { if(oeEl){oeEl.textContent='✕ '+closedMsg(dk);oeEl.style.display='block';} return; }
   if (!isManager()) {
     const pwd=document.getElementById('overridePwd')?.value||'';
     const ok=await checkPassword(pwd,PWD_HASH_LARGE);
@@ -5260,6 +5326,7 @@ async function deleteRes(dk,id) {
 
 /* ── DINING MODAL ── */
 function openDiningModal(existing) {
+  if (!existing && isClosedDate(currentDate)) { alert(closedMsg(currentDate)); return; }
   document.getElementById('modalTitle').textContent=existing?'Edit Dining Reservation':'Dining Room';
   const timeSlots=[];
   for (let h=11;h<=22;h++) for (let m=0;m<60;m+=30) { if(h===22&&m>0) break; timeSlots.push(String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')); }
@@ -5286,6 +5353,7 @@ function openDiningModal(existing) {
 }
 
 async function saveDining(dk,editId) {
+  if (!editId && isClosedDate(dk)) return showErr(closedMsg(dk));
   const name=sanitizeText(document.getElementById('dName').value, 80);
   const guests=sanitizeGuests(document.getElementById('dGuests').value);
   const phone=sanitizePhone(document.getElementById('dPhone').value);
@@ -5399,6 +5467,7 @@ async function moveReservation() {
   if (!resId)    { if (me) me.textContent = '⚠ No reservation selected.'; return; }
   if (!newDate)  { if (me) me.textContent = '⚠ Please select a date.'; return; }
   if (!newTime)  { if (me) me.textContent = '⚠ Please select a time.'; return; }
+  if (isClosedDate(newDate)) { if (me) me.textContent = '⚠ Closed on '+closedDayName(newDate)+' — choose another date.'; return; }
   if (newDate === oldDate && newTime === oldTime) {
     if (me) me.textContent = '⚠ New slot is the same as the current slot.'; return;
   }
@@ -5571,6 +5640,7 @@ async function runImport() {
     const notes=sanitizeText(notesParts.join('\t'),200);
     const dk=parseDateStr(dateRaw.trim());
     if (!dk) { skipped++; errors.push('Bad date: "'+dateRaw.trim()+'"'); continue; }
+    if (isClosedDate(dk)) { skipped++; errors.push('Closed date ('+closedDayName(dk)+'): '+dk); continue; }
     const guests=sanitizeGuests(guestsRaw);
     const cleanName=sanitizeText(name,80);
     const cleanInitials=sanitizeInitials(initials);
@@ -6295,6 +6365,9 @@ window._preloadAllReservations = preloadAllReservations;
     const live = $('iosLive'); const up = !!window._fbReady; live.textContent = up ? 'Live' : 'Offline'; live.classList.toggle('off', !up);
     renderWeek(key, tk);
     renderBanners(key);
+    const seg = document.querySelector('#iosTodayScr .i-seg');
+    if (seg) seg.style.display = isClosedDate(key) ? 'none' : '';
+    if (isClosedDate(key)) { $('iosStats').innerHTML = ''; $('iosSlots').innerHTML = iosClosedHTML(key, false); return; }
     const all = getAllResForDate(key).filter(r => r.slot);
     const guests = all.reduce((a,r)=>a+(r.guests||0),0);
     $('iosStats').innerHTML = `<div class="i-stat"><b>${guests}</b><span>Guests</span></div><div class="i-stat"><b>${all.length}</b><span>Bookings</span></div><div class="i-stat"><b>${all.filter(r=>r.confirmed).length}</b><span>Confirmed</span></div>`;
@@ -6324,6 +6397,16 @@ window._preloadAllReservations = preloadAllReservations;
           `<div class="i-ghead${g.over?' bad':''}"><span>${grillName(g.nums)}</span><span>${g.double ? g.load+'p double' : g.load+' of '+g.limit}</span></div>`
           + `<div class="i-group">${g.members.map(r => rowHTML(r, key, s, isToday, nowMins, g.double)).join('')}</div>`).join('') + '</div>';
     }).join('');
+  }
+  function iosClosedHTML(k, dining){
+    let h = `<div class="i-empty i-closed"><b>Closed</b><div class="ic-name">${esc(closedDayName(k))}</div>We’re closed today. Reservations can’t be made for this date.</div>`;
+    const rows = dining
+      ? Object.entries(diningReservations[k]||{}).filter(([,r])=>r&&r.time).map(([id,r]) =>
+          `<div class="i-row" role="button" tabindex="0" data-din="${esc(id)}"><span class="i-party din">${esc(r.guests)}</span><div class="main"><div class="t1">${esc(r.name||'Guest')}</div><div class="t2">${ampm(r.time)}</div></div>${chev}</div>`)
+      : getAllResForDate(k).filter(r=>r.slot).map(r =>
+          `<div class="i-row" role="button" tabindex="0" data-res="${esc(r.id)}" data-slot="${r.slot}"><span class="i-party">${r.guests||''}</span><div class="main"><div class="t1">${esc(r.name||'Guest')}</div><div class="t2">${ampm(r.slot)}</div></div>${chev}</div>`);
+    if (rows.length) h += `<div class="i-banner warn">${rows.length} reservation${rows.length>1?'s':''} still on this date. Tap to move it to another day or delete it.</div><div class="i-group">${rows.join('')}</div>`;
+    return h;
   }
   const psText = g => g.members.length===1 ? `<b>${g.load}p</b>` : `${g.members.map(r=>(r.guests||0)+'p').join(' + ')} = <b>${g.load}p</b>`;
   function capsHTML(st, gs){
@@ -6378,7 +6461,7 @@ window._preloadAllReservations = preloadAllReservations;
     let h = '';
     for (let i=0;i<8;i++){
       const d = addDays(start,i), k = dateKey(d), g = countFn(k);
-      h += `<button type="button" class="i-day${k===key?' sel':''}${k===tk?' today':''}${(!elId||elId==='iosWeek')&&hasDraft(k)?' draft':''}" data-day="${k}"><div class="dw">${WD[d.getDay()]}</div><div class="dn">${d.getDate()}</div><div class="dg">${g?g+'p':''}</div></button>`;
+      h += `<button type="button" class="i-day${k===key?' sel':''}${k===tk?' today':''}${(!elId||elId==='iosWeek')&&hasDraft(k)?' draft':''}" data-day="${k}"><div class="dw">${WD[d.getDay()]}</div><div class="dn">${d.getDate()}</div><div class="dg">${isClosedDate(k)?'Closed':g?g+'p':''}</div></button>`;
     }
     w.innerHTML = h;
     const s = w.querySelector('.sel'); if (s && !w._touched) s.scrollIntoView({inline:'center', block:'nearest'});
@@ -6388,7 +6471,7 @@ window._preloadAllReservations = preloadAllReservations;
     const off = $('dbOfflineBanner');
     if (off && off.style.display === 'block') h += '<div class="i-banner bad">Database offline — reservations cannot be saved or loaded. Do not take reservations. Contact manager.</div>';
     const cd = (typeof chefDayOverrideData!=='undefined') ? chefDayOverrideData[key] : null;
-    if (cd && cd.removed) h += `<div class="i-banner warn">1 chef removed for this day${cd.initials?' by '+esc(cd.initials):''}. Restore it from More.</div>`;
+    if (cd && cd.removed && !isClosedDate(key)) h += `<div class="i-banner warn">1 chef removed for this day${cd.initials?' by '+esc(cd.initials):''}. Restore it from More.</div>`;
     $('iosBanners').innerHTML = h;
   }
 
@@ -6420,7 +6503,7 @@ window._preloadAllReservations = preloadAllReservations;
       let h = ''; for (let i=0;i<lead;i++) h += '<span></span>';
       for (let d=1; d<=days; d++){
         const k = dateKey(new Date(y,m,d)), n = count(k);
-        h += `<button type="button" class="i-cday${k===sel?' sel':''}${k===tk?' today':''}${k<tk?' past':''}${!dining&&hasDraft(k)?' draft':''}" data-k="${k}"><span class="num">${d}</span><span class="cnt">${n?n+'p':''}</span></button>`;
+        h += `<button type="button" class="i-cday${k===sel?' sel':''}${k===tk?' today':''}${k<tk?' past':''}${!dining&&hasDraft(k)?' draft':''}" data-k="${k}"><span class="num">${d}</span><span class="cnt">${isClosedDate(k)?'Closed':n?n+'p':''}</span></button>`;
       }
       const g = $('iosJGrid'); g.innerHTML = h; g.className = 'i-calgrid' + (dirn ? (dirn>0?' i-in':' i-back') : '');
     };
@@ -6861,6 +6944,7 @@ window._preloadAllReservations = preloadAllReservations;
   function startBooking(presetSlot, kind){
     const tk = todayKey();
     if (presetSlot && dateKey(currentDate) < tk) { toast('That day has passed. Pick another day.'); return; }
+    if (presetSlot && isClosedDate(currentDate)) { toast(closedMsg(currentDate)); return; }
     S.book = { kind: kind||'hibachi', preset: presetSlot||null, party: null, step: presetSlot ? 1 : 0, calMonth: null, dir: 'in', name:'', phone:'', notes:'', noteTag:'', time:null };
     if (!presetSlot && dateKey(currentDate) < tk) goDate(tk);
     $('iosScrim').classList.add('on'); $('iosBook').classList.add('on'); document.body.style.overflow='hidden';
@@ -6881,9 +6965,9 @@ window._preloadAllReservations = preloadAllReservations;
   function go(step, dir){ S.book.step = step; S.book.dir = dir||'in'; renderBook(); }
 
   function stepDate(el){
-    const B = S.book, tk = todayKey(), sel = dateKey(currentDate) < tk ? tk : dateKey(currentDate);
+    const B = S.book, tk = todayKey(), sel0 = dateKey(currentDate) < tk ? tk : dateKey(currentDate), sel = isClosedDate(sel0) ? '' : sel0;
     const now = new Date(), minMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    if (!B.calMonth) { const d = keyToDate(sel); B.calMonth = new Date(d.getFullYear(), d.getMonth(), 1); }
+    if (!B.calMonth) { const d = keyToDate(sel0); B.calMonth = new Date(d.getFullYear(), d.getMonth(), 1); }
     el.innerHTML = `<div class="i-q">What day?</div><div class="i-hint">Swipe or use the arrows to change months.</div>
       <div class="i-cal" id="iosCal"><div class="i-calhead"><span class="i-caltitle" id="iosCalTitle"></span><span class="i-calnav">
       <button type="button" id="iosCalPrev" aria-label="Previous month"><svg width="12" height="20" viewBox="0 0 12 20"><path d="M10 2 2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -6897,13 +6981,13 @@ window._preloadAllReservations = preloadAllReservations;
       const lead = new Date(y,m,1).getDay(), days = new Date(y,m+1,0).getDate();
       let h = ''; for (let i=0;i<lead;i++) h += '<span></span>';
       for (let d=1; d<=days; d++){
-        const k = dateKey(new Date(y,m,d)), past = k < tk, n = B.kind==='dining' ? diningGuests(k) : dayGuests(k);
-        h += `<button type="button" class="i-cday${k===sel?' sel':''}${k===tk?' today':''}" data-k="${k}" ${past?'disabled':''}><span class="num">${d}</span><span class="cnt">${n?n+'p':''}</span></button>`;
+        const k = dateKey(new Date(y,m,d)), past = k < tk, shut = isClosedDate(k), n = B.kind==='dining' ? diningGuests(k) : dayGuests(k);
+        h += `<button type="button" class="i-cday${k===sel?' sel':''}${k===tk?' today':''}" data-k="${k}" ${past||shut?'disabled':''}${shut?' aria-label="Closed"':''}><span class="num">${d}</span><span class="cnt">${shut?'Closed':n?n+'p':''}</span></button>`;
       }
       const g = $('iosCalGrid'); g.innerHTML = h; g.className = 'i-calgrid' + (dirn ? (dirn>0?' i-in':' i-back') : '');
     };
     const shift = n => { const t = new Date(B.calMonth.getFullYear(), B.calMonth.getMonth()+n, 1); if (t < minMonth) return; B.calMonth = t; draw(n); };
-    const pick = k => { el.querySelectorAll('.i-cday').forEach(x => x.classList.toggle('sel', x.dataset.k===k)); goDate(k); setTimeout(()=>go(1,'in'), 160); };
+    const pick = k => { if (isClosedDate(k)) return toast(closedMsg(k)); el.querySelectorAll('.i-cday').forEach(x => x.classList.toggle('sel', x.dataset.k===k)); goDate(k); setTimeout(()=>go(1,'in'), 160); };
     $('iosCalPrev').onclick = () => shift(-1);
     $('iosCalNext').onclick = () => shift(1);
     $('iosCalToday').onclick = () => { B.calMonth = new Date(minMonth); draw(0); pick(tk); };
@@ -7033,6 +7117,7 @@ window._preloadAllReservations = preloadAllReservations;
     const key = dateKey(currentDate), tk = todayKey();
     $('iosDSub').textContent = currentDate.toLocaleDateString('en-CA',{weekday:'long', month:'long', day:'numeric', year:'numeric'});
     renderWeek(key, tk, 'iosDWeek', diningGuests);
+    if (isClosedDate(key)) { $('iosDList').innerHTML = iosClosedHTML(key, true); return; }
     const all = Object.entries(diningReservations[key]||{}).filter(([,r])=>r&&r.time).map(([id,r])=>Object.assign({id},r));
     $('iosDStats').innerHTML = `<div class="i-stat"><b>${all.reduce((a,r)=>a+(Number(r.guests)||0),0)}</b><span>Guests</span></div><div class="i-stat"><b>${all.length}</b><span>Tables</span></div>`;
     const box = $('iosDList');
@@ -7051,6 +7136,7 @@ window._preloadAllReservations = preloadAllReservations;
   function handoff(slot){
     const g = S.book && S.book.party;
     if (!g) return;
+    if (isClosedDate(currentDate)) { toast(closedMsg(currentDate)); return; }
     const k = dateKey(currentDate);
     whenLoaded(k, () => safe(() => {
       openSteppedModal(slot);
@@ -7098,12 +7184,13 @@ window._preloadAllReservations = preloadAllReservations;
   function renderMore(){
     const key = dateKey(currentDate), dstr = currentDate.toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'});
     const chefOff = (typeof chefDayOverrides!=='undefined') && chefDayOverrides[key] > 0;
+    const shut = isClosedDate(key);
     const item = (act, t1, t2, cls) => `<button type="button" class="i-item${cls?' '+cls:''}" data-act="${act}"><div class="main"><div>${t1}</div>${t2?'<div class="t2">'+t2+'</div>':''}</div>${cls?'':chev}</button>`;
     $('iosMoreBody').innerHTML =
-      `<div class="i-sechead">For ${dstr}</div><div class="i-list">`
+      (shut ? '' : `<div class="i-sechead">For ${dstr}</div><div class="i-list">`
       + item('print','Print daily sheet','Same sheet as the classic view')
       + item(chefOff?'restoreChef':'removeChef', chefOff?'Restore chef for this day':'Remove a chef for this day', chefOff?'A chef is currently removed':'Password required')
-      + `</div><div class="i-list">`
+      + `</div>`) + `<div class="i-list">`
       + item('history','History','Opens the classic history screen')
       + item('classic','Switch to classic view','Same account, original screens')
       + `</div><div class="i-list">${item('signout','Sign out','', 'danger')}</div>`
