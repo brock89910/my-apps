@@ -1688,7 +1688,7 @@ body:not(.ios-mode) .parade-banner .pb-full { color:#ff453a; }
 
 /* table picker */
 @keyframes tblPulse { 0%,100% { box-shadow:0 0 0 3px rgba(215,0,21,.25); } 50% { box-shadow:0 0 0 6px rgba(215,0,21,.12); } }
-.tbl-pick { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:4px; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif; }
+.tbl-pick { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-top:4px; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif; }
 .tbl-opt { appearance:none; border:1px solid #3a3a3c; background:#2c2c2e; color:#f2f2f7; border-radius:12px; padding:10px 4px 9px; font-weight:600; font-size:15px; line-height:1.2; cursor:pointer; text-align:center; font-family:inherit; transition:transform .12s, background .12s; }
 .tbl-opt:active { transform:scale(.96); }
 .tbl-opt small { display:block; font-size:11px; font-weight:500; margin-top:2px; color:#30d158; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -1698,6 +1698,8 @@ body:not(.ios-mode) .parade-banner .pb-full { color:#ff453a; }
 .tbl-opt.taken small { color:#636366; }
 .tbl-allfull { padding:12px 14px; border-radius:12px; background:rgba(215,0,21,.12); color:#ff453a; font-weight:600; font-size:14px; line-height:1.4; }
 .tbl-msg { display:none; margin-top:8px; font-size:13px; font-weight:500; color:#ff453a; }
+@media (max-width:560px) { .tbl-pick { grid-template-columns:repeat(3,1fr); } }
+body.ios-mode .tbl-pick { grid-template-columns:repeat(3,1fr); }
 .tbl-note { font-size:13px; color:#8e8e93; margin-top:2px; }
 body.ios-mode .tbl-opt { background:#fff; color:#000; border-color:#d1d1d6; }
 body.ios-mode .tbl-opt small { color:#248a3d; }
@@ -2342,7 +2344,7 @@ function fcfsOpen(dk, excludeId) { const sd = specialDiningDay(dk); if (!sd) ret
 function fcfsTakenMsg(dk, t, excludeId) {
   const who = fcfsTaken(dk, excludeId)[t], open = fcfsOpen(dk, excludeId);
   return 'Table '+t+' is already taken'+(who?' by '+who.name+' ('+displayTime(who.time)+')':'')+'. '
-    + (open.length ? 'Open: '+open.join(', ')+'.' : 'All five tables are taken.');
+    + (open.length ? 'Open: '+open.join(', ')+', or Other.' : 'Tables 1–5 are all taken, so choose Other.');
 }
 function specialDiningBannerHtml(d) {
   const sd = specialDiningDay(d); if (!sd) return '';
@@ -2355,42 +2357,47 @@ function specialDiningBannerHtml(d) {
     + '<div class="pb-title">Tables 1–5 are first come, first serve</div>'
     + '<div class="pb-sub">3:30 – 6:00 PM. Each booking in this window gets one of these tables, and each table can only be given out once.</div>'
     + '<div class="pb-tables">'+cells+'</div>'
-    + (open.length ? '' : '<div class="pb-full">All five tables are taken. No more dining bookings from 3:30 to 6:00.</div>')
+    + (open.length ? '' : '<div class="pb-full">All five tables are taken. Any more bookings from 3:30 to 6:00 go to Other.</div>')
     + '</div></div>';
 }
 function tableBadgeHtml(dk, r) {
   if (!r || !r.table) return '';
-  return '<span class="table-badge">Table '+escHtml(normTable(r.table))+'</span>';
+  const t = normTable(r.table);
+  return '<span class="table-badge">'+(t==='OTHER' ? 'Other table' : 'Table '+escHtml(t))+'</span>';
 }
 // Picker of tappable "Table 1".."Table 5" text buttons. Taken ones are crossed out.
 function tablePickerHtml(dk, time, selected, excludeId) {
   const sd = specialDiningDay(dk); if (!sd) return '';
   if (!inFcfsWindow(dk, time)) return '<div class="tbl-note">Tables 1–5 are only assigned for 3:30–6:00 bookings.</div>';
   const tk = fcfsTaken(dk, excludeId), open = fcfsOpen(dk, excludeId);
-  if (!open.length) return '<div class="tbl-allfull">All five tables are taken for 3:30–6:00. Choose 6:00 or later.</div>';
-  return '<div class="tbl-pick">' + sd.fcfsTables.map(t => {
+  const full = open.length ? '' : '<div class="tbl-allfull" style="margin-bottom:8px">Tables 1–5 are all taken. Use Other.</div>';
+  return full + '<div class="tbl-pick">' + sd.fcfsTables.map(t => {
     const who = tk[t];
     return '<button type="button" class="tbl-opt'+(who?' taken':'')+(selected===t&&!who?' sel':'')+'" data-tbl="'+t+'">Table '+t
       + '<small>'+(who ? escHtml(who.name) : (selected===t ? 'Selected' : 'Open'))+'</small></button>';
-  }).join('') + '</div>';
+  }).join('')
+  + '<button type="button" class="tbl-opt'+(selected==='OTHER'?' sel':'')+'" data-tbl="OTHER">Other<small>'+(selected==='OTHER'?'Selected':'Not 1–5')+'</small></button>'
+  + '</div>';
 }
-// Shared validation used by saveDining. Returns an error string or ''.
 function fcfsValidate(dk, time, table, excludeId) {
   if (!inFcfsWindow(dk, time)) return '';
   const open = fcfsOpen(dk, excludeId);
-  if (!open.length) return 'All five tables are taken for 3:30–6:00. Choose 6:00 or later.';
-  if (!table) return 'Choose a table for this booking. Open: '+open.join(', ')+'.';
-  if (!specialDiningDay(dk).fcfsTables.includes(table)) return 'From 3:30 to 6:00 the table must be 1–5.';
+  if (!table) return 'Choose a table for this booking. '+(open.length ? 'Open: '+open.join(', ')+', or Other.' : 'Tables 1–5 are taken, so choose Other.');
+  if (table==='OTHER') return '';
+  if (!specialDiningDay(dk).fcfsTables.includes(table)) return 'Choose Table 1–5 or Other.';
   if (!open.includes(table)) return fcfsTakenMsg(dk, table, excludeId);
   return '';
 }
+// Phone is required for dining bookings on special days
+function phoneRequiredFor(dk) { return !!specialDiningDay(dk); }
+function phoneOk(v) { return String(v||'').replace(/\D/g,'').length >= 10; }
 /* classic dining modal picker */
 let _dEditId = null;
 function _renderDTablePicker() {
   const wrap = document.getElementById('dTableWrap'); if (!wrap) return;
   const dk = dateKey(currentDate), time = document.getElementById('dTime').value, hid = document.getElementById('dTable');
   if (!inFcfsWindow(dk, time)) hid.value = '';
-  else if (hid.value && !fcfsOpen(dk, _dEditId).includes(hid.value)) hid.value = '';
+  else if (hid.value && hid.value!=='OTHER' && !fcfsOpen(dk, _dEditId).includes(hid.value)) hid.value = '';
   wrap.innerHTML = tablePickerHtml(dk, time, hid.value, _dEditId) + '<div class="tbl-msg" id="dTableMsg"></div>';
   wrap.querySelectorAll('.tbl-opt').forEach(b => b.onclick = () => {
     const t = b.dataset.tbl, msg = document.getElementById('dTableMsg');
@@ -5503,7 +5510,7 @@ function openDiningModal(existing) {
     +'<div class="form-row" style="margin:0"><label class="form-label">Time *</label>'
     +'<select class="form-select" id="dTime" onchange="_renderDTablePicker()">'+timeOptions+'</select></div></div>'
     +tableRow
-    +'<div class="form-row"><label class="form-label">Phone</label>'
+    +'<div class="form-row"><label class="form-label">Phone'+(sdDay?' *':'')+'</label>'
     +'<input class="form-input" id="dPhone" type="tel" placeholder="506-555-0100" value="'+escHtml(existing?existing.phone||'':'')+'"></div>'
     +'<div class="form-row"><label class="form-label">Notes</label>'
     +'<textarea class="form-textarea" id="dNotes" placeholder="Allergies, preferences…">'+escHtml(existing?existing.notes||'':'')+'</textarea></div>'
@@ -5524,6 +5531,7 @@ async function saveDining(dk,editId) {
   if (!name) return showErr('Guest name is required.');
   if (!guests) return showErr('Party size required.');
   if (!time) return showErr('Time is required.');
+  if (phoneRequiredFor(dk) && !phoneOk(phone)) return showErr('Phone number is required today (10 digits).');
   const data={name,guests,phone,notes,time,updatedAt:Date.now()};
   if (specialDiningDay(dk)) {
     const tEl=document.getElementById('dTable');
@@ -7225,12 +7233,11 @@ window._preloadAllReservations = preloadAllReservations;
     DINING_TIMES.forEach(t => {
       const have = diningAt(k,t).reduce((a,r)=>a+(Number(r.guests)||0),0), n = diningAt(k,t).length;
       const fc = inFcfsWindow(k,t) ? fcfsOpen(k,null).length : -1;
-      const fcTxt = fc<0 ? '' : (fc ? ` · ${fc} of 5 open` : ' · Full');
-      h += `<button type="button" class="i-trow${B.time===t?' sel':''}" data-t="${t}"${fc===0?' style="opacity:.45"':''}><span class="i-tmcol"><span class="i-tm">${short(t)}</span></span><span class="i-mini">${have}p<span class="i-add">+${g}p = ${have+g}p</span></span><span class="i-st">${n?n+' table'+(n>1?'s':''):''}${fcTxt}</span></button>`;
+      const fcTxt = fc<0 ? '' : (fc ? ` · ${fc} of 5 open` : ' · Other only');
+      h += `<button type="button" class="i-trow${B.time===t?' sel':''}" data-t="${t}"><span class="i-tmcol"><span class="i-tm">${short(t)}</span></span><span class="i-mini">${have}p<span class="i-add">+${g}p = ${have+g}p</span></span><span class="i-st">${n?n+' table'+(n>1?'s':''):''}${fcTxt}</span></button>`;
     });
     el.innerHTML = h + '</div>';
     el.querySelectorAll('.i-trow').forEach(b => b.onclick = () => {
-      if (inFcfsWindow(k, b.dataset.t) && !fcfsOpen(k,null).length) { toast('All five tables are taken for 3:30–6:00'); return; }
       B.time = b.dataset.t; go(3,'in');
     });
     const first = el.querySelector('.i-trow.sel') || [...el.querySelectorAll('.i-trow')].find(b => b.dataset.t >= '18:00');
@@ -7245,12 +7252,16 @@ window._preloadAllReservations = preloadAllReservations;
     setTimeout(()=>inp.focus(), 340);
   }
   function stepDPhone(el){
-    const B = S.book;
-    el.innerHTML = `<div class="i-q">Phone number</div>${dSum()}<div class="i-field"><input id="iosDPhone" type="tel" inputmode="tel" placeholder="(506) 555-0100" value="${esc(B.phone)}"></div><div class="i-err"></div><button type="button" class="i-btn" id="iosDNext">Continue</button><button type="button" class="i-btn ghost" id="iosDSkip">No phone</button>`;
+    const B = S.book, req = phoneRequiredFor(dateKey(currentDate));
+    el.innerHTML = `<div class="i-q">Phone number</div>${dSum()}${req?'<div class="i-hint">Required for today’s bookings.</div>':''}<div class="i-field"><input id="iosDPhone" type="tel" inputmode="tel" placeholder="(506) 555-0100" value="${esc(B.phone)}"></div><div class="i-err" id="iosDPErr"></div><button type="button" class="i-btn" id="iosDNext">Continue</button>${req?'':'<button type="button" class="i-btn ghost" id="iosDSkip">No phone</button>'}`;
     const inp = $('iosDPhone');
     inp.oninput = () => fmtPhone(inp);
-    const nx = () => { B.phone = inp.value.trim(); go(5,'in'); };
-    $('iosDNext').onclick = nx; $('iosDSkip').onclick = () => { B.phone=''; go(5,'in'); };
+    const nx = () => {
+      const v = inp.value.trim();
+      if (req && !phoneOk(v)) { $('iosDPErr').textContent = 'Enter a 10-digit phone number.'; return; }
+      B.phone = v; go(5,'in');
+    };
+    $('iosDNext').onclick = nx; if (!req) $('iosDSkip').onclick = () => { B.phone=''; go(5,'in'); };
     inp.onkeydown = e => { if (e.key==='Enter') { e.preventDefault(); nx(); } };
     setTimeout(()=>inp.focus(), 340);
   }
@@ -7258,7 +7269,7 @@ window._preloadAllReservations = preloadAllReservations;
     const B = S.book, tags = ['Allergy','Birthday','Anniversary','High chair','Window'];
     const sdk = dateKey(currentDate), sdDay = specialDiningDay(sdk);
     const needTbl = inFcfsWindow(sdk, B.time);
-    if (needTbl && B.table && !fcfsOpen(sdk,null).includes(B.table)) B.table = '';
+    if (needTbl && B.table && B.table!=='OTHER' && !fcfsOpen(sdk,null).includes(B.table)) B.table = '';
     const tblHtml = needTbl ? `<div class="i-q" style="margin-top:4px">Pick a table</div><div class="i-hint">First come, first serve from 3:30 to 6:00</div><div id="iosDTblWrap" style="margin-bottom:14px"></div>` : '';
     el.innerHTML = `${tblHtml}<div class="i-q">Any notes?</div>${dSum()}<div class="i-chips">${tags.map(t=>`<button type="button" class="i-chip${B.noteTag===t?' sel':''}" data-t="${t}">${t}</button>`).join('')}</div>
       <div class="i-field"><textarea id="iosDNotes" placeholder="Allergies, preferences…">${esc(B.notes)}</textarea></div><div class="i-err" id="iosDErr"></div>
@@ -7280,7 +7291,8 @@ window._preloadAllReservations = preloadAllReservations;
   // Fills the tracker's own dining form invisibly and calls saveDining(), so the write is identical to the classic screen.
   async function saveDiningIos(){
     const B = S.book, dk = dateKey(currentDate), btn = $('iosDSave');
-    const tErr = fcfsValidate(dk, B.time, inFcfsWindow(dk,B.time) ? normTable(B.table) : '', null);
+    const tErr = (phoneRequiredFor(dk) && !phoneOk(B.phone)) ? 'Phone number is required today. Go back and add it.'
+      : fcfsValidate(dk, B.time, inFcfsWindow(dk,B.time) ? normTable(B.table) : '', null);
     if (tErr) { const e = $('iosDErr'); if (e) e.textContent = tErr; return; }
     if (btn) btn.disabled = true;
     const notes = [B.noteTag, (B.notes||'').trim()].filter(Boolean).join(': ');
