@@ -1657,6 +1657,22 @@ body.i-silent #modalOverlay { visibility:hidden !important; }
 .i-week { margin-bottom:18px; overflow-x:visible; }
 .i-day { flex:1 1 0; width:auto; min-width:0; }
 @media (prefers-reduced-motion: reduce) { #iosApp *, #iosApp *::before { animation:none !important; transition:none !important; } }
+
+/* ── SPECIAL DAY (Nov 28 2026 Christmas Parade) ── */
+@keyframes paradeGlow { 0%,100% { box-shadow:0 0 0 2px #ff3b30, 0 0 14px 2px rgba(255,59,48,.55); } 50% { box-shadow:0 0 0 2px #ffd60a, 0 0 26px 6px rgba(255,214,10,.75); } }
+@keyframes tableGlow  { 0%,100% { box-shadow:0 0 0 2px #ffd60a, 0 0 10px 2px rgba(255,214,10,.6); } 50% { box-shadow:0 0 0 3px #ffd60a, 0 0 22px 6px rgba(255,214,10,.9); } }
+.parade-banner { margin:0 0 16px; padding:14px 16px; border-radius:14px; background:linear-gradient(135deg,#8b0000,#c41e1e 55%,#0b6b2e); color:#fff; text-align:center; animation:paradeGlow 1.8s ease-in-out infinite; position:relative; z-index:1; }
+.parade-banner .pb-title { font-size:1.25rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; line-height:1.2; }
+.parade-banner .pb-rule { margin-top:8px; padding:8px 10px; background:rgba(0,0,0,.28); border:2px dashed #ffd60a; border-radius:10px; font-weight:800; font-size:1rem; letter-spacing:.03em; color:#ffd60a; text-transform:uppercase; }
+.parade-banner .pb-sub { margin-top:6px; font-size:.78rem; opacity:.9; }
+.table-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:999px; background:#ffd60a; color:#111; font-weight:800; font-size:.85rem; letter-spacing:.04em; text-transform:uppercase; animation:tableGlow 1.6s ease-in-out infinite; white-space:nowrap; }
+.table-badge.fcfs { background:#ff3b30; color:#fff; }
+.dining-card.has-table, .i-row.has-table { outline:3px solid #ffd60a; outline-offset:-3px; animation:tableGlow 1.6s ease-in-out infinite; border-radius:12px; }
+.i-row.has-table .t1 { overflow:visible; display:flex; align-items:center; gap:8px; }
+.i-row.has-table .t1 .table-badge { margin-left:2px; }
+.table-input { font-size:1.4rem !important; font-weight:800 !important; text-align:center; letter-spacing:.05em; text-transform:uppercase; }
+.table-input.picked { background:#ffd60a !important; color:#111 !important; border-color:#ffd60a !important; animation:tableGlow 1.6s ease-in-out infinite; }
+.table-fcfs-warn { display:none; margin:8px 0 0; padding:8px 10px; border-radius:8px; background:#ff3b30; color:#fff; font-weight:700; font-size:.8rem; text-align:center; }
 </style>
 </head>
 <body>
@@ -2263,6 +2279,41 @@ const CLOSED_DAYS = { '12-25':'Christmas Day', '01-01':"New Year's Day" };
 function closedDayName(d) { if (!d) return null; const k = typeof d==='string' ? d : dateKey(d); return CLOSED_DAYS[k.slice(5,10)] || null; }
 function isClosedDate(d) { return !!closedDayName(d); }
 function closedMsg(d) { return 'Closed for '+(closedDayName(d)||'the holiday')+' — reservations cannot be made on this date.'; }
+/* ── SPECIAL DINING DAYS — specific dates only (not recurring) ──
+   Shows a glowing banner on the dining tab (classic + iOS) and lets staff
+   type a table number for each dining reservation on that date. */
+const SPECIAL_DINING_DAYS = {
+  '2026-11-28': {
+    title: 'Christmas Parade Day',
+    rule: 'Tables 1–5 · 3:30–6:00 = FIRST COME FIRST SERVE',
+    sub: 'Do not reserve Tables 1–5 between 3:30 and 6:00. Assign a table number to every dining booking today.',
+    fcfsTables: ['1','2','3','4','5'], fcfsStart: '15:30', fcfsEnd: '18:00'
+  }
+};
+function specialDiningDay(d) { if (!d) return null; const k = typeof d==='string' ? d : dateKey(d); return SPECIAL_DINING_DAYS[k] || null; }
+function specialDiningBannerHtml(d) {
+  const sd = specialDiningDay(d); if (!sd) return '';
+  return '<div class="parade-banner"><div class="pb-title">🎄 '+escHtml(sd.title)+' 🎄</div>'
+    + '<div class="pb-rule">'+escHtml(sd.rule)+'</div>'
+    + '<div class="pb-sub">'+escHtml(sd.sub)+'</div></div>';
+}
+function normTable(t) { return String(t||'').replace(/^\s*(table|tbl|t)\s*#?\s*/i,'').trim().toUpperCase(); }
+// true if this table + time falls in the first-come-first-serve block for that day
+function isFcfsConflict(d, table, time) {
+  const sd = specialDiningDay(d); if (!sd || !table || !time) return false;
+  return sd.fcfsTables.includes(normTable(table)) && time >= sd.fcfsStart && time < sd.fcfsEnd;
+}
+function tableBadgeHtml(dk, r) {
+  if (!r || !r.table) return '';
+  const bad = isFcfsConflict(dk, r.table, r.time);
+  return '<span class="table-badge'+(bad?' fcfs':'')+'">🪑 Table '+escHtml(normTable(r.table))+(bad?' · FCFS!':'')+'</span>';
+}
+function _onTableInput() {
+  const inp = document.getElementById('dTable'); if (!inp) return;
+  inp.classList.toggle('picked', !!inp.value.trim());
+  const w = document.getElementById('dTableWarn'), t = document.getElementById('dTime');
+  if (w) w.style.display = isFcfsConflict(currentDate, inp.value, t && t.value) ? 'block' : 'none';
+}
 function openDiningById(dk, id) { const r=(diningReservations[dk]||{})[id]; if (r) openDiningModal(Object.assign({id}, r)); }
 function closedPageHtml(dk) {
   const name = closedDayName(dk);
@@ -2324,12 +2375,29 @@ function getChefsAtTime(dow, timeMins, dateStr) {
   return 0;
 }
 
-function generateTimeSlots(dow) {
+/* ── ONE-OFF DATE SLOT OVERRIDES ──
+   Specific dates only (not recurring). add = extra bookable slots, remove = slots not allowed.
+   Dec 31 2026 (Thu, New Year's Eve): 8:30 grill bookable, NO 6:00 grill. */
+const DATE_SLOT_OVERRIDES = {
+  '2026-12-31': { add: ['20:30'], remove: ['18:00'] }
+};
+function isSlotDisallowed(dk, slot) {
+  const o = DATE_SLOT_OVERRIDES[dk];
+  return !!(o && o.remove && o.remove.includes(slot));
+}
+
+function generateTimeSlots(dow, dk) {
   const win = getServiceWindow(dow);
   if (!win) return [];
   const lastBook = getLastBookableMinutes(dow);
-  const slots = [];
+  let slots = [];
   for (let m = win.start; m <= lastBook; m += 30) slots.push(minutesToTime(m));
+  const o = DATE_SLOT_OVERRIDES[dk || dateKey(currentDate)];
+  if (o) {
+    if (o.add) o.add.forEach(t => { if (!slots.includes(t)) slots.push(t); });
+    if (o.remove) slots = slots.filter(t => !o.remove.includes(t));
+    slots.sort((a,b) => timeToMinutes(a) - timeToMinutes(b));
+  }
   return slots;
 }
 
@@ -3599,13 +3667,16 @@ function renderDining() {
   if (_dfab) _dfab.style.display=isClosedDate(currentDate)?'none':'';
   if (isClosedDate(currentDate)) { list.innerHTML=closedPageHtml(key); return; }
   const all=Object.entries(diningReservations[key]||{});
-  if (!all.length) { list.innerHTML='<div class="empty-slot">No dining room reservations for this day.</div>'; return; }
+  const banner=specialDiningBannerHtml(key);
+  if (!all.length) { list.innerHTML=banner+'<div class="empty-slot">No dining room reservations for this day.</div>'; return; }
+  if (banner) list.insertAdjacentHTML('beforeend', banner);
   all.sort(([,a],[,b])=>{const ta=a.time||'99:99',tb=b.time||'99:99';return ta!==tb?ta.localeCompare(tb):(a.name||'').localeCompare(b.name||'');});
   all.forEach(([id,r])=>{
-    const card=document.createElement('div'); card.className='dining-card';
+    const card=document.createElement('div'); card.className='dining-card'+(r.table?' has-table':'');
     const timeStr=r.time?displayTime(r.time):'';
-    card.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">'
+    card.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;gap:8px">'
       +'<div class="dining-name">'+escHtml(r.name||'Guest')+'</div>'
+      +tableBadgeHtml(key,r)
       +(timeStr?'<span style="font-family:var(--serif);font-size:0.88rem;font-weight:600;color:var(--gold)">'+timeStr+'</span>':'')
       +'</div><div class="dining-detail"><span>'+r.guests+' guests</span>'+(r.phone?'<span>'+escHtml(r.phone)+'</span>':'')+'</div>'
       +(r.notes?'<div class="dining-note">'+escHtml(r.notes)+'</div>':'');
@@ -4038,7 +4109,7 @@ function _refreshDateSlotOptions() {
   const cur = sel.value;
   if (isClosedDate(dateVal)) { sel.innerHTML = '<option value="">Closed — '+closedDayName(dateVal)+'</option>'; return; }
   const dow = new Date(dateVal+'T00:00:00').getDay();
-  const opts = generateTimeSlots(dow).map(s=>'<option value="'+s+'"'+(s===cur?' selected':'')+'>'+displayTime(s)+'</option>').join('');
+  const opts = generateTimeSlots(dow, dateVal).map(s=>'<option value="'+s+'"'+(s===cur?' selected':'')+'>'+displayTime(s)+'</option>').join('');
   sel.innerHTML = opts || '<option value="">No service this day</option>';
 }
 
@@ -5335,13 +5406,19 @@ function openDiningModal(existing) {
     return '<option value="'+t+'"'+sel+'>'+displayTime(t)+'</option>';
   }).join('');
   const deleteBtn=existing?'<button class="btn-danger" onclick="deleteDining(\''+dateKey(currentDate)+'\',\''+existing.id+'\')">✕ Remove</button>':'';
+  const sdDay=specialDiningDay(currentDate);
+  const tableRow=sdDay?'<div class="form-row"><label class="form-label">Table Number (type it)</label>'
+    +'<input class="form-input table-input'+(existing&&existing.table?' picked':'')+'" id="dTable" type="text" maxlength="6" autocomplete="off" placeholder="e.g. 7" value="'+escHtml(existing?normTable(existing.table):'')+'" oninput="_onTableInput()">'
+    +'<div class="table-fcfs-warn" id="dTableWarn">⚠ Tables 1–5 are FIRST COME FIRST SERVE from 3:30 to 6:00 today</div></div>':'';
   document.getElementById('modalBody').innerHTML=''
+    +specialDiningBannerHtml(currentDate)
     +'<div class="form-row"><label class="form-label">Guest Name *</label>'
     +'<input class="form-input" id="dName" type="text" placeholder="Last name or full name" value="'+escHtml(existing?existing.name||'':'')+'"></div>'
     +'<div class="form-grid"><div class="form-row" style="margin:0"><label class="form-label">Party Size *</label>'
     +'<input class="form-input" id="dGuests" type="number" min="1" placeholder="3" value="'+(existing?existing.guests||'':'')+'"></div>'
     +'<div class="form-row" style="margin:0"><label class="form-label">Time *</label>'
-    +'<select class="form-select" id="dTime">'+timeOptions+'</select></div></div>'
+    +'<select class="form-select" id="dTime" onchange="_onTableInput()">'+timeOptions+'</select></div></div>'
+    +tableRow
     +'<div class="form-row"><label class="form-label">Phone</label>'
     +'<input class="form-input" id="dPhone" type="tel" placeholder="506-555-0100" value="'+escHtml(existing?existing.phone||'':'')+'"></div>'
     +'<div class="form-row"><label class="form-label">Notes</label>'
@@ -5350,6 +5427,7 @@ function openDiningModal(existing) {
     +'<button class="btn-gold" onclick="saveDining(\''+dateKey(currentDate)+'\',\''+(existing?existing.id||'':'')+'\')">'+( existing?'✓ Update':'✓ Add to Dining')+'</button>'
     +deleteBtn;
   showModal();
+  if (sdDay) setTimeout(_onTableInput,0);
 }
 
 async function saveDining(dk,editId) {
@@ -5363,9 +5441,19 @@ async function saveDining(dk,editId) {
   if (!guests) return showErr('Party size required.');
   if (!time) return showErr('Time is required.');
   const data={name,guests,phone,notes,time,updatedAt:Date.now()};
+  const tEl=document.getElementById('dTable');
+  if (tEl && specialDiningDay(dk)) {
+    const table=normTable(sanitizeText(tEl.value, 6));
+    if (table) {
+      if (isFcfsConflict(dk, table, time) && !confirm('Table '+table+' is FIRST COME FIRST SERVE from 3:30 to 6:00 today (Christmas Parade).\n\nBook it anyway?')) return;
+      data.table=table;
+    }
+  } else if (editId) {
+    const prev=(diningReservations[dk]||{})[editId]; if (prev && prev.table) data.table=prev.table;
+  }
   try {
-    if (editId) { await window._set(window._ref(window._db,`dining/${dk}/${editId}`),data); await logAudit('edit','Dining: '+name+' · '+guests+'p · '+displayTime(time),''); }
-    else { await window._push(window._ref(window._db,`dining/${dk}`),data); await logAudit('create','Dining: '+name+' · '+guests+'p · '+displayTime(time),''); }
+    if (editId) { await window._set(window._ref(window._db,`dining/${dk}/${editId}`),data); await logAudit('edit','Dining: '+name+' · '+guests+'p · '+displayTime(time)+(data.table?' · Table '+data.table:''),''); }
+    else { await window._push(window._ref(window._db,`dining/${dk}`),data); await logAudit('create','Dining: '+name+' · '+guests+'p · '+displayTime(time)+(data.table?' · Table '+data.table:''),''); }
     closeModal();
   } catch(e) { showErr('Firebase error: '+e.message); }
 }
@@ -5468,6 +5556,7 @@ async function moveReservation() {
   if (!newDate)  { if (me) me.textContent = '⚠ Please select a date.'; return; }
   if (!newTime)  { if (me) me.textContent = '⚠ Please select a time.'; return; }
   if (isClosedDate(newDate)) { if (me) me.textContent = '⚠ Closed on '+closedDayName(newDate)+' — choose another date.'; return; }
+  if (isSlotDisallowed(newDate, newTime)) { if (me) me.textContent = '⚠ '+displayTime(newTime)+' is not available on '+newDate+' — choose another time.'; return; }
   if (newDate === oldDate && newTime === oldTime) {
     if (me) me.textContent = '⚠ New slot is the same as the current slot.'; return;
   }
@@ -6945,7 +7034,7 @@ window._preloadAllReservations = preloadAllReservations;
     const tk = todayKey();
     if (presetSlot && dateKey(currentDate) < tk) { toast('That day has passed. Pick another day.'); return; }
     if (presetSlot && isClosedDate(currentDate)) { toast(closedMsg(currentDate)); return; }
-    S.book = { kind: kind||'hibachi', preset: presetSlot||null, party: null, step: presetSlot ? 1 : 0, calMonth: null, dir: 'in', name:'', phone:'', notes:'', noteTag:'', time:null };
+    S.book = { kind: kind||'hibachi', preset: presetSlot||null, party: null, step: presetSlot ? 1 : 0, calMonth: null, dir: 'in', name:'', phone:'', notes:'', noteTag:'', time:null, table:'' };
     if (!presetSlot && dateKey(currentDate) < tk) goDate(tk);
     $('iosScrim').classList.add('on'); $('iosBook').classList.add('on'); document.body.style.overflow='hidden';
     renderBook();
@@ -7051,7 +7140,7 @@ window._preloadAllReservations = preloadAllReservations;
   function diningAt(dk, t){ return Object.values((diningReservations[dk])||{}).filter(r=>r&&r.time===t); }
   function stepDTime(el){
     const B = S.book, k = dateKey(currentDate), g = B.party;
-    let h = `<div class="i-q">What time?</div><div class="i-hint">Dining room, ${currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'})} for ${g}.</div><div class="i-group i-tpick">`;
+    let h = specialDiningBannerHtml(k) + `<div class="i-q">What time?</div><div class="i-hint">Dining room, ${currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'})} for ${g}.</div><div class="i-group i-tpick">`;
     DINING_TIMES.forEach(t => {
       const have = diningAt(k,t).reduce((a,r)=>a+(Number(r.guests)||0),0), n = diningAt(k,t).length;
       h += `<button type="button" class="i-trow${B.time===t?' sel':''}" data-t="${t}"><span class="i-tmcol"><span class="i-tm">${short(t)}</span></span><span class="i-mini">${have}p<span class="i-add">+${g}p = ${have+g}p</span></span><span class="i-st">${n?n+' table'+(n>1?'s':''):''}</span></button>`;
@@ -7081,11 +7170,17 @@ window._preloadAllReservations = preloadAllReservations;
   }
   function stepDNotes(el){
     const B = S.book, tags = ['Allergy','Birthday','Anniversary','High chair','Window'];
-    el.innerHTML = `<div class="i-q">Any notes?</div>${dSum()}<div class="i-chips">${tags.map(t=>`<button type="button" class="i-chip${B.noteTag===t?' sel':''}" data-t="${t}">${t}</button>`).join('')}</div>
+    const sdk = dateKey(currentDate), sdDay = specialDiningDay(sdk);
+    const tblHtml = sdDay ? `<div class="i-q" style="margin-top:4px">Table number</div><div class="i-field"><input id="iosDTable" class="table-input${B.table?' picked':''}" autocomplete="off" maxlength="6" placeholder="Type table # (e.g. 7)" value="${esc(B.table||'')}"></div><div class="table-fcfs-warn" id="iosDTableWarn" style="margin-bottom:10px">⚠ Tables 1–5 are FIRST COME FIRST SERVE from 3:30 to 6:00 today</div>` : '';
+    el.innerHTML = `${tblHtml}<div class="i-q">Any notes?</div>${dSum()}<div class="i-chips">${tags.map(t=>`<button type="button" class="i-chip${B.noteTag===t?' sel':''}" data-t="${t}">${t}</button>`).join('')}</div>
       <div class="i-field"><textarea id="iosDNotes" placeholder="Allergies, preferences…">${esc(B.notes)}</textarea></div><div class="i-err" id="iosDErr"></div>
       <button type="button" class="i-btn" id="iosDSave">Book table</button>`;
     el.querySelectorAll('.i-chip').forEach(c => c.onclick = () => { B.noteTag = B.noteTag===c.dataset.t ? '' : c.dataset.t; el.querySelectorAll('.i-chip').forEach(x=>x.classList.toggle('sel', x.dataset.t===B.noteTag)); });
     $('iosDNotes').oninput = e => { B.notes = e.target.value; };
+    if (sdDay) {
+      const ti = $('iosDTable'), upd = () => { B.table = normTable(ti.value); ti.classList.toggle('picked', !!B.table); $('iosDTableWarn').style.display = isFcfsConflict(sdk, B.table, B.time) ? 'block' : 'none'; };
+      ti.oninput = upd; upd();
+    }
     $('iosDSave').onclick = () => safe(saveDiningIos);
   }
   // Fills the tracker's own dining form invisibly and calls saveDining(), so the write is identical to the classic screen.
@@ -7098,6 +7193,7 @@ window._preloadAllReservations = preloadAllReservations;
       openDiningModal(null);
       $('dName').value = B.name; $('dGuests').value = B.party; $('dTime').value = B.time;
       $('dPhone').value = B.phone || ''; $('dNotes').value = notes;
+      if ($('dTable')) $('dTable').value = B.table || '';
       await saveDining(dk, '');
     } finally { document.body.classList.remove('i-silent'); }
     const stillOpen = $('modalOverlay').style.display !== 'none';
@@ -7119,14 +7215,15 @@ window._preloadAllReservations = preloadAllReservations;
     renderWeek(key, tk, 'iosDWeek', diningGuests);
     if (isClosedDate(key)) { $('iosDList').innerHTML = iosClosedHTML(key, true); return; }
     const all = Object.entries(diningReservations[key]||{}).filter(([,r])=>r&&r.time).map(([id,r])=>Object.assign({id},r));
+    const pBanner = specialDiningBannerHtml(key);
     $('iosDStats').innerHTML = `<div class="i-stat"><b>${all.reduce((a,r)=>a+(Number(r.guests)||0),0)}</b><span>Guests</span></div><div class="i-stat"><b>${all.length}</b><span>Tables</span></div>`;
     const box = $('iosDList');
-    if (!all.length) { box.innerHTML = '<div class="i-empty"><b>No dining reservations</b>Tap + to add one for this day.</div>'; return; }
+    if (!all.length) { box.innerHTML = pBanner + '<div class="i-empty"><b>No dining reservations</b>Tap + to add one for this day.</div>'; return; }
     const times = [...new Set(all.map(r=>r.time))].sort();
-    box.innerHTML = times.map(t => {
+    box.innerHTML = pBanner + times.map(t => {
       const rs = all.filter(r=>r.time===t).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
       return `<div class="i-shead"><strong>${ampm(t)}</strong><span>${rs.reduce((a,r)=>a+(Number(r.guests)||0),0)}p</span></div><div class="i-group" style="margin-bottom:22px">`
-        + rs.map(r => `<div class="i-row" role="button" tabindex="0" data-din="${esc(r.id)}"><span class="i-party din">${esc(r.guests)}</span><div class="main"><div class="t1">${esc(r.name||'Guest')}</div><div class="t2">${esc(r.phone||'')}${r.notes?(r.phone?'  ':'')+esc(r.notes):''}</div></div>${r.notes && /allerg/i.test(r.notes)?'<span class="i-tags"><span class="i-tag bad">Allergy</span></span>':''}${chev}</div>`).join('')
+        + rs.map(r => `<div class="i-row${r.table?' has-table':''}" role="button" tabindex="0" data-din="${esc(r.id)}"><span class="i-party din">${esc(r.guests)}</span><div class="main"><div class="t1">${esc(r.name||'Guest')} ${tableBadgeHtml(key,r)}</div><div class="t2">${esc(r.phone||'')}${r.notes?(r.phone?'  ':'')+esc(r.notes):''}</div></div>${r.notes && /allerg/i.test(r.notes)?'<span class="i-tags"><span class="i-tag bad">Allergy</span></span>':''}${chev}</div>`).join('')
         + '</div>';
     }).join('');
   }
