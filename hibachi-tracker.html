@@ -1659,33 +1659,54 @@ body.i-silent #modalOverlay { visibility:hidden !important; }
 @media (prefers-reduced-motion: reduce) { #iosApp *, #iosApp *::before { animation:none !important; transition:none !important; } }
 
 /* ── SPECIAL DAY (Nov 28 2026 Christmas Parade) ── */
-@keyframes paradeGlow { 0%,100% { box-shadow:0 0 0 2px #ff3b30, 0 0 14px 2px rgba(255,59,48,.55); } 50% { box-shadow:0 0 0 2px #ffd60a, 0 0 26px 6px rgba(255,214,10,.75); } }
-@keyframes tableGlow  { 0%,100% { box-shadow:0 0 0 2px #ffd60a, 0 0 10px 2px rgba(255,214,10,.6); } 50% { box-shadow:0 0 0 3px #ffd60a, 0 0 22px 6px rgba(255,214,10,.9); } }
-.parade-banner { margin:0 0 16px; padding:14px 16px; border-radius:14px; background:linear-gradient(135deg,#8b0000,#c41e1e 55%,#0b6b2e); color:#fff; text-align:center; animation:paradeGlow 1.8s ease-in-out infinite; position:relative; z-index:1; }
-.parade-banner .pb-title { font-size:1.25rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; line-height:1.2; }
-.parade-banner .pb-rule { margin-top:8px; padding:8px 10px; background:rgba(0,0,0,.28); border:2px dashed #ffd60a; border-radius:10px; font-weight:800; font-size:1rem; letter-spacing:.03em; color:#ffd60a; text-transform:uppercase; }
-.parade-banner .pb-sub { margin-top:6px; font-size:.78rem; opacity:.9; }
-.table-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:999px; background:#ffd60a; color:#111; font-weight:800; font-size:.85rem; letter-spacing:.04em; text-transform:uppercase; animation:tableGlow 1.6s ease-in-out infinite; white-space:nowrap; }
-.table-badge.fcfs { background:#ff3b30; color:#fff; }
-.dining-card.has-table, .i-row.has-table { outline:3px solid #ffd60a; outline-offset:-3px; animation:tableGlow 1.6s ease-in-out infinite; border-radius:12px; }
+/* Flat candy-cane stripe: hard colour stops, no blending */
+.parade-banner { --pb-red:#d70015; --pb-card:#1c1c1e; --pb-text:#f2f2f7; --pb-sub:#98989f; --pb-sep:#38383a; --pb-cell:#2c2c2e; --pb-green:#30d158;
+  margin:0 0 16px; border-radius:14px; overflow:hidden; background:var(--pb-card); color:var(--pb-text); border:1px solid var(--pb-sep);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif; text-align:left; }
+body.ios-mode .parade-banner { --pb-card:#fff; --pb-text:#000; --pb-sub:#6c6c70; --pb-sep:#e5e5ea; --pb-cell:#f2f2f7; --pb-green:#248a3d; border:none; }
+.parade-banner .pb-stripe { height:10px; background:repeating-linear-gradient(-45deg, var(--pb-red) 0 10px, #fff 10px 20px); }
+.parade-banner .pb-body { padding:14px 16px 16px; }
+.parade-banner .pb-eyebrow { font-size:13px; font-weight:600; color:var(--pb-red); letter-spacing:.01em; }
+body:not(.ios-mode) .parade-banner .pb-eyebrow { color:#ff453a; }
+.parade-banner .pb-title { font-size:20px; font-weight:700; line-height:1.25; margin-top:2px; letter-spacing:-.01em; }
+.parade-banner .pb-sub { font-size:14px; color:var(--pb-sub); margin-top:4px; line-height:1.4; }
+.parade-banner .pb-tables { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-top:14px; }
+.parade-banner .pb-cell { background:var(--pb-cell); border-radius:10px; padding:8px 4px 7px; text-align:center; min-width:0; }
+.parade-banner .pb-cell b { display:block; font-size:20px; font-weight:700; line-height:1.1; font-variant-numeric:tabular-nums; }
+.parade-banner .pb-cell span { display:block; font-size:11px; font-weight:600; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.parade-banner .pb-cell.open span { color:var(--pb-green); }
+.parade-banner .pb-cell.taken { background:transparent; box-shadow:inset 0 0 0 1px var(--pb-sep); }
+.parade-banner .pb-cell.taken b { color:var(--pb-sub); }
+.parade-banner .pb-cell.taken span { color:var(--pb-sub); font-weight:500; }
+.parade-banner .pb-full { margin-top:12px; font-size:14px; font-weight:600; color:var(--pb-red); }
+body:not(.ios-mode) .parade-banner .pb-full { color:#ff453a; }
+
+.table-badge { display:inline-flex; align-items:center; padding:2px 8px; border-radius:6px; background:#d70015; color:#fff; font-weight:600; font-size:12px; letter-spacing:.01em; white-space:nowrap; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif; }
+.dining-card.has-table { box-shadow:inset 3px 0 0 #d70015; }
+.i-row.has-table { box-shadow:inset 3px 0 0 #d70015; }
 .i-row.has-table .t1 { overflow:visible; display:flex; align-items:center; gap:8px; }
-.i-row.has-table .t1 .table-badge { margin-left:2px; }
-.table-input { font-size:1.4rem !important; font-weight:800 !important; text-align:center; letter-spacing:.05em; text-transform:uppercase; }
-.table-input.picked { background:#ffd60a !important; color:#111 !important; border-color:#ffd60a !important; animation:tableGlow 1.6s ease-in-out infinite; }
-.tbl-pick { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:4px; }
-.tbl-opt { appearance:none; border:2px solid #555; background:#2a2a2a; color:#eee; border-radius:12px; padding:12px 4px; font-weight:800; font-size:1rem; line-height:1.15; cursor:pointer; text-align:center; font-family:inherit; }
-.tbl-opt small { display:block; font-size:.62rem; font-weight:600; margin-top:3px; opacity:.85; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.tbl-opt.sel { background:#ffd60a; color:#111; border-color:#ffd60a; animation:tableGlow 1.6s ease-in-out infinite; transform:scale(1.04); }
-.tbl-opt.taken { background:#3a1a1a; color:#c66; border-color:#6a2a2a; text-decoration:line-through; cursor:not-allowed; opacity:.75; }
-.tbl-opt.taken small { text-decoration:none; }
-.tbl-allfull { padding:12px; border-radius:10px; background:#ff3b30; color:#fff; font-weight:800; text-align:center; }
-.tbl-msg { display:none; margin-top:8px; padding:8px 10px; border-radius:8px; background:#ff3b30; color:#fff; font-weight:700; font-size:.82rem; text-align:center; }
-.tbl-note { font-size:.75rem; opacity:.75; margin-top:2px; }
-body.ios-mode .tbl-opt { background:#fff; color:#111; border-color:#c7c7cc; }
-body.ios-mode .tbl-opt.sel { background:#ffd60a; border-color:#ffd60a; }
-body.ios-mode .tbl-opt.taken { background:#f6e3e3; color:#b33; border-color:#e6b4b4; }
-.parade-banner .pb-live { margin-top:8px; font-weight:800; font-size:.92rem; }
-.table-fcfs-warn { display:none; margin:8px 0 0; padding:8px 10px; border-radius:8px; background:#ff3b30; color:#fff; font-weight:700; font-size:.8rem; text-align:center; }
+
+/* table picker */
+@keyframes tblPulse { 0%,100% { box-shadow:0 0 0 3px rgba(215,0,21,.25); } 50% { box-shadow:0 0 0 6px rgba(215,0,21,.12); } }
+.tbl-pick { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:4px; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif; }
+.tbl-opt { appearance:none; border:1px solid #3a3a3c; background:#2c2c2e; color:#f2f2f7; border-radius:12px; padding:10px 4px 9px; font-weight:600; font-size:15px; line-height:1.2; cursor:pointer; text-align:center; font-family:inherit; transition:transform .12s, background .12s; }
+.tbl-opt:active { transform:scale(.96); }
+.tbl-opt small { display:block; font-size:11px; font-weight:500; margin-top:2px; color:#30d158; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tbl-opt.sel { background:#d70015; border-color:#d70015; color:#fff; animation:tblPulse 1.6s ease-in-out infinite; }
+.tbl-opt.sel small { color:#fff; }
+.tbl-opt.taken { background:transparent; color:#636366; border-color:#3a3a3c; cursor:not-allowed; }
+.tbl-opt.taken small { color:#636366; }
+.tbl-allfull { padding:12px 14px; border-radius:12px; background:rgba(215,0,21,.12); color:#ff453a; font-weight:600; font-size:14px; line-height:1.4; }
+.tbl-msg { display:none; margin-top:8px; font-size:13px; font-weight:500; color:#ff453a; }
+.tbl-note { font-size:13px; color:#8e8e93; margin-top:2px; }
+body.ios-mode .tbl-opt { background:#fff; color:#000; border-color:#d1d1d6; }
+body.ios-mode .tbl-opt small { color:#248a3d; }
+body.ios-mode .tbl-opt.sel { background:#d70015; border-color:#d70015; color:#fff; }
+body.ios-mode .tbl-opt.sel small { color:#fff; }
+body.ios-mode .tbl-opt.taken { background:#f2f2f7; color:#aeaeb2; border-color:#f2f2f7; }
+body.ios-mode .tbl-opt.taken small { color:#aeaeb2; }
+body.ios-mode .tbl-allfull { color:#d70015; background:rgba(215,0,21,.08); }
+body.ios-mode .tbl-msg { color:#d70015; }
 </style>
 </head>
 <body>
@@ -2299,7 +2320,7 @@ function closedMsg(d) { return 'Closed for '+(closedDayName(d)||'the holiday')+'
    no more dining bookings can be made for 3:30–6:00. */
 const SPECIAL_DINING_DAYS = {
   '2026-11-28': {
-    title: 'Christmas Parade Day',
+    title: 'Christmas Parade · Saturday, Nov 28',
     rule: 'Tables 1–5 · 3:30–6:00 · FIRST COME FIRST SERVE',
     sub: 'Every dining booking from 3:30 to 6:00 gets one of Tables 1–5. Once a table is given out, nobody else can get it.',
     fcfsTables: ['1','2','3','4','5'], fcfsStart: '15:30', fcfsEnd: '18:00'
@@ -2320,43 +2341,45 @@ function fcfsTaken(dk, excludeId) {
 function fcfsOpen(dk, excludeId) { const sd = specialDiningDay(dk); if (!sd) return []; const tk = fcfsTaken(dk, excludeId); return sd.fcfsTables.filter(t => !tk[t]); }
 function fcfsTakenMsg(dk, t, excludeId) {
   const who = fcfsTaken(dk, excludeId)[t], open = fcfsOpen(dk, excludeId);
-  return '✕ Table '+t+' is already taken'+(who?' by '+who.name+' ('+displayTime(who.time)+')':'')+'. '
-    + (open.length ? 'Still open: Table '+open.join(', ')+'.' : 'All Tables 1–5 are taken.');
+  return 'Table '+t+' is already taken'+(who?' by '+who.name+' ('+displayTime(who.time)+')':'')+'. '
+    + (open.length ? 'Open: '+open.join(', ')+'.' : 'All five tables are taken.');
 }
 function specialDiningBannerHtml(d) {
   const sd = specialDiningDay(d); if (!sd) return '';
   const dk = typeof d==='string' ? d : dateKey(d), tk = fcfsTaken(dk, null), open = fcfsOpen(dk, null);
-  const takenTxt = Object.keys(tk).sort().map(t => t+' ('+tk[t].name+')').join(', ');
-  const live = open.length
-    ? 'OPEN: Table '+open.join(', ')+(takenTxt ? '  ·  TAKEN: '+takenTxt : '')
-    : '⛔ ALL TABLES 1–5 TAKEN for 3:30–6:00';
-  return '<div class="parade-banner"><div class="pb-title">🎄 '+escHtml(sd.title)+' 🎄</div>'
-    + '<div class="pb-rule">'+escHtml(sd.rule)+'</div>'
-    + '<div class="pb-live">'+escHtml(live)+'</div>'
-    + '<div class="pb-sub">'+escHtml(sd.sub)+'</div></div>';
+  const cells = sd.fcfsTables.map(t => tk[t]
+    ? '<div class="pb-cell taken"><b>'+t+'</b><span>'+escHtml(tk[t].name)+'</span></div>'
+    : '<div class="pb-cell open"><b>'+t+'</b><span>Open</span></div>').join('');
+  return '<div class="parade-banner"><div class="pb-stripe"></div><div class="pb-body">'
+    + '<div class="pb-eyebrow">'+escHtml(sd.title)+'</div>'
+    + '<div class="pb-title">Tables 1–5 are first come, first serve</div>'
+    + '<div class="pb-sub">3:30 – 6:00 PM. Each booking in this window gets one of these tables, and each table can only be given out once.</div>'
+    + '<div class="pb-tables">'+cells+'</div>'
+    + (open.length ? '' : '<div class="pb-full">All five tables are taken. No more dining bookings from 3:30 to 6:00.</div>')
+    + '</div></div>';
 }
 function tableBadgeHtml(dk, r) {
   if (!r || !r.table) return '';
-  return '<span class="table-badge">🪑 Table '+escHtml(normTable(r.table))+'</span>';
+  return '<span class="table-badge">Table '+escHtml(normTable(r.table))+'</span>';
 }
 // Picker of tappable "Table 1".."Table 5" text buttons. Taken ones are crossed out.
 function tablePickerHtml(dk, time, selected, excludeId) {
   const sd = specialDiningDay(dk); if (!sd) return '';
   if (!inFcfsWindow(dk, time)) return '<div class="tbl-note">Tables 1–5 are only assigned for 3:30–6:00 bookings.</div>';
   const tk = fcfsTaken(dk, excludeId), open = fcfsOpen(dk, excludeId);
-  if (!open.length) return '<div class="tbl-allfull">⛔ All Tables 1–5 are already taken for 3:30–6:00.<br>Can\'t book this time — pick 6:00 or later.</div>';
+  if (!open.length) return '<div class="tbl-allfull">All five tables are taken for 3:30–6:00. Choose 6:00 or later.</div>';
   return '<div class="tbl-pick">' + sd.fcfsTables.map(t => {
     const who = tk[t];
     return '<button type="button" class="tbl-opt'+(who?' taken':'')+(selected===t&&!who?' sel':'')+'" data-tbl="'+t+'">Table '+t
-      + '<small>'+(who ? 'Taken · '+escHtml(who.name) : (selected===t ? '✓ Selected' : 'Open'))+'</small></button>';
+      + '<small>'+(who ? escHtml(who.name) : (selected===t ? 'Selected' : 'Open'))+'</small></button>';
   }).join('') + '</div>';
 }
 // Shared validation used by saveDining. Returns an error string or ''.
 function fcfsValidate(dk, time, table, excludeId) {
   if (!inFcfsWindow(dk, time)) return '';
   const open = fcfsOpen(dk, excludeId);
-  if (!open.length) return '✕ All Tables 1–5 are already taken for 3:30–6:00. Pick 6:00 or later.';
-  if (!table) return 'Pick a table (1–5) for this 3:30–6:00 booking. Still open: Table '+open.join(', ')+'.';
+  if (!open.length) return 'All five tables are taken for 3:30–6:00. Choose 6:00 or later.';
+  if (!table) return 'Choose a table for this booking. Open: '+open.join(', ')+'.';
   if (!specialDiningDay(dk).fcfsTables.includes(table)) return 'From 3:30 to 6:00 the table must be 1–5.';
   if (!open.includes(table)) return fcfsTakenMsg(dk, table, excludeId);
   return '';
@@ -5469,7 +5492,7 @@ function openDiningModal(existing) {
   const deleteBtn=existing?'<button class="btn-danger" onclick="deleteDining(\''+dateKey(currentDate)+'\',\''+existing.id+'\')">✕ Remove</button>':'';
   const sdDay=specialDiningDay(currentDate);
   _dEditId=existing?existing.id:null;
-  const tableRow=sdDay?'<div class="form-row"><label class="form-label">Table (3:30–6:00 · first come first serve)</label>'
+  const tableRow=sdDay?'<div class="form-row"><label class="form-label">Table</label>'
     +'<input type="hidden" id="dTable" value="'+escHtml(existing?normTable(existing.table):'')+'"><div id="dTableWrap"></div></div>':'';
   document.getElementById('modalBody').innerHTML=''
     +specialDiningBannerHtml(currentDate)
@@ -7202,12 +7225,12 @@ window._preloadAllReservations = preloadAllReservations;
     DINING_TIMES.forEach(t => {
       const have = diningAt(k,t).reduce((a,r)=>a+(Number(r.guests)||0),0), n = diningAt(k,t).length;
       const fc = inFcfsWindow(k,t) ? fcfsOpen(k,null).length : -1;
-      const fcTxt = fc<0 ? '' : (fc ? ` · T1–5: ${fc} open` : ' · T1–5 FULL');
+      const fcTxt = fc<0 ? '' : (fc ? ` · ${fc} of 5 open` : ' · Full');
       h += `<button type="button" class="i-trow${B.time===t?' sel':''}" data-t="${t}"${fc===0?' style="opacity:.45"':''}><span class="i-tmcol"><span class="i-tm">${short(t)}</span></span><span class="i-mini">${have}p<span class="i-add">+${g}p = ${have+g}p</span></span><span class="i-st">${n?n+' table'+(n>1?'s':''):''}${fcTxt}</span></button>`;
     });
     el.innerHTML = h + '</div>';
     el.querySelectorAll('.i-trow').forEach(b => b.onclick = () => {
-      if (inFcfsWindow(k, b.dataset.t) && !fcfsOpen(k,null).length) { toast('All Tables 1–5 are already taken for 3:30–6:00'); return; }
+      if (inFcfsWindow(k, b.dataset.t) && !fcfsOpen(k,null).length) { toast('All five tables are taken for 3:30–6:00'); return; }
       B.time = b.dataset.t; go(3,'in');
     });
     const first = el.querySelector('.i-trow.sel') || [...el.querySelectorAll('.i-trow')].find(b => b.dataset.t >= '18:00');
@@ -7236,7 +7259,7 @@ window._preloadAllReservations = preloadAllReservations;
     const sdk = dateKey(currentDate), sdDay = specialDiningDay(sdk);
     const needTbl = inFcfsWindow(sdk, B.time);
     if (needTbl && B.table && !fcfsOpen(sdk,null).includes(B.table)) B.table = '';
-    const tblHtml = needTbl ? `<div class="i-q" style="margin-top:4px">Pick a table</div><div class="i-hint">3:30–6:00 · first come first serve</div><div id="iosDTblWrap" style="margin-bottom:14px"></div>` : '';
+    const tblHtml = needTbl ? `<div class="i-q" style="margin-top:4px">Pick a table</div><div class="i-hint">First come, first serve from 3:30 to 6:00</div><div id="iosDTblWrap" style="margin-bottom:14px"></div>` : '';
     el.innerHTML = `${tblHtml}<div class="i-q">Any notes?</div>${dSum()}<div class="i-chips">${tags.map(t=>`<button type="button" class="i-chip${B.noteTag===t?' sel':''}" data-t="${t}">${t}</button>`).join('')}</div>
       <div class="i-field"><textarea id="iosDNotes" placeholder="Allergies, preferences…">${esc(B.notes)}</textarea></div><div class="i-err" id="iosDErr"></div>
       <button type="button" class="i-btn" id="iosDSave">Book table</button>`;
