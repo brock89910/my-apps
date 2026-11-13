@@ -1672,6 +1672,19 @@ body.i-silent #modalOverlay { visibility:hidden !important; }
 .i-row.has-table .t1 .table-badge { margin-left:2px; }
 .table-input { font-size:1.4rem !important; font-weight:800 !important; text-align:center; letter-spacing:.05em; text-transform:uppercase; }
 .table-input.picked { background:#ffd60a !important; color:#111 !important; border-color:#ffd60a !important; animation:tableGlow 1.6s ease-in-out infinite; }
+.tbl-pick { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:4px; }
+.tbl-opt { appearance:none; border:2px solid #555; background:#2a2a2a; color:#eee; border-radius:12px; padding:12px 4px; font-weight:800; font-size:1rem; line-height:1.15; cursor:pointer; text-align:center; font-family:inherit; }
+.tbl-opt small { display:block; font-size:.62rem; font-weight:600; margin-top:3px; opacity:.85; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tbl-opt.sel { background:#ffd60a; color:#111; border-color:#ffd60a; animation:tableGlow 1.6s ease-in-out infinite; transform:scale(1.04); }
+.tbl-opt.taken { background:#3a1a1a; color:#c66; border-color:#6a2a2a; text-decoration:line-through; cursor:not-allowed; opacity:.75; }
+.tbl-opt.taken small { text-decoration:none; }
+.tbl-allfull { padding:12px; border-radius:10px; background:#ff3b30; color:#fff; font-weight:800; text-align:center; }
+.tbl-msg { display:none; margin-top:8px; padding:8px 10px; border-radius:8px; background:#ff3b30; color:#fff; font-weight:700; font-size:.82rem; text-align:center; }
+.tbl-note { font-size:.75rem; opacity:.75; margin-top:2px; }
+body.ios-mode .tbl-opt { background:#fff; color:#111; border-color:#c7c7cc; }
+body.ios-mode .tbl-opt.sel { background:#ffd60a; border-color:#ffd60a; }
+body.ios-mode .tbl-opt.taken { background:#f6e3e3; color:#b33; border-color:#e6b4b4; }
+.parade-banner .pb-live { margin-top:8px; font-weight:800; font-size:.92rem; }
 .table-fcfs-warn { display:none; margin:8px 0 0; padding:8px 10px; border-radius:8px; background:#ff3b30; color:#fff; font-weight:700; font-size:.8rem; text-align:center; }
 </style>
 </head>
@@ -2280,39 +2293,87 @@ function closedDayName(d) { if (!d) return null; const k = typeof d==='string' ?
 function isClosedDate(d) { return !!closedDayName(d); }
 function closedMsg(d) { return 'Closed for '+(closedDayName(d)||'the holiday')+' — reservations cannot be made on this date.'; }
 /* ── SPECIAL DINING DAYS — specific dates only (not recurring) ──
-   Shows a glowing banner on the dining tab (classic + iOS) and lets staff
-   type a table number for each dining reservation on that date. */
+   Nov 28 2026 Christmas Parade: from 3:30 to 6:00 every dining booking must be
+   given one of Tables 1–5, first come first serve. Once a table is given to a
+   group it can't be given to anyone else in that window. When all 5 are taken,
+   no more dining bookings can be made for 3:30–6:00. */
 const SPECIAL_DINING_DAYS = {
   '2026-11-28': {
     title: 'Christmas Parade Day',
-    rule: 'Tables 1–5 · 3:30–6:00 = FIRST COME FIRST SERVE',
-    sub: 'Do not reserve Tables 1–5 between 3:30 and 6:00. Assign a table number to every dining booking today.',
+    rule: 'Tables 1–5 · 3:30–6:00 · FIRST COME FIRST SERVE',
+    sub: 'Every dining booking from 3:30 to 6:00 gets one of Tables 1–5. Once a table is given out, nobody else can get it.',
     fcfsTables: ['1','2','3','4','5'], fcfsStart: '15:30', fcfsEnd: '18:00'
   }
 };
 function specialDiningDay(d) { if (!d) return null; const k = typeof d==='string' ? d : dateKey(d); return SPECIAL_DINING_DAYS[k] || null; }
+function normTable(t) { return String(t||'').replace(/^\s*(table|tbl|t)\s*#?\s*/i,'').trim().toUpperCase(); }
+function inFcfsWindow(dk, time) { const sd = specialDiningDay(dk); return !!(sd && time && time >= sd.fcfsStart && time < sd.fcfsEnd); }
+// table -> {id, name, time} for tables already given out in the window (excluding the booking being edited)
+function fcfsTaken(dk, excludeId) {
+  const sd = specialDiningDay(dk), out = {}; if (!sd) return out;
+  Object.entries(diningReservations[dk]||{}).forEach(([id,r]) => {
+    if (!r || id===excludeId || !inFcfsWindow(dk, r.time)) return;
+    const t = normTable(r.table); if (sd.fcfsTables.includes(t)) out[t] = { id, name: r.name||'Guest', time: r.time };
+  });
+  return out;
+}
+function fcfsOpen(dk, excludeId) { const sd = specialDiningDay(dk); if (!sd) return []; const tk = fcfsTaken(dk, excludeId); return sd.fcfsTables.filter(t => !tk[t]); }
+function fcfsTakenMsg(dk, t, excludeId) {
+  const who = fcfsTaken(dk, excludeId)[t], open = fcfsOpen(dk, excludeId);
+  return '✕ Table '+t+' is already taken'+(who?' by '+who.name+' ('+displayTime(who.time)+')':'')+'. '
+    + (open.length ? 'Still open: Table '+open.join(', ')+'.' : 'All Tables 1–5 are taken.');
+}
 function specialDiningBannerHtml(d) {
   const sd = specialDiningDay(d); if (!sd) return '';
+  const dk = typeof d==='string' ? d : dateKey(d), tk = fcfsTaken(dk, null), open = fcfsOpen(dk, null);
+  const takenTxt = Object.keys(tk).sort().map(t => t+' ('+tk[t].name+')').join(', ');
+  const live = open.length
+    ? 'OPEN: Table '+open.join(', ')+(takenTxt ? '  ·  TAKEN: '+takenTxt : '')
+    : '⛔ ALL TABLES 1–5 TAKEN for 3:30–6:00';
   return '<div class="parade-banner"><div class="pb-title">🎄 '+escHtml(sd.title)+' 🎄</div>'
     + '<div class="pb-rule">'+escHtml(sd.rule)+'</div>'
+    + '<div class="pb-live">'+escHtml(live)+'</div>'
     + '<div class="pb-sub">'+escHtml(sd.sub)+'</div></div>';
-}
-function normTable(t) { return String(t||'').replace(/^\s*(table|tbl|t)\s*#?\s*/i,'').trim().toUpperCase(); }
-// true if this table + time falls in the first-come-first-serve block for that day
-function isFcfsConflict(d, table, time) {
-  const sd = specialDiningDay(d); if (!sd || !table || !time) return false;
-  return sd.fcfsTables.includes(normTable(table)) && time >= sd.fcfsStart && time < sd.fcfsEnd;
 }
 function tableBadgeHtml(dk, r) {
   if (!r || !r.table) return '';
-  const bad = isFcfsConflict(dk, r.table, r.time);
-  return '<span class="table-badge'+(bad?' fcfs':'')+'">🪑 Table '+escHtml(normTable(r.table))+(bad?' · FCFS!':'')+'</span>';
+  return '<span class="table-badge">🪑 Table '+escHtml(normTable(r.table))+'</span>';
 }
-function _onTableInput() {
-  const inp = document.getElementById('dTable'); if (!inp) return;
-  inp.classList.toggle('picked', !!inp.value.trim());
-  const w = document.getElementById('dTableWarn'), t = document.getElementById('dTime');
-  if (w) w.style.display = isFcfsConflict(currentDate, inp.value, t && t.value) ? 'block' : 'none';
+// Picker of tappable "Table 1".."Table 5" text buttons. Taken ones are crossed out.
+function tablePickerHtml(dk, time, selected, excludeId) {
+  const sd = specialDiningDay(dk); if (!sd) return '';
+  if (!inFcfsWindow(dk, time)) return '<div class="tbl-note">Tables 1–5 are only assigned for 3:30–6:00 bookings.</div>';
+  const tk = fcfsTaken(dk, excludeId), open = fcfsOpen(dk, excludeId);
+  if (!open.length) return '<div class="tbl-allfull">⛔ All Tables 1–5 are already taken for 3:30–6:00.<br>Can\'t book this time — pick 6:00 or later.</div>';
+  return '<div class="tbl-pick">' + sd.fcfsTables.map(t => {
+    const who = tk[t];
+    return '<button type="button" class="tbl-opt'+(who?' taken':'')+(selected===t&&!who?' sel':'')+'" data-tbl="'+t+'">Table '+t
+      + '<small>'+(who ? 'Taken · '+escHtml(who.name) : (selected===t ? '✓ Selected' : 'Open'))+'</small></button>';
+  }).join('') + '</div>';
+}
+// Shared validation used by saveDining. Returns an error string or ''.
+function fcfsValidate(dk, time, table, excludeId) {
+  if (!inFcfsWindow(dk, time)) return '';
+  const open = fcfsOpen(dk, excludeId);
+  if (!open.length) return '✕ All Tables 1–5 are already taken for 3:30–6:00. Pick 6:00 or later.';
+  if (!table) return 'Pick a table (1–5) for this 3:30–6:00 booking. Still open: Table '+open.join(', ')+'.';
+  if (!specialDiningDay(dk).fcfsTables.includes(table)) return 'From 3:30 to 6:00 the table must be 1–5.';
+  if (!open.includes(table)) return fcfsTakenMsg(dk, table, excludeId);
+  return '';
+}
+/* classic dining modal picker */
+let _dEditId = null;
+function _renderDTablePicker() {
+  const wrap = document.getElementById('dTableWrap'); if (!wrap) return;
+  const dk = dateKey(currentDate), time = document.getElementById('dTime').value, hid = document.getElementById('dTable');
+  if (!inFcfsWindow(dk, time)) hid.value = '';
+  else if (hid.value && !fcfsOpen(dk, _dEditId).includes(hid.value)) hid.value = '';
+  wrap.innerHTML = tablePickerHtml(dk, time, hid.value, _dEditId) + '<div class="tbl-msg" id="dTableMsg"></div>';
+  wrap.querySelectorAll('.tbl-opt').forEach(b => b.onclick = () => {
+    const t = b.dataset.tbl, msg = document.getElementById('dTableMsg');
+    if (b.classList.contains('taken')) { msg.textContent = fcfsTakenMsg(dk, t, _dEditId); msg.style.display = 'block'; return; }
+    hid.value = t; _renderDTablePicker();
+  });
 }
 function openDiningById(dk, id) { const r=(diningReservations[dk]||{})[id]; if (r) openDiningModal(Object.assign({id}, r)); }
 function closedPageHtml(dk) {
@@ -5407,9 +5468,9 @@ function openDiningModal(existing) {
   }).join('');
   const deleteBtn=existing?'<button class="btn-danger" onclick="deleteDining(\''+dateKey(currentDate)+'\',\''+existing.id+'\')">✕ Remove</button>':'';
   const sdDay=specialDiningDay(currentDate);
-  const tableRow=sdDay?'<div class="form-row"><label class="form-label">Table Number (type it)</label>'
-    +'<input class="form-input table-input'+(existing&&existing.table?' picked':'')+'" id="dTable" type="text" maxlength="6" autocomplete="off" placeholder="e.g. 7" value="'+escHtml(existing?normTable(existing.table):'')+'" oninput="_onTableInput()">'
-    +'<div class="table-fcfs-warn" id="dTableWarn">⚠ Tables 1–5 are FIRST COME FIRST SERVE from 3:30 to 6:00 today</div></div>':'';
+  _dEditId=existing?existing.id:null;
+  const tableRow=sdDay?'<div class="form-row"><label class="form-label">Table (3:30–6:00 · first come first serve)</label>'
+    +'<input type="hidden" id="dTable" value="'+escHtml(existing?normTable(existing.table):'')+'"><div id="dTableWrap"></div></div>':'';
   document.getElementById('modalBody').innerHTML=''
     +specialDiningBannerHtml(currentDate)
     +'<div class="form-row"><label class="form-label">Guest Name *</label>'
@@ -5417,7 +5478,7 @@ function openDiningModal(existing) {
     +'<div class="form-grid"><div class="form-row" style="margin:0"><label class="form-label">Party Size *</label>'
     +'<input class="form-input" id="dGuests" type="number" min="1" placeholder="3" value="'+(existing?existing.guests||'':'')+'"></div>'
     +'<div class="form-row" style="margin:0"><label class="form-label">Time *</label>'
-    +'<select class="form-select" id="dTime" onchange="_onTableInput()">'+timeOptions+'</select></div></div>'
+    +'<select class="form-select" id="dTime" onchange="_renderDTablePicker()">'+timeOptions+'</select></div></div>'
     +tableRow
     +'<div class="form-row"><label class="form-label">Phone</label>'
     +'<input class="form-input" id="dPhone" type="tel" placeholder="506-555-0100" value="'+escHtml(existing?existing.phone||'':'')+'"></div>'
@@ -5427,7 +5488,7 @@ function openDiningModal(existing) {
     +'<button class="btn-gold" onclick="saveDining(\''+dateKey(currentDate)+'\',\''+(existing?existing.id||'':'')+'\')">'+( existing?'✓ Update':'✓ Add to Dining')+'</button>'
     +deleteBtn;
   showModal();
-  if (sdDay) setTimeout(_onTableInput,0);
+  if (sdDay) _renderDTablePicker();
 }
 
 async function saveDining(dk,editId) {
@@ -5441,15 +5502,12 @@ async function saveDining(dk,editId) {
   if (!guests) return showErr('Party size required.');
   if (!time) return showErr('Time is required.');
   const data={name,guests,phone,notes,time,updatedAt:Date.now()};
-  const tEl=document.getElementById('dTable');
-  if (tEl && specialDiningDay(dk)) {
-    const table=normTable(sanitizeText(tEl.value, 6));
-    if (table) {
-      if (isFcfsConflict(dk, table, time) && !confirm('Table '+table+' is FIRST COME FIRST SERVE from 3:30 to 6:00 today (Christmas Parade).\n\nBook it anyway?')) return;
-      data.table=table;
-    }
-  } else if (editId) {
-    const prev=(diningReservations[dk]||{})[editId]; if (prev && prev.table) data.table=prev.table;
+  if (specialDiningDay(dk)) {
+    const tEl=document.getElementById('dTable');
+    const table=normTable(tEl?tEl.value:'');
+    const err=fcfsValidate(dk, time, table, editId||null);
+    if (err) return showErr(err);
+    if (inFcfsWindow(dk, time)) data.table=table;
   }
   try {
     if (editId) { await window._set(window._ref(window._db,`dining/${dk}/${editId}`),data); await logAudit('edit','Dining: '+name+' · '+guests+'p · '+displayTime(time)+(data.table?' · Table '+data.table:''),''); }
@@ -7143,10 +7201,15 @@ window._preloadAllReservations = preloadAllReservations;
     let h = specialDiningBannerHtml(k) + `<div class="i-q">What time?</div><div class="i-hint">Dining room, ${currentDate.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'})} for ${g}.</div><div class="i-group i-tpick">`;
     DINING_TIMES.forEach(t => {
       const have = diningAt(k,t).reduce((a,r)=>a+(Number(r.guests)||0),0), n = diningAt(k,t).length;
-      h += `<button type="button" class="i-trow${B.time===t?' sel':''}" data-t="${t}"><span class="i-tmcol"><span class="i-tm">${short(t)}</span></span><span class="i-mini">${have}p<span class="i-add">+${g}p = ${have+g}p</span></span><span class="i-st">${n?n+' table'+(n>1?'s':''):''}</span></button>`;
+      const fc = inFcfsWindow(k,t) ? fcfsOpen(k,null).length : -1;
+      const fcTxt = fc<0 ? '' : (fc ? ` · T1–5: ${fc} open` : ' · T1–5 FULL');
+      h += `<button type="button" class="i-trow${B.time===t?' sel':''}" data-t="${t}"${fc===0?' style="opacity:.45"':''}><span class="i-tmcol"><span class="i-tm">${short(t)}</span></span><span class="i-mini">${have}p<span class="i-add">+${g}p = ${have+g}p</span></span><span class="i-st">${n?n+' table'+(n>1?'s':''):''}${fcTxt}</span></button>`;
     });
     el.innerHTML = h + '</div>';
-    el.querySelectorAll('.i-trow').forEach(b => b.onclick = () => { B.time = b.dataset.t; go(3,'in'); });
+    el.querySelectorAll('.i-trow').forEach(b => b.onclick = () => {
+      if (inFcfsWindow(k, b.dataset.t) && !fcfsOpen(k,null).length) { toast('All Tables 1–5 are already taken for 3:30–6:00'); return; }
+      B.time = b.dataset.t; go(3,'in');
+    });
     const first = el.querySelector('.i-trow.sel') || [...el.querySelectorAll('.i-trow')].find(b => b.dataset.t >= '18:00');
     if (first) setTimeout(()=>first.scrollIntoView({block:'center'}), 60);
   }
@@ -7171,21 +7234,31 @@ window._preloadAllReservations = preloadAllReservations;
   function stepDNotes(el){
     const B = S.book, tags = ['Allergy','Birthday','Anniversary','High chair','Window'];
     const sdk = dateKey(currentDate), sdDay = specialDiningDay(sdk);
-    const tblHtml = sdDay ? `<div class="i-q" style="margin-top:4px">Table number</div><div class="i-field"><input id="iosDTable" class="table-input${B.table?' picked':''}" autocomplete="off" maxlength="6" placeholder="Type table # (e.g. 7)" value="${esc(B.table||'')}"></div><div class="table-fcfs-warn" id="iosDTableWarn" style="margin-bottom:10px">⚠ Tables 1–5 are FIRST COME FIRST SERVE from 3:30 to 6:00 today</div>` : '';
+    const needTbl = inFcfsWindow(sdk, B.time);
+    if (needTbl && B.table && !fcfsOpen(sdk,null).includes(B.table)) B.table = '';
+    const tblHtml = needTbl ? `<div class="i-q" style="margin-top:4px">Pick a table</div><div class="i-hint">3:30–6:00 · first come first serve</div><div id="iosDTblWrap" style="margin-bottom:14px"></div>` : '';
     el.innerHTML = `${tblHtml}<div class="i-q">Any notes?</div>${dSum()}<div class="i-chips">${tags.map(t=>`<button type="button" class="i-chip${B.noteTag===t?' sel':''}" data-t="${t}">${t}</button>`).join('')}</div>
       <div class="i-field"><textarea id="iosDNotes" placeholder="Allergies, preferences…">${esc(B.notes)}</textarea></div><div class="i-err" id="iosDErr"></div>
       <button type="button" class="i-btn" id="iosDSave">Book table</button>`;
     el.querySelectorAll('.i-chip').forEach(c => c.onclick = () => { B.noteTag = B.noteTag===c.dataset.t ? '' : c.dataset.t; el.querySelectorAll('.i-chip').forEach(x=>x.classList.toggle('sel', x.dataset.t===B.noteTag)); });
     $('iosDNotes').oninput = e => { B.notes = e.target.value; };
-    if (sdDay) {
-      const ti = $('iosDTable'), upd = () => { B.table = normTable(ti.value); ti.classList.toggle('picked', !!B.table); $('iosDTableWarn').style.display = isFcfsConflict(sdk, B.table, B.time) ? 'block' : 'none'; };
-      ti.oninput = upd; upd();
+    if (needTbl) {
+      const draw = () => {
+        const w = $('iosDTblWrap'); w.innerHTML = tablePickerHtml(sdk, B.time, B.table, null) + '<div class="tbl-msg" id="iosDTblMsg"></div>';
+        w.querySelectorAll('.tbl-opt').forEach(b => b.onclick = () => {
+          if (b.classList.contains('taken')) { const m = $('iosDTblMsg'); m.textContent = fcfsTakenMsg(sdk, b.dataset.tbl, null); m.style.display = 'block'; return; }
+          B.table = b.dataset.tbl; draw();
+        });
+      };
+      draw();
     }
     $('iosDSave').onclick = () => safe(saveDiningIos);
   }
   // Fills the tracker's own dining form invisibly and calls saveDining(), so the write is identical to the classic screen.
   async function saveDiningIos(){
     const B = S.book, dk = dateKey(currentDate), btn = $('iosDSave');
+    const tErr = fcfsValidate(dk, B.time, inFcfsWindow(dk,B.time) ? normTable(B.table) : '', null);
+    if (tErr) { const e = $('iosDErr'); if (e) e.textContent = tErr; return; }
     if (btn) btn.disabled = true;
     const notes = [B.noteTag, (B.notes||'').trim()].filter(Boolean).join(': ');
     document.body.classList.add('i-silent');
@@ -7193,7 +7266,7 @@ window._preloadAllReservations = preloadAllReservations;
       openDiningModal(null);
       $('dName').value = B.name; $('dGuests').value = B.party; $('dTime').value = B.time;
       $('dPhone').value = B.phone || ''; $('dNotes').value = notes;
-      if ($('dTable')) $('dTable').value = B.table || '';
+      if ($('dTable')) $('dTable').value = inFcfsWindow(dk,B.time) ? (B.table || '') : '';
       await saveDining(dk, '');
     } finally { document.body.classList.remove('i-silent'); }
     const stillOpen = $('modalOverlay').style.display !== 'none';
