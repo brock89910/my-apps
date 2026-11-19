@@ -2147,8 +2147,17 @@ const DOUBLE_GRILL_COMBINED_MAX  = 24;
 const DOUBLE_GRILL_MIN_GUESTS    = 15;
 const DOUBLE_GRILL_BLOCK_MINUTES = 120;
 const DOUBLE_GRILL_WARN_MINUTES  = 150;
-const OVERRIDE_MAX_GUESTS        = 42;
+const OVERRIDE_MAX_GUESTS        = 50;
 const LARGE_GROUP_PASSWORD_MIN   = 25; // parties of 25+ need the over-24 password
+/* ── Guest tally start times — on these dates the day's guest tally only counts
+   hibachi bookings at or after the given time (earlier bookings still show, they just aren't counted) ── */
+const TALLY_FROM_TIME = { '2026-12-02': '14:00' };
+function tallyRecs(dk, recs) {
+  const from = TALLY_FROM_TIME[dk];
+  if (!from) return recs;
+  const fromMin = timeToMinutes(from);
+  return recs.filter(r => r && r.slot && timeToMinutes(r.slot) >= fromMin);
+}
 const PWD_HASH_OVER24 = '25acb16856540e76e3d7646bc13427d5eb2511cba626de1000b56956af4cc117'; // 2017040334 — parties over 24
 const WARN_GUESTS                = 10;
 const COOK_BLOCK_MINUTES         = 60;
@@ -3332,7 +3341,7 @@ async function loadWeekData() {
       const vals=Object.values(data).filter(r=>r&&r.slot);
       const diningVals=Object.values(snapDining.val()||{});
       weekDataCache[dk]={
-        guests:vals.reduce((s,r)=>s+(r.guests||0),0),
+        guests:tallyRecs(dk,vals).reduce((s,r)=>s+(r.guests||0),0),
         bookings:vals.length,
         hasOverride:vals.some(r=>r.managerOverride||r.overrideBooked),
         hasLargeGroup:vals.some(r=>(r.guests||0)>=DOUBLE_GRILL_MIN_GUESTS),
@@ -3360,7 +3369,7 @@ function renderWeekStrip() {
     let guests=0,bookings=0;
     if (dk===dateKey(currentDate)&&reservations[dk]) {
       const all=Object.values(reservations[dk]||{});
-      bookings=all.length; guests=all.reduce((s,r)=>s+(r.guests||0),0);
+      bookings=all.length; guests=tallyRecs(dk,all.filter(r=>r&&r.slot)).reduce((s,r)=>s+(r.guests||0),0);
     } else if (weekDataCache[dk]!==undefined) {
       guests=weekDataCache[dk].guests; bookings=weekDataCache[dk].bookings;
     }
@@ -6483,7 +6492,7 @@ window._preloadAllReservations = preloadAllReservations;
   }
   function dayGuests(dk){
     const r = reservations[dk];
-    if (r) return Object.entries(r).filter(([id,v]) => id!=='__chefRemoved' && v && v.slot).reduce((a,[,v]) => a+(v.guests||0), 0);
+    if (r) return tallyRecs(dk, Object.entries(r).filter(([id,v]) => id!=='__chefRemoved' && v && v.slot).map(([,v]) => v)).reduce((a,v) => a+(v.guests||0), 0);
     const w = (typeof weekDataCache!=='undefined') ? weekDataCache[dk] : null;
     return w ? (w.guests||0) : 0;
   }
@@ -6547,7 +6556,7 @@ window._preloadAllReservations = preloadAllReservations;
     if (seg) seg.style.display = isClosedDate(key) ? 'none' : '';
     if (isClosedDate(key)) { $('iosStats').innerHTML = ''; $('iosSlots').innerHTML = iosClosedHTML(key, false); return; }
     const all = getAllResForDate(key).filter(r => r.slot);
-    const guests = all.reduce((a,r)=>a+(r.guests||0),0);
+    const guests = tallyRecs(key, all).reduce((a,r)=>a+(r.guests||0),0);
     $('iosStats').innerHTML = `<div class="i-stat"><b>${guests}</b><span>Guests</span></div><div class="i-stat"><b>${all.length}</b><span>Bookings</span></div><div class="i-stat"><b>${all.filter(r=>r.confirmed).length}</b><span>Confirmed</span></div>`;
     const box = $('iosSlots');
     const slots = slotsForDay();
